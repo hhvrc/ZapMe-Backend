@@ -1,0 +1,6 @@
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/hhvrc/ZapMe-Frontend
+[submodule "backend.tests/DataSet"]
+	path = backend.tests/DataSet
+	url = https://github.com/hhvrc/ZapMe-Backend-UnitTest-DataSet
