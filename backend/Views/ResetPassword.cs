@@ -17,7 +17,7 @@ public static class ResetPassword
                             EmailButton.Build("Reset password", resetPasswordUrl)
                         );
 
-        HtmlElement footer = EmailFooter.Build("HeavenVR", "Made in Norway ❤️", "ZapMe", "https://heavenvr.tech/zapme");
+        HtmlElement footer = EmailFooter.Build(Constants.AppCreator, Constants.MadeInText, Constants.AppName, Constants.MainPageUrl);
 
         HtmlElement document = EmailDocument.Build("Password reset request", "Password reset request", new HtmlElement[] { container }, footer, backgroundColor);
 

@@ -1,44 +1,70 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using ZapMe.Records;
 
 namespace ZapMe.Data.Models;
 
-public enum UserOnlineStatus
+public sealed class AccountEntity : IUserRecord
 {
-    Invisible,
-    DoNotDisturb,
-    Away,
-    Online,
-    DownBad
-}
-
-public sealed class UserEntity
-{
+    /// <inheritdoc/>
     public Guid Id { get; set; }
 
-    public required string UserName { get; set; }
+    /// <inheritdoc/>
+    public string UserName { get; set; } = null!;
 
-    public required string Email { get; set; }
+    /// <summary>
+    /// 
+    /// </summary>
+    public string Email { get; set; } = null!;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public bool EmailVerified { get; set; }
 
-    public required string PasswordHash { get; set; }
+    /// <summary>
+    /// 
+    /// </summary>
+    public string PasswordHash { get; set; } = null!;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public int AcceptedTosVersion { get; set; }
 
-    public Guid? ProfilePictureId { get; set; }
+    /// <inheritdoc/>
+    public Guid ProfilePictureId { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public ImageEntity? ProfilePicture { get; set; }
 
+    /// <inheritdoc/>
     public UserOnlineStatus OnlineStatus { get; set; }
-    public required string StatusText { get; set; }
 
+    /// <inheritdoc/>
+    public string OnlineStatusText { get; set; } = null!;
+
+    /// <summary>
+    /// 
+    /// </summary>
     public string? PasswordResetToken { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public DateTime? PasswordResetRequestedAt { get; set; }
 
+    /// <inheritdoc/>
     public DateTime CreatedAt { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public DateTime UpdatedAt { get; set; }
 
+    /// <inheritdoc/>
     public DateTime LastOnline { get; set; }
 
     public ICollection<SignInEntity>? SignIns { get; set; }
@@ -50,9 +76,9 @@ public sealed class UserEntity
     public ICollection<OAuthConnectionEntity>? OauthConnections { get; set; }
 }
 
-public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
+public sealed class UserEntityConfiguration : IEntityTypeConfiguration<AccountEntity>
 {
-    public void Configure(EntityTypeBuilder<UserEntity> builder)
+    public void Configure(EntityTypeBuilder<AccountEntity> builder)
     {
         builder.ToTable("users");
 
@@ -86,7 +112,7 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntit
         builder.Property(u => u.OnlineStatus)
             .HasColumnName("statusOnline");
 
-        builder.Property(u => u.StatusText)
+        builder.Property(u => u.OnlineStatusText)
             .HasColumnName("statusText")
             .HasMaxLength(128);
 

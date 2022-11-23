@@ -59,7 +59,7 @@ public interface ISignInManager
     /// <param name="password"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<SignInResult> PasswordSignInAsync(UserEntity user, string password, CancellationToken cancellationToken = default);
+    Task<SignInResult> PasswordSignInAsync(AccountEntity user, string password, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 

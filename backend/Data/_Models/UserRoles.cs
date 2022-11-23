@@ -6,7 +6,7 @@ namespace ZapMe.Data.Models;
 public sealed class UserRoleEntity
 {
     public Guid UserId { get; set; }
-    public required UserEntity User { get; set; }
+    public required AccountEntity User { get; set; }
 
     public required string RoleName { get; set; }
 

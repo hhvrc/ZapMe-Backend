@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using ZapMe.Attributes;
+using ZapMe.Controllers.Api.V1.User.Models;
 using ZapMe.Logic;
 
 namespace ZapMe.Controllers.Api.V1.Account.Models;
@@ -7,27 +8,17 @@ namespace ZapMe.Controllers.Api.V1.Account.Models;
 /// <summary>
 /// Account object, this can only retrieved for the user you are logged in as
 /// </summary>
-public struct AccountDto
+public class AccountDto : UserDto
 {
-    public AccountDto(Data.Models.UserEntity user)
+    public AccountDto(Data.Models.AccountEntity user)
+        : base(user)
     {
-        Id = user.Id;
-        UserName = user.UserName;
         ObscuredEmail = Transformers.ObscureEmail(user.Email);
         EmailVerified = user.EmailVerified;
+        AcceptedTosVersion = user.AcceptedTosVersion;
         ConnectedAccounts = user.OauthConnections?.Select(oc => oc.ProviderName).ToArray() ?? Array.Empty<string>();
         Friends = user.Relations?.Select(fs => fs.TargetUserId).ToArray() ?? Array.Empty<Guid>();
-        CreatedAt = user.CreatedAt;
     }
-
-    /// <summary/>
-    [JsonPropertyName("id")]
-    public Guid Id { get; set; }
-
-    /// <summary/>
-    [Username(false)]
-    [JsonPropertyName("username")]
-    public string UserName { get; set; }
 
     /// <summary>
     /// Obfuscated email of your account
@@ -43,6 +34,12 @@ public struct AccountDto
     public bool EmailVerified { get; set; }
 
     /// <summary>
+    /// 
+    /// </summary>
+    [JsonPropertyName("accepted_tos_version")]
+    public int AcceptedTosVersion { get; set; }
+
+    /// <summary>
     /// OAuth2 providers this account is connected to
     /// </summary>
     [JsonPropertyName("connected_accounts")]
@@ -53,10 +50,4 @@ public struct AccountDto
     /// </summary>
     [JsonPropertyName("friends")]
     public Guid[] Friends { get; set; }
-
-    /// <summary>
-    /// Date this account was created at
-    /// </summary>
-    [JsonPropertyName("created_at")]
-    public DateTime CreatedAt { get; set; }
 }

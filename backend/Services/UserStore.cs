@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 using ZapMe.Data;
 using ZapMe.Data.Models;
+using ZapMe.Records;
 using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Services;
@@ -20,15 +21,15 @@ public sealed class UserStore : IUserStore
         _logger = logger;
     }
 
-    public async Task<UserEntity?> TryCreateAsync(string username, string email, string passwordHash, CancellationToken cancellationToken)
+    public async Task<AccountEntity?> TryCreateAsync(string username, string email, string passwordHash, CancellationToken cancellationToken)
     {
-        var user = new UserEntity
+        var user = new AccountEntity
         {
             UserName = username,
             Email = email,
             PasswordHash = passwordHash,
             OnlineStatus = UserOnlineStatus.Online,
-            StatusText = String.Empty,
+            OnlineStatusText = String.Empty,
             UpdatedAt = DateTime.UtcNow
         };
 
@@ -50,10 +51,10 @@ public sealed class UserStore : IUserStore
         return null;
     }
 
-    public async Task<UserEntity?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
+    public async Task<AccountEntity?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
     {
         return await _cache.GetOrAddAsync("user:id:" + userId, async (_, ct) =>
-            new DTOs.HybridCacheEntry<UserEntity?>
+            new DTOs.HybridCacheEntry<AccountEntity?>
             {
                 Value = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId, ct),
                 ExpiresAtUtc = DateTime.UtcNow + TimeSpan.FromMinutes(5)
@@ -61,10 +62,10 @@ public sealed class UserStore : IUserStore
         , cancellationToken);
     }
 
-    public async Task<UserEntity?> GetByNameAsync(string userName, CancellationToken cancellationToken)
+    public async Task<AccountEntity?> GetByNameAsync(string userName, CancellationToken cancellationToken)
     {
         return await _cache.GetOrAddAsync("user:name:" + userName, async (_, ct) =>
-            new DTOs.HybridCacheEntry<UserEntity?>
+            new DTOs.HybridCacheEntry<AccountEntity?>
             {
                 Value = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == userName, ct),
                 ExpiresAtUtc = DateTime.UtcNow + TimeSpan.FromMinutes(5)
@@ -72,17 +73,17 @@ public sealed class UserStore : IUserStore
         , cancellationToken);
     }
 
-    public async Task<UserEntity?> GetByEmailAsync(string email, CancellationToken cancellationToken)
+    public async Task<AccountEntity?> GetByEmailAsync(string email, CancellationToken cancellationToken)
     {
         return await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
     }
 
-    public async Task<UserEntity?> GetByPasswordResetTokenAsync(string passwordResetToken, CancellationToken cancellationToken)
+    public async Task<AccountEntity?> GetByPasswordResetTokenAsync(string passwordResetToken, CancellationToken cancellationToken)
     {
         return await _dbContext.Users.FirstOrDefaultAsync(u => u.PasswordResetToken == passwordResetToken, cancellationToken);
     }
 
-    private async Task<bool> UpdateAsync(Expression<Func<UserEntity, bool>> whereSelector, Expression<Func<SetPropertyCalls<UserEntity>, SetPropertyCalls<UserEntity>>> setPropertyCalls, CancellationToken cancellationToken)
+    private async Task<bool> UpdateAsync(Expression<Func<AccountEntity, bool>> whereSelector, Expression<Func<SetPropertyCalls<AccountEntity>, SetPropertyCalls<AccountEntity>>> setPropertyCalls, CancellationToken cancellationToken)
     {
         try
         {
@@ -95,9 +96,9 @@ public sealed class UserStore : IUserStore
 
         return false;
     }
-    private Task<bool> UpdateAsync(Guid userId, Expression<Func<SetPropertyCalls<UserEntity>, SetPropertyCalls<UserEntity>>> setPropertyCalls, CancellationToken cancellationToken) =>
+    private Task<bool> UpdateAsync(Guid userId, Expression<Func<SetPropertyCalls<AccountEntity>, SetPropertyCalls<AccountEntity>>> setPropertyCalls, CancellationToken cancellationToken) =>
         UpdateAsync(u => u.Id == userId, setPropertyCalls, cancellationToken);
-    private Task<bool> UpdateAsync(string userName, Expression<Func<SetPropertyCalls<UserEntity>, SetPropertyCalls<UserEntity>>> setPropertyCalls, CancellationToken cancellationToken) =>
+    private Task<bool> UpdateAsync(string userName, Expression<Func<SetPropertyCalls<AccountEntity>, SetPropertyCalls<AccountEntity>>> setPropertyCalls, CancellationToken cancellationToken) =>
         UpdateAsync(u => u.UserName == userName, setPropertyCalls, cancellationToken);
 
     public Task<bool> SetUserNameAsync(Guid userId, string userName, CancellationToken cancellationToken) =>

@@ -2,7 +2,7 @@
 
 namespace ZapMe.Attributes;
 
-public interface IOpenApiAttribute
+public interface IParameterAttribute
 {
     void Apply(OpenApiSchema schema);
     void Apply(OpenApiParameter parameter);

@@ -5,7 +5,7 @@ namespace ZapMe.Views;
 
 public static class EmailDocument
 {
-    public static HtmlElement Build(string title, string previewText, IEnumerable<HtmlElement> children, HtmlElement footer, Color? backgroundColor = null)
+    public static HtmlElement Build(string title, string previewText, IEnumerable<HtmlElement> children, in HtmlElement footer, Color? backgroundColor = null)
     {
         backgroundColor ??= Color.FromArgb(246, 246, 246);
 

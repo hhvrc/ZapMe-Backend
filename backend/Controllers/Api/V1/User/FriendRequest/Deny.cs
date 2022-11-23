@@ -16,7 +16,7 @@ public partial class UserController
     [RequestSizeLimit(1024)]
     [HttpDelete("i/{userId}/friendrequest", Name = "DenyFriendRequest")]
     [Produces(Application.Json, Application.Xml)]
-    [ProducesResponseType(typeof(User.Models.User), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(User.Models.UserDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)]
     public IActionResult FriendRequestDeny([FromRoute] Guid userId)
     {

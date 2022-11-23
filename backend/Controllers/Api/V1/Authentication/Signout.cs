@@ -21,8 +21,6 @@ public partial class AuthenticationController
 
         await _signInManager.SignOutAsync(signIn.Id, cancellationToken);
 
-        Response.Cookies.Delete("access_token");
-
-        return Ok();
+        return SignOut();
     }
 }

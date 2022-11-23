@@ -12,7 +12,7 @@ public interface IUserStore
     /// <param name="passwordHash"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<UserEntity?> TryCreateAsync(string userName, string email, string passwordHash, CancellationToken cancellationToken = default);
+    Task<AccountEntity?> TryCreateAsync(string userName, string email, string passwordHash, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -20,7 +20,7 @@ public interface IUserStore
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<UserEntity?> GetByIdAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<AccountEntity?> GetByIdAsync(Guid userId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -28,7 +28,7 @@ public interface IUserStore
     /// <param name="userName"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<UserEntity?> GetByNameAsync(string userName, CancellationToken cancellationToken = default);
+    Task<AccountEntity?> GetByNameAsync(string userName, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -36,7 +36,7 @@ public interface IUserStore
     /// <param name="email"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<UserEntity?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
+    Task<AccountEntity?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -44,7 +44,7 @@ public interface IUserStore
     /// <param name="passwordResetToken"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<UserEntity?> GetByPasswordResetTokenAsync(string passwordResetToken, CancellationToken cancellationToken = default);
+    Task<AccountEntity?> GetByPasswordResetTokenAsync(string passwordResetToken, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 

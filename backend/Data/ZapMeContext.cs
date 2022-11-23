@@ -9,7 +9,7 @@ public sealed class ZapMeContext : DbContext
     {
     }
 
-    public required DbSet<UserEntity> Users { get; set; }
+    public required DbSet<AccountEntity> Users { get; set; }
     public required DbSet<ImageEntity> Images { get; set; }
     public required DbSet<SignInEntity> SignIns { get; set; }
     public required DbSet<LockOutEntity> LockOuts { get; set; }
@@ -22,7 +22,7 @@ public sealed class ZapMeContext : DbContext
     {
         modelBuilder.UseHiLo();
 
-        new UserEntityConfiguration().Configure(modelBuilder.Entity<UserEntity>());
+        new UserEntityConfiguration().Configure(modelBuilder.Entity<AccountEntity>());
         new ImageEntityConfiguration().Configure(modelBuilder.Entity<ImageEntity>());
         new SignInEntityConfiguration().Configure(modelBuilder.Entity<SignInEntity>());
         new LockOutEntityConfiguration().Configure(modelBuilder.Entity<LockOutEntity>());

@@ -6,7 +6,7 @@ namespace ZapMe.Data.Models;
 public sealed class OAuthConnectionEntity
 {
     public Guid UserId { get; set; }
-    public required UserEntity User { get; set; }
+    public required AccountEntity User { get; set; }
 
     public required string ProviderName { get; set; }
 

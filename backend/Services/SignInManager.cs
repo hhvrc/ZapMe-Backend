@@ -39,7 +39,7 @@ public sealed class SignInManager : ISignInManager
         return LockOutManager.IsLockedOutAsync(userId, cancellationToken);
     }
 
-    public async Task<SignInResult> PasswordSignInAsync(UserEntity user, string password, CancellationToken cancellationToken)
+    public async Task<SignInResult> PasswordSignInAsync(AccountEntity user, string password, CancellationToken cancellationToken)
     {
         if (password == null) throw new NullReferenceException(nameof(password));
 
@@ -48,7 +48,7 @@ public sealed class SignInManager : ISignInManager
             return SignInResultType.LockedOut;
         }
 
-        var result = UserManager.CheckPassword(user, password, cancellationToken);
+        var result = UserManager.CheckPassword(in user, password, cancellationToken);
         if (result != PasswordCheckResult.Success)
         {
             return result switch

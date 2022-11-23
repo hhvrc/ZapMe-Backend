@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using System.Security.Principal;
+using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.Data.Models;
 using ZapMe.Helpers;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -50,15 +54,17 @@ public partial class AuthenticationController
                 return this.Error_InternalServerError();
         }
 
-        Data.Models.SignInEntity signIn = signInResult.SignIn!;
-        Response.Cookies.Append("access_token", signIn.Id.ToString(), new CookieOptions
-        {
-            HttpOnly = true,
-            SameSite = SameSiteMode.Strict,
-            Secure = true,
-            Expires = signIn.ExpiresAt
-        });
+        AccountEntity user = signInResult.SignIn!.User;
 
-        return Ok(new Account.Models.AccountDto(signIn.User)); // TODO: use a mapper FFS
+        Claim[] claims = new[]{
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(ClaimTypes.Email, user.Email)
+        };
+
+        ClaimsIdentity identity = new(claims, ZapMeAuthenticationDefaults.AuthenticationScheme);
+        GenericPrincipal principal = new(identity, null); // TODO: implement roles
+
+        return SignIn(principal, ZapMeAuthenticationDefaults.AuthenticationScheme);
     }
 }

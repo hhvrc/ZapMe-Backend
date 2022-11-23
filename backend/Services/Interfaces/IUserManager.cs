@@ -23,7 +23,7 @@ public interface IUserManager
     /// <param name="password"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<UserEntity?> TryCreateAsync(string userName, string email, string password, CancellationToken cancellationToken = default);
+    Task<AccountEntity?> TryCreateAsync(string userName, string email, string password, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -39,7 +39,7 @@ public interface IUserManager
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<UserEntity?> GetByIdAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<AccountEntity?> GetByIdAsync(Guid userId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -47,7 +47,7 @@ public interface IUserManager
     /// <param name="userName"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<UserEntity?> GetByNameAsync(string userName, CancellationToken cancellationToken = default);
+    Task<AccountEntity?> GetByNameAsync(string userName, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -55,7 +55,7 @@ public interface IUserManager
     /// <param name="email"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<UserEntity?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
+    Task<AccountEntity?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -100,7 +100,7 @@ public interface IUserManager
     /// <param name="password"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    PasswordCheckResult CheckPassword(UserEntity user, string password, CancellationToken cancellationToken = default);
+    PasswordCheckResult CheckPassword(in AccountEntity user, string password, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 

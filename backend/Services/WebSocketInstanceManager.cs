@@ -7,7 +7,7 @@ namespace ZapMe.Services;
 
 public sealed class WebSocketInstanceManager : IWebSocketInstanceManager
 {
-    private static readonly ConcurrentDictionary<string, WebSocketInstance> _instances = new();
+    private static readonly ConcurrentDictionary<string, WebSocketInstance> _Instances = new();
 
     private readonly ILogger<WebSocketInstanceManager> _logger;
 
@@ -18,7 +18,7 @@ public sealed class WebSocketInstanceManager : IWebSocketInstanceManager
 
     public async Task<bool> RegisterInstanceAsync(Guid ownerId, string instanceId, WebSocketInstance instance, CancellationToken cancellationToken)
     {
-        if (!_instances.TryAdd(instanceId, instance))
+        if (!_Instances.TryAdd(instanceId, instance))
         {
             return false;
         }
@@ -29,7 +29,7 @@ public sealed class WebSocketInstanceManager : IWebSocketInstanceManager
         }
         catch
         {
-            _instances.Remove(instanceId, out _);
+            _Instances.Remove(instanceId, out _);
             await instance.CloseAsync(WebSocketCloseStatus.InternalServerError, "Failed to register instance", cancellationToken);
             throw;
         }
@@ -39,7 +39,7 @@ public sealed class WebSocketInstanceManager : IWebSocketInstanceManager
 
     public async Task RemoveInstanceAsync(string instanceId, string reason, CancellationToken cancellationToken)
     {
-        if (_instances.Remove(instanceId, out var instance) && instance != null)
+        if (_Instances.Remove(instanceId, out var instance) && instance != null)
         {
             await instance.CloseAsync(WebSocketCloseStatus.NormalClosure, reason, cancellationToken);
 

@@ -24,7 +24,7 @@ public sealed class DebounceService : IDebounceService
     private struct DebounceDisposableResponse
     {
         [JsonPropertyName("disposable")]
-        public bool IsDisposable { get; set; }
+        public string Disposable { get; set; }
     }
 
     public async Task<bool> IsDisposableEmailAsync(string email, CancellationToken cancellationToken)
@@ -35,10 +35,22 @@ public sealed class DebounceService : IDebounceService
             return false;
         }
 
-        using HttpResponseMessage response = await _httpClient.GetAsync("?email=" + anonymizedEmail, cancellationToken);
+        bool isDisposable;
 
-        DebounceDisposableResponse content = await response.Content.ReadFromJsonAsync<DebounceDisposableResponse>(cancellationToken: cancellationToken);
+        try
+        {
+            using HttpResponseMessage response = await _httpClient.GetAsync("?email=" + anonymizedEmail, cancellationToken);
 
-        return content.IsDisposable;
+            DebounceDisposableResponse content = await response.Content.ReadFromJsonAsync<DebounceDisposableResponse>(cancellationToken: cancellationToken);
+
+            isDisposable = Boolean.Parse(content.Disposable);
+        }
+        catch (Exception)
+        {
+            isDisposable = false;
+            _logger.LogError("disposable.io sent back invalid return for {}", anonymizedEmail);
+        }
+
+        return isDisposable;
     }
 }

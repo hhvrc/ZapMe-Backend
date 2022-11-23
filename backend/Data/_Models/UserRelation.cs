@@ -13,10 +13,10 @@ public enum UserRelationType
 public sealed class UserRelationEntity
 {
     public Guid SourceUserId { get; set; }
-    public required UserEntity SourceUser { get; set; }
+    public required AccountEntity SourceUser { get; set; }
 
     public Guid TargetUserId { get; set; }
-    public required UserEntity TargetUser { get; set; }
+    public required AccountEntity TargetUser { get; set; }
 
     public UserRelationType RelationType { get; set; }
 

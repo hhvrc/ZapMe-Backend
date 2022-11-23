@@ -18,23 +18,23 @@ public sealed class UserManager : IUserManager
         _logger = logger;
     }
 
-    public async Task<UserEntity?> TryCreateAsync(string userName, string email, string password, CancellationToken cancellationToken)
+    public async Task<AccountEntity?> TryCreateAsync(string userName, string email, string password, CancellationToken cancellationToken)
     {
         var passwordHash = PasswordHasher.HashPassword(password);
 
-        return await UserStore.TryCreateAsync(userName, email, passwordHash, cancellationToken);
+        return await UserStore.TryCreateAsync(userName.TrimAndMinifyWhiteSpaces(), email, passwordHash, cancellationToken);
     }
 
     public Task DeleteAsync(Guid userId, CancellationToken cancellationToken) => UserStore.DeleteAsync(userId, cancellationToken);
-    public Task<UserEntity?> GetByIdAsync(Guid userId, CancellationToken cancellationToken) => UserStore.GetByIdAsync(userId, cancellationToken);
-    public Task<UserEntity?> GetByNameAsync(string userName, CancellationToken cancellationToken) => UserStore.GetByNameAsync(userName, cancellationToken);
-    public Task<UserEntity?> GetByEmailAsync(string email, CancellationToken cancellationToken) => UserStore.GetByEmailAsync(email, cancellationToken);
+    public Task<AccountEntity?> GetByIdAsync(Guid userId, CancellationToken cancellationToken) => UserStore.GetByIdAsync(userId, cancellationToken);
+    public Task<AccountEntity?> GetByNameAsync(string userName, CancellationToken cancellationToken) => UserStore.GetByNameAsync(userName, cancellationToken);
+    public Task<AccountEntity?> GetByEmailAsync(string email, CancellationToken cancellationToken) => UserStore.GetByEmailAsync(email, cancellationToken);
     public Task<bool> SetUserNameAsync(Guid userId, string userName, CancellationToken cancellationToken) => UserStore.SetUserNameAsync(userId, userName, cancellationToken);
     public Task<bool> SetEmailAsync(Guid userId, string email, CancellationToken cancellationToken) => UserStore.SetEmailAsync(userId, email, cancellationToken);
     public Task<bool> SetPasswordAsync(Guid userId, string password, CancellationToken cancellationToken) => UserStore.SetPasswordHashAsync(userId, PasswordHasher.HashPassword(password), cancellationToken);
     public Task<bool> SetLastOnlineAsync(Guid userId, DateTime lastOnline, CancellationToken cancellationToken) => UserStore.SetLastOnlineAsync(userId, lastOnline, cancellationToken);
 
-    public PasswordCheckResult CheckPassword(UserEntity user, string password, CancellationToken cancellationToken)
+    public PasswordCheckResult CheckPassword(in AccountEntity user, string password, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(user, nameof(user));
 
@@ -73,7 +73,7 @@ public sealed class UserManager : IUserManager
     {
         bool result = false;
 
-        UserEntity? user = await UserStore.GetByPasswordResetTokenAsync(passwordResetToken, cancellationToken);
+        AccountEntity? user = await UserStore.GetByPasswordResetTokenAsync(passwordResetToken, cancellationToken);
         if (user?.PasswordResetRequestedAt.HasValue ?? false)
         {
             TimeSpan tokenAge = DateTime.UtcNow - user.PasswordResetRequestedAt.Value;

@@ -8,7 +8,7 @@ public sealed class LockOutEntity
     public Guid Id { get; set; }
 
     public Guid UserId { get; set; }
-    public required UserEntity User { get; set; }
+    public required AccountEntity User { get; set; }
 
     public string? Reason { get; set; }
 

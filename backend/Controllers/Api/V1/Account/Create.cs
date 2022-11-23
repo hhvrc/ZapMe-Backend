@@ -27,7 +27,7 @@ public partial class AccountController
     [HttpPost(Name = "CreateAccount")]
     [Consumes(Application.Json, Application.Xml)]
     [Produces(Application.Json, Application.Xml)]
-    [ProducesResponseType(typeof(Account.Models.AccountDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Account.Models.AccountDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status409Conflict)] // Username/email already taken
     public async Task<IActionResult> CreateAsync([FromBody] Account.Models.Create body, [FromServices] IGoogleReCaptchaService reCaptchaService, [FromServices] IDebounceService debounceService, CancellationToken cancellationToken)
@@ -68,15 +68,13 @@ public partial class AccountController
 
         await using TimeLock tl = TimeLock.FromSeconds(4, cancellationToken);
 
-        string username = body.UserName.TrimAndMinifyWhiteSpaces();
-
         // Create account
-        UserEntity? user = await _userManager.TryCreateAsync(username, body.Email, body.Password, cancellationToken);
+        AccountEntity? user = await _userManager.TryCreateAsync(body.UserName, body.Email, body.Password, cancellationToken);
         if (user == null)
         {
             return this.Error_InvalidModelState((nameof(body.UserName), "Username/Email already taken"), (nameof(body.Email), "Username/Email already taken"));
         }
 
-        return Ok(new Account.Models.AccountDto(user)); // TODO: use a mapper FFS
+        return Created("/api/v1/account", new Account.Models.AccountDto(user)); // TODO: use a mapper FFS
     }
 }

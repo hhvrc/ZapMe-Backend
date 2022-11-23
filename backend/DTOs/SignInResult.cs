@@ -12,26 +12,19 @@ public enum SignInResultType
     InternalServerError
 }
 
-public struct SignInResult
+public readonly struct SignInResult
 {
     public static SignInResult Success(SignInEntity signIn)
     {
-        return new SignInResult(SignInResultType.Success, signIn);
+        return new SignInResult { Result = SignInResultType.Success, SignIn = signIn };
     }
 
-
-    public SignInResult(SignInResultType resultType, SignInEntity? signIn = null)
-    {
-        Result = resultType;
-        SignIn = signIn;
-    }
-
-    public SignInResultType Result { get; }
-    public SignInEntity? SignIn { get; }
+    public readonly SignInResultType Result { get; init; }
+    public readonly SignInEntity? SignIn { get; init; }
 
     public static implicit operator SignInResult(SignInResultType resultType)
     {
-        return new SignInResult(resultType);
+        return new SignInResult { Result = resultType, SignIn = null };
     }
 }
 
