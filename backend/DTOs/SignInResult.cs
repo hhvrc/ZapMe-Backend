@@ -14,13 +14,13 @@ public enum SignInResultType
 
 public readonly struct SignInResult
 {
-    public static SignInResult Success(SignInEntity signIn)
+    public static SignInResult Success(SessionEntity session)
     {
-        return new SignInResult { Result = SignInResultType.Success, SignIn = signIn };
+        return new SignInResult { Result = SignInResultType.Success, SignIn = session };
     }
 
     public readonly SignInResultType Result { get; init; }
-    public readonly SignInEntity? SignIn { get; init; }
+    public readonly SessionEntity? SignIn { get; init; }
 
     public static implicit operator SignInResult(SignInResultType resultType)
     {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.Models;
-using ZapMe.Data.Models;
 using ZapMe.DTOs;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -23,9 +23,9 @@ public partial class AccountController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Delete([FromHeader] string password, [FromQuery] string? reason, CancellationToken cancellationToken)
     {
-        SignInEntity signIn = this.GetSignIn()!;
+        ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 
-        PasswordCheckResult result = _userManager.CheckPassword(signIn.User, password, cancellationToken);
+        PasswordCheckResult result = _userManager.CheckPassword(session.User, password, cancellationToken);
         switch (result)
         {
             case PasswordCheckResult.Success:
@@ -37,7 +37,7 @@ public partial class AccountController
                 return this.Error_InternalServerError();
         }
 
-        await _userManager.DeleteAsync(signIn.UserId, cancellationToken);
+        await _userManager.DeleteAsync(session.UserId, cancellationToken);
 
         // TODO: register reason if supplied
 

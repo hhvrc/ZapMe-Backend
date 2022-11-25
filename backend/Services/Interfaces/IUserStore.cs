@@ -41,6 +41,14 @@ public interface IUserStore
     /// <summary>
     /// 
     /// </summary>
+    /// <param name="userNameOrEmail"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<AccountEntity?> GetByUsernameOrEmail(string userNameOrEmail, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 
+    /// </summary>
     /// <param name="passwordResetToken"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>

@@ -11,7 +11,7 @@ public sealed class ZapMeContext : DbContext
 
     public required DbSet<AccountEntity> Users { get; set; }
     public required DbSet<ImageEntity> Images { get; set; }
-    public required DbSet<SignInEntity> SignIns { get; set; }
+    public required DbSet<SessionEntity> Sessions { get; set; }
     public required DbSet<LockOutEntity> LockOuts { get; set; }
     public required DbSet<UserRoleEntity> UserRoles { get; set; }
     public required DbSet<UserRelationEntity> UserRelations { get; set; }
@@ -24,7 +24,7 @@ public sealed class ZapMeContext : DbContext
 
         new UserEntityConfiguration().Configure(modelBuilder.Entity<AccountEntity>());
         new ImageEntityConfiguration().Configure(modelBuilder.Entity<ImageEntity>());
-        new SignInEntityConfiguration().Configure(modelBuilder.Entity<SignInEntity>());
+        new SessionConfiguration().Configure(modelBuilder.Entity<SessionEntity>());
         new LockOutEntityConfiguration().Configure(modelBuilder.Entity<LockOutEntity>());
         new UserRoleEntityConfiguration().Configure(modelBuilder.Entity<UserRoleEntity>());
         new UserRelationEntityConfiguration().Configure(modelBuilder.Entity<UserRelationEntity>());

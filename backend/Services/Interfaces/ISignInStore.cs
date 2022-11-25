@@ -5,25 +5,25 @@ namespace ZapMe.Services.Interfaces;
 /// <summary>
 /// Represents a store for sign in entities.
 /// </summary>
-public interface ISignInStore
+public interface ISessionStore
 {
     /// <summary>
     /// 
     /// </summary>
     /// <param name="userId"></param>
-    /// <param name="deviceName"></param>
+    /// <param name="sessionName"></param>
     /// <param name="expiresAt"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<SignInEntity?> TryCreateAsync(Guid userId, string deviceName, DateTime expiresAt, CancellationToken cancellationToken = default);
+    Task<SessionEntity?> TryCreateAsync(Guid userId, string sessionName, DateTime expiresAt, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="signInId"></param>
+    /// <param name="sessionId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<SignInEntity?> GetByIdAsync(Guid signInId, CancellationToken cancellationToken = default);
+    Task<SessionEntity?> GetByIdAsync(Guid sessionId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -31,24 +31,24 @@ public interface ISignInStore
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<SignInEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<SessionEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="signInId"></param>
+    /// <param name="sessionId"></param>
     /// <param name="expiresAt"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> SetExipresAtAsync(Guid signInId, DateTime expiresAt, CancellationToken cancellationToken = default);
+    Task<bool> SetExipresAtAsync(Guid sessionId, DateTime expiresAt, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="signInId"></param>
+    /// <param name="sessionId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> DeleteAsync(Guid signInId, CancellationToken cancellationToken);
+    Task<bool> DeleteAsync(Guid sessionId, CancellationToken cancellationToken);
 
     /// <summary>
     /// 
@@ -56,5 +56,5 @@ public interface ISignInStore
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> DeleteAllAsync(Guid userId, CancellationToken cancellationToken);
+    Task<int> DeleteAllAsync(Guid userId, CancellationToken cancellationToken);
 }

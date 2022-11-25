@@ -17,11 +17,8 @@ partial class App
                 cookie.IsEssential = true;
                 cookie.SameSite = SameSiteMode.Strict;
                 cookie.SecurePolicy = CookieSecurePolicy.Always;
-                cookie.MaxAge = TimeSpan.FromDays(30);
-
-                // CookieAuthenticationOptions
-                opt.ExpireTimeSpan = TimeSpan.FromDays(30);
-                opt.SlidingExpiration = true;
+                cookie.MaxAge = opt.ExpiresTimeSpanSession;
+                cookie.Expiration = opt.ExpiresTimeSpanSession;
             })
             .AddGoogle(opt =>
             {

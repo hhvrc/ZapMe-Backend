@@ -4,11 +4,20 @@ namespace Microsoft.AspNetCore.Http;
 
 public static class IHeaderDictionaryExtensions
 {
+    public static string? GetFirst(this IHeaderDictionary headers, string name)
+    {
+        if (headers.TryGetValue(name, out StringValues values))
+        {
+            return values.FirstOrDefault();
+        }
+
+        return null;
+    }
     public static StringValues GetPrefferedHeader(this IHeaderDictionary headers, params string[] names)
     {
-        foreach (var name in names)
+        foreach (string name in names)
         {
-            if (headers.TryGetValue(name, out var value) && value.Any())
+            if (headers.TryGetValue(name, out StringValues value) && value.Any())
             {
                 return value;
             }

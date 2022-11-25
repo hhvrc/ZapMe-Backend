@@ -19,15 +19,21 @@ partial class App
 
         Services.AddTransient<IHybridCache, HybridCache>();
         Services.AddTransient<IPasswordHasher, PasswordHasher>();
+
         Services.AddTransient<IUserStore, UserStore>();
         Services.AddTransient<IUserManager, UserManager>();
-        Services.AddTransient<ISignInStore, SignInStore>();
+
+        Services.AddTransient<ISessionStore, SessionStore>();
+        Services.AddTransient<ISessionManager, SessionManager>();
+
         Services.AddTransient<ILockOutStore, LockOutStore>();
         Services.AddTransient<ILockOutManager, LockOutManager>();
-        Services.AddTransient<ISignInManager, SignInManager>();
+
         Services.AddTransient<IUserRelationStore, UserRelationStore>();
-        Services.AddTransient<IFriendRequestStore, FriendRequestStore>();
         Services.AddTransient<IUserRelationManager, UserRelationManager>();
+
+        Services.AddTransient<IFriendRequestStore, FriendRequestStore>();
+
         Services.AddTransient<IWebSocketInstanceManager, WebSocketInstanceManager>();
     }
 }

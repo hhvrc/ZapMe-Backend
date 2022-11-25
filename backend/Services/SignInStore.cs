@@ -5,54 +5,54 @@ using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Services;
 
-public sealed class SignInStore : ISignInStore
+public sealed class SessionStore : ISessionStore
 {
     private readonly ZapMeContext _dbContext;
-    private readonly ILogger<SignInStore> _logger;
+    private readonly ILogger<SessionStore> _logger;
 
-    public SignInStore(ZapMeContext dbContext, ILogger<SignInStore> logger)
+    public SessionStore(ZapMeContext dbContext, ILogger<SessionStore> logger)
     {
         _dbContext = dbContext;
         _logger = logger;
     }
 
 
-    public async Task<SignInEntity?> TryCreateAsync(Guid userId, string deviceName, DateTime expiresAt, CancellationToken cancellationToken)
+    public async Task<SessionEntity?> TryCreateAsync(Guid userId, string sessionName, DateTime expiresAt, CancellationToken cancellationToken)
     {
-        var signIn = new SignInEntity
+        SessionEntity session = new SessionEntity
         {
             User = null!, // TODO: wtf do i do now? ask on C# discord
             UserId = userId,
-            DeviceName = deviceName,
+            Name = sessionName,
             ExpiresAt = expiresAt
         };
 
-        await _dbContext.SignIns.AddAsync(signIn, cancellationToken);
+        await _dbContext.Sessions.AddAsync(session, cancellationToken);
         int nAdded = await _dbContext.SaveChangesAsync(cancellationToken);
 
         if (nAdded > 0)
         {
-            return await GetByIdAsync(signIn.Id, cancellationToken);
+            return await GetByIdAsync(session.Id, cancellationToken);
         }
 
         return null;
     }
 
-    public async Task<SignInEntity?> GetByIdAsync(Guid signInId, CancellationToken cancellationToken)
+    public async Task<SessionEntity?> GetByIdAsync(Guid sessionId, CancellationToken cancellationToken)
     {
-        return await _dbContext.SignIns.Include(static s => s.User).FirstOrDefaultAsync(s => s.Id == signInId, cancellationToken);
+        return await _dbContext.Sessions.Include(static s => s.User).FirstOrDefaultAsync(s => s.Id == sessionId, cancellationToken);
     }
 
-    public async Task<SignInEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken)
+    public async Task<SessionEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken)
     {
-        return await _dbContext.SignIns.Where(s => s.UserId == userId).ToArrayAsync(cancellationToken);
+        return await _dbContext.Sessions.Where(s => s.UserId == userId).ToArrayAsync(cancellationToken);
     }
 
-    public async Task<bool> SetExipresAtAsync(Guid signInId, DateTime expiresAt, CancellationToken cancellationToken = default)
+    public async Task<bool> SetExipresAtAsync(Guid sessionId, DateTime expiresAt, CancellationToken cancellationToken = default)
     {
         try
         {
-            return await _dbContext.SignIns.Where(s => s.Id == signInId).ExecuteUpdateAsync(s => s.SetProperty(static s => s.ExpiresAt, _ => expiresAt), cancellationToken) > 0;
+            return await _dbContext.Sessions.Where(s => s.Id == sessionId).ExecuteUpdateAsync(s => s.SetProperty(static s => s.ExpiresAt, _ => expiresAt), cancellationToken) > 0;
         }
         catch (DbUpdateException)
         {
@@ -61,11 +61,11 @@ public sealed class SignInStore : ISignInStore
         return false;
     }
 
-    public async Task<bool> DeleteAsync(Guid signInId, CancellationToken cancellationToken)
+    public async Task<bool> DeleteAsync(Guid sessionId, CancellationToken cancellationToken)
     {
         try
         {
-            return await _dbContext.SignIns.Where(s => s.Id == signInId).ExecuteDeleteAsync(cancellationToken) > 0;
+            return await _dbContext.Sessions.Where(s => s.Id == sessionId).ExecuteDeleteAsync(cancellationToken) > 0;
         }
         catch (DbUpdateException)
         {
@@ -74,16 +74,16 @@ public sealed class SignInStore : ISignInStore
         return false;
     }
 
-    public async Task<bool> DeleteAllAsync(Guid userId, CancellationToken cancellationToken)
+    public async Task<int> DeleteAllAsync(Guid userId, CancellationToken cancellationToken)
     {
         try
         {
-            return await _dbContext.SignIns.Where(s => s.UserId == userId).ExecuteDeleteAsync(cancellationToken) > 0;
+            return await _dbContext.Sessions.Where(s => s.UserId == userId).ExecuteDeleteAsync(cancellationToken);
         }
         catch (DbUpdateException)
         {
         }
 
-        return false;
+        return 0;
     }
 }

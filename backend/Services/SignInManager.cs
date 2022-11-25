@@ -1,107 +1,57 @@
 ﻿using ZapMe.Data.Models;
-using ZapMe.DTOs;
 using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Services;
 
-public sealed class SignInManager : ISignInManager
+public sealed class SessionManager : ISessionManager
 {
-    public ISignInStore SignInStore { get; }
-    public ILockOutManager LockOutManager { get; }
-    public IUserManager UserManager { get; }
-    private readonly ILogger<SignInManager> _logger;
+    public ISessionStore SignInStore { get; }
+    private readonly ILogger<SessionManager> _logger;
 
-    public SignInManager(ISignInStore signInStore, ILockOutManager lockOutManager, IUserManager userManager, ILogger<SignInManager> logger)
+    public SessionManager(ISessionStore sessionStore, ILogger<SessionManager> logger)
     {
-        SignInStore = signInStore;
-        LockOutManager = lockOutManager;
-        UserManager = userManager;
+        SignInStore = sessionStore;
         _logger = logger;
     }
 
-    public async Task<SignInEntity?> TryGetSignInAsync(Guid signInId, CancellationToken cancellationToken)
+    /// <inheritdoc/>
+    public Task<SessionEntity?> GetSignInAsync(Guid sessionId, CancellationToken cancellationToken) => SignInStore.GetByIdAsync(sessionId, cancellationToken);
+
+    /// <inheritdoc/>
+    public Task<SessionEntity?> SignInAsync(Guid userId, string deviceName, TimeSpan expiresIn, CancellationToken cancellationToken) => SignInStore.TryCreateAsync(userId, deviceName, DateTime.UtcNow + expiresIn, cancellationToken);
+
+    /// <inheritdoc/>
+    public Task<bool> RefreshSignInAsync(Guid sessionId, TimeSpan expiresIn, CancellationToken cancellationToken) => SignInStore.SetExipresAtAsync(sessionId, DateTime.UtcNow + expiresIn, cancellationToken);
+
+    /// <inheritdoc/>
+    public Task<bool> SignOutAsync(Guid sessionId, CancellationToken cancellationToken) => SignInStore.DeleteAsync(sessionId, cancellationToken);
+
+    /// <inheritdoc/>
+    public Task<int> SignOutAllAsync(Guid userId, CancellationToken cancellationToken) => SignInStore.DeleteAllAsync(userId, cancellationToken);
+
+    /// <inheritdoc/>
+    public async Task<bool> IsValidAsync(Guid sessionId, CancellationToken cancellationToken)
     {
-        return await SignInStore.GetByIdAsync(signInId, cancellationToken);
+        SessionEntity? session = await SignInStore.GetByIdAsync(sessionId, cancellationToken);
+        if (session is null)
+        {
+            return false;
+        }
+
+        if (session.IsExpired)
+        {
+            await SignInStore.DeleteAsync(session.Id, cancellationToken);
+            return false;
+        }
+
+        return true;
     }
 
-    public async Task<bool> IsValidAsync(Guid signInId, CancellationToken cancellationToken)
-    {
-        return (await SignInStore.GetByIdAsync(signInId, cancellationToken))?.IsValid ?? false;
-    }
-
+    /// <inheritdoc/>
     public async Task<bool> IsSignedInAsync(Guid userId, CancellationToken cancellationToken)
     {
-        return (await SignInStore.ListByUserAsync(userId, cancellationToken))?.Where(s => s.ExpiresAt < DateTime.UtcNow).Any() ?? false;
-    }
+        SessionEntity[] sessions = await SignInStore.ListByUserAsync(userId, cancellationToken);
 
-    public Task<bool> IsLockedOutAsync(Guid userId, CancellationToken cancellationToken)
-    {
-        return LockOutManager.IsLockedOutAsync(userId, cancellationToken);
-    }
-
-    public async Task<SignInResult> PasswordSignInAsync(AccountEntity user, string password, CancellationToken cancellationToken)
-    {
-        if (password == null) throw new NullReferenceException(nameof(password));
-
-        if (await LockOutManager.IsLockedOutAsync(user.Id, cancellationToken))
-        {
-            return SignInResultType.LockedOut;
-        }
-
-        var result = UserManager.CheckPassword(in user, password, cancellationToken);
-        if (result != PasswordCheckResult.Success)
-        {
-            return result switch
-            {
-                PasswordCheckResult.UserNotFound => SignInResultType.UserNotFound,
-                PasswordCheckResult.PasswordInvalid => SignInResultType.PasswordInvalid,
-                _ => throw new NotImplementedException($"Value: {result}")
-            };
-        }
-
-        var signIn = await SignInStore.TryCreateAsync(user.Id, "a", DateTime.UtcNow + TimeSpan.FromMinutes(30), cancellationToken);
-        if (signIn == null)
-        {
-            _logger.LogCritical("SignIn is null!");
-            return SignInResultType.InternalServerError;
-        }
-
-        return SignInResult.Success(signIn);
-    }
-
-    public async Task<SignInResult> PasswordSignInAsync(Guid userId, string password, CancellationToken cancellationToken)
-    {
-        if (password == null) throw new NullReferenceException(nameof(password));
-
-        var user = await UserManager.GetByIdAsync(userId, cancellationToken);
-        if (user == null) return SignInResultType.UserNotFound;
-
-        return await PasswordSignInAsync(user, password, cancellationToken);
-    }
-
-    public async Task<SignInResult> PasswordSignInAsync(string userName, string password, CancellationToken cancellationToken)
-    {
-        if (userName == null) throw new NullReferenceException(nameof(userName));
-        if (password == null) throw new NullReferenceException(nameof(password));
-
-        var user = await UserManager.GetByNameAsync(userName, cancellationToken);
-        if (user == null) return SignInResultType.UserNotFound;
-
-        return await PasswordSignInAsync(user, password, cancellationToken);
-    }
-
-    public async Task RefreshSignInAsync(Guid signInId, CancellationToken cancellationToken)
-    {
-        await SignInStore.SetExipresAtAsync(signInId, DateTime.UtcNow + TimeSpan.FromMinutes(30), cancellationToken);
-    }
-
-    public Task SignOutAsync(Guid signInId, CancellationToken cancellationToken) => SignInStore.DeleteAsync(signInId, cancellationToken);
-    public Task SignOutAllAsync(Guid userId, CancellationToken cancellationToken) => SignInStore.DeleteAllAsync(userId, cancellationToken);
-
-    public Task LockoutAsync(Guid userId, string? reason, string flags, DateTime? expiresAt, CancellationToken cancellationToken) => LockOutManager.LockOutAsync(userId, reason, flags, expiresAt, cancellationToken);
-
-    public Task ResetLockoutAsync(Guid userId, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
+        return sessions.Any(session => !session.IsExpired);
     }
 }

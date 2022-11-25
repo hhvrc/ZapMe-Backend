@@ -27,8 +27,9 @@ public sealed class UserManager : IUserManager
 
     public Task DeleteAsync(Guid userId, CancellationToken cancellationToken) => UserStore.DeleteAsync(userId, cancellationToken);
     public Task<AccountEntity?> GetByIdAsync(Guid userId, CancellationToken cancellationToken) => UserStore.GetByIdAsync(userId, cancellationToken);
-    public Task<AccountEntity?> GetByNameAsync(string userName, CancellationToken cancellationToken) => UserStore.GetByNameAsync(userName, cancellationToken);
+    public Task<AccountEntity?> GetByUsernameAsync(string userName, CancellationToken cancellationToken) => UserStore.GetByNameAsync(userName, cancellationToken);
     public Task<AccountEntity?> GetByEmailAsync(string email, CancellationToken cancellationToken) => UserStore.GetByEmailAsync(email, cancellationToken);
+    public Task<AccountEntity?> GetByUsernameOrEmail(string userNameOrEmail, CancellationToken cancellationToken) => UserStore.GetByUsernameOrEmail(userNameOrEmail, cancellationToken);
     public Task<bool> SetUserNameAsync(Guid userId, string userName, CancellationToken cancellationToken) => UserStore.SetUserNameAsync(userId, userName, cancellationToken);
     public Task<bool> SetEmailAsync(Guid userId, string email, CancellationToken cancellationToken) => UserStore.SetEmailAsync(userId, email, cancellationToken);
     public Task<bool> SetPasswordAsync(Guid userId, string password, CancellationToken cancellationToken) => UserStore.SetPasswordHashAsync(userId, PasswordHasher.HashPassword(password), cancellationToken);

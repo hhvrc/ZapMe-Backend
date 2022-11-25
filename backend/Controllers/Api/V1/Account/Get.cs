@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.Models;
-using ZapMe.Data.Models;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
@@ -19,8 +19,8 @@ public partial class AccountController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)]
     public IActionResult Get()
     {
-        SignInEntity signIn = this.GetSignIn()!;
+        ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 
-        return Ok(new Account.Models.AccountDto(signIn.User)); // TODO: use a mapper FFS
+        return Ok(new Account.Models.AccountDto(session.User)); // TODO: use a mapper FFS
     }
 }

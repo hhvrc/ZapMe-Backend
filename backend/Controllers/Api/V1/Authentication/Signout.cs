@@ -17,9 +17,9 @@ public partial class AuthenticationController
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> SignOut(CancellationToken cancellationToken)
     {
-        SignInEntity signIn = this.GetSignIn()!;
+        SessionEntity session = this.GetSignIn()!;
 
-        await _signInManager.SignOutAsync(signIn.Id, cancellationToken);
+        await _sessionManager.SignOutAsync(session.Id, cancellationToken);
 
         return SignOut();
     }

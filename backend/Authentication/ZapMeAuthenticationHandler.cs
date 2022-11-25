@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
-using System.Security.Principal;
 using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
 
@@ -13,19 +12,22 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
     private HttpContext _context = default!;
     private ZapMeAuthenticationOptions _options = default!;
     private Task<AuthenticateResult>? _authenticateTask = null;
-    private readonly ISignInManager _signInManager;
+    private readonly ISessionStore _sessionStore;
     private readonly IOptionsMonitor<ZapMeAuthenticationOptions> _optionsMonitor;
     private readonly ILogger<ZapMeAuthenticationHandler> _logger;
 
-    public ZapMeAuthenticationHandler(ISignInManager signInManager, IOptionsMonitor<ZapMeAuthenticationOptions> optionsMonitor, ILogger<ZapMeAuthenticationHandler> logger)
+    public ZapMeAuthenticationHandler(IUserManager userManager, ISessionStore sessionStore, ILockOutManager lockOutManager, IOptionsMonitor<ZapMeAuthenticationOptions> optionsMonitor, ILogger<ZapMeAuthenticationHandler> logger)
     {
-        _signInManager = signInManager;
+        _userManager = userManager;
+        _sessionStore = sessionStore;
+        _lockOutManager = lockOutManager;
         _optionsMonitor = optionsMonitor;
         _logger = logger;
     }
 
     private HttpRequest Request => _context.Request;
     private HttpResponse Response => _context.Response;
+    private string CookieName => _options.Cookie.Name ?? throw new InvalidOperationException("Cookie name cannot be null");
 
     public Task InitializeAsync(AuthenticationScheme scheme, HttpContext context)
     {
@@ -36,39 +38,84 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
         return Task.CompletedTask;
     }
 
+    public async Task SignInAsync(ClaimsPrincipal claimsIdentity, AuthenticationProperties? properties)
+    {
+        ArgumentNullException.ThrowIfNull(claimsIdentity, "ClaimsPrincipal cannot be null.");
+
+        if (claimsIdentity is not ZapMePrincipal user)
+        {
+            throw new InvalidOperationException("Invalid user type");
+        }
+
+        ZapMeIdentity identity = user.Identity;
+        ArgumentNullException.ThrowIfNull(identity, "The identity cannot be null.");
+
+        if (identity.AuthenticationType != _scheme.Name)
+        {
+            if (!identity.IsAuthenticated)
+            {
+                throw new ArgumentException("The identity must be authenticated.", nameof(claimsIdentity));
+            }
+
+            throw new ArgumentException("The identity must be authenticated using the same scheme.", nameof(claimsIdentity));
+        }
+
+        SignInProperties sessionProperties = identity.SignInProperties;
+        ArgumentNullException.ThrowIfNull(sessionProperties, "The SignInProperties cannot be null.");
+
+        TimeSpan expiresIn = _options.ExpiresTimeSpanSession;
+        if (sessionProperties.RememberMe)
+        {
+            expiresIn = _options.ExpiresTimeSpanRemembered;
+        }
+        DateTime expiresAt = DateTime.UtcNow.Add(expiresIn);
+
+        SessionEntity? session = await _sessionStore.TryCreateAsync(identity.UserId, sessionProperties.SessionName, expiresAt, _context.RequestAborted);
+        if (session == null)
+        {
+            throw new InvalidOperationException("SignIn cannot be null.");
+        }
+
+        Response.StatusCode = StatusCodes.Status200OK;
+        Response.Cookies.Append(
+            CookieName,
+            session.Id.ToString(),
+            _options.Cookie.Build(_context)
+        );
+    }
+
+    public Task SignOutAsync(AuthenticationProperties? properties)
+    {
+        Response.Cookies.Delete(CookieName, _options.Cookie.Build(_context));
+
+        return Task.CompletedTask;
+    }
+
     private async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        if (!Request.Cookies.TryGetValue(Constants.LoginCookieName, out string? accessToken))
+        if (!Request.Cookies.TryGetValue(Constants.LoginCookieName, out string? sessionIdString))
             return AuthenticateResult.NoResult();
 
-        if (String.IsNullOrEmpty(accessToken))
+        if (String.IsNullOrEmpty(sessionIdString))
             return AuthenticateResult.Fail("Empty Login Cookie");
 
-        if (!Guid.TryParse(accessToken, out Guid signInId))
+        if (!Guid.TryParse(sessionIdString, out Guid sessionId))
             return AuthenticateResult.Fail("Malformed Login Cookie");
 
-        SignInEntity? signIn = await _signInManager.TryGetSignInAsync(signInId);
-        if (signIn == null)
+        SessionEntity? session = await _sessionStore.GetByIdAsync(sessionId, _context.RequestAborted);
+        if (session == null)
             return AuthenticateResult.Fail("Invalid Login Cookie");
 
-        if (!signIn.IsValid)
+        if (session.IsExpired)
             return AuthenticateResult.Fail("Expired Login Cookie");
 
-        _context.SetSignIn(signIn);
+        // TODO: some kinda refresh logic for the cookie if it's half way expired
 
-        AccountEntity user = signIn.User;
+        ZapMePrincipal principal = new ZapMePrincipal(session.User);
 
-        Claim[] claims = new[]{
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(ClaimTypes.Email, user.Email)
-        };
+        _context.User = principal; // TODO: is this needed?
 
-        ClaimsIdentity identity = new(claims, _scheme.Name);
-        GenericPrincipal principal = new(identity, null); // TODO: implement roles
-        AuthenticationTicket ticket = new(principal, _scheme.Name);
-
-        return AuthenticateResult.Success(ticket);
+        return AuthenticateResult.Success(new AuthenticationTicket(principal, ZapMeAuthenticationDefaults.AuthenticationScheme));
     }
 
     public Task<AuthenticateResult> AuthenticateAsync()
@@ -88,20 +135,4 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
         Response.StatusCode = StatusCodes.Status403Forbidden;
         return Task.CompletedTask;
     }
-
-    public Task SignInAsync(ClaimsPrincipal user, AuthenticationProperties? properties)
-    {
-        return Task.CompletedTask;
-    }
-
-    public Task SignOutAsync(AuthenticationProperties? properties)
-    {
-        return Task.CompletedTask;
-    }
-
-    public Task HandleChallengeAsync(AuthenticationProperties properties)
-    {
-        return Task.CompletedTask;
-    }
-
 }

@@ -47,7 +47,7 @@ public interface IUserManager
     /// <param name="userName"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<AccountEntity?> GetByNameAsync(string userName, CancellationToken cancellationToken = default);
+    Task<AccountEntity?> GetByUsernameAsync(string userName, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -56,6 +56,14 @@ public interface IUserManager
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<AccountEntity?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="userNameOrEmail"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<AccountEntity?> GetByUsernameOrEmail(string userNameOrEmail, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 

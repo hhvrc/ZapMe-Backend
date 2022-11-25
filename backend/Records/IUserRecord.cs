@@ -19,7 +19,7 @@ public interface IUserRecord
     /// <summary>
     /// 
     /// </summary>
-    string UserName { get; set; }
+    string Username { get; set; }
 
     /// <summary>
     /// 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ZapMe.Authentication;
 using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;
@@ -18,14 +19,14 @@ public partial class UserController
     [ProducesResponseType(typeof(User.FriendRequest.Models.FriendRequestList), StatusCodes.Status200OK)]
     public async Task<IActionResult> FriendRequestList([FromServices] IFriendRequestStore friendRequestStore, CancellationToken cancellationToken)
     {
-        Guid userId = this.GetSignIn()!.UserId;
+        ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 
-        FriendRequestEntity[] friendRequests = await friendRequestStore.ListByUserAsync(userId, cancellationToken);
+        FriendRequestEntity[] friendRequests = await friendRequestStore.ListByUserAsync(identity.UserId, cancellationToken);
 
         return Ok(new User.FriendRequest.Models.FriendRequestList
         {
-            Incoming = friendRequests.Where(fr => fr.ReceiverId == userId).Select(fr => fr.SenderId).ToArray(),
-            Outgoing = friendRequests.Where(fr => fr.SenderId == userId).Select(fr => fr.ReceiverId).ToArray()
+            Incoming = friendRequests.Where(fr => fr.ReceiverId == identity.UserId).Select(fr => fr.SenderId).ToArray(),
+            Outgoing = friendRequests.Where(fr => fr.SenderId == identity.UserId).Select(fr => fr.ReceiverId).ToArray()
         });
     }
 }

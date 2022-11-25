@@ -35,10 +35,10 @@ public partial class AccountController
             string? passwordResetToken = await _userManager.GeneratePasswordResetTokenAsync(account.Id, cancellationToken);
             if (passwordResetToken != null)
             {
-                string render = ResetPassword.Build(account.UserName, Constants.BackendBaseUrl + "/reset-password?token=" + passwordResetToken);
+                string render = ResetPassword.Build(account.Username, Constants.BackendBaseUrl + "/reset-password?token=" + passwordResetToken);
 
                 // Send recovery secret to email
-                await mailServiceProvider.SendMailAsync("Hello", "hello", $"{account.UserName} <{account.Email}>", "Password recovery", render, cancellationToken);
+                await mailServiceProvider.SendMailAsync("Hello", "hello", $"{account.Username} <{account.Email}>", "Password recovery", render, cancellationToken);
             }
         }
 

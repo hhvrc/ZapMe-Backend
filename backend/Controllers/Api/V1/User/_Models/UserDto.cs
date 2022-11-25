@@ -9,7 +9,7 @@ public class UserDto : IUserRecord
     public UserDto()
     {
         Id = Guid.Empty;
-        UserName = String.Empty;
+        Username = String.Empty;
         ProfilePictureId = Guid.Empty;
         OnlineStatus = UserOnlineStatus.Offline;
         OnlineStatusText = String.Empty;
@@ -19,7 +19,7 @@ public class UserDto : IUserRecord
     public UserDto(IUserRecord user)
     {
         Id = user.Id;
-        UserName = user.UserName;
+        Username = user.Username;
         ProfilePictureId = user.ProfilePictureId;
         OnlineStatus = user.OnlineStatus;
         OnlineStatusText = user.OnlineStatusText;
@@ -34,7 +34,7 @@ public class UserDto : IUserRecord
     /// <inheritdoc/>
     [Username(false)]
     [JsonPropertyName("username")]
-    public string UserName { get; set; }
+    public string Username { get; set; }
 
     /// <inheritdoc/>
     [JsonPropertyName("profile_picture_id")]

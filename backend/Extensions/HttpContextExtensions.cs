@@ -1,20 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using ZapMe.Data.Models;
 
 namespace Microsoft.AspNetCore.Http;
 
 public static class HttpContextExtensions
 {
-    public static SignInEntity? GetSignIn(this HttpContext context) =>
-        context.Items["SignIn"] as SignInEntity;
-    public static void SetSignIn(this HttpContext context, SignInEntity signIn) =>
-        context.Items["SignIn"] = signIn;
-
     public static async Task<AuthenticationScheme[]> GetExternalProvidersAsync(this HttpContext context)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
-        var schemes = context.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
+        IAuthenticationSchemeProvider schemes = context.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
 
         return (from scheme in await schemes.GetAllSchemesAsync()
                 where !String.IsNullOrEmpty(scheme.DisplayName)
@@ -41,12 +35,22 @@ public static class HttpContextExtensions
             return ipAddr;
         }
 
-        ipAddr = context.Request.Headers.GetPrefferedHeader("CF-Connecting-IP", "X-Forwarded-For", "X-Real-IP", "True-Client-IP", "X-Client-IP").FirstOrDefault()
+        ipAddr = context.Request.Headers.GetPrefferedHeader("CF-Connecting-IP", "True-Client-IP", "X-Forwarded-For", "X-Real-IP", "X-Client-IP").FirstOrDefault() // Note: The order is important, and it is assumed that this server will be behind cloudflare
             ?? context.Connection?.RemoteIpAddress?.ToString()
             ?? throw new NullReferenceException("Unable to get any IP address, this should never happen"); // This should never happen, at least it should return localhost
 
         context.Items["RequestIpAddress"] = ipAddr;
 
         return ipAddr;
+    }
+
+    public static string GetCloudflareIPCountry(this HttpContext context)
+    {
+        return context.Request.Headers.GetFirst("cf-ipcountry") ?? "XX";
+    }
+
+    public static string GetRemoteUserAgent(this HttpContext context)
+    {
+        return context.Request.Headers.GetFirst("User-Agent") ?? "Unknown";
     }
 }

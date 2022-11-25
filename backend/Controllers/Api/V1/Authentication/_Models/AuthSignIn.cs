@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using ZapMe.Attributes;
 
 namespace ZapMe.Controllers.Api.V1.Authentication.Models;
@@ -8,13 +9,31 @@ namespace ZapMe.Controllers.Api.V1.Authentication.Models;
 /// </summary>
 public struct AuthSignIn
 {
-    /// <summary/>
+    /// <summary>
+    /// Username or email address
+    /// </summary>
     [Username(false)]
     [JsonPropertyName("username")]
-    public string UserName { get; set; }
+    public string Username { get; set; }
 
-    /// <summary/>
+    /// <summary>
+    /// Password
+    /// </summary>
     [Username(true)]
     [JsonPropertyName("password")]
     public string Password { get; set; }
+
+    /// <summary>
+    /// Session name to remember this sign in by, e.g. "My home computer"
+    /// This is for the users to be able to see which devices they have logged in their user settings
+    /// </summary>
+    [StringLength(32, MinimumLength = 1)]
+    [JsonPropertyName("sessionName")]
+    public string SessionName { get; set; }
+
+    /// <summary>
+    /// Make this login persist for a longer period of time
+    /// </summary>
+    [JsonPropertyName("rememberMe")]
+    public bool RememberMe { get; set; }
 }

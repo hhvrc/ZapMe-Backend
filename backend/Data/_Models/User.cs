@@ -10,7 +10,7 @@ public sealed class AccountEntity : IUserRecord
     public Guid Id { get; set; }
 
     /// <inheritdoc/>
-    public string UserName { get; set; } = null!;
+    public string Username { get; set; } = null!;
 
     /// <summary>
     /// 
@@ -67,7 +67,7 @@ public sealed class AccountEntity : IUserRecord
     /// <inheritdoc/>
     public DateTime LastOnline { get; set; }
 
-    public ICollection<SignInEntity>? SignIns { get; set; }
+    public ICollection<SessionEntity>? Sessions { get; set; }
     public ICollection<LockOutEntity>? LockOuts { get; set; }
     public ICollection<UserRoleEntity>? UserRoles { get; set; }
     public ICollection<UserRelationEntity>? Relations { get; set; }
@@ -88,8 +88,8 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<AccountEn
             .HasColumnName("id")
             .HasDefaultValueSql("gen_random_uuid()");
 
-        builder.Property(u => u.UserName)
-            .HasColumnName("userName")
+        builder.Property(u => u.Username)
+            .HasColumnName("username")
             .HasMaxLength(32);
 
         builder.Property(u => u.Email)
@@ -144,7 +144,7 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<AccountEn
             .HasForeignKey(r => r.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(u => u.UserName)
+        builder.HasIndex(u => u.Username)
             .HasDatabaseName("users_username_idx")
             .IsUnique();
 

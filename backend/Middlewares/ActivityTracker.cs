@@ -1,4 +1,4 @@
-﻿using ZapMe.Data.Models;
+﻿using ZapMe.Authentication;
 using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Middlewares;
@@ -14,9 +14,9 @@ public sealed class ActivityTracker
         _logger = logger;
     }
 
-    public async Task InvokeAsync(HttpContext context, ISignInManager signInManager)
+    public async Task InvokeAsync(HttpContext context, IUserManager userManager)
     {
-        SignInEntity? signIn = context.GetSignIn();
+        ZapMeIdentity? identity = context.User?.Identity as ZapMeIdentity;
 
         try
         {
@@ -24,9 +24,9 @@ public sealed class ActivityTracker
         }
         finally
         {
-            if (signIn != null)
+            if (identity != null)
             {
-                await signInManager.UserManager.SetLastOnlineAsync(signIn.UserId, DateTime.UtcNow, context.RequestAborted);
+                await userManager.SetLastOnlineAsync(identity.UserId, DateTime.UtcNow, context.RequestAborted);
             }
         }
     }

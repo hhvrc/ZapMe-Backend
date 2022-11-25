@@ -11,8 +11,8 @@ partial class App
             opt.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             opt.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
             {
-                ZapMe.Data.Models.SignInEntity? signIn = ctx.GetSignIn();
-                if (signIn == null)
+                ZapMe.Data.Models.SessionEntity? session = ctx.GetSignIn();
+                if (session == null)
                 {
                     return RateLimitPartition.GetSlidingWindowLimiter(ctx.GetRemoteIP(), key => new SlidingWindowRateLimiterOptions()
                     {
@@ -25,13 +25,13 @@ partial class App
                     });
                 }
 
-                ZapMe.Data.Models.AccountEntity user = signIn.User;
+                ZapMe.Data.Models.AccountEntity user = session.User;
                 if (user?.UserRoles?.Select(r => r.RoleName).Contains("admin") ?? false)
                 {
                     return RateLimitPartition.GetNoLimiter("admin");
                 }
 
-                return RateLimitPartition.GetTokenBucketLimiter(signIn.UserId.ToString(), key => new TokenBucketRateLimiterOptions()
+                return RateLimitPartition.GetTokenBucketLimiter(session.UserId.ToString(), key => new TokenBucketRateLimiterOptions()
                 {
                     TokenLimit = 10,
                     QueueProcessingOrder = QueueProcessingOrder.OldestFirst,

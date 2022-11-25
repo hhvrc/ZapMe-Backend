@@ -24,7 +24,7 @@ public sealed partial class WebSocketController
         if (wsManager.IsWebSocketRequest)
         {
             // Get the user id from the claims
-            SignInEntity signIn = this.GetSignIn()!;
+            SessionEntity session = this.GetSignIn()!;
 
             // The trace identifier is used to identify the websocket instance, it will be unique for each websocket connection
             string instanceId = HttpContext.TraceIdentifier;
@@ -39,7 +39,7 @@ public sealed partial class WebSocketController
             }
 
             // Register instance globally, the manager will have the ability to kill this connection
-            if (!await _webSocketInstanceManager.RegisterInstanceAsync(signIn.UserId, instanceId, instance, cancellationToken))
+            if (!await _webSocketInstanceManager.RegisterInstanceAsync(session.UserId, instanceId, instance, cancellationToken))
             {
                 return this.Error_InternalServerError();
             }

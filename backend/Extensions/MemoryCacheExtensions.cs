@@ -7,7 +7,7 @@ public static class MemoryCacheExtensions
     {
         if (!cache.TryGetValue(key, out T? result))
         {
-            (result, var expiration) = await factory();
+            (result, TimeSpan expiration) = await factory();
 
             if (result != null)
             {

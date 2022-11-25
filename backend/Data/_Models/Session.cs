@@ -3,35 +3,35 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ZapMe.Data.Models;
 
-public sealed class SignInEntity
+public sealed class SessionEntity
 {
     public Guid Id { get; set; }
 
     public Guid UserId { get; set; }
     public required AccountEntity User { get; set; }
 
-    public required string DeviceName { get; set; }
+    public required string Name { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
     public DateTime ExpiresAt { get; set; }
 
-    public bool IsValid => DateTime.UtcNow < ExpiresAt;
+    public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
 }
 
-public sealed class SignInEntityConfiguration : IEntityTypeConfiguration<SignInEntity>
+public sealed class SessionConfiguration : IEntityTypeConfiguration<SessionEntity>
 {
-    public void Configure(EntityTypeBuilder<SignInEntity> builder)
+    public void Configure(EntityTypeBuilder<SessionEntity> builder)
     {
-        builder.ToTable("signIns");
+        builder.ToTable("sessions");
 
         builder.HasKey(si => si.Id);
 
         builder.Property(si => si.UserId)
             .HasColumnName("userId");
 
-        builder.Property(si => si.DeviceName)
-            .HasColumnName("deviceName")
+        builder.Property(si => si.Name)
+            .HasColumnName("name")
             .HasMaxLength(32);
 
         builder.Property(si => si.CreatedAt)
@@ -41,10 +41,10 @@ public sealed class SignInEntityConfiguration : IEntityTypeConfiguration<SignInE
         builder.Property(si => si.ExpiresAt)
             .HasColumnName("expiresAt");
 
-        builder.Ignore(si => si.IsValid);
+        builder.Ignore(si => si.IsExpired);
 
         builder.HasOne(si => si.User)
-            .WithMany(u => u.SignIns)
+            .WithMany(u => u.Sessions)
             .HasForeignKey(si => si.UserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
