@@ -5,6 +5,9 @@ using ZapMe;
 using ZapMe.Controllers;
 using ZapMe.Middlewares;
 
+// The services are ordered by dependency requirements.
+// The middlewares are ordered by execution order.
+
 // ########################################
 // ######## GLOBAL SETTINGS ###############
 // ########################################
@@ -43,11 +46,11 @@ services.Configure<ApiBehaviorOptions>(static opt => opt.InvalidModelStateRespon
 // ######## ZAPME SERVICES ################
 // ########################################
 
-services.AddZapMeUsers();
-services.AddZapMeSessions();
-services.AddZapMeLockOuts();
-services.AddZapMeUserRelations();
-services.AddZapMeFriendRequests();
+services.ZMAddUsers();
+services.ZMAddSessions();
+services.ZMAddLockOuts();
+services.ZMAddUserRelations();
+services.ZMAddFriendRequests();
 
 services.ZMAddHttpClients();
 services.ZMAddWebSockets();

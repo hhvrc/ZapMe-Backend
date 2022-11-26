@@ -6,7 +6,7 @@ using ZapMe.Services.Interfaces;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
-public static class ZapMeServicesIServiceCollectionExtensions
+public static class ZapMeIServiceCollectionExtensions
 {
     public static void ZMAddHttpClients([NotNull] this IServiceCollection services)
     {
@@ -20,31 +20,31 @@ public static class ZapMeServicesIServiceCollectionExtensions
         services.AddHttpClient<IMailGunService, MailGunService>(SetupHttpClient);
     }
 
-    public static void AddZapMeUsers([NotNull] this IServiceCollection services)
+    public static void ZMAddUsers([NotNull] this IServiceCollection services)
     {
         services.AddTransient<IUserStore, UserStore>();
         services.AddTransient<IUserManager, UserManager>();
     }
 
-    public static void AddZapMeSessions([NotNull] this IServiceCollection services)
+    public static void ZMAddSessions([NotNull] this IServiceCollection services)
     {
         services.AddTransient<ISessionStore, SessionStore>();
         services.AddTransient<ISessionManager, SessionManager>();
     }
 
-    public static void AddZapMeLockOuts([NotNull] this IServiceCollection services)
+    public static void ZMAddLockOuts([NotNull] this IServiceCollection services)
     {
         services.AddTransient<ILockOutStore, LockOutStore>();
         services.AddTransient<ILockOutManager, LockOutManager>();
     }
 
-    public static void AddZapMeUserRelations([NotNull] this IServiceCollection services)
+    public static void ZMAddUserRelations([NotNull] this IServiceCollection services)
     {
         services.AddTransient<IUserRelationStore, UserRelationStore>();
         services.AddTransient<IUserRelationManager, UserRelationManager>();
     }
 
-    public static void AddZapMeFriendRequests([NotNull] this IServiceCollection services)
+    public static void ZMAddFriendRequests([NotNull] this IServiceCollection services)
     {
         services.AddTransient<IFriendRequestStore, FriendRequestStore>();
         //services.AddTransient<IFriendRequestManager, FriendRequestManager>();
