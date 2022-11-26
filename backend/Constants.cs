@@ -34,6 +34,7 @@ public static class Constants
     public const string PrivacyPolicyUrl = BackendBaseUrl + "/privacy";
 
     public const string LoginCookieName = AppName + ".Login";
+    public const string DevelopmentCorsPolicyName = AppName + ".AllowAll";
 
     public static readonly string AssemblyXmlPath = Path.Combine(AppContext.BaseDirectory, Assembly.GetExecutingAssembly().GetName().Name + ".xml");
 }

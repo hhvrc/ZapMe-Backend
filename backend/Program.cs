@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using ZapMe;
 using ZapMe.Controllers;
 using ZapMe.Middlewares;
 
@@ -106,7 +107,7 @@ app.UseRouting();
 
 if (isDevelopment)
 {
-    app.UseCors("dev");
+    app.UseCors(Constants.DevelopmentCorsPolicyName);
 }
 
 app.UseAuthentication();

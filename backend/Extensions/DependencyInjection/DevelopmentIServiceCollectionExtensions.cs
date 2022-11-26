@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Logging;
+using ZapMe;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -9,7 +10,7 @@ public static class DevelopmentIServiceCollectionExtensions
         IdentityModelEventSource.ShowPII = true;
         services.AddCors(opt =>
         {
-            opt.AddPolicy("AllowAll", policy =>
+            opt.AddPolicy(Constants.DevelopmentCorsPolicyName, policy =>
             {
                 policy.AllowAnyOrigin();
                 policy.AllowAnyMethod();
