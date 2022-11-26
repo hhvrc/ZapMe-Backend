@@ -8,20 +8,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ZapMeServicesIServiceCollectionExtensions
 {
-    public static void AddZapMeServices([NotNull] this IServiceCollection services)
-    {
-        services.AddZapMeHttpClients();
-
-        services.AddZapMeUsers();
-        services.AddZapMeSessions();
-        services.AddZapMeLockOuts();
-        services.AddZapMeUserRelations();
-        services.AddZapMeFriendRequests();
-
-        services.AddZapMeWebSockets();
-    }
-
-    public static void AddZapMeHttpClients([NotNull] this IServiceCollection services)
+    public static void ZMAddHttpClients([NotNull] this IServiceCollection services)
     {
         static void SetupHttpClient(HttpClient cli)
         {
@@ -63,7 +50,7 @@ public static class ZapMeServicesIServiceCollectionExtensions
         //services.AddTransient<IFriendRequestManager, FriendRequestManager>();
     }
 
-    public static void AddZapMeWebSockets([NotNull] this IServiceCollection services)
+    public static void ZMAddWebSockets([NotNull] this IServiceCollection services)
     {
         services.AddTransient<IWebSocketInstanceManager, WebSocketInstanceManager>();
     }

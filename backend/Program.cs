@@ -42,7 +42,14 @@ services.Configure<ApiBehaviorOptions>(static opt => opt.InvalidModelStateRespon
 // ######## ZAPME SERVICES ################
 // ########################################
 
-services.AddZapMeServices(); // TODO: bad naming
+services.AddZapMeUsers();
+services.AddZapMeSessions();
+services.AddZapMeLockOuts();
+services.AddZapMeUserRelations();
+services.AddZapMeFriendRequests();
+
+services.ZMAddHttpClients();
+services.ZMAddWebSockets();
 services.ZMAddRateLimiter();
 services.ZMAddSwagger();
 services.ZMAddAuthentication(configuration);
