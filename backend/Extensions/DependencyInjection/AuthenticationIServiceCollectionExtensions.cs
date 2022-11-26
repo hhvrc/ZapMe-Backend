@@ -1,12 +1,14 @@
-﻿using ZapMe.Authentication;
+﻿using System.Diagnostics.CodeAnalysis;
+using ZapMe;
+using ZapMe.Authentication;
 
-namespace ZapMe.App;
+namespace Microsoft.Extensions.DependencyInjection;
 
-partial class App
+public static class AuthenticationIServiceCollectionExtensions
 {
-    private void AddAuthentication()
+    public static void ZMAddAuthentication([NotNull] this IServiceCollection services, [NotNull] IConfiguration configuration)
     {
-        Services
+        services
             .AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
             .AddZapMe(opt =>
             {
@@ -22,17 +24,17 @@ partial class App
             })
             .AddGoogle(opt =>
             {
-                opt.ClientId = Configuration["Authorization:Google:ClientId"]!;
-                opt.ClientSecret = Configuration["Authorization:Google:ClientSecret"]!;
-                opt.CallbackPath = Configuration["Authorization:Google:CallbackPath"]!;
+                opt.ClientId = configuration["Authorization:Google:ClientId"]!;
+                opt.ClientSecret = configuration["Authorization:Google:ClientSecret"]!;
+                opt.CallbackPath = configuration["Authorization:Google:CallbackPath"]!;
                 opt.Scope.Add("openid");
                 opt.Scope.Add(".../auth/userinfo.email");
             })
             .AddGitHub(opt =>
             {
-                opt.ClientId = Configuration["Authorization:GitHub:ClientId"]!;
-                opt.ClientSecret = Configuration["Authorization:GitHub:ClientSecret"]!;
-                opt.CallbackPath = Configuration["Authorization:GitHub:CallbackPath"]!;
+                opt.ClientId = configuration["Authorization:GitHub:ClientId"]!;
+                opt.ClientSecret = configuration["Authorization:GitHub:ClientSecret"]!;
+                opt.CallbackPath = configuration["Authorization:GitHub:CallbackPath"]!;
                 opt.Scope.Add("user:email");
             })/*
             .AddTwitter(options => {

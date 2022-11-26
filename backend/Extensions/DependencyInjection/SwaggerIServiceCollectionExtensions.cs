@@ -1,17 +1,20 @@
 ﻿using Microsoft.OpenApi.Models;
+using System.Diagnostics.CodeAnalysis;
+using ZapMe;
+using ZapMe.Attributes;
 
-namespace ZapMe.App;
+namespace Microsoft.Extensions.DependencyInjection;
 
-partial class App
+public static class SwaggerIServiceCollectionExtensions
 {
-    private void AddSwagger()
+    public static void ZMAddSwagger([NotNull] this IServiceCollection services)
     {
-        Services.AddEndpointsApiExplorer();
-        Services.AddSwaggerGen(opt =>
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen(opt =>
         {
-            opt.SchemaFilter<ZapMe.Attributes.ZapMeAttributeSwaggerFilter>();
-            opt.ParameterFilter<ZapMe.Attributes.ZapMeAttributeSwaggerFilter>();
-            opt.OperationFilter<ZapMe.Attributes.ZapMeAttributeSwaggerFilter>();
+            opt.SchemaFilter<ZapMeAttributeSwaggerFilter>();
+            opt.ParameterFilter<ZapMeAttributeSwaggerFilter>();
+            opt.OperationFilter<ZapMeAttributeSwaggerFilter>();
 
             opt.SwaggerDoc("v1", new OpenApiInfo
             {
@@ -34,16 +37,6 @@ partial class App
             opt.SupportNonNullableReferenceTypes();
 
             opt.IncludeXmlComments(Constants.AssemblyXmlPath);
-        });
-    }
-
-    private void UseSwagger()
-    {
-        Application.UseSwagger();
-        Application.UseSwaggerUI(opt =>
-        {
-            opt.SwaggerEndpoint("/swagger/v1/swagger.json", Constants.AppName + " API - json");
-            opt.SwaggerEndpoint("/swagger/v1/swagger.yaml", Constants.AppName + " API - yaml");
         });
     }
 }

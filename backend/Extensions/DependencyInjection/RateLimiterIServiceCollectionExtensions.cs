@@ -1,17 +1,18 @@
-﻿using System.Threading.RateLimiting;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Threading.RateLimiting;
 
-namespace ZapMe.App;
+namespace Microsoft.Extensions.DependencyInjection;
 
-partial class App
+public static class RateLimiterIServiceCollectionExtensions
 {
-    private void AddRateLimiting()
+    public static void ZMAddRateLimiter([NotNull] this IServiceCollection services)
     {
-        Services.AddRateLimiter(opt =>
+        services.AddRateLimiter(opt =>
         {
             opt.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             opt.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
             {
-                ZapMe.Data.Models.SessionEntity? session = ctx.GetSignIn();
+                Data.Models.SessionEntity? session = ctx.GetSignIn();
                 if (session == null)
                 {
                     return RateLimitPartition.GetSlidingWindowLimiter(ctx.GetRemoteIP(), key => new SlidingWindowRateLimiterOptions()
@@ -25,7 +26,7 @@ partial class App
                     });
                 }
 
-                ZapMe.Data.Models.AccountEntity user = session.User;
+                Data.Models.AccountEntity user = session.User;
                 if (user?.UserRoles?.Select(r => r.RoleName).Contains("admin") ?? false)
                 {
                     return RateLimitPartition.GetNoLimiter("admin");

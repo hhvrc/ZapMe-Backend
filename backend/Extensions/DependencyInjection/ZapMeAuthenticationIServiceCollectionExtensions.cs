@@ -4,14 +4,12 @@ using ZapMe.Authentication;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
-public static class ZapMeAuthenticationExtensions
+public static class ZapMeAuthenticationIServiceCollectionExtensions
 {
     private static string AuthScheme => ZapMeAuthenticationDefaults.AuthenticationScheme;
 
-    public static AuthenticationBuilder AddZapMe([NotNull] this AuthenticationBuilder builder, Action<ZapMeAuthenticationOptions>? configureOptions = null)
+    public static void AddZapMeAuthentication([NotNull] this IServiceCollection services, Action<ZapMeAuthenticationOptions>? configureOptions = null)
     {
-        IServiceCollection services = builder.Services;
-
         services.Configure<AuthenticationOptions>(o =>
         {
             o.AddScheme(AuthScheme, scheme =>
@@ -33,8 +31,5 @@ public static class ZapMeAuthenticationExtensions
         });
 
         services.AddTransient<IAuthenticationSignInHandler, ZapMeAuthenticationHandler>();
-        //services.AddTransient<IAuthenticationService, ZapMeAuthenticationService>();
-
-        return builder;
     }
 }
