@@ -16,11 +16,9 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
     private readonly IOptionsMonitor<ZapMeAuthenticationOptions> _optionsMonitor;
     private readonly ILogger<ZapMeAuthenticationHandler> _logger;
 
-    public ZapMeAuthenticationHandler(IUserManager userManager, ISessionStore sessionStore, ILockOutManager lockOutManager, IOptionsMonitor<ZapMeAuthenticationOptions> optionsMonitor, ILogger<ZapMeAuthenticationHandler> logger)
+    public ZapMeAuthenticationHandler(ISessionStore sessionStore, IOptionsMonitor<ZapMeAuthenticationOptions> optionsMonitor, ILogger<ZapMeAuthenticationHandler> logger)
     {
-        _userManager = userManager;
         _sessionStore = sessionStore;
-        _lockOutManager = lockOutManager;
         _optionsMonitor = optionsMonitor;
         _logger = logger;
     }

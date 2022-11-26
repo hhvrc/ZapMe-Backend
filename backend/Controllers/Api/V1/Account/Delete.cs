@@ -25,6 +25,7 @@ public partial class AccountController
     {
         ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 
+        // TODO: get the password hash from the database, or get it earlier in the pipeline
         PasswordCheckResult result = _userManager.CheckPassword(session.User, password, cancellationToken);
         switch (result)
         {
