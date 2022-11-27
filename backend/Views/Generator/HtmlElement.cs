@@ -89,7 +89,7 @@ public sealed partial class HtmlElement
         Children.Add(htmlTag);
         return htmlTag;
     }
-    
+
     public string Render()
     {
         StringBuilder sb = new StringBuilder();

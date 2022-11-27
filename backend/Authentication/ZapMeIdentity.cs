@@ -28,7 +28,7 @@ public class ZapMeIdentity : ClaimsIdentity
     {
         AddClaims(CreateClaims(account));
     }
-    
+
     private Guid GetGuid(string claimType)
     {
         Claim? claim = FindFirst(claimType);

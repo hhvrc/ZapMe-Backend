@@ -24,11 +24,11 @@ public sealed class ScopedDelayLock : IAsyncDisposable
 
     private readonly long _unlockTime;
     private readonly CancellationToken _cancellationToken;
-    
+
     public async ValueTask DisposeAsync()
     {
         long ticksLeft = _unlockTime - DateTime.Now.Ticks;
-        
+
         if (ticksLeft > 0)
         {
             await Task.Delay(TimeSpan.FromTicks(ticksLeft), _cancellationToken);

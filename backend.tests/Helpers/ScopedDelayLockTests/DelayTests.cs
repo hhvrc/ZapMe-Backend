@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Drawing;
 using ZapMe.Helpers;
 
 namespace ZapMe.Tests.Helpers.ScopedDelayLockTests;

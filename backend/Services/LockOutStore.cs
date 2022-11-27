@@ -31,17 +31,17 @@ public sealed class LockOutStore : ILockOutStore
             ExpiresAt = expiresAt
         };
 
-            await _dbContext.LockOuts.AddAsync(entity, cancellationToken);
-            int nAdded = await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.LockOuts.AddAsync(entity, cancellationToken);
+        int nAdded = await _dbContext.SaveChangesAsync(cancellationToken);
 
-            if (nAdded > 0)
-            {
-                return entity;
-            }
+        if (nAdded > 0)
+        {
+            return entity;
+        }
 
         return null;
     }
-    
+
     public Task<LockOutEntity?> GetByIdAsync(Guid lockOutId, CancellationToken cancellationToken)
     {
         return _cache.GetOrAddAsync("lockOut:id:" + lockOutId, async (_, ct) =>
@@ -52,7 +52,7 @@ public sealed class LockOutStore : ILockOutStore
             }
         , cancellationToken);
     }
-    
+
     public Task<LockOutEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken)
     {
         return _cache.GetOrAddAsync("lockOut:user:" + userId, async (_, ct) =>

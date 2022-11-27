@@ -105,7 +105,7 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             return AuthenticateResult.Fail("Expired Login Cookie");
 
         // TODO: some kinda refresh logic for the cookie if it's half way expired
-        
+
         ZapMePrincipal principal = new ZapMePrincipal(session.User);
 
         principal.SessionEntity = session;

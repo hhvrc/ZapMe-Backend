@@ -15,7 +15,7 @@ public static class RateLimiterIServiceCollectionExtensions
             opt.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
             {
                 SessionEntity? session = (ctx.User as ZapMePrincipal)?.SessionEntity;
-                
+
                 if (session == null)
                 {
                     return RateLimitPartition.GetSlidingWindowLimiter(ctx.GetRemoteIP(), key => new SlidingWindowRateLimiterOptions()

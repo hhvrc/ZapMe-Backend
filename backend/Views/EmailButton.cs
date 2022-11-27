@@ -1,14 +1,11 @@
-﻿using System.Drawing;
-using ZapMe.Views.Generator;
+﻿using ZapMe.Views.Generator;
 
 namespace ZapMe.Views;
 
 public static class EmailButton
 {
-    public static HtmlElement Build(string text, string url, Color? backgroundColor = null)
+    public static HtmlElement Build(string text, string url)
     {
-        backgroundColor ??= Color.FromArgb(52, 152, 219);
-
         HtmlElement table = new HtmlElement(HtmlTagType.Table, ("class", "btn btn-primary"), ("role", "presentation"), ("border", "0"), ("cellpadding", "0"), ("cellspacing", "0"));
 
         table
