@@ -33,19 +33,12 @@ public sealed class UserStore : IUserStore
             UpdatedAt = DateTime.UtcNow
         };
 
-        try
-        {
-            await _dbContext.Users.AddAsync(user, cancellationToken);
-            int nAdded = await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.Users.AddAsync(user, cancellationToken);
+        int nAdded = await _dbContext.SaveChangesAsync(cancellationToken);
 
-            if (nAdded > 0)
-            {
-                return user;
-            }
-        }
-        catch (Exception ex)
+        if (nAdded > 0)
         {
-            _logger.LogCritical(ex, "Failed to create user {Username}", username);
+            return user;
         }
 
         return null;
@@ -90,16 +83,7 @@ public sealed class UserStore : IUserStore
 
     private async Task<bool> UpdateAsync(Expression<Func<AccountEntity, bool>> whereSelector, Expression<Func<SetPropertyCalls<AccountEntity>, SetPropertyCalls<AccountEntity>>> setPropertyCalls, CancellationToken cancellationToken)
     {
-        try
-        {
-            return (await _dbContext.Users.Where(whereSelector).ExecuteUpdateAsync(setPropertyCalls, cancellationToken)) > 0;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogCritical(ex, "Failed to update user");
-        }
-
-        return false;
+        return (await _dbContext.Users.Where(whereSelector).ExecuteUpdateAsync(setPropertyCalls, cancellationToken)) > 0;
     }
     private Task<bool> UpdateAsync(Guid userId, Expression<Func<SetPropertyCalls<AccountEntity>, SetPropertyCalls<AccountEntity>>> setPropertyCalls, CancellationToken cancellationToken) =>
         UpdateAsync(u => u.Id == userId, setPropertyCalls, cancellationToken);
@@ -129,15 +113,6 @@ public sealed class UserStore : IUserStore
 
     public async Task<bool> DeleteAsync(Guid userId, CancellationToken cancellationToken)
     {
-        try
-        {
-            return await _dbContext.Users.Where(u => u.Id == userId).ExecuteDeleteAsync(cancellationToken) > 0;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogCritical(ex, "Failed to delete user {UserId}", userId);
-        }
-
-        return false;
+        return await _dbContext.Users.Where(u => u.Id == userId).ExecuteDeleteAsync(cancellationToken) > 0;
     }
 }

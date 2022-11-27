@@ -26,6 +26,8 @@ public sealed class WebSocketInstanceManager : IWebSocketInstanceManager
         try
         {
             // Add to redis
+
+            // Publish event
         }
         catch
         {

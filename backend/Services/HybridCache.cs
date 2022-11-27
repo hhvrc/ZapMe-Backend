@@ -62,6 +62,7 @@ public sealed class HybridCache : IHybridCache
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to deserialize cache entry");
+                await DistributedCache.RemoveAsync(key, cancellationToken);
                 return default;
             }
 

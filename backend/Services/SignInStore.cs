@@ -50,40 +50,16 @@ public sealed class SessionStore : ISessionStore
 
     public async Task<bool> SetExipresAtAsync(Guid sessionId, DateTime expiresAt, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            return await _dbContext.Sessions.Where(s => s.Id == sessionId).ExecuteUpdateAsync(s => s.SetProperty(static s => s.ExpiresAt, _ => expiresAt), cancellationToken) > 0;
-        }
-        catch (DbUpdateException)
-        {
-        }
-
-        return false;
+        return await _dbContext.Sessions.Where(s => s.Id == sessionId).ExecuteUpdateAsync(s => s.SetProperty(static s => s.ExpiresAt, _ => expiresAt), cancellationToken) > 0;
     }
 
     public async Task<bool> DeleteAsync(Guid sessionId, CancellationToken cancellationToken)
     {
-        try
-        {
-            return await _dbContext.Sessions.Where(s => s.Id == sessionId).ExecuteDeleteAsync(cancellationToken) > 0;
-        }
-        catch (DbUpdateException)
-        {
-        }
-
-        return false;
+        return await _dbContext.Sessions.Where(s => s.Id == sessionId).ExecuteDeleteAsync(cancellationToken) > 0;
     }
 
-    public async Task<int> DeleteAllAsync(Guid userId, CancellationToken cancellationToken)
+    public Task<int> DeleteAllAsync(Guid userId, CancellationToken cancellationToken)
     {
-        try
-        {
-            return await _dbContext.Sessions.Where(s => s.UserId == userId).ExecuteDeleteAsync(cancellationToken);
-        }
-        catch (DbUpdateException)
-        {
-        }
-
-        return 0;
+        return _dbContext.Sessions.Where(s => s.UserId == userId).ExecuteDeleteAsync(cancellationToken);
     }
 }

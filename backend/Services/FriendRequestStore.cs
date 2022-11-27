@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Npgsql;
 using ZapMe.Data;
 using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
@@ -19,79 +18,33 @@ public class FriendRequestStore : IFriendRequestStore
         _logger = logger;
     }
 
-    public async Task<FriendRequestEntity?> CreateAsync(Guid senderId, Guid receiverId, CancellationToken cancellationToken = default)
+    public async Task<FriendRequestEntity> CreateAsync(Guid senderId, Guid receiverId, CancellationToken cancellationToken = default)
     {
-        FriendRequestEntity? friendRequestEntity = null;
-
-        try
+        FriendRequestEntity friendRequestEntity = new FriendRequestEntity
         {
-            friendRequestEntity = new FriendRequestEntity
-            {
-                SenderId = senderId,
-                ReceiverId = receiverId,
-                Sender = null!,
-                Receiver = null!,
-            };
+            SenderId = senderId,
+            ReceiverId = receiverId,
+            Sender = null!,
+            Receiver = null!,
+        };
 
-            await _dbContext.FriendRequests.AddAsync(friendRequestEntity, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to create friend request");
-            friendRequestEntity = null;
-        }
+        await _dbContext.FriendRequests.AddAsync(friendRequestEntity, cancellationToken);
 
         return friendRequestEntity;
     }
 
-    public async Task<FriendRequestEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken = default)
+    public Task<FriendRequestEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        FriendRequestEntity[] friendRequestEntity;
-
-        try
-        {
-            friendRequestEntity = await _dbContext.FriendRequests.Where(fr => fr.SenderId == userId || fr.ReceiverId == userId).ToArrayAsync(cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to list friend requests by sender");
-            friendRequestEntity = Array.Empty<FriendRequestEntity>();
-        }
-
-        return friendRequestEntity;
+        return _dbContext.FriendRequests.Where(fr => fr.SenderId == userId || fr.ReceiverId == userId).ToArrayAsync(cancellationToken);
     }
 
-    public async Task<FriendRequestEntity[]> ListBySenderAsync(Guid senderId, CancellationToken cancellationToken = default)
+    public Task<FriendRequestEntity[]> ListBySenderAsync(Guid senderId, CancellationToken cancellationToken = default)
     {
-        FriendRequestEntity[] friendRequestEntity;
-
-        try
-        {
-            friendRequestEntity = await _dbContext.FriendRequests.Where(fr => fr.SenderId == senderId).ToArrayAsync(cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to list friend requests by sender");
-            friendRequestEntity = Array.Empty<FriendRequestEntity>();
-        }
-        
-        return friendRequestEntity;
+        return _dbContext.FriendRequests.Where(fr => fr.SenderId == senderId).ToArrayAsync(cancellationToken);
     }
 
-    public async Task<FriendRequestEntity[]> ListByReceiverAsync(Guid receiverId, CancellationToken cancellationToken = default)
+    public Task<FriendRequestEntity[]> ListByReceiverAsync(Guid receiverId, CancellationToken cancellationToken = default)
     {
-        FriendRequestEntity[] friendRequestEntity;
-
-        try
-        {
-            friendRequestEntity = await _dbContext.FriendRequests.Where(fr => fr.ReceiverId == receiverId).ToArrayAsync(cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to list friend requests by receiver");
-            friendRequestEntity = Array.Empty<FriendRequestEntity>();
-        }
-
-        return friendRequestEntity;
+        return _dbContext.FriendRequests.Where(fr => fr.ReceiverId == receiverId).ToArrayAsync(cancellationToken);
     }
 }

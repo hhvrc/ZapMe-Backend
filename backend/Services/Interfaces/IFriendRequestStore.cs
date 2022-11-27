@@ -14,7 +14,7 @@ public interface IFriendRequestStore
     /// <param name="receiverId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<FriendRequestEntity?> CreateAsync(Guid senderId, Guid receiverId, CancellationToken cancellationToken = default);
+    Task<FriendRequestEntity> CreateAsync(Guid senderId, Guid receiverId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Npgsql;
 using ZapMe.Data;
 using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
@@ -21,33 +20,25 @@ public sealed class UserRelationStore : IUserRelationStore
 
     public async Task<UserRelationEntity?> CreateAsync(Guid sourceUserId, Guid targetUserId, CancellationToken cancellationToken)
     {
-        try
+        var entity = new UserRelationEntity
         {
-            var entity = new UserRelationEntity
-            {
-                SourceUserId = sourceUserId,
-                TargetUserId = targetUserId,
-                RelationType = UserRelationType.None,
-                SourceUser = null!,
-                TargetUser = null!,
-            };
+            SourceUserId = sourceUserId,
+            TargetUserId = targetUserId,
+            RelationType = UserRelationType.None,
+            SourceUser = null!,
+            TargetUser = null!,
+        };
 
-            await _dbContext.UserRelations.AddAsync(entity, cancellationToken);
+        await _dbContext.UserRelations.AddAsync(entity, cancellationToken);
 
-            return entity;
-        }
-        catch (PostgresException)
-        {
-        }
-
-        return null;
+        return entity;
     }
 
     public Task<UserRelationEntity[]> ListOutgoingAsync(Guid sourceUserId, CancellationToken cancellationToken)
     {
         return _dbContext.UserRelations.Where(ur => ur.SourceUserId == sourceUserId).ToArrayAsync(cancellationToken);
     }
-    
+
     public Task<UserRelationEntity[]> ListIncomingByTypeAsync(Guid targetUserId, UserRelationType relationType, CancellationToken cancellationToken)
     {
         return _dbContext.UserRelations.Where(ur => ur.TargetUserId == targetUserId && ur.RelationType == relationType).ToArrayAsync(cancellationToken);
@@ -73,7 +64,7 @@ public sealed class UserRelationStore : IUserRelationStore
             .Where(ur => ur.SourceUserId == sourceUserId && ur.TargetUserId == targetUserId)
             .ExecuteUpdateAsync(s => s.SetProperty(static ur => ur.Notes, _ => notes), cancellationToken) > 0;
     }
-    
+
     public async Task<bool> DeleteAsync(Guid sourceUserId, Guid targetUserId, CancellationToken cancellationToken = default)
     {
         return await _dbContext.UserRelations.Where(ur => ur.SourceUserId == sourceUserId && ur.TargetUserId == targetUserId).ExecuteDeleteAsync(cancellationToken) > 0;
