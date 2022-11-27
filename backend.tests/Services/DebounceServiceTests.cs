@@ -64,7 +64,7 @@ public sealed class DebounceServiceTests
 /* lang=json */
 """
 {
-    "disposable": true
+    "disposable": "true"
 }
 """
             );
