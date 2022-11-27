@@ -39,12 +39,16 @@ logging.ZMAddLogging();
 services.AddRouting();
 services.AddControllers().AddJsonOptions(static opt => opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, true)));
 services.AddResponseCompression();
-services.Configure<ApiBehaviorOptions>(static opt => opt.InvalidModelStateResponseFactory = ErrorResponseFactory.CreateErrorResult);
 //services.AddHealthChecks().AddCheck("sql" ) //TODO: explore this
+services.Configure<ApiBehaviorOptions>(static opt => opt.InvalidModelStateResponseFactory = ErrorResponseFactory.CreateErrorResult);
 
 // ########################################
 // ######## ZAPME SERVICES ################
 // ########################################
+
+services.ZMAddDataCaching(configuration);
+services.ZMAddHttpClients();
+services.ZMAddPasswordHashing();
 
 services.ZMAddUsers();
 services.ZMAddSessions();
@@ -52,14 +56,12 @@ services.ZMAddLockOuts();
 services.ZMAddUserRelations();
 services.ZMAddFriendRequests();
 
-services.ZMAddHttpClients();
 services.ZMAddWebSockets();
 services.ZMAddRateLimiter();
 services.ZMAddSwagger();
 services.ZMAddAuthentication(configuration);
 services.ZMAddAuthorization();
 services.ZMAddDatabase(configuration);
-services.ZMAddDataCaching(configuration);
 services.ZMAddAmazonAWS(configuration);
 
 // ########################################

@@ -45,8 +45,10 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             throw new InvalidOperationException("Invalid user type");
         }
 
-        ZapMeIdentity identity = user.Identity;
-        ArgumentNullException.ThrowIfNull(identity, "The identity cannot be null.");
+        ZapMeIdentity identity = user.Identity
+            ?? throw new InvalidOperationException("ZapMeIdentity cannot be null.");
+        SignInProperties sessionProperties = user.SignInProperties
+            ?? throw new InvalidOperationException("SignInProperties cannot be null.");
 
         if (identity.AuthenticationType != _scheme.Name)
         {
@@ -58,8 +60,6 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             throw new ArgumentException("The identity must be authenticated using the same scheme.", nameof(claimsIdentity));
         }
 
-        SignInProperties sessionProperties = identity.SignInProperties;
-        ArgumentNullException.ThrowIfNull(sessionProperties, "The SignInProperties cannot be null.");
 
         TimeSpan expiresIn = _options.ExpiresTimeSpanSession;
         if (sessionProperties.RememberMe)
@@ -68,11 +68,8 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
         }
         DateTime expiresAt = DateTime.UtcNow.Add(expiresIn);
 
-        SessionEntity? session = await _sessionStore.TryCreateAsync(identity.UserId, sessionProperties.SessionName, expiresAt, _context.RequestAborted);
-        if (session == null)
-        {
-            throw new InvalidOperationException("SignIn cannot be null.");
-        }
+        SessionEntity session = await _sessionStore.TryCreateAsync(identity.UserId, sessionProperties.SessionName, expiresAt, _context.RequestAborted)
+            ?? throw new InvalidOperationException("Session cannot be null.");
 
         Response.StatusCode = StatusCodes.Status200OK;
         Response.Cookies.Append(
@@ -108,8 +105,10 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             return AuthenticateResult.Fail("Expired Login Cookie");
 
         // TODO: some kinda refresh logic for the cookie if it's half way expired
-
+        
         ZapMePrincipal principal = new ZapMePrincipal(session.User);
+
+        principal.SessionEntity = session;
 
         _context.User = principal; // TODO: is this needed?
 

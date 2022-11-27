@@ -50,12 +50,12 @@ namespace ZapMe.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    userName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    username = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
                     email = table.Column<string>(type: "character varying(320)", maxLength: 320, nullable: false),
                     emailVerified = table.Column<bool>(type: "boolean", nullable: false),
                     passwordHash = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
                     acceptedTosVersion = table.Column<int>(type: "integer", nullable: false),
-                    profilePictureId = table.Column<Guid>(type: "uuid", nullable: true),
+                    profilePictureId = table.Column<Guid>(type: "uuid", nullable: false),
                     statusOnline = table.Column<int>(type: "integer", nullable: false),
                     statusText = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     passwordResetToken = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
@@ -118,20 +118,20 @@ namespace ZapMe.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "signIns",
+                name: "sessions",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     userId = table.Column<Guid>(type: "uuid", nullable: false),
-                    deviceName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    name = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
                     createdAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
                     expiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_signIns", x => x.Id);
+                    table.PrimaryKey("PK_sessions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_signIns_users_userId",
+                        name: "FK_sessions_users_userId",
                         column: x => x.userId,
                         principalTable: "users",
                         principalColumn: "id",
@@ -201,8 +201,8 @@ namespace ZapMe.Migrations
                 column: "userId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_signIns_userId",
-                table: "signIns",
+                name: "IX_sessions_userId",
+                table: "sessions",
                 column: "userId");
 
             migrationBuilder.CreateIndex(
@@ -240,7 +240,7 @@ namespace ZapMe.Migrations
             migrationBuilder.CreateIndex(
                 name: "users_username_idx",
                 table: "users",
-                column: "userName",
+                column: "username",
                 unique: true);
 
             migrationBuilder.AddForeignKey(
@@ -285,7 +285,7 @@ namespace ZapMe.Migrations
                 name: "oauthConnections");
 
             migrationBuilder.DropTable(
-                name: "signIns");
+                name: "sessions");
 
             migrationBuilder.DropTable(
                 name: "userRelations");

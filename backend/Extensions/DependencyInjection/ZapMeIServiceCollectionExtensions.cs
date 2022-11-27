@@ -20,6 +20,11 @@ public static class ZapMeIServiceCollectionExtensions
         services.AddHttpClient<IMailGunService, MailGunService>(SetupHttpClient);
     }
 
+    public static void ZMAddPasswordHashing([NotNull] this IServiceCollection services)
+    {
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
+    }
+
     public static void ZMAddUsers([NotNull] this IServiceCollection services)
     {
         services.AddTransient<IUserStore, UserStore>();

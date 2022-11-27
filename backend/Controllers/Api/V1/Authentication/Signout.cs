@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ZapMe.Authentication;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -16,9 +17,9 @@ public partial class AuthenticationController
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> SignOut(CancellationToken cancellationToken)
     {
-        Guid sessionId = ???; // TODO: Get the session ID of this login session
+        ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 
-        await _sessionManager.SignOutAsync(session.Id, cancellationToken);
+        await _sessionManager.SignOutAsync(identity.SessionId, cancellationToken);
 
         return SignOut();
     }

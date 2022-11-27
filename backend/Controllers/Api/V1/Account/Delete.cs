@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.Data.Models;
 using ZapMe.DTOs;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -23,7 +24,7 @@ public partial class AccountController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Delete([FromHeader] string password, [FromQuery] string? reason, CancellationToken cancellationToken)
     {
-        ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
+        SessionEntity session = (User as ZapMePrincipal)?.SessionEntity ?? throw new NullReferenceException("SessionEntity is null.");
 
         // TODO: get the password hash from the database, or get it earlier in the pipeline
         PasswordCheckResult result = _userManager.CheckPassword(session.User, password, cancellationToken);

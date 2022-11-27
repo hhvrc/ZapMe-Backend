@@ -25,6 +25,100 @@ namespace ZapMe.Migrations
             modelBuilder.HasSequence("EntityFrameworkHiLoSequence")
                 .IncrementsBy(10);
 
+            modelBuilder.Entity("ZapMe.Data.Models.AccountEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<int>("AcceptedTosVersion")
+                        .HasColumnType("integer")
+                        .HasColumnName("acceptedTosVersion");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("createdAt")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("character varying(320)")
+                        .HasColumnName("email");
+
+                    b.Property<bool>("EmailVerified")
+                        .HasColumnType("boolean")
+                        .HasColumnName("emailVerified");
+
+                    b.Property<DateTime>("LastOnline")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("lastOnline")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<int>("OnlineStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("statusOnline");
+
+                    b.Property<string>("OnlineStatusText")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("statusText");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("passwordHash");
+
+                    b.Property<DateTime?>("PasswordResetRequestedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("passwordResetRequestedAt");
+
+                    b.Property<string>("PasswordResetToken")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("passwordResetToken");
+
+                    b.Property<Guid>("ProfilePictureId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("profilePictureId");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updatedAt")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("username");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasDatabaseName("users_email_idx");
+
+                    b.HasIndex("PasswordResetToken")
+                        .IsUnique()
+                        .HasDatabaseName("users_passwordResetToken_idx");
+
+                    b.HasIndex("ProfilePictureId");
+
+                    b.HasIndex("Username")
+                        .IsUnique()
+                        .HasDatabaseName("users_username_idx");
+
+                    b.ToTable("users", (string)null);
+                });
+
             modelBuilder.Entity("ZapMe.Data.Models.FriendRequestEntity", b =>
                 {
                     b.Property<Guid>("SenderId")
@@ -150,7 +244,7 @@ namespace ZapMe.Migrations
                     b.ToTable("oauthConnections", (string)null);
                 });
 
-            modelBuilder.Entity("ZapMe.Data.Models.SignInEntity", b =>
+            modelBuilder.Entity("ZapMe.Data.Models.SessionEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -162,15 +256,15 @@ namespace ZapMe.Migrations
                         .HasColumnName("createdAt")
                         .HasDefaultValueSql("now()");
 
-                    b.Property<string>("DeviceName")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
-                        .HasColumnName("deviceName");
-
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expiresAt");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("name");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
@@ -180,101 +274,7 @@ namespace ZapMe.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("signIns", (string)null);
-                });
-
-            modelBuilder.Entity("ZapMe.Data.Models.UserEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<int>("AcceptedTosVersion")
-                        .HasColumnType("integer")
-                        .HasColumnName("acceptedTosVersion");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("createdAt")
-                        .HasDefaultValueSql("now()");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(320)
-                        .HasColumnType("character varying(320)")
-                        .HasColumnName("email");
-
-                    b.Property<bool>("EmailVerified")
-                        .HasColumnType("boolean")
-                        .HasColumnName("emailVerified");
-
-                    b.Property<DateTime>("LastOnline")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("lastOnline")
-                        .HasDefaultValueSql("now()");
-
-                    b.Property<int>("OnlineStatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("statusOnline");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("character varying(120)")
-                        .HasColumnName("passwordHash");
-
-                    b.Property<DateTime?>("PasswordResetRequestedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("passwordResetRequestedAt");
-
-                    b.Property<string>("PasswordResetToken")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("passwordResetToken");
-
-                    b.Property<Guid?>("ProfilePictureId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("profilePictureId");
-
-                    b.Property<string>("StatusText")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("statusText");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updatedAt")
-                        .HasDefaultValueSql("now()");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
-                        .HasColumnName("userName");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique()
-                        .HasDatabaseName("users_email_idx");
-
-                    b.HasIndex("PasswordResetToken")
-                        .IsUnique()
-                        .HasDatabaseName("users_passwordResetToken_idx");
-
-                    b.HasIndex("ProfilePictureId");
-
-                    b.HasIndex("UserName")
-                        .IsUnique()
-                        .HasDatabaseName("users_username_idx");
-
-                    b.ToTable("users", (string)null);
+                    b.ToTable("sessions", (string)null);
                 });
 
             modelBuilder.Entity("ZapMe.Data.Models.UserRelationEntity", b =>
@@ -342,15 +342,26 @@ namespace ZapMe.Migrations
                     b.ToTable("userRoles", (string)null);
                 });
 
+            modelBuilder.Entity("ZapMe.Data.Models.AccountEntity", b =>
+                {
+                    b.HasOne("ZapMe.Data.Models.ImageEntity", "ProfilePicture")
+                        .WithMany()
+                        .HasForeignKey("ProfilePictureId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
+                    b.Navigation("ProfilePicture");
+                });
+
             modelBuilder.Entity("ZapMe.Data.Models.FriendRequestEntity", b =>
                 {
-                    b.HasOne("ZapMe.Data.Models.UserEntity", "Receiver")
+                    b.HasOne("ZapMe.Data.Models.AccountEntity", "Receiver")
                         .WithMany("FriendRequestsIncoming")
                         .HasForeignKey("ReceiverId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ZapMe.Data.Models.UserEntity", "Sender")
+                    b.HasOne("ZapMe.Data.Models.AccountEntity", "Sender")
                         .WithMany("FriendRequestsOutgoing")
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -363,7 +374,7 @@ namespace ZapMe.Migrations
 
             modelBuilder.Entity("ZapMe.Data.Models.ImageEntity", b =>
                 {
-                    b.HasOne("ZapMe.Data.Models.UserEntity", "Uploader")
+                    b.HasOne("ZapMe.Data.Models.AccountEntity", "Uploader")
                         .WithMany()
                         .HasForeignKey("UploaderId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -373,7 +384,7 @@ namespace ZapMe.Migrations
 
             modelBuilder.Entity("ZapMe.Data.Models.LockOutEntity", b =>
                 {
-                    b.HasOne("ZapMe.Data.Models.UserEntity", "User")
+                    b.HasOne("ZapMe.Data.Models.AccountEntity", "User")
                         .WithMany("LockOuts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -384,7 +395,7 @@ namespace ZapMe.Migrations
 
             modelBuilder.Entity("ZapMe.Data.Models.OAuthConnectionEntity", b =>
                 {
-                    b.HasOne("ZapMe.Data.Models.UserEntity", "User")
+                    b.HasOne("ZapMe.Data.Models.AccountEntity", "User")
                         .WithMany("OauthConnections")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -393,10 +404,10 @@ namespace ZapMe.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ZapMe.Data.Models.SignInEntity", b =>
+            modelBuilder.Entity("ZapMe.Data.Models.SessionEntity", b =>
                 {
-                    b.HasOne("ZapMe.Data.Models.UserEntity", "User")
-                        .WithMany("SignIns")
+                    b.HasOne("ZapMe.Data.Models.AccountEntity", "User")
+                        .WithMany("Sessions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -404,25 +415,15 @@ namespace ZapMe.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ZapMe.Data.Models.UserEntity", b =>
-                {
-                    b.HasOne("ZapMe.Data.Models.ImageEntity", "ProfilePicture")
-                        .WithMany()
-                        .HasForeignKey("ProfilePictureId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("ProfilePicture");
-                });
-
             modelBuilder.Entity("ZapMe.Data.Models.UserRelationEntity", b =>
                 {
-                    b.HasOne("ZapMe.Data.Models.UserEntity", "SourceUser")
+                    b.HasOne("ZapMe.Data.Models.AccountEntity", "SourceUser")
                         .WithMany("Relations")
                         .HasForeignKey("SourceUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ZapMe.Data.Models.UserEntity", "TargetUser")
+                    b.HasOne("ZapMe.Data.Models.AccountEntity", "TargetUser")
                         .WithMany()
                         .HasForeignKey("TargetUserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -435,7 +436,7 @@ namespace ZapMe.Migrations
 
             modelBuilder.Entity("ZapMe.Data.Models.UserRoleEntity", b =>
                 {
-                    b.HasOne("ZapMe.Data.Models.UserEntity", "User")
+                    b.HasOne("ZapMe.Data.Models.AccountEntity", "User")
                         .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -444,7 +445,7 @@ namespace ZapMe.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ZapMe.Data.Models.UserEntity", b =>
+            modelBuilder.Entity("ZapMe.Data.Models.AccountEntity", b =>
                 {
                     b.Navigation("FriendRequestsIncoming");
 
@@ -456,7 +457,7 @@ namespace ZapMe.Migrations
 
                     b.Navigation("Relations");
 
-                    b.Navigation("SignIns");
+                    b.Navigation("Sessions");
 
                     b.Navigation("UserRoles");
                 });

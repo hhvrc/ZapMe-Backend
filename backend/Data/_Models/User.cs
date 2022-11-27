@@ -1,15 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using ZapMe.Records;
+using ZapMe.Enums;
 
 namespace ZapMe.Data.Models;
 
-public sealed class AccountEntity : IUserRecord
+public sealed class AccountEntity
 {
-    /// <inheritdoc/>
+    /// <summary>
+    /// 
+    /// </summary>
     public Guid Id { get; set; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// 
+    /// </summary>
     public string Username { get; set; } = null!;
 
     /// <summary>
@@ -40,10 +44,14 @@ public sealed class AccountEntity : IUserRecord
     /// </summary>
     public ImageEntity? ProfilePicture { get; set; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// 
+    /// </summary>
     public UserOnlineStatus OnlineStatus { get; set; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// 
+    /// </summary>
     public string OnlineStatusText { get; set; } = null!;
 
     /// <summary>
@@ -56,7 +64,9 @@ public sealed class AccountEntity : IUserRecord
     /// </summary>
     public DateTime? PasswordResetRequestedAt { get; set; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Date this account was created at
+    /// </summary>
     public DateTime CreatedAt { get; set; }
 
     /// <summary>
@@ -64,7 +74,9 @@ public sealed class AccountEntity : IUserRecord
     /// </summary>
     public DateTime UpdatedAt { get; set; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Last time this user was online
+    /// </summary>
     public DateTime LastOnline { get; set; }
 
     public ICollection<SessionEntity>? Sessions { get; set; }

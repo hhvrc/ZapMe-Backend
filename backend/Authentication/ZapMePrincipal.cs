@@ -10,4 +10,7 @@ public class ZapMePrincipal : ClaimsPrincipal
     }
 
     public new ZapMeIdentity Identity => (base.Identity as ZapMeIdentity)!;
+
+    public SessionEntity? SessionEntity { get; set; }
+    public SignInProperties? SignInProperties { get; set; }
 }

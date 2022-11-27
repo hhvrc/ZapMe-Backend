@@ -28,18 +28,36 @@ public class ZapMeIdentity : ClaimsIdentity
     {
         AddClaims(CreateClaims(account));
     }
-
-    public string UserIdClaimType => ClaimTypes.NameIdentifier;
-    private Guid? _userId = null;
-    public Guid UserId
+    
+    private Guid GetGuid(string claimType)
     {
-        get
+        Claim? claim = FindFirst(claimType);
+
+        if (claim == null)
         {
-            _userId ??= Guid.Parse(FindFirst(UserIdClaimType)!.Value);
-            return _userId.Value;
+            throw new KeyNotFoundException($"Claim {claimType} not found.");
         }
+
+        if (!Guid.TryParse(claim.Value, out Guid result))
+        {
+            throw new InvalidDataException($"Claim {claimType} is not a valid GUID");
+        }
+
+        return result;
     }
 
-    public SignInProperties? SignInProperties { get; set; }
+    public string SessionIdClaimType => ZapMeAuthenticationDefaults.AuthenticationScheme + ".SessionId";
+    public Guid SessionId => GetGuid(SessionIdClaimType);
+
+    public string UserIdClaimType => ClaimTypes.NameIdentifier;
+    public Guid UserId => GetGuid(UserIdClaimType);
+
+    public string UsernameClaimType => ClaimTypes.Name;
+    public string Username => Name ?? throw new InvalidOperationException("Name cannot be null");
+
+    public IEnumerable<string> Roles => FindAll(ClaimTypes.Role).Select(claim => claim.Value);
+
+    public string SecurityStampClaimType => ZapMeAuthenticationDefaults.AuthenticationScheme + ".SecurityStamp";
+    public Guid SecurityStamp => GetGuid(SecurityStampClaimType);
 }
 

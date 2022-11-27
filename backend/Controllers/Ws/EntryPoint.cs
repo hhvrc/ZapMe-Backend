@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ZapMe.Authentication;
 using ZapMe.Data.Models;
 
 namespace ZapMe.Controllers.Ws;
@@ -24,7 +25,7 @@ public sealed partial class WebSocketController
         if (wsManager.IsWebSocketRequest)
         {
             // Get the user id from the claims
-            SessionEntity session = this.GetSignIn()!;
+            SessionEntity session = (User as ZapMePrincipal)?.SessionEntity ?? throw new NullReferenceException("SessionEntity is null.");
 
             // The trace identifier is used to identify the websocket instance, it will be unique for each websocket connection
             string instanceId = HttpContext.TraceIdentifier;

@@ -1,10 +1,11 @@
 ﻿using System.Text.Json.Serialization;
 using ZapMe.Attributes;
-using ZapMe.Records;
+using ZapMe.Data.Models;
+using ZapMe.Enums;
 
 namespace ZapMe.Controllers.Api.V1.User.Models;
 
-public class UserDto : IUserRecord
+public class UserDto
 {
     public UserDto()
     {
@@ -16,7 +17,7 @@ public class UserDto : IUserRecord
         LastOnline = DateTime.MinValue;
         CreatedAt = DateTime.MinValue;
     }
-    public UserDto(IUserRecord user)
+    public UserDto(AccountEntity user)
     {
         Id = user.Id;
         Username = user.Username;
@@ -27,32 +28,46 @@ public class UserDto : IUserRecord
         CreatedAt = user.CreatedAt;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// 
+    /// </summary>
     [JsonPropertyName("id")]
     public Guid Id { get; set; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// 
+    /// </summary>
     [Username(false)]
     [JsonPropertyName("username")]
     public string Username { get; set; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// 
+    /// </summary>
     [JsonPropertyName("profile_picture_id")]
     public Guid ProfilePictureId { get; set; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// 
+    /// </summary>
     [JsonPropertyName("status")]
     public UserOnlineStatus OnlineStatus { get; set; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// 
+    /// </summary>
     [JsonPropertyName("status_text")]
     public string OnlineStatusText { get; set; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Date this account was created at
+    /// </summary>
     [JsonPropertyName("created_at")]
     public DateTime CreatedAt { get; set; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Last time this user was online
+    /// </summary>
     [JsonPropertyName("last_online")]
     public DateTime LastOnline { get; set; }
 }

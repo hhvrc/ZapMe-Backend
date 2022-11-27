@@ -68,13 +68,13 @@ public partial class AuthenticationController
             return this.Error(StatusCodes.Status400BadRequest, "Email not verified", "Please verify your email address before signing in", UserNotification.SeverityLevel.Error, "Email not verified", "Please verify your email address before signing in");
         }
 
-        ZapMeIdentity identity = new ZapMeIdentity(account)
+        ZapMePrincipal principal = new ZapMePrincipal(account)
         {
             // Gather request details for distinguishing between different devices in the account's session list, and to prevent session hijacking
             SignInProperties = new SignInProperties(body.RememberMe, body.SessionName, this.GetRemoteIP(), this.GetCloudflareIPCountry(), this.GetRemoteUserAgent())
         };
 
 
-        return SignIn(new ZapMePrincipal(account), ZapMeAuthenticationDefaults.AuthenticationScheme);
+        return SignIn(principal, ZapMeAuthenticationDefaults.AuthenticationScheme);
     }
 }

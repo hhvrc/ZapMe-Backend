@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 using ZapMe.Data;
 using ZapMe.Data.Models;
-using ZapMe.Records;
+using ZapMe.Enums;
 using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Services;
