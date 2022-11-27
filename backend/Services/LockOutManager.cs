@@ -19,9 +19,9 @@ public sealed class LockOutManager : ILockOutManager
         throw new NotImplementedException();
     }
 
-    public Task<List<LockOutEntity>> ListByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    public Task<LockOutEntity[]> ListByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return LockOutStore.ListByUserAsync(userId, cancellationToken);
     }
 
     public async Task LockOutAsync(Guid userId, string? reason, string flags, DateTime? expiresAt, CancellationToken cancellationToken)

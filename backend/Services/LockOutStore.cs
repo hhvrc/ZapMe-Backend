@@ -48,10 +48,10 @@ public sealed class LockOutStore : ILockOutStore
 
         return null;
     }
-
-    public async Task<LockOutEntity?> GetByIdAsync(Guid lockOutId, CancellationToken cancellationToken)
+    
+    public Task<LockOutEntity?> GetByIdAsync(Guid lockOutId, CancellationToken cancellationToken)
     {
-        return await _cache.GetOrAddAsync("lockOut:id:" + lockOutId, async (_, ct) =>
+        return _cache.GetOrAddAsync("lockOut:id:" + lockOutId, async (_, ct) =>
             new DTOs.HybridCacheEntry<LockOutEntity?>
             {
                 Value = await _dbContext.LockOuts.FirstOrDefaultAsync(l => l.Id == lockOutId, ct),
@@ -59,10 +59,10 @@ public sealed class LockOutStore : ILockOutStore
             }
         , cancellationToken);
     }
-
-    public async Task<LockOutEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken)
+    
+    public Task<LockOutEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken)
     {
-        return await _cache.GetOrAddAsync("lockOut:user:" + userId, async (_, ct) =>
+        return _cache.GetOrAddAsync("lockOut:user:" + userId, async (_, ct) =>
             new DTOs.HybridCacheEntry<LockOutEntity[]>
             {
                 Value = await _dbContext.LockOuts.Where(l => l.UserId == userId).ToArrayAsync(ct),

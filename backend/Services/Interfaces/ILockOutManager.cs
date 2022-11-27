@@ -26,7 +26,7 @@ public interface ILockOutManager
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<List<LockOutEntity>> ListByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<LockOutEntity[]> ListByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 

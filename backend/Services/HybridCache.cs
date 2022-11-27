@@ -21,7 +21,7 @@ public sealed class HybridCache : IHybridCache
 
     private void SetMemoryCache<T>(string key, HybridCacheEntry<T> entry)
     {
-        var memcacheEntry = MemoryCache.CreateEntry(key);
+        ICacheEntry memcacheEntry = MemoryCache.CreateEntry(key);
         memcacheEntry.SlidingExpiration = entry.ExpiresAtUtc - DateTime.UtcNow;
         memcacheEntry.Value = entry.Value;
     }
@@ -34,7 +34,7 @@ public sealed class HybridCache : IHybridCache
 
     public async Task SetAsync<T>(string key, T value, TimeSpan lifetime, CancellationToken cancellationToken)
     {
-        var entry = new HybridCacheEntry<T>
+        HybridCacheEntry<T> entry = new HybridCacheEntry<T>
         {
             Value = value,
             ExpiresAtUtc = DateTime.UtcNow + lifetime
@@ -52,7 +52,7 @@ public sealed class HybridCache : IHybridCache
             }
         }
 
-        var distrubutedCacheResult = await DistributedCache.GetStringAsync(key, cancellationToken);
+        string? distrubutedCacheResult = await DistributedCache.GetStringAsync(key, cancellationToken);
         if (distrubutedCacheResult != null)
         {
             try
@@ -83,11 +83,11 @@ public sealed class HybridCache : IHybridCache
 
     public async Task<T> GetOrAddAsync<T>(string key, Func<string, HybridCacheEntry<T>> factory, CancellationToken cancellationToken = default)
     {
-        var entry = await GetAsync<T>(key, cancellationToken);
+        T? entry = await GetAsync<T>(key, cancellationToken);
 
         if (entry == null)
         {
-            var value = factory(key);
+            HybridCacheEntry<T> value = factory(key);
             await SetAsync(key, value, cancellationToken);
             entry = value.Value;
         }
@@ -97,11 +97,11 @@ public sealed class HybridCache : IHybridCache
 
     public async Task<T> GetOrAddAsync<T>(string key, Func<string, CancellationToken, Task<HybridCacheEntry<T>>> factory, CancellationToken cancellationToken = default)
     {
-        var entry = await GetAsync<T>(key, cancellationToken);
+        T? entry = await GetAsync<T>(key, cancellationToken);
 
         if (entry == null)
         {
-            var value = await factory(key, cancellationToken);
+            HybridCacheEntry<T> value = await factory(key, cancellationToken);
             await SetAsync(key, value, cancellationToken);
             entry = value.Value;
         }

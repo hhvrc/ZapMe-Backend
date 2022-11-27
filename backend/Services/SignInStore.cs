@@ -38,14 +38,14 @@ public sealed class SessionStore : ISessionStore
         return null;
     }
 
-    public async Task<SessionEntity?> GetByIdAsync(Guid sessionId, CancellationToken cancellationToken)
+    public Task<SessionEntity?> GetByIdAsync(Guid sessionId, CancellationToken cancellationToken)
     {
-        return await _dbContext.Sessions.Include(static s => s.User).FirstOrDefaultAsync(s => s.Id == sessionId, cancellationToken);
+        return _dbContext.Sessions.Include(static s => s.User).FirstOrDefaultAsync(s => s.Id == sessionId, cancellationToken);
     }
 
-    public async Task<SessionEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken)
+    public Task<SessionEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken)
     {
-        return await _dbContext.Sessions.Where(s => s.UserId == userId).ToArrayAsync(cancellationToken);
+        return _dbContext.Sessions.Where(s => s.UserId == userId).ToArrayAsync(cancellationToken);
     }
 
     public async Task<bool> SetExipresAtAsync(Guid sessionId, DateTime expiresAt, CancellationToken cancellationToken = default)

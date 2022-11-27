@@ -24,7 +24,7 @@ public class ZapMeIdentity : ClaimsIdentity
         }
     }
 
-    public ZapMeIdentity(AccountEntity account)
+    public ZapMeIdentity(AccountEntity account) : base(ZapMeAuthenticationDefaults.AuthenticationScheme)
     {
         AddClaims(CreateClaims(account));
     }

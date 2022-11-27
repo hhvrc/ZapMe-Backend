@@ -43,14 +43,14 @@ public sealed class UserRelationStore : IUserRelationStore
         return null;
     }
 
-    public async Task<UserRelationEntity[]> ListOutgoingAsync(Guid sourceUserId, CancellationToken cancellationToken)
+    public Task<UserRelationEntity[]> ListOutgoingAsync(Guid sourceUserId, CancellationToken cancellationToken)
     {
-        return await _dbContext.UserRelations.Where(ur => ur.SourceUserId == sourceUserId).ToArrayAsync(cancellationToken);
+        return _dbContext.UserRelations.Where(ur => ur.SourceUserId == sourceUserId).ToArrayAsync(cancellationToken);
     }
-
-    public async Task<UserRelationEntity[]> ListIncomingByTypeAsync(Guid targetUserId, UserRelationType relationType, CancellationToken cancellationToken)
+    
+    public Task<UserRelationEntity[]> ListIncomingByTypeAsync(Guid targetUserId, UserRelationType relationType, CancellationToken cancellationToken)
     {
-        return await _dbContext.UserRelations.Where(ur => ur.TargetUserId == targetUserId && ur.RelationType == relationType).ToArrayAsync(cancellationToken);
+        return _dbContext.UserRelations.Where(ur => ur.TargetUserId == targetUserId && ur.RelationType == relationType).ToArrayAsync(cancellationToken);
     }
 
     public async Task<bool> SetRelationTypeAsync(Guid sourceUserId, Guid targetUserId, UserRelationType relationType, CancellationToken cancellationToken = default)
@@ -73,14 +73,14 @@ public sealed class UserRelationStore : IUserRelationStore
             .Where(ur => ur.SourceUserId == sourceUserId && ur.TargetUserId == targetUserId)
             .ExecuteUpdateAsync(s => s.SetProperty(static ur => ur.Notes, _ => notes), cancellationToken) > 0;
     }
-
+    
     public async Task<bool> DeleteAsync(Guid sourceUserId, Guid targetUserId, CancellationToken cancellationToken = default)
     {
         return await _dbContext.UserRelations.Where(ur => ur.SourceUserId == sourceUserId && ur.TargetUserId == targetUserId).ExecuteDeleteAsync(cancellationToken) > 0;
     }
 
-    public async Task<int> PurgeAsync(Guid userId, UserRelationType? relationType, CancellationToken cancellationToken)
+    public Task<int> PurgeAsync(Guid userId, UserRelationType? relationType, CancellationToken cancellationToken)
     {
-        return await _dbContext.UserRelations.Where(ur => ur.SourceUserId == userId || ur.TargetUserId == userId).ExecuteDeleteAsync(cancellationToken);
+        return _dbContext.UserRelations.Where(ur => ur.SourceUserId == userId || ur.TargetUserId == userId).ExecuteDeleteAsync(cancellationToken);
     }
 }
