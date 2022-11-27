@@ -14,8 +14,8 @@ public class UserDto
         ProfilePictureId = Guid.Empty;
         OnlineStatus = UserOnlineStatus.Offline;
         OnlineStatusText = String.Empty;
-        LastOnline = DateTime.MinValue;
         CreatedAt = DateTime.MinValue;
+        LastOnline = DateTime.MinValue;
     }
     public UserDto(AccountEntity user)
     {
@@ -24,13 +24,14 @@ public class UserDto
         ProfilePictureId = user.ProfilePictureId;
         OnlineStatus = user.OnlineStatus;
         OnlineStatusText = user.OnlineStatusText;
-        LastOnline = user.LastOnline;
         CreatedAt = user.CreatedAt;
+        LastOnline = user.LastOnline;
     }
 
     /// <summary>
     /// 
     /// </summary>
+    [JsonPropertyOrder(0)]
     [JsonPropertyName("id")]
     public Guid Id { get; set; }
 
@@ -38,36 +39,42 @@ public class UserDto
     /// 
     /// </summary>
     [Username(false)]
+    [JsonPropertyOrder(1)]
     [JsonPropertyName("username")]
     public string Username { get; set; }
 
     /// <summary>
     /// 
     /// </summary>
+    [JsonPropertyOrder(5)]
     [JsonPropertyName("profile_picture_id")]
     public Guid ProfilePictureId { get; set; }
 
     /// <summary>
     /// 
     /// </summary>
+    [JsonPropertyOrder(8)]
     [JsonPropertyName("status")]
     public UserOnlineStatus OnlineStatus { get; set; }
 
     /// <summary>
     /// 
     /// </summary>
+    [JsonPropertyOrder(9)]
     [JsonPropertyName("status_text")]
     public string OnlineStatusText { get; set; }
 
     /// <summary>
     /// Date this account was created at
     /// </summary>
+    [JsonPropertyOrder(15)]
     [JsonPropertyName("created_at")]
     public DateTime CreatedAt { get; set; }
 
     /// <summary>
     /// Last time this user was online
     /// </summary>
+    [JsonPropertyOrder(16)]
     [JsonPropertyName("last_online")]
     public DateTime LastOnline { get; set; }
 }

@@ -24,30 +24,35 @@ public class AccountDto : UserDto
     /// Obfuscated email of your account
     /// </summary>
     [EmailAddress(false)]
+    [JsonPropertyOrder(3)]
     [JsonPropertyName("email")]
     public string ObscuredEmail { get; set; }
 
     /// <summary>
     /// True if email address has been verified
     /// </summary>
+    [JsonPropertyOrder(4)]
     [JsonPropertyName("email_verified")]
     public bool EmailVerified { get; set; }
 
     /// <summary>
     /// 
     /// </summary>
+    [JsonPropertyOrder(10)]
     [JsonPropertyName("accepted_tos_version")]
     public int AcceptedTosVersion { get; set; }
 
     /// <summary>
-    /// OAuth2 providers this account is connected to
-    /// </summary>
-    [JsonPropertyName("connected_accounts")]
-    public string[] ConnectedAccounts { get; set; }
-
-    /// <summary>
     /// Id of friends this account has
     /// </summary>
+    [JsonPropertyOrder(11)]
     [JsonPropertyName("friends")]
     public Guid[] Friends { get; set; }
+
+    /// <summary>
+    /// OAuth2 providers this account is connected to
+    /// </summary>
+    [JsonPropertyOrder(12)]
+    [JsonPropertyName("connected_accounts")]
+    public string[] ConnectedAccounts { get; set; }
 }
