@@ -36,7 +36,7 @@ public partial class AuthenticationController
             return this.Error_AnonymousOnly();
         }
 
-        await using TimeLock tl = TimeLock.FromSeconds(4, cancellationToken);
+        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
 
         AccountEntity? account = await userManager.GetByUsernameAsync(body.Username, cancellationToken) ?? await userManager.GetByEmailAsync(body.Username, cancellationToken);
         if (account == null)

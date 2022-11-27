@@ -25,7 +25,7 @@ public partial class AccountController
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> RecoveryRequest([FromBody] Account.Models.RecoveryRequest body, [FromServices] IMailGunService mailServiceProvider, CancellationToken cancellationToken)
     {
-        await using TimeLock tl = TimeLock.FromSeconds(1, cancellationToken);
+        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(1, cancellationToken);
 
         AccountEntity? account = await _userManager.GetByEmailAsync(body.Email, cancellationToken);
 

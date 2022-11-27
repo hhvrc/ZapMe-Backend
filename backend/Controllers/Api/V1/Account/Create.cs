@@ -66,7 +66,7 @@ public partial class AccountController
             return this.Error_InvalidModelState((nameof(body.Email), "Disposable Emails are not allowed"));
         }
 
-        await using TimeLock tl = TimeLock.FromSeconds(4, cancellationToken);
+        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
 
         // Create account
         AccountEntity? user = await _userManager.TryCreateAsync(body.UserName, body.Email, body.Password, cancellationToken);
