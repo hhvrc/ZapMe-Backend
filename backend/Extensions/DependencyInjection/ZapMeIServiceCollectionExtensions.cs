@@ -1,23 +1,46 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using ZapMe;
+using ZapMe.Controllers.Api.V1.Config.Models;
 using ZapMe.Services;
 using ZapMe.Services.Interfaces;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ZapMeIServiceCollectionExtensions
 {
-    public static void ZMAddHttpClients([NotNull] this IServiceCollection services)
+    public static void ZMAddHttpClients([NotNull] this IServiceCollection services, [NotNull] IConfiguration configuration)
     {
-        static void SetupHttpClient(HttpClient cli)
+        services.AddHttpClient("Debounce", static config =>
         {
-            cli.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(Constants.AppName, Constants.AppVersion.String));
-        }
-
-        services.AddHttpClient<IDebounceService, DebounceService>(SetupHttpClient);
-        services.AddHttpClient<IGoogleReCaptchaService, GoogleReCaptchaService>(SetupHttpClient);
-        services.AddHttpClient<IMailGunService, MailGunService>(SetupHttpClient);
+            config.BaseAddress = new Uri($"https://disposable.debounce.io/", UriKind.Absolute);
+            config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
+            config.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(Encoding.UTF8.WebName));
+            config.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(Constants.AppName, Constants.AppVersion.String));
+        });
+        services.AddHttpClient("GoogleReCaptcha", static config =>
+        {
+            config.BaseAddress = new Uri("https://www.google.com/recaptcha/api/", UriKind.Absolute);
+            config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
+            config.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(Encoding.UTF8.WebName));
+            config.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(Constants.AppName, Constants.AppVersion.String));
+        });
+        services.AddHttpClient("MailGun", config =>
+        {
+            config.BaseAddress = new Uri("https://api.eu.mailgun.net/v3/", UriKind.Absolute);
+            config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
+            config.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(Encoding.UTF8.WebName));
+            config.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(Constants.AppName, Constants.AppVersion.String));
+            config.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"api:{configuration["Mailgun:ApiKey"]}")));
+        });
+        
+        services.AddScoped<IDebounceService, DebounceService>();
+        services.AddScoped<IGoogleReCaptchaService, GoogleReCaptchaService>();
+        services.AddScoped<IMailGunService, MailGunService>();
     }
 
     public static void ZMAddPasswordHashing([NotNull] this IServiceCollection services)

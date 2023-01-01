@@ -8,17 +8,13 @@ namespace ZapMe.Services;
 
 public sealed class DebounceService : IDebounceService
 {
-    private readonly HttpClient _httpClient;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<DebounceService> _logger;
 
-    public DebounceService(HttpClient httpClient, ILogger<DebounceService> logger)
+    public DebounceService(IHttpClientFactory httpClientFactory, ILogger<DebounceService> logger)
     {
-        _httpClient = httpClient;
+        _httpClientFactory = httpClientFactory;
         _logger = logger;
-
-        // Set client defaults
-        _httpClient.BaseAddress = new Uri($"https://disposable.debounce.io", UriKind.Absolute);
-        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
     }
 
     private struct DebounceDisposableResponse
@@ -35,20 +31,16 @@ public sealed class DebounceService : IDebounceService
             return false;
         }
 
-        bool isDisposable;
+        HttpClient client = _httpClientFactory.CreateClient("Debounce");
 
-        try
+        using HttpResponseMessage response = await client.GetAsync("?email=" + anonymizedEmail, cancellationToken);
+
+        DebounceDisposableResponse content = await response.Content.ReadFromJsonAsync<DebounceDisposableResponse>(cancellationToken: cancellationToken);
+
+        if (!Boolean.TryParse(content.Disposable, out bool isDisposable))
         {
-            using HttpResponseMessage response = await _httpClient.GetAsync("?email=" + anonymizedEmail, cancellationToken);
-
-            DebounceDisposableResponse content = await response.Content.ReadFromJsonAsync<DebounceDisposableResponse>(cancellationToken: cancellationToken);
-
-            isDisposable = Boolean.Parse(content.Disposable);
-        }
-        catch (Exception)
-        {
-            isDisposable = false;
             _logger.LogError("disposable.io sent back invalid return for {}", anonymizedEmail);
+            return false;
         }
 
         return isDisposable;

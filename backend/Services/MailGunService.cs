@@ -1,5 +1,10 @@
-﻿using System.Net.Http.Headers;
+﻿using Polly;
+using Polly.CircuitBreaker;
+using Polly.Extensions.Http;
+using System.Net.Http.Headers;
+using System.ServiceModel.Channels;
 using System.Text;
+using System.Web;
 using ZapMe.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -7,39 +12,44 @@ namespace ZapMe.Services;
 
 public sealed class MailGunService : IMailGunService
 {
-    private readonly string _domainName;
-    private readonly HttpClient _httpClient;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly AsyncCircuitBreakerPolicy<HttpResponseMessage> _circuitBreaker;
     private readonly ILogger<LockOutStore> _logger;
 
-    public MailGunService(HttpClient httpClient, IConfiguration config, ILogger<LockOutStore> logger)
-    {
-        _domainName = config["Mailgun:Domain"] ?? throw new NullReferenceException("Config entry \"Mailgun:Domain\" is missing!");
-        _httpClient = httpClient;
+    public MailGunService(IHttpClientFactory httpClientFactory, ILogger<LockOutStore> logger)
+    {        
+        _httpClientFactory = httpClientFactory;
+        
+        _circuitBreaker = Policy<HttpResponseMessage>.Handle<HttpRequestException>().OrTransientHttpError()
+            .CircuitBreakerAsync(3, TimeSpan.FromSeconds(10));
+        
         _logger = logger;
-
-        string apiKey = config["Mailgun:ApiKey"] ?? throw new NullReferenceException("Config entry \"Mailgun:ApiKey\" is missing!");
-
-        // Set client defaults
-        _httpClient.BaseAddress = new Uri($"https://api.eu.mailgun.net/v3/{_domainName}/", UriKind.Absolute);
-        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"api:{apiKey}")));
     }
 
-    public async Task<bool> SendMailAsync(string senderName, string senderExt, string recepients, string subject, string htmlbody, CancellationToken cancellationToken)
+    public async Task<bool> SendMailAsync(string senderName, string senderExt, string senderDomain, string recepients, string subject, string htmlbody, CancellationToken cancellationToken)
     {
-        MultipartFormDataContent content = new MultipartFormDataContent
-        {
-            { new StringContent($"{senderName} <{senderExt}@{_domainName}>"), "from" },
-            { new StringContent(recepients), "to" },
-            { new StringContent(subject), "subject" },
-            { new StringContent(htmlbody), "html" }
-        };
+        HttpClient client = _httpClientFactory.CreateClient("MailGun");
 
-        using HttpResponseMessage result = await _httpClient.PostAsync("messages", content, cancellationToken);
-
-        if (!result.IsSuccessStatusCode)
+        // Send the request
+        using HttpResponseMessage response = await _circuitBreaker.ExecuteAsync(async () =>
+            await client.SendAsync(
+                new HttpRequestMessage(HttpMethod.Post, HttpUtility.UrlEncode(senderDomain) + "/messages")
+                {
+                    Content = new MultipartFormDataContent
+                    {
+                        { new StringContent($"{senderName} <{senderExt}@{senderDomain}>"), "from" },
+                        { new StringContent(recepients), "to" },
+                        { new StringContent(subject), "subject" },
+                        { new StringContent(htmlbody), "html" }
+                    }
+                },
+                cancellationToken
+            )
+        );
+        
+        if (!response.IsSuccessStatusCode)
         {
-            _logger.LogError("Failed to send mail: {} {}", result.StatusCode, await result.Content.ReadAsStringAsync(cancellationToken));
+            _logger.LogError("Failed to send mail: {} {}", response.StatusCode, await response.Content.ReadAsStringAsync(cancellationToken));
             return false;
         }
 
