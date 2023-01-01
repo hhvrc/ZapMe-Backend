@@ -11,6 +11,7 @@ public sealed class EmailAddressAttribute : ValidationAttribute, IParameterAttri
     public const string ExampleEmail = "user.name@example.com";
     private const string _ErrMsgMustBeString = "Email address must be a string";
     private const string _ErrMsgInvalid = "Email address is invalid";
+    private const string _ErrMsgContainsPlus = "Email address cannot contain a +";
 
     public bool ShouldValidate { get; }
 
@@ -33,9 +34,14 @@ public sealed class EmailAddressAttribute : ValidationAttribute, IParameterAttri
             return new ValidationResult(_ErrMsgMustBeString);
         }
 
-        if (!MailAddress.TryCreate(email, out _))
+        if (!MailAddress.TryCreate(email, out MailAddress? parsed) || parsed is null)
         {
             return new ValidationResult(_ErrMsgInvalid);
+        }
+
+        if (parsed.User.Contains('+'))
+        {
+            return new ValidationResult(_ErrMsgContainsPlus);
         }
 
         return ValidationResult.Success;
