@@ -37,8 +37,9 @@ public partial class AccountController
             {
                 string render = ResetPassword.Build(account.Username, Constants.BackendBaseUrl + "/reset-password?token=" + passwordResetToken);
 
+                // TODO: Hardcoded domain (replace with config)
                 // Send recovery secret to email
-                await mailServiceProvider.SendMailAsync("Hello", "hello", $"{account.Username} <{account.Email}>", "Password recovery", render, cancellationToken);
+                await mailServiceProvider.SendMailAsync("Hello", "hello", "heavenvr.tech", $"{account.Username} <{account.Email}>", "Password recovery", render, cancellationToken);
             }
         }
 
