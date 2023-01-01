@@ -1,10 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using ZapMe;
-using ZapMe.Controllers.Api.V1.Config.Models;
 using ZapMe.Services;
 using ZapMe.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;
@@ -13,31 +10,31 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ZapMeIServiceCollectionExtensions
 {
+    private static void AddHttpClientConsumingJson(IServiceCollection services, string name, string baseUri, Action<HttpClient>? configureClient = null)
+    {
+        services.AddHttpClient(name, config =>
+        {
+            config.BaseAddress = new Uri(baseUri, UriKind.Absolute);
+            config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
+            config.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(Encoding.UTF8.WebName));
+            config.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(Constants.AppName, Constants.AppVersion.String));
+            configureClient?.Invoke(config);
+        });
+    }
+
     public static void ZMAddHttpClients([NotNull] this IServiceCollection services, [NotNull] IConfiguration configuration)
     {
-        services.AddHttpClient("Debounce", static config =>
+        AddHttpClientConsumingJson(services, "Debounce", "https://disposable.debounce.io/");
+        AddHttpClientConsumingJson(services, "ReCaptcha", "https://www.google.com/recaptcha/api/");
+        AddHttpClientConsumingJson(services, "MailGun", "https://api.eu.mailgun.net/v3/", config =>
         {
-            config.BaseAddress = new Uri($"https://disposable.debounce.io/", UriKind.Absolute);
-            config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
-            config.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(Encoding.UTF8.WebName));
-            config.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(Constants.AppName, Constants.AppVersion.String));
+            string apiKey = configuration["MailGun:ApiKey"] ?? throw new KeyNotFoundException("Could not find \"MailGun:ApiKey\" in configuration");
+
+            string encodedApiKey = Convert.ToBase64String(Encoding.UTF8.GetBytes("api:" + apiKey));
+            
+            config.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", encodedApiKey);
         });
-        services.AddHttpClient("GoogleReCaptcha", static config =>
-        {
-            config.BaseAddress = new Uri("https://www.google.com/recaptcha/api/", UriKind.Absolute);
-            config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
-            config.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(Encoding.UTF8.WebName));
-            config.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(Constants.AppName, Constants.AppVersion.String));
-        });
-        services.AddHttpClient("MailGun", config =>
-        {
-            config.BaseAddress = new Uri("https://api.eu.mailgun.net/v3/", UriKind.Absolute);
-            config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
-            config.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue(Encoding.UTF8.WebName));
-            config.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(Constants.AppName, Constants.AppVersion.String));
-            config.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"api:{configuration["Mailgun:ApiKey"]}")));
-        });
-        
+
         services.AddScoped<IDebounceService, DebounceService>();
         services.AddScoped<IGoogleReCaptchaService, GoogleReCaptchaService>();
         services.AddScoped<IMailGunService, MailGunService>();
