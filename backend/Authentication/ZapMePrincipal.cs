@@ -5,12 +5,9 @@ namespace ZapMe.Authentication;
 
 public class ZapMePrincipal : ClaimsPrincipal
 {
-    public ZapMePrincipal(AccountEntity account) : base(new ZapMeIdentity(account))
+    public ZapMePrincipal(SessionEntity session) : base(new ZapMeIdentity(session))
     {
     }
 
     public new ZapMeIdentity Identity => (base.Identity as ZapMeIdentity)!;
-
-    public SessionEntity? SessionEntity { get; set; }
-    public SignInProperties? SignInProperties { get; set; }
 }

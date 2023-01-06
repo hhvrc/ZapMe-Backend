@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ZapMe.Constants;
 using ZapMe.Data.Models;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
@@ -27,19 +28,18 @@ public partial class AccountController
     {
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(1, cancellationToken);
 
-        AccountEntity? account = await _userManager.GetByEmailAsync(body.Email, cancellationToken);
+        AccountEntity? account = await _accountManager.GetByEmailAsync(body.Email, cancellationToken);
 
         if (account != null)
         {
             // Create/Overwrite recovery secret
-            string? passwordResetToken = await _userManager.GeneratePasswordResetTokenAsync(account.Id, cancellationToken);
+            string? passwordResetToken = await _accountManager.GeneratePasswordResetTokenAsync(account.Id, cancellationToken);
             if (passwordResetToken != null)
             {
-                string render = ResetPassword.Build(account.Username, Constants.BackendBaseUrl + "/reset-password?token=" + passwordResetToken);
+                string render = ResetPassword.Build(account.Name, App.BackendBaseUrl + "/reset-password?token=" + passwordResetToken);
 
-                // TODO: Hardcoded domain (replace with config)
                 // Send recovery secret to email
-                await mailServiceProvider.SendMailAsync("Hello", "hello", "heavenvr.tech", $"{account.Username} <{account.Email}>", "Password recovery", render, cancellationToken);
+                await mailServiceProvider.SendMailAsync("Hello", "hello", $"{account.Name} <{account.Email}>", "Password recovery", render, cancellationToken);
             }
         }
 

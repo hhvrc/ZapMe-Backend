@@ -1,7 +1,8 @@
-﻿namespace ZapMe.Authentication;
+﻿using ZapMe.Constants;
+
+namespace ZapMe.Authentication;
 
 public static class ZapMeAuthenticationDefaults
 {
-    public const string AuthenticationScheme = Constants.AppName;
-    public const string SignInPropertiesKey = "ZapMeAuthenticationProperties";
+    public const string AuthenticationScheme = App.AppName;
 }

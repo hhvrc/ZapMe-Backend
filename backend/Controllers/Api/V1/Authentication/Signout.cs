@@ -19,7 +19,7 @@ public partial class AuthenticationController
     {
         ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 
-        await _sessionManager.SignOutAsync(identity.SessionId, cancellationToken);
+        await _sessionManager.SessionStore.DeleteSessionAsync(identity.SessionId, cancellationToken);
 
         return SignOut();
     }

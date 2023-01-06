@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using ZapMe;
+using ZapMe.Constants;
 using ZapMe.Controllers;
 using ZapMe.Middlewares;
 
@@ -46,8 +46,7 @@ services.Configure<ApiBehaviorOptions>(static opt => opt.InvalidModelStateRespon
 // ######## ZAPME SERVICES ################
 // ########################################
 
-services.ZMAddDataCaching(configuration);
-services.ZMAddHttpClients(configuration);
+services.ZMAddHttpClients();
 services.ZMAddPasswordHashing();
 
 services.ZMAddUsers();
@@ -112,15 +111,14 @@ app.UseRouting();
 
 if (isDevelopment)
 {
-    app.UseCors(Constants.DevelopmentCorsPolicyName);
+    app.UseCors(App.DevelopmentCorsPolicyName);
 }
 
-app.UseAuthentication();
-
+// UseAuthentication is not required in .NET 7 because it is automatically called by UseAuthorization
 app.UseAuthorization();
 
 app.UseRateLimiter(); // As early as possible
-// App!.UseHealthChecks("/api/v1/health/"); // TODO: explore this
+// App!.UseHealthChecks("/api/v1/health/"); // TODO: explore thisl
 
 app.UseSwaggerAndUI();
 app.UseMiddleware<ActivityTracker>();

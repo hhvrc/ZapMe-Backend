@@ -12,10 +12,13 @@ public interface ISessionStore
     /// </summary>
     /// <param name="userId"></param>
     /// <param name="sessionName"></param>
+    /// <param name="ipAddress"></param>
+    /// <param name="countryCode"></param>
+    /// <param name="userAgent"></param>
     /// <param name="expiresAt"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<SessionEntity?> TryCreateAsync(Guid userId, string sessionName, DateTime expiresAt, CancellationToken cancellationToken = default);
+    Task<SessionEntity> CreateAsync(Guid userId, string sessionName, string ipAddress, string countryCode, UserAgentEntity userAgent, DateTime expiresAt, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -48,7 +51,7 @@ public interface ISessionStore
     /// <param name="sessionId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> DeleteAsync(Guid sessionId, CancellationToken cancellationToken);
+    Task<bool> DeleteSessionAsync(Guid sessionId, CancellationToken cancellationToken);
 
     /// <summary>
     /// 
@@ -56,5 +59,5 @@ public interface ISessionStore
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<int> DeleteAllAsync(Guid userId, CancellationToken cancellationToken);
+    Task<int> DeleteUserSessionsAsync(Guid userId, CancellationToken cancellationToken);
 }

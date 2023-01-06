@@ -69,7 +69,7 @@ public partial class AccountController
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
 
         // Create account
-        AccountEntity? user = await _userManager.TryCreateAsync(body.UserName, body.Email, body.Password, cancellationToken);
+        AccountEntity? user = await _accountManager.TryCreateAsync(body.UserName, body.Email, body.Password, cancellationToken);
         if (user == null)
         {
             return this.Error_InvalidModelState((nameof(body.UserName), "Username/Email already taken"), (nameof(body.Email), "Username/Email already taken"));

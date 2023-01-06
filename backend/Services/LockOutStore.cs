@@ -10,13 +10,11 @@ namespace ZapMe.Services;
 public sealed class LockOutStore : ILockOutStore
 {
     private readonly ZapMeContext _dbContext;
-    private readonly IHybridCache _cache;
     private readonly ILogger<LockOutStore> _logger;
 
-    public LockOutStore(ZapMeContext dbContext, IHybridCache cacheProviderService, ILogger<LockOutStore> logger)
+    public LockOutStore(ZapMeContext dbContext, ILogger<LockOutStore> logger)
     {
         _dbContext = dbContext;
-        _cache = cacheProviderService;
         _logger = logger;
     }
 
@@ -44,24 +42,12 @@ public sealed class LockOutStore : ILockOutStore
 
     public Task<LockOutEntity?> GetByIdAsync(Guid lockOutId, CancellationToken cancellationToken)
     {
-        return _cache.GetOrAddAsync("lockOut:id:" + lockOutId, async (_, ct) =>
-            new DTOs.HybridCacheEntry<LockOutEntity?>
-            {
-                Value = await _dbContext.LockOuts.FirstOrDefaultAsync(l => l.Id == lockOutId, ct),
-                ExpiresAtUtc = DateTime.UtcNow + TimeSpan.FromMinutes(5)
-            }
-        , cancellationToken);
+        return _dbContext.LockOuts.FirstOrDefaultAsync(l => l.Id == lockOutId, cancellationToken);
     }
 
     public Task<LockOutEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken)
     {
-        return _cache.GetOrAddAsync("lockOut:user:" + userId, async (_, ct) =>
-            new DTOs.HybridCacheEntry<LockOutEntity[]>
-            {
-                Value = await _dbContext.LockOuts.Where(l => l.UserId == userId).ToArrayAsync(ct),
-                ExpiresAtUtc = DateTime.UtcNow + TimeSpan.FromMinutes(5)
-            }
-        , cancellationToken);
+        return _dbContext.LockOuts.Where(l => l.UserId == userId).ToArrayAsync(cancellationToken);
     }
 
     private async Task<bool> UpdateAsync(Guid lockOutId, Expression<Func<SetPropertyCalls<LockOutEntity>, SetPropertyCalls<LockOutEntity>>> setPropertyCalls, CancellationToken cancellationToken)

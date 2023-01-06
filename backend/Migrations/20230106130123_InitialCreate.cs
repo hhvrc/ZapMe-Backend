@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -15,6 +16,44 @@ namespace ZapMe.Migrations
                 incrementBy: 10);
 
             migrationBuilder.CreateTable(
+                name: "userAgents",
+                columns: table => new
+                {
+                    hash = table.Column<byte[]>(type: "bytea", maxLength: 32, nullable: false),
+                    length = table.Column<int>(type: "integer", nullable: false),
+                    value = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
+                    createdAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_userAgents", x => x.hash);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "accounts",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    name = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    email = table.Column<string>(type: "character varying(320)", maxLength: 320, nullable: false),
+                    emailVerified = table.Column<bool>(type: "boolean", nullable: false),
+                    passwordHash = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
+                    acceptedTosVersion = table.Column<int>(type: "integer", nullable: false),
+                    profilePictureId = table.Column<Guid>(type: "uuid", nullable: false),
+                    statusOnline = table.Column<int>(type: "integer", nullable: false),
+                    statusText = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    passwordResetToken = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
+                    passwordResetRequestedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    createdAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    updatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    lastOnline = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_accounts", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "friendRequests",
                 columns: table => new
                 {
@@ -25,6 +64,18 @@ namespace ZapMe.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_friendRequests", x => new { x.senderId, x.receiverId });
+                    table.ForeignKey(
+                        name: "FK_friendRequests_accounts_receiverId",
+                        column: x => x.receiverId,
+                        principalTable: "accounts",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_friendRequests_accounts_senderId",
+                        column: x => x.senderId,
+                        principalTable: "accounts",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -42,35 +93,11 @@ namespace ZapMe.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_images", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "users",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    username = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    email = table.Column<string>(type: "character varying(320)", maxLength: 320, nullable: false),
-                    emailVerified = table.Column<bool>(type: "boolean", nullable: false),
-                    passwordHash = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
-                    acceptedTosVersion = table.Column<int>(type: "integer", nullable: false),
-                    profilePictureId = table.Column<Guid>(type: "uuid", nullable: false),
-                    statusOnline = table.Column<int>(type: "integer", nullable: false),
-                    statusText = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    passwordResetToken = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
-                    passwordResetRequestedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    createdAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    updatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    lastOnline = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_users", x => x.id);
                     table.ForeignKey(
-                        name: "FK_users_images_profilePictureId",
-                        column: x => x.profilePictureId,
-                        principalTable: "images",
-                        principalColumn: "Id",
+                        name: "FK_images_accounts_uploaderId",
+                        column: x => x.uploaderId,
+                        principalTable: "accounts",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.SetNull);
                 });
 
@@ -89,9 +116,9 @@ namespace ZapMe.Migrations
                 {
                     table.PrimaryKey("PK_lockOuts", x => x.id);
                     table.ForeignKey(
-                        name: "FK_lockOuts_users_userId",
+                        name: "FK_lockOuts_accounts_userId",
                         column: x => x.userId,
-                        principalTable: "users",
+                        principalTable: "accounts",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -109,9 +136,9 @@ namespace ZapMe.Migrations
                 {
                     table.PrimaryKey("PK_oauthConnections", x => new { x.userId, x.providerName });
                     table.ForeignKey(
-                        name: "FK_oauthConnections_users_userId",
+                        name: "FK_oauthConnections_accounts_userId",
                         column: x => x.userId,
-                        principalTable: "users",
+                        principalTable: "accounts",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -123,6 +150,9 @@ namespace ZapMe.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     userId = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    ipAddress = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
+                    country = table.Column<string>(type: "character varying(2)", maxLength: 2, nullable: false),
+                    userAgent = table.Column<byte[]>(type: "bytea", maxLength: 32, nullable: false),
                     createdAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
                     expiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -130,10 +160,16 @@ namespace ZapMe.Migrations
                 {
                     table.PrimaryKey("PK_sessions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_sessions_users_userId",
+                        name: "FK_sessions_accounts_userId",
                         column: x => x.userId,
-                        principalTable: "users",
+                        principalTable: "accounts",
                         principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_sessions_userAgents_userAgent",
+                        column: x => x.userAgent,
+                        principalTable: "userAgents",
+                        principalColumn: "hash",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -152,15 +188,15 @@ namespace ZapMe.Migrations
                 {
                     table.PrimaryKey("PK_userRelations", x => new { x.sourceUserId, x.targetUserId });
                     table.ForeignKey(
-                        name: "FK_userRelations_users_sourceUserId",
+                        name: "FK_userRelations_accounts_sourceUserId",
                         column: x => x.sourceUserId,
-                        principalTable: "users",
+                        principalTable: "accounts",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_userRelations_users_targetUserId",
+                        name: "FK_userRelations_accounts_targetUserId",
                         column: x => x.targetUserId,
-                        principalTable: "users",
+                        principalTable: "accounts",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -177,12 +213,35 @@ namespace ZapMe.Migrations
                 {
                     table.PrimaryKey("PK_userRoles", x => new { x.userId, x.roleName });
                     table.ForeignKey(
-                        name: "FK_userRoles_users_userId",
+                        name: "FK_userRoles_accounts_userId",
                         column: x => x.userId,
-                        principalTable: "users",
+                        principalTable: "accounts",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "accounts_email_idx",
+                table: "accounts",
+                column: "email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "accounts_name_idx",
+                table: "accounts",
+                column: "name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "accounts_passwordResetToken_idx",
+                table: "accounts",
+                column: "passwordResetToken",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_accounts_profilePictureId",
+                table: "accounts",
+                column: "profilePictureId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_friendRequests_receiverId",
@@ -198,6 +257,11 @@ namespace ZapMe.Migrations
                 name: "IX_lockOuts_userId",
                 table: "lockOuts",
                 column: "userId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_sessions_userAgent",
+                table: "sessions",
+                column: "userAgent");
 
             migrationBuilder.CreateIndex(
                 name: "IX_sessions_userId",
@@ -219,51 +283,12 @@ namespace ZapMe.Migrations
                 table: "userRoles",
                 column: "userId");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_users_profilePictureId",
-                table: "users",
-                column: "profilePictureId");
-
-            migrationBuilder.CreateIndex(
-                name: "users_email_idx",
-                table: "users",
-                column: "email",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "users_passwordResetToken_idx",
-                table: "users",
-                column: "passwordResetToken",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "users_username_idx",
-                table: "users",
-                column: "username",
-                unique: true);
-
             migrationBuilder.AddForeignKey(
-                name: "FK_friendRequests_users_receiverId",
-                table: "friendRequests",
-                column: "receiverId",
-                principalTable: "users",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_friendRequests_users_senderId",
-                table: "friendRequests",
-                column: "senderId",
-                principalTable: "users",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_images_users_uploaderId",
-                table: "images",
-                column: "uploaderId",
-                principalTable: "users",
-                principalColumn: "id",
+                name: "FK_accounts_images_profilePictureId",
+                table: "accounts",
+                column: "profilePictureId",
+                principalTable: "images",
+                principalColumn: "Id",
                 onDelete: ReferentialAction.SetNull);
         }
 
@@ -271,8 +296,8 @@ namespace ZapMe.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_images_users_uploaderId",
-                table: "images");
+                name: "FK_accounts_images_profilePictureId",
+                table: "accounts");
 
             migrationBuilder.DropTable(
                 name: "friendRequests");
@@ -293,10 +318,13 @@ namespace ZapMe.Migrations
                 name: "userRoles");
 
             migrationBuilder.DropTable(
-                name: "users");
+                name: "userAgents");
 
             migrationBuilder.DropTable(
                 name: "images");
+
+            migrationBuilder.DropTable(
+                name: "accounts");
 
             migrationBuilder.DropSequence(
                 name: "EntityFrameworkHiLoSequence");

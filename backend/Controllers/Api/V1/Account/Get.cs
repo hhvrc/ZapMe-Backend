@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.Models;
-using ZapMe.Data.Models;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
@@ -20,8 +19,8 @@ public partial class AccountController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)]
     public IActionResult Get()
     {
-        SessionEntity session = (User as ZapMePrincipal)?.SessionEntity ?? throw new NullReferenceException("SessionEntity is null.");
+        ZapMeIdentity identity = (User as ZapMePrincipal)!.Identity;
 
-        return Ok(new Account.Models.AccountDto(session.User)); // TODO: use a mapper FFS
+        return Ok(new Account.Models.AccountDto(identity.Account)); // TODO: use a mapper FFS
     }
 }

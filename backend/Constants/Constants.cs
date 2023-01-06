@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 
-namespace ZapMe;
+namespace ZapMe.Constants;
 
-public static class Constants
+public static class App
 {
     public const string AppName = "ZapMe";
     public const string AppCreator = "HeavenVR";
@@ -19,6 +19,7 @@ public static class Constants
     }
 
     public const string AppDescription = "Open source application to control things";
+    public const string WebsiteUrl = "https://heavenvr.tech/";
     public const string BackendBaseUrl = "https://heavenvr.tech/zapme";
 
     public const string MainPageUrl = BackendBaseUrl;

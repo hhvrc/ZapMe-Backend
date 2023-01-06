@@ -14,10 +14,10 @@ public sealed partial class AccountController : ControllerBase
 {
     public string ControllerRoute { get; private set; } = String.Empty;
 
-    private readonly IUserManager _userManager;
+    private readonly IAccountManager _accountManager;
 
-    public AccountController(IUserManager userManager)
+    public AccountController(IAccountManager userManager)
     {
-        _userManager = userManager;
+        _accountManager = userManager;
     }
 }

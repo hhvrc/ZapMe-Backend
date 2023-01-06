@@ -7,15 +7,19 @@ namespace ZapMe.Services;
 
 public sealed class GoogleReCaptchaService : IGoogleReCaptchaService
 {
-    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly HttpClient _httpClient;
     private readonly ILogger<GoogleReCaptchaService> _logger;
     private readonly string _reCaptchaSecret;
 
-    public GoogleReCaptchaService(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<GoogleReCaptchaService> logger)
+    public GoogleReCaptchaService(HttpClient httpClient, IConfiguration configuration, ILogger<GoogleReCaptchaService> logger)
     {
-        _httpClientFactory = httpClientFactory;
+        _httpClient = httpClient;
         _logger = logger;
         _reCaptchaSecret = configuration["Authorization:ReCaptcha:Secret"] ?? throw new KeyNotFoundException("Config entry \"Authorization:ReCaptcha:Secret\" is missing!");
+
+        // Set client defaults
+        _httpClient.BaseAddress = new Uri("https://www.google.com/recaptcha/api/", UriKind.Absolute);
+        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
     }
 
     private static IEnumerable<KeyValuePair<string, string>> CreateEnumerableKVPair(params (string, string)[] kvPairs)
@@ -48,10 +52,8 @@ public sealed class GoogleReCaptchaService : IGoogleReCaptchaService
             ("response", reCaptchaToken),
             ("remoteip", remoteIpAddress)
         );
-        
-        HttpClient client = _httpClientFactory.CreateClient("GoogleReCaptcha");
 
-        using HttpResponseMessage response = await client.PostAsync("siteverify", content, cancellationToken);
+        using HttpResponseMessage response = await _httpClient.PostAsync("siteverify", content, cancellationToken);
 
         return await response.Content.ReadFromJsonAsync<GoogleReCaptchaVerifyResponse>(cancellationToken: cancellationToken);
     }

@@ -1,5 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using ZapMe;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using ZapMe.Authentication;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -9,18 +11,32 @@ public static class AuthenticationIServiceCollectionExtensions
     public static void ZMAddAuthentication([NotNull] this IServiceCollection services, [NotNull] IConfiguration configuration)
     {
         services
-            .AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
-            .AddZapMe(opt =>
+            .AddAuthentication(opt =>
             {
-                CookieBuilder cookie = opt.Cookie;
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(opt =>
+            {
+                opt.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = configuration["Jwt:Issuer"],
+                    ValidAudience = configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SigningKey"]!)),
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
 
-                cookie.Name = Constants.LoginCookieName;
-                cookie.HttpOnly = true;
-                cookie.IsEssential = true;
-                cookie.SameSite = SameSiteMode.Strict;
-                cookie.SecurePolicy = CookieSecurePolicy.Always;
-                cookie.MaxAge = opt.ExpiresTimeSpanSession;
-                cookie.Expiration = opt.ExpiresTimeSpanSession;
+                };
+                opt.Events = new JwtBearerEvents
+                {
+                    OnChallenge = JwtEventHandlers.OnChallenge,
+                    OnForbidden = JwtEventHandlers.OnForbidden,
+                    OnTokenValidated = JwtEventHandlers.OnTokenValidated,
+                    OnAuthenticationFailed = JwtEventHandlers.OnAuthenticationFailed,
+                };
             })
             .AddGoogle(opt =>
             {
@@ -36,8 +52,10 @@ public static class AuthenticationIServiceCollectionExtensions
                 opt.ClientSecret = configuration["Authorization:GitHub:ClientSecret"]!;
                 opt.CallbackPath = configuration["Authorization:GitHub:CallbackPath"]!;
                 opt.Scope.Add("user:email");
-            })/*
+            });/*
             .AddTwitter(options => {
-            })*/;
+            });
+            */
+
     }
 }
