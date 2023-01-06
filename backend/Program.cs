@@ -46,7 +46,6 @@ services.Configure<ApiBehaviorOptions>(static opt => opt.InvalidModelStateRespon
 // ######## ZAPME SERVICES ################
 // ########################################
 
-services.ZMAddDataCaching(configuration);
 services.ZMAddHttpClients();
 services.ZMAddPasswordHashing();
 

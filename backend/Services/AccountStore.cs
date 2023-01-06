@@ -11,13 +11,11 @@ namespace ZapMe.Services;
 public sealed class AccountStore : IAccountStore
 {
     private readonly ZapMeContext _dbContext;
-    private readonly IHybridCache _cache;
     private readonly ILogger<AccountStore> _logger;
 
-    public AccountStore(ZapMeContext dbContext, IHybridCache cacheProviderService, ILogger<AccountStore> logger)
+    public AccountStore(ZapMeContext dbContext, ILogger<AccountStore> logger)
     {
         _dbContext = dbContext;
-        _cache = cacheProviderService;
         _logger = logger;
     }
 
@@ -44,26 +42,14 @@ public sealed class AccountStore : IAccountStore
         return null;
     }
 
-    public async Task<AccountEntity?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
+    public Task<AccountEntity?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
     {
-        return await _cache.GetOrAddAsync("user:id:" + userId, async (_, ct) =>
-            new DTOs.HybridCacheEntry<AccountEntity?>
-            {
-                Value = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId, ct),
-                ExpiresAtUtc = DateTime.UtcNow + TimeSpan.FromMinutes(5)
-            }
-        , cancellationToken);
+        return _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
     }
 
-    public async Task<AccountEntity?> GetByNameAsync(string userName, CancellationToken cancellationToken)
+    public Task<AccountEntity?> GetByNameAsync(string userName, CancellationToken cancellationToken)
     {
-        return await _cache.GetOrAddAsync("user:name:" + userName, async (_, ct) =>
-            new DTOs.HybridCacheEntry<AccountEntity?>
-            {
-                Value = await _dbContext.Users.FirstOrDefaultAsync(u => u.Name == userName, ct),
-                ExpiresAtUtc = DateTime.UtcNow + TimeSpan.FromMinutes(5)
-            }
-        , cancellationToken);
+        return _dbContext.Users.FirstOrDefaultAsync(u => u.Name == userName, cancellationToken);
     }
 
     public Task<AccountEntity?> GetByEmailAsync(string email, CancellationToken cancellationToken)

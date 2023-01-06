@@ -12,7 +12,7 @@ using ZapMe.Data;
 namespace ZapMe.Migrations
 {
     [DbContext(typeof(ZapMeContext))]
-    [Migration("20221127001129_InitialCreate")]
+    [Migration("20230106130123_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace ZapMe.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.0")
+                .HasAnnotation("ProductVersion", "7.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseHiLo(modelBuilder, "EntityFrameworkHiLoSequence");
@@ -62,6 +62,12 @@ namespace ZapMe.Migrations
                         .HasColumnName("lastOnline")
                         .HasDefaultValueSql("now()");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("name");
+
                     b.Property<int>("OnlineStatus")
                         .HasColumnType("integer")
                         .HasColumnName("statusOnline");
@@ -97,29 +103,23 @@ namespace ZapMe.Migrations
                         .HasColumnName("updatedAt")
                         .HasDefaultValueSql("now()");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
-                        .HasColumnName("username");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
                         .IsUnique()
-                        .HasDatabaseName("users_email_idx");
+                        .HasDatabaseName("accounts_email_idx");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("accounts_name_idx");
 
                     b.HasIndex("PasswordResetToken")
                         .IsUnique()
-                        .HasDatabaseName("users_passwordResetToken_idx");
+                        .HasDatabaseName("accounts_passwordResetToken_idx");
 
                     b.HasIndex("ProfilePictureId");
 
-                    b.HasIndex("Username")
-                        .IsUnique()
-                        .HasDatabaseName("users_username_idx");
-
-                    b.ToTable("users", (string)null);
+                    b.ToTable("accounts", (string)null);
                 });
 
             modelBuilder.Entity("ZapMe.Data.Models.FriendRequestEntity", b =>
@@ -253,6 +253,12 @@ namespace ZapMe.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("CountryCode")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)")
+                        .HasColumnName("country");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -263,11 +269,23 @@ namespace ZapMe.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expiresAt");
 
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("ipAddress");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)")
                         .HasColumnName("name");
+
+                    b.Property<byte[]>("UserAgentHash")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("bytea")
+                        .HasColumnName("userAgent");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
@@ -275,9 +293,39 @@ namespace ZapMe.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserAgentHash");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("sessions", (string)null);
+                });
+
+            modelBuilder.Entity("ZapMe.Data.Models.UserAgentEntity", b =>
+                {
+                    b.Property<byte[]>("Hash")
+                        .HasMaxLength(32)
+                        .HasColumnType("bytea")
+                        .HasColumnName("hash");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("createdAt")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<int>("Length")
+                        .HasColumnType("integer")
+                        .HasColumnName("length");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)")
+                        .HasColumnName("value");
+
+                    b.HasKey("Hash");
+
+                    b.ToTable("userAgents", (string)null);
                 });
 
             modelBuilder.Entity("ZapMe.Data.Models.UserRelationEntity", b =>
@@ -409,13 +457,21 @@ namespace ZapMe.Migrations
 
             modelBuilder.Entity("ZapMe.Data.Models.SessionEntity", b =>
                 {
-                    b.HasOne("ZapMe.Data.Models.AccountEntity", "User")
+                    b.HasOne("ZapMe.Data.Models.UserAgentEntity", "UserAgent")
+                        .WithMany()
+                        .HasForeignKey("UserAgentHash")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ZapMe.Data.Models.AccountEntity", "Account")
                         .WithMany("Sessions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Account");
+
+                    b.Navigation("UserAgent");
                 });
 
             modelBuilder.Entity("ZapMe.Data.Models.UserRelationEntity", b =>

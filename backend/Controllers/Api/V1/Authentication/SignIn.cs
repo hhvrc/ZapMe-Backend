@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ZapMe.Authentication;
+using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data.Models;
 using ZapMe.Helpers;
@@ -73,8 +74,16 @@ public partial class AuthenticationController
             return this.Error(StatusCodes.Status400BadRequest, "Terms of Service not accepted", "Please accept the Terms of Service before signing in", UserNotification.SeverityLevel.Error, "Terms of Service not accepted", "Please accept the Terms of Service before signing in");
         }
 
-        SessionEntity session = await _sessionManager.CreateAsync(account.Id, body.SessionName, this.GetRemoteIP(), this.GetRemoteUserAgent(), this.GetRemoteUserAgent(), body.RememberMe, cancellationToken);
+        string userAgent = this.GetRemoteUserAgent();
 
-        return SignIn(new ZapMePrincipal(session), ZapMeAuthenticationDefaults.AuthenticationScheme);
+        if (userAgent.Length > UserAgentLimits.MaxLength)
+        {
+            // Request body too large
+            return this.Error(StatusCodes.Status413RequestEntityTooLarge, "User-Agent too long", "User-Agent header has a hard limit on 2048 characters", UserNotification.SeverityLevel.Error, "Bad client behaviour", "Your client has unexpected behaviour");
+        }
+
+        SessionEntity session = await _sessionManager.CreateAsync(account.Id, body.SessionName, this.GetRemoteIP(), this.GetCloudflareIPCountry(), userAgent, body.RememberMe, cancellationToken);
+
+        return SignIn(new ZapMePrincipal(session));
     }
 }

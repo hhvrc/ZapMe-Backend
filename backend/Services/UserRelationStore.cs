@@ -8,13 +8,11 @@ namespace ZapMe.Services;
 public sealed class UserRelationStore : IUserRelationStore
 {
     private readonly ZapMeContext _dbContext;
-    private readonly IHybridCache _cache;
     private readonly ILogger<UserRelationStore> _logger;
 
-    public UserRelationStore(ZapMeContext dbContext, IHybridCache cacheProviderService, ILogger<UserRelationStore> logger)
+    public UserRelationStore(ZapMeContext dbContext, ILogger<UserRelationStore> logger)
     {
         _dbContext = dbContext;
-        _cache = cacheProviderService;
         _logger = logger;
     }
 

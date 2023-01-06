@@ -8,13 +8,11 @@ namespace ZapMe.Services;
 public class FriendRequestStore : IFriendRequestStore
 {
     private readonly ZapMeContext _dbContext;
-    private readonly IHybridCache _cache;
     private readonly ILogger<FriendRequestStore> _logger;
 
-    public FriendRequestStore(ZapMeContext dbContext, IHybridCache cacheProviderService, ILogger<FriendRequestStore> logger)
+    public FriendRequestStore(ZapMeContext dbContext, ILogger<FriendRequestStore> logger)
     {
         _dbContext = dbContext;
-        _cache = cacheProviderService;
         _logger = logger;
     }
 

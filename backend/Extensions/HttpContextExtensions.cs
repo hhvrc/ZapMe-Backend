@@ -46,7 +46,7 @@ public static class HttpContextExtensions
 
     public static string GetCloudflareIPCountry(this HttpContext context)
     {
-        return context.Request.Headers.GetFirst("cf-ipcountry") ?? "XX";
+        return context.Request.Headers.GetFirst("cf-ipcountry") ?? "ZZ";
     }
 
     public static string GetRemoteUserAgent(this HttpContext context)

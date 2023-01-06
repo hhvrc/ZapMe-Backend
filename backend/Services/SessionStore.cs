@@ -17,7 +17,7 @@ public sealed class SessionStore : ISessionStore
     }
 
 
-    public async Task<SessionEntity> CreateAsync(Guid userId, string sessionName, string ipAddress, string? countryCode, UserAgentEntity userAgent, DateTime expiresAt, CancellationToken cancellationToken)
+    public async Task<SessionEntity> CreateAsync(Guid userId, string sessionName, string ipAddress, string countryCode, UserAgentEntity userAgent, DateTime expiresAt, CancellationToken cancellationToken)
     {
         SessionEntity session = new SessionEntity
         {
@@ -25,7 +25,7 @@ public sealed class SessionStore : ISessionStore
             UserId = userId,
             Name = sessionName,
             IpAddress = ipAddress,
-            CountryCode = countryCode ?? "ZZ",
+            CountryCode = countryCode,
             UserAgentHash = userAgent.Hash,
             UserAgent = null!,
             ExpiresAt = expiresAt

@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 using System.Text;
 using ZapMe.Constants;
 using ZapMe.Data;
@@ -21,12 +22,18 @@ public sealed class UserAgentStore : IUserAgentStore
         int length = userAgent.Length;
         byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(userAgent));
 
+        UserAgentEntity? entry = await _dbContext.UserAgents.Where(x => x.Hash == hash).FirstOrDefaultAsync(cancellationToken);
+        if (entry != null)
+        {
+            return entry;
+        }
+
         if (userAgent.Length > UserAgentLimits.StoredLength)
         {
             userAgent = userAgent[..UserAgentLimits.StoredLength];
         }
 
-        var entry = new UserAgentEntity
+        entry = new UserAgentEntity
         {
             Hash = hash,
             Length = length,

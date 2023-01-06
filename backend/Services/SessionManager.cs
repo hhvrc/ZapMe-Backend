@@ -16,7 +16,7 @@ public sealed class SessionManager : ISessionManager
         _logger = logger;
     }
 
-    public async Task<SessionEntity> CreateAsync(Guid userId, string sessionName, string ipAddress, string? countryCode, string userAgent, bool rememberMe, CancellationToken cancellationToken = default)
+    public async Task<SessionEntity> CreateAsync(Guid userId, string sessionName, string ipAddress, string countryCode, string userAgent, bool rememberMe, CancellationToken cancellationToken = default)
     {
         UserAgentEntity userAgentEntity = await UserAgentStore.EnsureCreatedAsync(userAgent, cancellationToken);
         DateTime expiresAt = DateTime.UtcNow.Add(rememberMe ? TimeSpan.FromDays(30) : TimeSpan.FromHours(1));
