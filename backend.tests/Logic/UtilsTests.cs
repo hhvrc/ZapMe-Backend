@@ -2,7 +2,7 @@
 
 namespace ZapMe.Tests.Logic;
 
-public sealed class UtilTest
+public sealed class UtilTests
 {
     [Fact]
     public void GenerateRandomString_Length()

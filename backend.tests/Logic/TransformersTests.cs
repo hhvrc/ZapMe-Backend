@@ -4,52 +4,77 @@ namespace ZapMe.Tests.Logic;
 
 public sealed class TransformersTests
 {
-    [Fact]
-    public void ObscureDomain_Normal()
+    [Theory]
+    [InlineData("", "")]
+    [InlineData("a", "*")]
+    [InlineData("ab", "**")]
+    [InlineData("abc", "***")]
+    [InlineData("abc.", "***.")]
+    [InlineData("a.com", "*.com")]
+    [InlineData("ab.com", "**.com")]
+    [InlineData("abc.com", "***.com")]
+    [InlineData("abcd.com", "****.com")]
+    [InlineData("abcde.com", "a***e.com")]
+    [InlineData("abcdef.com", "a****f.com")]
+    public void ObscureDomain_EmptyOrValid_ReturnsObscured(string input, string expected)
     {
-        Assert.Equal("***", Transformers.ObscureDomain("wtf"));
-        Assert.Equal("***.", Transformers.ObscureDomain("wtf."));
-        Assert.Equal("*.com", Transformers.ObscureDomain("a.com"));
-        Assert.Equal("**.com", Transformers.ObscureDomain("ez.com"));
-        Assert.Equal("***.com", Transformers.ObscureDomain("lol.com"));
-        Assert.Equal("****.com", Transformers.ObscureDomain("test.com"));
-        Assert.Equal("b***d.com", Transformers.ObscureDomain("bread.com"));
-        Assert.Equal("e*****e.com", Transformers.ObscureDomain("example.com"));
-        Assert.Equal(String.Empty, Transformers.ObscureDomain(String.Empty));
+        // Act
+        var result = Transformers.ObscureDomain(input);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData(" ")]
+    [InlineData(".")]
+    [InlineData("....")]
+    [InlineData("..com")]
+    [InlineData(".com")]
+    [InlineData("example..")]
+    public void ObscureDomain_InvalidDomain_ThrowsFormatException(string value)
+    {
+        Assert.Throws<FormatException>(() => Transformers.ObscureDomain(value));
     }
 
     [Fact]
-    public void ObscureDomain_ThrowsException()
+    public void ObscureDomain_Null_ThrowsArgumentNullException()
     {
-        Assert.Throws<FormatException>(() => Transformers.ObscureDomain("example.."));
-        Assert.Throws<FormatException>(() => Transformers.ObscureDomain(".com"));
-        Assert.Throws<FormatException>(() => Transformers.ObscureDomain("..com"));
-        Assert.Throws<FormatException>(() => Transformers.ObscureDomain("...."));
-        Assert.Throws<FormatException>(() => Transformers.ObscureDomain("."));
         Assert.Throws<ArgumentNullException>(() => Transformers.ObscureDomain(null!));
     }
-
-    [Fact]
-    public void ObscureEmail_Normal()
+    
+    [Theory]
+    [InlineData("", "")]
+    [InlineData("a@b", "*@*")]
+    [InlineData("a.b@c.d", "***@*.d")]
+    [InlineData("test@test", "****@****")]
+    [InlineData("bread@bread", "b***d@b***d")]
+    [InlineData("user.name@example", "u*******e@e*****e")]
+    [InlineData("user.name@example.com", "u*******e@e*****e.com")]
+    public void ObscureEmail_EmptyOrValid_ReturnsObscured(string input, string expected)
     {
-        Assert.Equal("*@*", Transformers.ObscureEmail("a@b"));
-        Assert.Equal("***@*.d", Transformers.ObscureEmail("a.b@c.d"));
-        Assert.Equal("****@****", Transformers.ObscureEmail("test@test"));
-        Assert.Equal("b***d@b***d", Transformers.ObscureEmail("bread@bread"));
-        Assert.Equal("u*******e@e*****e", Transformers.ObscureEmail("user.name@example"));
-        Assert.Equal("u*******e@e*****e.com", Transformers.ObscureEmail("user.name@example.com"));
-        Assert.Equal(String.Empty, Transformers.ObscureEmail(String.Empty));
+        // Act
+        var result = Transformers.ObscureEmail(input);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData("@")]
+    [InlineData("@@example")]
+    [InlineData("@example")]
+    [InlineData("user@@")]
+    [InlineData("user@")]
+    [InlineData("example")]
+    public void ObscureEmail_InvalidEmail_ThrowsFormatException(string value)
+    {
+        Assert.Throws<FormatException>(() => Transformers.ObscureEmail(value));
     }
 
     [Fact]
-    public void ObscureEmail_ThrowsException()
+    public void ObscureEmail_Null_ThrowsArgumentNullException()
     {
-        Assert.Throws<FormatException>(() => Transformers.ObscureEmail("example"));
-        Assert.Throws<FormatException>(() => Transformers.ObscureEmail("user@"));
-        Assert.Throws<FormatException>(() => Transformers.ObscureEmail("user@@"));
-        Assert.Throws<FormatException>(() => Transformers.ObscureEmail("@example"));
-        Assert.Throws<FormatException>(() => Transformers.ObscureEmail("@@example"));
-        Assert.Throws<FormatException>(() => Transformers.ObscureEmail("@"));
         Assert.Throws<ArgumentNullException>(() => Transformers.ObscureEmail(null!));
     }
 

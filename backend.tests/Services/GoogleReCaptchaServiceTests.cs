@@ -8,18 +8,23 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Tests.Services;
 
-public sealed class GoogleReCaptchaServiceTest
+public sealed class GoogleReCaptchaServiceTests
 {
-    private readonly IGoogleReCaptchaService _sut;
-    private readonly HttpClient _httpClient;
     private readonly string _reCaptchaSecret;
+    private readonly IGoogleReCaptchaService _sut;
     private readonly IConfiguration _configuration;
-    private readonly Bogus.Faker _faker = new Bogus.Faker();
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly Mock<ILogger<GoogleReCaptchaService>> _loggerMock = new();
-    private readonly MockHttpMessageHandler _handler = new MockHttpMessageHandler();
+    private readonly MockHttpMessageHandler _handlerMock = new MockHttpMessageHandler();
+    private readonly Bogus.Faker _faker = new Bogus.Faker();
 
-    public GoogleReCaptchaServiceTest()
+    public GoogleReCaptchaServiceTests()
     {
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(It.IsAny<string>()))
+            .Returns(() => new HttpClient(_handlerMock) { BaseAddress = new Uri("https://disposable.debounce.io", UriKind.Absolute) });
+
         _reCaptchaSecret = _faker.Random.AlphaNumeric(32);
 
         _configuration = new ConfigurationBuilder()
@@ -28,15 +33,15 @@ public sealed class GoogleReCaptchaServiceTest
             })
             .Build();
 
-        _httpClient = new HttpClient(_handler);
-        _sut = new GoogleReCaptchaService(_httpClient, _configuration, _loggerMock.Object);
+        _httpClientFactory = httpClientFactoryMock.Object;
+        _sut = new GoogleReCaptchaService(_httpClientFactory, _configuration, _loggerMock.Object);
     }
 
     private async Task<GoogleReCaptchaVerifyResponse> CreateRequest(string userResponseToken, string remoteIp, string responseBody)
     {
         responseBody = responseBody.Replace("{DateTime}", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"));
 
-        _handler
+        _handlerMock
             .When(HttpMethod.Post, "https://www.google.com/recaptcha/api/siteverify")
             .With(req => req.Content?.Headers?.ContentType?.MediaType == "application/x-www-form-urlencoded")
             .WithExactFormData(new KeyValuePair<string, string?>[] {
