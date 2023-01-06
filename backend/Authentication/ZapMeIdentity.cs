@@ -11,7 +11,7 @@ public class ZapMeIdentity : ClaimsIdentity
     private IEnumerable<Claim?> CreateClaims(AccountEntity account)
     {
         yield return CreateClaim(ClaimTypes.NameIdentifier, account.Id.ToString());
-        yield return CreateClaim(ClaimTypes.Name, account.Username);
+        yield return CreateClaim(ClaimTypes.Name, account.Name);
         yield return CreateClaim(ClaimTypes.Email, account.Email);
 
         ICollection<UserRoleEntity>? roles = account.UserRoles;
@@ -24,9 +24,10 @@ public class ZapMeIdentity : ClaimsIdentity
         }
     }
 
-    public ZapMeIdentity(AccountEntity account) : base(ZapMeAuthenticationDefaults.AuthenticationScheme)
+    public ZapMeIdentity(SessionEntity session) : base(ZapMeAuthenticationDefaults.AuthenticationScheme)
     {
-        AddClaims(CreateClaims(account));
+        Session = session;
+        AddClaims(CreateClaims(Account));
     }
 
     private Guid GetGuid(string claimType)
@@ -46,18 +47,21 @@ public class ZapMeIdentity : ClaimsIdentity
         return result;
     }
 
-    public string SessionIdClaimType => ZapMeAuthenticationDefaults.AuthenticationScheme + ".SessionId";
-    public Guid SessionId => GetGuid(SessionIdClaimType);
+    public SessionEntity Session { get; }
+    public AccountEntity Account => Session.Account;
 
-    public string UserIdClaimType => ClaimTypes.NameIdentifier;
-    public Guid UserId => GetGuid(UserIdClaimType);
+    public static string SessionIdClaimType => ZapMeAuthenticationDefaults.AuthenticationScheme + ".SessionId";
+    public Guid SessionId => Session.Id;
 
-    public string UsernameClaimType => ClaimTypes.Name;
-    public string Username => Name ?? throw new InvalidOperationException("Name cannot be null");
+    public static string AccountIdClaimType => ClaimTypes.NameIdentifier;
+    public Guid AccountId => Account.Id;
+
+    public static string AccountNameClaimType => ClaimTypes.Name;
+    public string AccountName => Account.Name;
 
     public IEnumerable<string> Roles => FindAll(ClaimTypes.Role).Select(claim => claim.Value);
 
-    public string SecurityStampClaimType => ZapMeAuthenticationDefaults.AuthenticationScheme + ".SecurityStamp";
+    public static string SecurityStampClaimType => ZapMeAuthenticationDefaults.AuthenticationScheme + ".SecurityStamp";
     public Guid SecurityStamp => GetGuid(SecurityStampClaimType);
 }
 

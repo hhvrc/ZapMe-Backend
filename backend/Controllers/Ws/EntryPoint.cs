@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ZapMe.Authentication;
-using ZapMe.Data.Models;
 
 namespace ZapMe.Controllers.Ws;
 
@@ -24,23 +23,23 @@ public sealed partial class WebSocketController
 
         if (wsManager.IsWebSocketRequest)
         {
-            // Get the user id from the claims
-            SessionEntity session = (User as ZapMePrincipal)?.SessionEntity ?? throw new NullReferenceException("SessionEntity is null.");
+            // Get the authenticated identity
+            ZapMeIdentity identity = (User as ZapMePrincipal)!.Identity;
 
             // The trace identifier is used to identify the websocket instance, it will be unique for each websocket connection
             string instanceId = HttpContext.TraceIdentifier;
 
             // Create the connection instance
-            using var instance = await WebSocketInstance.CreateAsync(wsManager, User, logger);
+            using WebSocketInstance? instance = await WebSocketInstance.CreateAsync(wsManager, User, logger);
             if (instance == null)
             {
-                // TODO: log this
+                _logger.LogError("Failed to create websocket instance");
 
                 return this.Error_InternalServerError();
             }
 
             // Register instance globally, the manager will have the ability to kill this connection
-            if (!await _webSocketInstanceManager.RegisterInstanceAsync(session.UserId, instanceId, instance, cancellationToken))
+            if (!await _webSocketInstanceManager.RegisterInstanceAsync(identity.AccountId, instanceId, instance, cancellationToken))
             {
                 return this.Error_InternalServerError();
             }

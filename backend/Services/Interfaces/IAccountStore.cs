@@ -1,37 +1,18 @@
 ﻿using ZapMe.Data.Models;
-using ZapMe.DTOs;
 
 namespace ZapMe.Services.Interfaces;
 
-public interface IUserManager
+public interface IAccountStore
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    IUserStore UserStore { get; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    IPasswordHasher PasswordHasher { get; }
-
     /// <summary>
     /// 
     /// </summary>
     /// <param name="userName"></param>
     /// <param name="email"></param>
-    /// <param name="password"></param>
+    /// <param name="passwordHash"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<AccountEntity?> TryCreateAsync(string userName, string email, string password, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    Task DeleteAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<AccountEntity?> TryCreateAsync(string userName, string email, string passwordHash, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -47,7 +28,7 @@ public interface IUserManager
     /// <param name="userName"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<AccountEntity?> GetByUsernameAsync(string userName, CancellationToken cancellationToken = default);
+    Task<AccountEntity?> GetByNameAsync(string userName, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -64,6 +45,14 @@ public interface IUserManager
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<AccountEntity?> GetByUsernameOrEmail(string userNameOrEmail, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="passwordResetToken"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<AccountEntity?> GetByPasswordResetTokenAsync(string passwordResetToken, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -87,10 +76,19 @@ public interface IUserManager
     /// 
     /// </summary>
     /// <param name="userId"></param>
-    /// <param name="password"></param>
+    /// <param name="emailVerified"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> SetPasswordAsync(Guid userId, string password, CancellationToken cancellationToken = default);
+    Task<bool> SetEmailVerifiedAsync(Guid userId, bool emailVerified, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="passwordHash"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<bool> SetPasswordHashAsync(Guid userId, string passwordHash, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -104,35 +102,17 @@ public interface IUserManager
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="user"></param>
-    /// <param name="password"></param>
+    /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    PasswordCheckResult CheckPassword(in AccountEntity user, string password, CancellationToken cancellationToken = default);
+    Task<bool> DeleteAsync(Guid userId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="userId"></param>
-    /// <param name="password"></param>
+    /// <param name="token"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<PasswordCheckResult> CheckPasswordAsync(Guid userId, string password, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    Task<string?> GeneratePasswordResetTokenAsync(Guid userId, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="passwordResetToken"></param>
-    /// <param name="password"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    Task<bool> TryCompletePasswordResetAsync(string passwordResetToken, string password, CancellationToken cancellationToken = default);
+    Task<bool> SetPasswordResetTokenAsync(Guid userId, string? token, CancellationToken cancellationToken);
 }

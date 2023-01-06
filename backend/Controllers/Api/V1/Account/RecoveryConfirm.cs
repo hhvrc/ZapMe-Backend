@@ -27,7 +27,7 @@ public partial class AccountController
     {
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
 
-        if (!await _userManager.TryCompletePasswordResetAsync(body.Token, body.NewPassword, cancellationToken))
+        if (!await _accountManager.TryCompletePasswordResetAsync(body.Token, body.NewPassword, cancellationToken))
         {
             return this.Error(StatusCodes.Status400BadRequest, "Bad reset token", "The reset token is invalid, expired, or has already been used.", UserNotification.SeverityLevel.Error, "Bad reset token", "The reset token is invalid, expired, or has already been used.");
         }

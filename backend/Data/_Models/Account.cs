@@ -14,7 +14,7 @@ public sealed class AccountEntity
     /// <summary>
     /// 
     /// </summary>
-    public string Username { get; set; } = null!;
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// 
@@ -92,7 +92,7 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<AccountEn
 {
     public void Configure(EntityTypeBuilder<AccountEntity> builder)
     {
-        builder.ToTable("users");
+        builder.ToTable("accounts");
 
         builder.HasKey(u => u.Id);
 
@@ -100,8 +100,8 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<AccountEn
             .HasColumnName("id")
             .HasDefaultValueSql("gen_random_uuid()");
 
-        builder.Property(u => u.Username)
-            .HasColumnName("username")
+        builder.Property(u => u.Name)
+            .HasColumnName("name")
             .HasMaxLength(32);
 
         builder.Property(u => u.Email)
@@ -156,16 +156,16 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<AccountEn
             .HasForeignKey(r => r.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(u => u.Username)
-            .HasDatabaseName("users_username_idx")
+        builder.HasIndex(u => u.Name)
+            .HasDatabaseName("accounts_name_idx")
             .IsUnique();
 
         builder.HasIndex(u => u.Email)
-            .HasDatabaseName("users_email_idx")
+            .HasDatabaseName("accounts_email_idx")
             .IsUnique();
 
         builder.HasIndex(u => u.PasswordResetToken)
-            .HasDatabaseName("users_passwordResetToken_idx")
+            .HasDatabaseName("accounts_passwordResetToken_idx")
             .IsUnique();
     }
 }

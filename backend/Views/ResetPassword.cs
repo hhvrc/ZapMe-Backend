@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using ZapMe.Constants;
 using ZapMe.Views.Generator;
 
 namespace ZapMe.Views;
@@ -17,7 +18,7 @@ public static class ResetPassword
                             EmailButton.Build("Reset password", resetPasswordUrl)
                         );
 
-        HtmlElement footer = EmailFooter.Build(Constants.AppCreator, Constants.MadeInText, Constants.AppName, Constants.MainPageUrl);
+        HtmlElement footer = EmailFooter.Build(App.AppCreator, App.MadeInText, App.AppName, App.MainPageUrl);
 
         HtmlElement document = EmailDocument.Build("Password reset request", "Password reset request", new HtmlElement[] { container }, footer, backgroundColor);
 

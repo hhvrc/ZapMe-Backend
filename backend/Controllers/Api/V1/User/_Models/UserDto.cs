@@ -20,7 +20,7 @@ public class UserDto
     public UserDto(AccountEntity user)
     {
         Id = user.Id;
-        Username = user.Username;
+        Username = user.Name;
         ProfilePictureId = user.ProfilePictureId;
         OnlineStatus = user.OnlineStatus;
         OnlineStatusText = user.OnlineStatusText;

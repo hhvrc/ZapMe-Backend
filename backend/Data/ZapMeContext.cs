@@ -14,6 +14,7 @@ public sealed class ZapMeContext : DbContext
     public required DbSet<SessionEntity> Sessions { get; set; }
     public required DbSet<LockOutEntity> LockOuts { get; set; }
     public required DbSet<UserRoleEntity> UserRoles { get; set; }
+    public required DbSet<UserAgentEntity> UserAgents { get; set; }
     public required DbSet<UserRelationEntity> UserRelations { get; set; }
     public required DbSet<FriendRequestEntity> FriendRequests { get; set; }
     public required DbSet<OAuthConnectionEntity> OAuthConnections { get; set; }
@@ -27,6 +28,7 @@ public sealed class ZapMeContext : DbContext
         new SessionConfiguration().Configure(modelBuilder.Entity<SessionEntity>());
         new LockOutEntityConfiguration().Configure(modelBuilder.Entity<LockOutEntity>());
         new UserRoleEntityConfiguration().Configure(modelBuilder.Entity<UserRoleEntity>());
+        new UserAgentEntityConfiguration().Configure(modelBuilder.Entity<UserAgentEntity>());
         new UserRelationEntityConfiguration().Configure(modelBuilder.Entity<UserRelationEntity>());
         new FriendRequestEntityConfiguration().Configure(modelBuilder.Entity<FriendRequestEntity>());
         new OAuthConnectionEntityConfiguration().Configure(modelBuilder.Entity<OAuthConnectionEntity>());

@@ -21,12 +21,12 @@ public partial class UserController
     {
         ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 
-        FriendRequestEntity[] friendRequests = await friendRequestStore.ListByUserAsync(identity.UserId, cancellationToken);
+        FriendRequestEntity[] friendRequests = await friendRequestStore.ListByUserAsync(identity.AccountId, cancellationToken);
 
         return Ok(new User.FriendRequest.Models.FriendRequestList
         {
-            Incoming = friendRequests.Where(fr => fr.ReceiverId == identity.UserId).Select(fr => fr.SenderId).ToArray(),
-            Outgoing = friendRequests.Where(fr => fr.SenderId == identity.UserId).Select(fr => fr.ReceiverId).ToArray()
+            Incoming = friendRequests.Where(fr => fr.ReceiverId == identity.AccountId).Select(fr => fr.SenderId).ToArray(),
+            Outgoing = friendRequests.Where(fr => fr.SenderId == identity.AccountId).Select(fr => fr.ReceiverId).ToArray()
         });
     }
 }

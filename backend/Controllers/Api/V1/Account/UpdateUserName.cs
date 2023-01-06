@@ -26,13 +26,13 @@ public partial class AccountController
     {
         ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 
-        PasswordCheckResult result = await _userManager.CheckPasswordAsync(identity.UserId, body.Password, cancellationToken);
+        PasswordCheckResult result = await _accountManager.CheckPasswordAsync(identity.AccountId, body.Password, cancellationToken);
         if (result != PasswordCheckResult.Success)
         {
             return this.Error_InvalidPassword();
         }
 
-        await _userManager.SetUserNameAsync(identity.UserId, body.NewUserName, cancellationToken);
+        await _accountManager.SetNameAsync(identity.AccountId, body.NewUserName, cancellationToken);
 
         return Ok();
     }

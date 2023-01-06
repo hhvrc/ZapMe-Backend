@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.Models;
-using ZapMe.Data.Models;
 using ZapMe.DTOs;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -24,10 +23,10 @@ public partial class AccountController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Delete([FromHeader] string password, [FromQuery] string? reason, CancellationToken cancellationToken)
     {
-        SessionEntity session = (User as ZapMePrincipal)?.SessionEntity ?? throw new NullReferenceException("SessionEntity is null.");
+        ZapMeIdentity identity = (User as ZapMePrincipal)!.Identity;
 
         // TODO: get the password hash from the database, or get it earlier in the pipeline
-        PasswordCheckResult result = _userManager.CheckPassword(session.User, password, cancellationToken);
+        PasswordCheckResult result = _accountManager.CheckPassword(identity.Account, password, cancellationToken);
         switch (result)
         {
             case PasswordCheckResult.Success:
@@ -39,7 +38,7 @@ public partial class AccountController
                 return this.Error_InternalServerError();
         }
 
-        await _userManager.DeleteAsync(session.UserId, cancellationToken);
+        await _accountManager.DeleteAsync(identity.AccountId, cancellationToken);
 
         // TODO: register reason if supplied
 

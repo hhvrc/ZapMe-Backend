@@ -14,7 +14,7 @@ public sealed class ActivityTracker
         _logger = logger;
     }
 
-    public async Task InvokeAsync(HttpContext context, IUserManager userManager)
+    public async Task InvokeAsync(HttpContext context, IAccountManager userManager)
     {
         ZapMeIdentity? identity = context.User?.Identity as ZapMeIdentity;
 
@@ -26,7 +26,7 @@ public sealed class ActivityTracker
         {
             if (identity != null)
             {
-                await userManager.SetLastOnlineAsync(identity.UserId, DateTime.UtcNow, context.RequestAborted);
+                await userManager.SetLastOnlineAsync(identity.AccountId, DateTime.UtcNow, context.RequestAborted);
             }
         }
     }

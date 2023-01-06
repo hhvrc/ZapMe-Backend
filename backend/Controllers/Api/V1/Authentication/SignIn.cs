@@ -14,10 +14,10 @@ public partial class AuthenticationController
     /// 
     /// </summary>
     /// <param name="body"></param>
-    /// <param name="cancellationToken"></param>
     /// <param name="userManager"></param>
     /// <param name="passwordHasher"></param>
     /// <param name="lockOutManager"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns>The user account</returns>
     /// <response code="200">Returns users account</response>
     /// <response code="400">Error details</response>
@@ -29,7 +29,7 @@ public partial class AuthenticationController
     [ProducesResponseType(typeof(Account.Models.AccountDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, CancellationToken cancellationToken, [FromServices] IUserManager userManager, [FromServices] IPasswordHasher passwordHasher, [FromServices] ILockOutManager lockOutManager)
+    public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] IAccountManager userManager, [FromServices] IPasswordHasher passwordHasher, [FromServices] ILockOutManager lockOutManager, CancellationToken cancellationToken)
     {
         if (User.Identity?.IsAuthenticated ?? false)
         {
@@ -38,7 +38,7 @@ public partial class AuthenticationController
 
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
 
-        AccountEntity? account = await userManager.GetByUsernameAsync(body.Username, cancellationToken) ?? await userManager.GetByEmailAsync(body.Username, cancellationToken);
+        AccountEntity? account = await userManager.GetByNameAsync(body.Username, cancellationToken) ?? await userManager.GetByEmailAsync(body.Username, cancellationToken);
         if (account == null)
         {
             return this.Error_InvalidCredentials("Invalid username/password", "Please check that your entered username and password are correct", "username", "password");
@@ -68,13 +68,13 @@ public partial class AuthenticationController
             return this.Error(StatusCodes.Status400BadRequest, "Email not verified", "Please verify your email address before signing in", UserNotification.SeverityLevel.Error, "Email not verified", "Please verify your email address before signing in");
         }
 
-        ZapMePrincipal principal = new ZapMePrincipal(account)
+        if (account.AcceptedTosVersion < 0) // TODO: have a currentTosVerion value
         {
-            // Gather request details for distinguishing between different devices in the account's session list, and to prevent session hijacking
-            SignInProperties = new SignInProperties(body.RememberMe, body.SessionName, this.GetRemoteIP(), this.GetCloudflareIPCountry(), this.GetRemoteUserAgent())
-        };
+            return this.Error(StatusCodes.Status400BadRequest, "Terms of Service not accepted", "Please accept the Terms of Service before signing in", UserNotification.SeverityLevel.Error, "Terms of Service not accepted", "Please accept the Terms of Service before signing in");
+        }
 
+        SessionEntity session = await _sessionManager.CreateAsync(account.Id, body.SessionName, this.GetRemoteIP(), this.GetRemoteUserAgent(), this.GetRemoteUserAgent(), body.RememberMe, cancellationToken);
 
-        return SignIn(principal, ZapMeAuthenticationDefaults.AuthenticationScheme);
+        return SignIn(new ZapMePrincipal(session), ZapMeAuthenticationDefaults.AuthenticationScheme);
     }
 }

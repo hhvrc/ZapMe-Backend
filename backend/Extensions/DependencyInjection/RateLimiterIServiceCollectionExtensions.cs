@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Threading.RateLimiting;
 using ZapMe.Authentication;
-using ZapMe.Data.Models;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -14,9 +13,9 @@ public static class RateLimiterIServiceCollectionExtensions
             opt.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             opt.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
             {
-                SessionEntity? session = (ctx.User as ZapMePrincipal)?.SessionEntity;
+                ZapMeIdentity? identity = (ctx.User as ZapMePrincipal)?.Identity;
 
-                if (session == null)
+                if (identity == null)
                 {
                     return RateLimitPartition.GetSlidingWindowLimiter(ctx.GetRemoteIP(), key => new SlidingWindowRateLimiterOptions()
                     {
@@ -29,13 +28,12 @@ public static class RateLimiterIServiceCollectionExtensions
                     });
                 }
 
-                AccountEntity user = session.User;
-                if (user?.UserRoles?.Select(r => r.RoleName).Contains("admin") ?? false)
+                if (identity.Roles.Contains("admin"))
                 {
                     return RateLimitPartition.GetNoLimiter("admin");
                 }
 
-                return RateLimitPartition.GetTokenBucketLimiter(session.UserId.ToString(), key => new TokenBucketRateLimiterOptions()
+                return RateLimitPartition.GetTokenBucketLimiter(identity.AccountId.ToString(), key => new TokenBucketRateLimiterOptions()
                 {
                     TokenLimit = 10,
                     QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
