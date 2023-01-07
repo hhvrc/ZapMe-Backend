@@ -38,8 +38,10 @@ public partial class AccountController
             {
                 string render = ResetPassword.Build(account.Name, App.BackendBaseUrl + "/reset-password?token=" + passwordResetToken);
 
+                // TODO: this is bad, fetch domain from config instead FIXME
+
                 // Send recovery secret to email
-                await mailServiceProvider.SendMailAsync("Hello", "hello", $"{account.Name} <{account.Email}>", "Password recovery", render, cancellationToken);
+                await mailServiceProvider.SendMailAsync("Hello", "hello", "heavenvr.tech", $"{account.Name} <{account.Email}>", "Password recovery", render, cancellationToken);
             }
         }
 

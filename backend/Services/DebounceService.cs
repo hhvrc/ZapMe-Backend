@@ -8,17 +8,13 @@ namespace ZapMe.Services;
 
 public sealed class DebounceService : IDebounceService
 {
-    private readonly HttpClient _httpClient;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<DebounceService> _logger;
 
-    public DebounceService(HttpClient httpClient, ILogger<DebounceService> logger)
+    public DebounceService(IHttpClientFactory httpClientFactory, ILogger<DebounceService> logger)
     {
-        _httpClient = httpClient;
+        _httpClientFactory = httpClientFactory;
         _logger = logger;
-
-        // Set client defaults
-        _httpClient.BaseAddress = new Uri($"https://disposable.debounce.io", UriKind.Absolute);
-        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
     }
 
     private struct DebounceDisposableResponse
@@ -29,26 +25,35 @@ public sealed class DebounceService : IDebounceService
 
     public async Task<bool> IsDisposableEmailAsync(string email, CancellationToken cancellationToken)
     {
-        string? anonymizedEmail = Transformers.AnonymizeEmailUser(email);
-        if (anonymizedEmail == null)
+        string anonymizedEmail = Transformers.AnonymizeEmailUser(email);
+
+        HttpClient httpClient = _httpClientFactory.CreateClient("Debounce");
+        
+        using HttpResponseMessage response = await httpClient.GetAsync("?email=" + anonymizedEmail, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
         {
+            _logger.LogError("Failed to check email: {} {}", response.StatusCode, await response.Content.ReadAsStringAsync(cancellationToken));
             return false;
         }
 
-        bool isDisposable;
-
+        string isDisposableStr;
+        
         try
         {
-            using HttpResponseMessage response = await _httpClient.GetAsync("?email=" + anonymizedEmail, cancellationToken);
-
             DebounceDisposableResponse content = await response.Content.ReadFromJsonAsync<DebounceDisposableResponse>(cancellationToken: cancellationToken);
-
-            isDisposable = Boolean.Parse(content.Disposable);
+            isDisposableStr = content.Disposable;
         }
-        catch (Exception)
+        catch(Exception)
         {
-            isDisposable = false;
             _logger.LogError("disposable.io sent back invalid return for {}", anonymizedEmail);
+            return false;
+        }
+
+        if (!Boolean.TryParse(isDisposableStr, out bool isDisposable))
+        {
+            _logger.LogError("disposable.io sent back invalid return for {}", anonymizedEmail);
+            return false;
         }
 
         return isDisposable;

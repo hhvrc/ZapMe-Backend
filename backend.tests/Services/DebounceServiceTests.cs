@@ -39,7 +39,7 @@ public sealed class DebounceServiceTests
         _handlerMock
             .When(HttpMethod.Get, "https://disposable.debounce.io")
             .WithExactQueryString(query)
-            .Respond(Application.Json, @"{""disposable"":false}");
+            .Respond(Application.Json, @"{""disposable"":""false""}");
 
         // Act
         var result = await _sut.IsDisposableEmailAsync(email);
@@ -60,7 +60,7 @@ public sealed class DebounceServiceTests
         _handlerMock
             .When(HttpMethod.Get, "https://disposable.debounce.io")
             .WithExactQueryString(query)
-            .Respond(Application.Json, @"{""disposable"":true}");
+            .Respond(Application.Json, @"{""disposable"":""true""}");
 
         // Act
         var result = await _sut.IsDisposableEmailAsync(email);

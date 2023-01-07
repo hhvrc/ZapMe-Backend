@@ -1,23 +1,43 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using ZapMe.Constants;
 using ZapMe.Services;
 using ZapMe.Services.Interfaces;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ZapMeIServiceCollectionExtensions
 {
-    public static void ZMAddHttpClients([NotNull] this IServiceCollection services)
+    public static void ZMAddHttpClients([NotNull] this IServiceCollection services, [NotNull] IConfiguration config)
     {
-        static void SetupHttpClient(HttpClient cli)
+        services.AddHttpClient("Debounce", cli =>
         {
+            cli.BaseAddress = new Uri("https://disposable.debounce.io/", UriKind.Absolute);
+            cli.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
             cli.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(App.AppName, App.AppVersion.String));
-        }
+        });
+        services.AddHttpClient("GoogleReCaptcha", cli =>
+        {
+            cli.BaseAddress = new Uri("https://www.google.com/recaptcha/api/", UriKind.Absolute);
+            cli.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
+            cli.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(App.AppName, App.AppVersion.String));
+        });
+        services.AddHttpClient("MailGun", cli =>
+        {
+            string apiKey = config["Mailgun:ApiKey"] ?? throw new NullReferenceException("Config entry \"Mailgun:ApiKey\" is missing!");
+            
+            cli.BaseAddress = new Uri("https://api.mailgun.net/v3/", UriKind.Absolute);
+            cli.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
+            cli.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(App.AppName, App.AppVersion.String));
+            cli.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"api:{apiKey}")));
+        });
 
-        services.AddHttpClient<IDebounceService, DebounceService>(SetupHttpClient);
-        services.AddHttpClient<IGoogleReCaptchaService, GoogleReCaptchaService>(SetupHttpClient);
-        services.AddHttpClient<IMailGunService, MailGunService>(SetupHttpClient);
+        services.AddTransient<IDebounceService, DebounceService>();
+        services.AddTransient<IGoogleReCaptchaService, GoogleReCaptchaService>();
+        services.AddTransient<IMailGunService, MailGunService>();
     }
 
     public static void ZMAddPasswordHashing([NotNull] this IServiceCollection services)
