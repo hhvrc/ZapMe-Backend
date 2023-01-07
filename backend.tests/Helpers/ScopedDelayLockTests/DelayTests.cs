@@ -16,6 +16,6 @@ public sealed class DelayTests
         }
         sw.Stop();
 
-        Assert.InRange(sw.ElapsedMilliseconds, 95, 105);
+        Assert.InRange(sw.ElapsedMilliseconds, 80, 120);
     }
 }

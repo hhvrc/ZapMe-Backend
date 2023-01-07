@@ -4,6 +4,7 @@ using RichardSzalay.MockHttp;
 using ZapMe.DTOs;
 using ZapMe.Services;
 using ZapMe.Services.Interfaces;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Tests.Services;
@@ -23,7 +24,7 @@ public sealed class GoogleReCaptchaServiceTests
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
         httpClientFactoryMock
             .Setup(_ => _.CreateClient(It.IsAny<string>()))
-            .Returns(() => new HttpClient(_handlerMock) { BaseAddress = new Uri("https://disposable.debounce.io", UriKind.Absolute) });
+            .Returns(() => new HttpClient(_handlerMock) { BaseAddress = new Uri("https://www.google.com/recaptcha/api/", UriKind.Absolute) });
 
         _reCaptchaSecret = _faker.Random.AlphaNumeric(32);
 
@@ -36,11 +37,9 @@ public sealed class GoogleReCaptchaServiceTests
         _httpClientFactory = httpClientFactoryMock.Object;
         _sut = new GoogleReCaptchaService(_httpClientFactory, _configuration, _loggerMock.Object);
     }
-
-    private async Task<GoogleReCaptchaVerifyResponse> CreateRequest(string userResponseToken, string remoteIp, string responseBody)
+    
+    void ArrangeMock(string userResponseToken, string remoteIp, string responseBody)
     {
-        responseBody = responseBody.Replace("{DateTime}", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"));
-
         _handlerMock
             .When(HttpMethod.Post, "https://www.google.com/recaptcha/api/siteverify")
             .With(req => req.Content?.Headers?.ContentType?.MediaType == "application/x-www-form-urlencoded")
@@ -50,90 +49,108 @@ public sealed class GoogleReCaptchaServiceTests
                 new("remoteip", remoteIp)
             })
             .Respond(Application.Json, responseBody);
-
-        return await _sut.VerifyUserResponseTokenAsync(userResponseToken, remoteIp);
     }
 
     [Fact]
-    public async Task GoodToken()
+    public async Task VerifyUserResponseTokenAsync_GoodToken_ReturnsSuccess()
     {
+        // Arrange
         string remoteIp = _faker.Internet.Ip();
+        string domainName = _faker.Internet.DomainName();
         string userResponseToken = _faker.Random.AlphaNumeric(32);
-        string body =
-/* lang=json */
-"""
-{
-    "success": true,
-    "challenge_ts": "{DateTime}",
-    "hostname": "mysite.com"
-}
-""";
+        string responseBody =
+        """
+        {
+            "success": true,
+            "challenge_ts": "{DateTime}",
+            "hostname": "{DomainName}"
+        }
+        """
+        .Replace("{DateTime}", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"))
+        .Replace("{DomainName}", domainName);
 
-        GoogleReCaptchaVerifyResponse response = await CreateRequest(userResponseToken, remoteIp, body);
+        ArrangeMock(userResponseToken, remoteIp, responseBody);
+        
+        // Act
+        var result = await _sut.VerifyUserResponseTokenAsync(userResponseToken, remoteIp);
 
-        Assert.True(response.Success);
-        Assert.Equal("mysite.com", response.Hostname);
-        Assert.Null(response.ApkPackageName);
-        Assert.Null(response.ErrorCodes);
+        // Assert
+        Assert.True(result.Success);
+        Assert.Equal(domainName, result.Hostname);
+        Assert.Null(result.ApkPackageName);
+        Assert.Null(result.ErrorCodes);
     }
 
     [Fact]
-    public async Task GoodTokenAndroid()
+    public async Task VerifyUserResponseTokenAsync_GoodAndroidToken_ReturnsSuccess()
     {
+        // Arrange
         string remoteIp = _faker.Internet.Ip();
+        string apkPackageName = _faker.Internet.DomainName();
         string userResponseToken = _faker.Random.AlphaNumeric(32);
-        string body =
-/* lang=json */
-"""
-{
-    "success": true,
-    "challenge_ts": "{DateTime}",
-    "apk_package_name": "com.hhvrc_vr.zapme.app"
-}
-""";
+        string responseBody =
+        """
+        {
+            "success": true,
+            "challenge_ts": "{DateTime}",
+            "apk_package_name": "{ApkPackageName}"
+        }
+        """
+        .Replace("{DateTime}", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"))
+        .Replace("{ApkPackageName}", apkPackageName);
 
-        GoogleReCaptchaVerifyResponse response = await CreateRequest(userResponseToken, remoteIp, body);
+        ArrangeMock(userResponseToken, remoteIp, responseBody);
 
-        Assert.True(response.Success);
-        Assert.Null(response.Hostname);
-        Assert.Equal("com.hhvrc_vr.zapme.app", response.ApkPackageName);
-        Assert.Null(response.ErrorCodes);
+        // Act
+        var result = await _sut.VerifyUserResponseTokenAsync(userResponseToken, remoteIp);
+
+        // Assert
+        Assert.True(result.Success);
+        Assert.Null(result.Hostname);
+        Assert.Equal(apkPackageName, result.ApkPackageName);
+        Assert.Null(result.ErrorCodes);
     }
 
     [Fact]
     public async Task BadToken_MissingInputSecret()
     {
         string remoteIp = _faker.Internet.Ip();
+        string domainName = _faker.Internet.DomainName();
         string userResponseToken = _faker.Random.AlphaNumeric(32);
-        string body =
-/* lang=json */
-"""
-{
-    "success": false,
-    "challenge_ts": "{DateTime}",
-    "hostname": "mysite.com",
-    "error-codes": [
-        "missing-input-secret",
-        "invalid-input-secret",
-        "missing-input-response",
-        "invalid-input-response",
-        "bad-request",
-        "timeout-or-duplicate"
-    ]
-}
-""";
+        string responseBody =
+        """
+        {
+            "success": false,
+            "challenge_ts": "{DateTime}",
+            "hostname": "{DomainName}",
+            "error-codes": [
+                "missing-input-secret",
+                "invalid-input-secret",
+                "missing-input-response",
+                "invalid-input-response",
+                "bad-request",
+                "timeout-or-duplicate"
+            ]
+        }
+        """
+        .Replace("{DateTime}", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"))
+        .Replace("{DomainName}", domainName);
 
-        GoogleReCaptchaVerifyResponse response = await CreateRequest(userResponseToken, remoteIp, body);
+        ArrangeMock(userResponseToken, remoteIp, responseBody);
 
-        Assert.False(response.Success);
-        Assert.Equal("mysite.com", response.Hostname);
-        Assert.Null(response.ApkPackageName);
-        Assert.NotNull(response.ErrorCodes);
-        Assert.Contains("missing-input-secret", response.ErrorCodes);
-        Assert.Contains("invalid-input-secret", response.ErrorCodes);
-        Assert.Contains("missing-input-response", response.ErrorCodes);
-        Assert.Contains("invalid-input-response", response.ErrorCodes);
-        Assert.Contains("bad-request", response.ErrorCodes);
-        Assert.Contains("timeout-or-duplicate", response.ErrorCodes);
+        // Act
+        var result = await _sut.VerifyUserResponseTokenAsync(userResponseToken, remoteIp);
+
+        // Assert
+        Assert.False(result.Success);
+        Assert.Equal(domainName, result.Hostname);
+        Assert.Null(result.ApkPackageName);
+        Assert.NotNull(result.ErrorCodes);
+        Assert.Contains("missing-input-secret", result.ErrorCodes);
+        Assert.Contains("invalid-input-secret", result.ErrorCodes);
+        Assert.Contains("missing-input-response", result.ErrorCodes);
+        Assert.Contains("invalid-input-response", result.ErrorCodes);
+        Assert.Contains("bad-request", result.ErrorCodes);
+        Assert.Contains("timeout-or-duplicate", result.ErrorCodes);
     }
 }
