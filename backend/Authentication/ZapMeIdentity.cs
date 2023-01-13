@@ -1,7 +1,23 @@
-﻿using System.Security.Claims;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using ZapMe.Data.Models;
 
 namespace ZapMe.Authentication;
+
+/*
+
+        
+        //create claims details based on the user information
+        var claims = new[] {
+                        new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                        new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                        new Claim("UserId", user.UserId.ToString()),
+                        new Claim("DisplayName", user.DisplayName),
+                        new Claim("UserName", user.UserName),
+                        new Claim("Email", user.Email)
+                    };
+*/
 
 public class ZapMeIdentity : ClaimsIdentity
 {
@@ -10,6 +26,9 @@ public class ZapMeIdentity : ClaimsIdentity
 
     private IEnumerable<Claim?> CreateClaims(AccountEntity account)
     {
+        //yield return CreateClaim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]);
+        yield return CreateClaim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString());
+        yield return CreateClaim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString());
         yield return CreateClaim(ClaimTypes.NameIdentifier, account.Id.ToString());
         yield return CreateClaim(ClaimTypes.Name, account.Name);
         yield return CreateClaim(ClaimTypes.Email, account.Email);

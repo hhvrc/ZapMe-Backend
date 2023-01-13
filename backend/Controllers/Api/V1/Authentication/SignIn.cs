@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 using ZapMe.Authentication;
 using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
@@ -84,6 +87,21 @@ public partial class AuthenticationController
 
         SessionEntity session = await _sessionManager.CreateAsync(account.Id, body.SessionName, this.GetRemoteIP(), this.GetCloudflareIPCountry(), userAgent, body.RememberMe, cancellationToken);
 
-        return SignIn(new ZapMePrincipal(session));
+        // Create JWT
+        ZapMePrincipal principal = new ZapMePrincipal(session);
+
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SigningKey"]!));
+        var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var token = new JwtSecurityToken(
+            _configuration["Jwt:Issuer"],
+            _configuration["Jwt:Audience"],
+            principal.Claims,
+            expires: DateTime.UtcNow.AddMinutes(10),
+            signingCredentials: signIn);
+
+        return Ok(new JwtSecurityTokenHandler().WriteToken(token));
+
+        //return SignIn();
     }
 }

@@ -75,6 +75,6 @@ public partial class AccountController
             return this.Error_InvalidModelState((nameof(body.UserName), "Username/Email already taken"), (nameof(body.Email), "Username/Email already taken"));
         }
 
-        return Created("/api/v1/account", new Account.Models.AccountDto(user)); // TODO: use a mapper FFS
+        return CreatedAtAction(nameof(Get), new Account.Models.AccountDto(user)); // TODO: use a mapper FFS
     }
 }

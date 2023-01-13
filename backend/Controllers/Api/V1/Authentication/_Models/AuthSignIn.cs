@@ -19,7 +19,7 @@ public struct AuthSignIn
     /// <summary>
     /// Password
     /// </summary>
-    [Username(true)]
+    [Password(false)]
     [JsonPropertyName("password")]
     public string Password { get; set; }
 
