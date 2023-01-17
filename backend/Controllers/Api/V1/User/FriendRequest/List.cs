@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ZapMe.Authentication;
+using ZapMe.Controllers.Api.V1.User.FriendRequest.Models;
 using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;
@@ -16,17 +17,17 @@ public partial class UserController
     [RequestSizeLimit(1024)]
     [HttpGet("friendrequests", Name = "ListFriendRequests")]
     [Produces(Application.Json, Application.Xml)]
-    [ProducesResponseType(typeof(User.FriendRequest.Models.FriendRequestList), StatusCodes.Status200OK)]
-    public async Task<IActionResult> FriendRequestList([FromServices] IFriendRequestStore friendRequestStore, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(FriendRequestList), StatusCodes.Status200OK)]
+    public async Task<FriendRequestList> ListFriendRequests([FromServices] IFriendRequestStore friendRequestStore, CancellationToken cancellationToken)
     {
         ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 
-        FriendRequestEntity[] friendRequests = await friendRequestStore.ListByUserAsync(identity.AccountId, cancellationToken);
+        FriendRequestEntity[] friendRequests = await friendRequestStore.ListByUserAsync(identity.AccountId).ToArrayAsync(cancellationToken); // TODO: improve performance
 
-        return Ok(new User.FriendRequest.Models.FriendRequestList
+        return new FriendRequestList
         {
-            Incoming = friendRequests.Where(fr => fr.ReceiverId == identity.AccountId).Select(fr => fr.SenderId).ToArray(),
-            Outgoing = friendRequests.Where(fr => fr.SenderId == identity.AccountId).Select(fr => fr.ReceiverId).ToArray()
-        });
+            Incoming = friendRequests.Where(fr => fr.ReceiverId == identity.AccountId).Select(fr => fr.SenderId),
+            Outgoing = friendRequests.Where(fr => fr.SenderId == identity.AccountId).Select(fr => fr.ReceiverId)
+        };
     }
 }

@@ -50,9 +50,9 @@ public sealed class SessionStore : ISessionStore
             .FirstOrDefaultAsync(s => s.Id == sessionId, cancellationToken);
     }
 
-    public Task<SessionEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken)
+    public IAsyncEnumerable<SessionEntity> ListByUserAsync(Guid userId)
     {
-        return _dbContext.Sessions.Where(s => s.UserId == userId).ToArrayAsync(cancellationToken);
+        return _dbContext.Sessions.Where(s => s.UserId == userId).ToAsyncEnumerable();
     }
 
     public async Task<bool> SetExipresAtAsync(Guid sessionId, DateTime expiresAt, CancellationToken cancellationToken = default)

@@ -20,23 +20,20 @@ public interface IFriendRequestStore
     /// 
     /// </summary>
     /// <param name="userId"></param>
-    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<FriendRequestEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<FriendRequestEntity> ListByUserAsync(Guid userId);
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="senderId"></param>
-    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<FriendRequestEntity[]> ListBySenderAsync(Guid senderId, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<FriendRequestEntity> ListBySenderAsync(Guid senderId);
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="receiverId"></param>
-    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<FriendRequestEntity[]> ListByReceiverAsync(Guid receiverId, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<FriendRequestEntity> ListByReceiverAsync(Guid receiverId);
 }

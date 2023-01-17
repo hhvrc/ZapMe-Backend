@@ -4,30 +4,23 @@ namespace Microsoft.AspNetCore.Http;
 
 public static class HttpContextExtensions
 {
-    public static async Task<AuthenticationScheme[]> GetExternalProvidersAsync(this HttpContext context)
+    public static async IAsyncEnumerable<AuthenticationScheme> GetExternalProvidersAsync(this HttpContext context)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
         IAuthenticationSchemeProvider schemes = context.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
 
-        return (from scheme in await schemes.GetAllSchemesAsync()
-                where !String.IsNullOrEmpty(scheme.DisplayName)
-                select scheme).ToArray();
-    }
-
-    public static async Task<bool> IsProviderSupportedAsync(this HttpContext context, string provider)
-    {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
-
-        if (String.IsNullOrWhiteSpace(provider))
+        foreach (AuthenticationScheme? scheme in from scheme in await schemes.GetAllSchemesAsync() where !String.IsNullOrEmpty(scheme.DisplayName) select scheme)
         {
-            return false;
+            yield return scheme;
         }
-
-        return (from scheme in await context.GetExternalProvidersAsync()
-                where String.Equals(scheme.Name, provider)
-                select scheme).Any();
     }
+
+    public static ValueTask<bool> IsProviderSupportedAsync(this HttpContext context, string provider)
+    {
+        return GetExternalProvidersAsync(context).AnyAsync(scheme => String.Equals(scheme.Name, provider, StringComparison.OrdinalIgnoreCase));
+    }
+    
     public static string GetRemoteIP(this HttpContext context)
     {
         if (!context.Items.TryGetValue("RequestIpAddress", out object? obj) && obj is string ipAddr)

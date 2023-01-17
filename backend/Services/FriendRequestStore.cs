@@ -31,18 +31,18 @@ public class FriendRequestStore : IFriendRequestStore
         return friendRequestEntity;
     }
 
-    public Task<FriendRequestEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<FriendRequestEntity> ListByUserAsync(Guid userId)
     {
-        return _dbContext.FriendRequests.Where(fr => fr.SenderId == userId || fr.ReceiverId == userId).ToArrayAsync(cancellationToken);
+        return _dbContext.FriendRequests.Where(fr => fr.SenderId == userId || fr.ReceiverId == userId).ToAsyncEnumerable();
     }
 
-    public Task<FriendRequestEntity[]> ListBySenderAsync(Guid senderId, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<FriendRequestEntity> ListBySenderAsync(Guid senderId)
     {
-        return _dbContext.FriendRequests.Where(fr => fr.SenderId == senderId).ToArrayAsync(cancellationToken);
+        return _dbContext.FriendRequests.Where(fr => fr.SenderId == senderId).ToAsyncEnumerable();
     }
 
-    public Task<FriendRequestEntity[]> ListByReceiverAsync(Guid receiverId, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<FriendRequestEntity> ListByReceiverAsync(Guid receiverId)
     {
-        return _dbContext.FriendRequests.Where(fr => fr.ReceiverId == receiverId).ToArrayAsync(cancellationToken);
+        return _dbContext.FriendRequests.Where(fr => fr.ReceiverId == receiverId).ToAsyncEnumerable();
     }
 }

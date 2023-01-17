@@ -18,11 +18,11 @@ public sealed class AccountManager : IAccountManager
         _logger = logger;
     }
 
-    public async Task<AccountEntity?> TryCreateAsync(string userName, string email, string password, CancellationToken cancellationToken)
+    public Task<AccountEntity?> TryCreateAsync(string userName, string email, string password, CancellationToken cancellationToken)
     {
         var passwordHash = PasswordHasher.HashPassword(password);
-
-        return await AccountStore.TryCreateAsync(userName.TrimAndMinifyWhiteSpaces(), email, passwordHash, cancellationToken);
+        
+        return AccountStore.TryCreateAsync(userName.TrimAndMinifyWhiteSpaces(), email, passwordHash, cancellationToken);
     }
 
     public Task DeleteAsync(Guid userId, CancellationToken cancellationToken) => AccountStore.DeleteAsync(userId, cancellationToken);

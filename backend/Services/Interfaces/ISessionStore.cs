@@ -32,9 +32,8 @@ public interface ISessionStore
     /// 
     /// </summary>
     /// <param name="userId"></param>
-    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<SessionEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<SessionEntity> ListByUserAsync(Guid userId);
 
     /// <summary>
     /// 

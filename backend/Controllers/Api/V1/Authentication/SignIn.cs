@@ -51,7 +51,7 @@ public partial class AuthenticationController
             return this.Error_InvalidCredentials("Invalid username/password", "Please check that your entered username and password are correct", "username", "password");
         }
 
-        LockOutEntity[] lockouts = await lockOutManager.ListByUserIdAsync(account.Id, cancellationToken);
+        LockOutEntity[] lockouts = await lockOutManager.ListByUserIdAsync(account.Id).ToArrayAsync(cancellationToken);
         if (lockouts.Any())
         {
             string reason = "Please contact support for more information";

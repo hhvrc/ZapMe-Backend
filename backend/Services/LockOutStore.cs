@@ -45,9 +45,9 @@ public sealed class LockOutStore : ILockOutStore
         return _dbContext.LockOuts.FirstOrDefaultAsync(l => l.Id == lockOutId, cancellationToken);
     }
 
-    public Task<LockOutEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken)
+    public IAsyncEnumerable<LockOutEntity> ListByUserAsync(Guid userId)
     {
-        return _dbContext.LockOuts.Where(l => l.UserId == userId).ToArrayAsync(cancellationToken);
+        return _dbContext.LockOuts.Where(l => l.UserId == userId).ToAsyncEnumerable();
     }
 
     private async Task<bool> UpdateAsync(Guid lockOutId, Expression<Func<SetPropertyCalls<LockOutEntity>, SetPropertyCalls<LockOutEntity>>> setPropertyCalls, CancellationToken cancellationToken)

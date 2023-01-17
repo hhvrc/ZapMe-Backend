@@ -42,10 +42,8 @@ public sealed class SessionManager : ISessionManager
     }
 
     /// <inheritdoc/>
-    public async Task<bool> UserHasSessionAsync(Guid userId, CancellationToken cancellationToken)
+    public ValueTask<bool> UserHasSessionAsync(Guid userId, CancellationToken cancellationToken)
     {
-        SessionEntity[] sessions = await SessionStore.ListByUserAsync(userId, cancellationToken);
-
-        return sessions.Any(session => !session.IsExpired);
+        return SessionStore.ListByUserAsync(userId).AnyAsync(session => !session.IsExpired, cancellationToken);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using System.Security.Claims;
 using ZapMe.Authentication.Models;
 using ZapMe.Data.Models;
@@ -67,8 +68,23 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
 
     private async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        if (!Request.Cookies.TryGetValue(_options.CookieName, out string? sessionIdString))
+        string? sessionIdString;
+
+        // First check if theres a authorization header, then check if theres a cookie
+        if (Request.Headers.TryGetValue("Authorization", out StringValues authorizationHeader))
+        {
+            string[] authorizationHeaderParts = authorizationHeader.ToString().Split(' ');
+            if (authorizationHeaderParts.Length != 2 || authorizationHeaderParts[0] != "Bearer")
+            {
+                return AuthenticateResult.Fail("Invalid authorization header.");
+            }
+
+            sessionIdString = authorizationHeaderParts[1];
+        }
+        else if (!Request.Cookies.TryGetValue(_options.CookieName, out sessionIdString))
+        {
             return AuthenticateResult.NoResult();
+        }
 
         if (String.IsNullOrEmpty(sessionIdString))
             return AuthenticateResult.Fail("Empty Login Cookie");

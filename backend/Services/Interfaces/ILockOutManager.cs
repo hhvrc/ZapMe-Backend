@@ -24,9 +24,8 @@ public interface ILockOutManager
     /// 
     /// </summary>
     /// <param name="userId"></param>
-    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<LockOutEntity[]> ListByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<LockOutEntity> ListByUserIdAsync(Guid userId);
 
     /// <summary>
     /// 
@@ -45,5 +44,5 @@ public interface ILockOutManager
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> IsLockedOutAsync(Guid userId, CancellationToken cancellationToken = default);
+    ValueTask<bool> IsLockedOutAsync(Guid userId, CancellationToken cancellationToken = default);
 }

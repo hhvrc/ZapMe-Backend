@@ -30,9 +30,8 @@ public interface ILockOutStore
     /// 
     /// </summary>
     /// <param name="userId"></param>
-    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<LockOutEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<LockOutEntity> ListByUserAsync(Guid userId);
 
     /// <summary>
     /// 
