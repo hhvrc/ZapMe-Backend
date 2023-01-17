@@ -13,7 +13,6 @@
   <PropertyGroup>
     <NoWarn>1591;1701</NoWarn>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
