@@ -1,7 +1,5 @@
-﻿using System.Net.Http.Headers;
-using ZapMe.DTOs;
+﻿using ZapMe.DTOs;
 using ZapMe.Services.Interfaces;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Services;
 

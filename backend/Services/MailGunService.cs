@@ -1,7 +1,4 @@
-﻿using System.Net.Http.Headers;
-using System.Text;
-using ZapMe.Services.Interfaces;
-using static System.Net.Mime.MediaTypeNames;
+﻿using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Services;
 
@@ -27,7 +24,7 @@ public sealed class MailGunService : IMailGunService
         };
 
         HttpClient httpClient = _httpClientFactory.CreateClient("MailGun");
-        
+
         using HttpResponseMessage result = await httpClient.PostAsync(Uri.EscapeDataString(senderDomain) + "/messages", content, cancellationToken);
 
         if (!result.IsSuccessStatusCode)

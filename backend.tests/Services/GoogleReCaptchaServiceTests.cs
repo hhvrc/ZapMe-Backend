@@ -25,17 +25,17 @@ public sealed class GoogleReCaptchaServiceTests
         _httpMessageHandlerMock = new MockHttpMessageHandler();
         _httpClientFactoryMock = new Mock<IHttpClientFactory>();
         _reCaptchaSecret = _faker.Random.AlphaNumeric(32);
-        
+
         _configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new KeyValuePair<string, string?>[] {
                 new("Authorization:ReCaptcha:Secret", _reCaptchaSecret)
             })
             .Build();
-        
+
         _httpClientFactoryMock
             .Setup(_ => _.CreateClient(It.IsAny<string>()))
             .Returns(() => new HttpClient(_httpMessageHandlerMock) { BaseAddress = new Uri("https://www.google.com/recaptcha/api/", UriKind.Absolute) });
-        
+
         _sut = new GoogleReCaptchaService(_httpClientFactoryMock.Object, _configuration, _loggerMock.Object);
     }
 

@@ -21,7 +21,7 @@ public sealed class AccountManager : IAccountManager
     public Task<AccountEntity?> TryCreateAsync(string userName, string email, string password, CancellationToken cancellationToken)
     {
         var passwordHash = PasswordHasher.HashPassword(password);
-        
+
         return AccountStore.TryCreateAsync(userName.TrimAndMinifyWhiteSpaces(), email, passwordHash, cancellationToken);
     }
 

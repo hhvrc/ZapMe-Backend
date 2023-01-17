@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
-using ZapMe.Attributes;
+﻿using System.Text.Json.Serialization;
 
 namespace ZapMe.Controllers.Api.V1.Authentication.Models;
 

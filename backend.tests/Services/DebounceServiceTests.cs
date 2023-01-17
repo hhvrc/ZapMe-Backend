@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Moq.Protected;
 using RichardSzalay.MockHttp;
 using System.Net;
 using ZapMe.Logic;
@@ -15,7 +14,7 @@ public sealed class DebounceServiceTests
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly Mock<ILogger<DebounceService>> _loggerMock = new();
     private readonly MockHttpMessageHandler _handlerMock = new MockHttpMessageHandler();
-    
+
     public DebounceServiceTests()
     {
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
@@ -43,7 +42,7 @@ public sealed class DebounceServiceTests
 
         // Act
         var result = await _sut.IsDisposableEmailAsync(email);
-        
+
         // Assert
         Assert.False(result);
     }
@@ -64,7 +63,7 @@ public sealed class DebounceServiceTests
 
         // Act
         var result = await _sut.IsDisposableEmailAsync(email);
-        
+
         // Assert
         Assert.True(result);
     }
@@ -74,7 +73,7 @@ public sealed class DebounceServiceTests
     {
         // Arrange
         var email = "user.name@disposeme.com";
-        
+
         _handlerMock
             .When(HttpMethod.Get, "https://disposable.debounce.io")
             .Respond(Application.Json, "");

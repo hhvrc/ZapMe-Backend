@@ -1,8 +1,5 @@
-﻿using Microsoft.VisualBasic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
 using ZapMe.Authentication;
-using ZapMe.Constants;
 
 namespace Microsoft.Extensions.DependencyInjection;
 

@@ -20,7 +20,7 @@ public static class HttpContextExtensions
     {
         return GetExternalProvidersAsync(context).AnyAsync(scheme => String.Equals(scheme.Name, provider, StringComparison.OrdinalIgnoreCase));
     }
-    
+
     public static string GetRemoteIP(this HttpContext context)
     {
         if (!context.Items.TryGetValue("RequestIpAddress", out object? obj) && obj is string ipAddr)

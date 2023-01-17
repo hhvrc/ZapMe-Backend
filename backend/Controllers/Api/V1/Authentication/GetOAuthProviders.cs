@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ZapMe.Controllers.Api.V1.Authentication.Models;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -17,7 +16,8 @@ public partial class AuthenticationController
     [ProducesResponseType(typeof(OAuthProviderList), StatusCodes.Status200OK)]
     public OAuthProviderList GetOAuthProviders()
     {
-        return new OAuthProviderList {
+        return new OAuthProviderList
+        {
             Providers = HttpContext.GetExternalProvidersAsync().Select(static p => p.DisplayName ?? p.Name)
         };
     }

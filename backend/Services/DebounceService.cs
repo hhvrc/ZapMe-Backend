@@ -1,8 +1,6 @@
-﻿using System.Net.Http.Headers;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using ZapMe.Logic;
 using ZapMe.Services.Interfaces;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Services;
 
@@ -28,7 +26,7 @@ public sealed class DebounceService : IDebounceService
         string anonymizedEmail = Transformers.AnonymizeEmailUser(email);
 
         HttpClient httpClient = _httpClientFactory.CreateClient("Debounce");
-        
+
         using HttpResponseMessage response = await httpClient.GetAsync("?email=" + anonymizedEmail, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
@@ -38,13 +36,13 @@ public sealed class DebounceService : IDebounceService
         }
 
         string isDisposableStr;
-        
+
         try
         {
             DebounceDisposableResponse content = await response.Content.ReadFromJsonAsync<DebounceDisposableResponse>(cancellationToken: cancellationToken);
             isDisposableStr = content.Disposable;
         }
-        catch(Exception)
+        catch (Exception)
         {
             _logger.LogError("disposable.io sent back invalid return for {}", anonymizedEmail);
             return false;

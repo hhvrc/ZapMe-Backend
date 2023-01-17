@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using ZapMe.Constants;
@@ -28,7 +27,7 @@ public static class ZapMeIServiceCollectionExtensions
         services.AddHttpClient("MailGun", cli =>
         {
             string apiKey = config["Mailgun:ApiKey"] ?? throw new NullReferenceException("Config entry \"Mailgun:ApiKey\" is missing!");
-            
+
             cli.BaseAddress = new Uri("https://api.mailgun.net/v3/", UriKind.Absolute);
             cli.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
             cli.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(App.AppName, App.AppVersion.String));

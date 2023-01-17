@@ -42,7 +42,7 @@ public sealed class TransformersTests
     {
         Assert.Throws<ArgumentNullException>(() => Transformers.ObscureDomain(null!));
     }
-    
+
     [Theory]
     [InlineData("", "")]
     [InlineData("a@b", "*@*")]
