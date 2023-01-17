@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 using ZapMe.Authentication;
+using ZapMe.Authentication.Models;
 using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data.Models;
@@ -23,14 +21,14 @@ public partial class AuthenticationController
     /// <param name="lockOutManager"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>The user account</returns>
-    /// <response code="200">Returns users account</response>
+    /// <response code="200">Returns SignInOk along with a Cookie with similar data</response>
     /// <response code="400">Error details</response>
     /// <response code="500">Error details</response>
     [RequestSizeLimit(1024)]
     [HttpPost("signin", Name = "AuthSignIn")]
     [Consumes(Application.Json, Application.Xml)]
     [Produces(Application.Json, Application.Xml)]
-    [ProducesResponseType(typeof(Account.Models.AccountDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SignInOk), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] IAccountManager userManager, [FromServices] IPasswordHasher passwordHasher, [FromServices] ILockOutManager lockOutManager, CancellationToken cancellationToken)
@@ -69,12 +67,12 @@ public partial class AuthenticationController
 
         if (!account.EmailVerified)
         {
-            return this.Error(StatusCodes.Status400BadRequest, "Email not verified", "Please verify your email address before signing in", UserNotification.SeverityLevel.Error, "Email not verified", "Please verify your email address before signing in");
+            return this.Error(StatusCodes.Status400BadRequest, "Unverified Email", "Email has not been verified", UserNotification.SeverityLevel.Error, "Email not verified", "Please verify your email address before signing in");
         }
 
         if (account.AcceptedTosVersion < 0) // TODO: have a currentTosVerion value
         {
-            return this.Error(StatusCodes.Status400BadRequest, "Terms of Service not accepted", "Please accept the Terms of Service before signing in", UserNotification.SeverityLevel.Error, "Terms of Service not accepted", "Please accept the Terms of Service before signing in");
+            return this.Error(StatusCodes.Status400BadRequest, "TOS Review Required", "User needs to accept new TOS", UserNotification.SeverityLevel.Error, "Terms of Service not accepted", "Please accept the Terms of Service before signing in");
         }
 
         string userAgent = this.GetRemoteUserAgent();
@@ -82,26 +80,11 @@ public partial class AuthenticationController
         if (userAgent.Length > UserAgentLimits.MaxLength)
         {
             // Request body too large
-            return this.Error(StatusCodes.Status413RequestEntityTooLarge, "User-Agent too long", "User-Agent header has a hard limit on 2048 characters", UserNotification.SeverityLevel.Error, "Bad client behaviour", "Your client has unexpected behaviour");
+            return this.Error(StatusCodes.Status413RequestEntityTooLarge, "User-Agent too long", "User-Agent header has a hard limit on 2048 characters", UserNotification.SeverityLevel.Error, "Bad client behaviour", "Your client has unexpected behaviour, please contact it's developers");
         }
 
         SessionEntity session = await _sessionManager.CreateAsync(account.Id, body.SessionName, this.GetRemoteIP(), this.GetCloudflareIPCountry(), userAgent, body.RememberMe, cancellationToken);
 
-        // Create JWT
-        ZapMePrincipal principal = new ZapMePrincipal(session);
-
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SigningKey"]!));
-        var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var token = new JwtSecurityToken(
-            _configuration["Jwt:Issuer"],
-            _configuration["Jwt:Audience"],
-            principal.Claims,
-            expires: DateTime.UtcNow.AddMinutes(10),
-            signingCredentials: signIn);
-
-        return Ok(new JwtSecurityTokenHandler().WriteToken(token));
-
-        //return SignIn();
+        return SignIn(new ZapMePrincipal(session));
     }
 }

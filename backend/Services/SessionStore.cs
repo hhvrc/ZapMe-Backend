@@ -44,7 +44,10 @@ public sealed class SessionStore : ISessionStore
 
     public Task<SessionEntity?> GetByIdAsync(Guid sessionId, CancellationToken cancellationToken)
     {
-        return _dbContext.Sessions.Include(static s => s.Account).FirstOrDefaultAsync(s => s.Id == sessionId, cancellationToken);
+        return _dbContext.Sessions
+            .Include(static s => s.Account)
+            .ThenInclude(static a => a.UserRoles)
+            .FirstOrDefaultAsync(s => s.Id == sessionId, cancellationToken);
     }
 
     public Task<SessionEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken)

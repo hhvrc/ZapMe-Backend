@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.VisualBasic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using ZapMe.Authentication;
+using ZapMe.Constants;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -11,27 +11,11 @@ public static class AuthenticationIServiceCollectionExtensions
     public static void ZMAddAuthentication([NotNull] this IServiceCollection services, [NotNull] IConfiguration configuration)
     {
         services
-            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(opt =>
+            .AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
+            .AddZapMe(opt =>
             {
-                opt.SaveToken = true;
-                opt.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = configuration["Jwt:Issuer"],
-                    ValidAudience = configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SigningKey"]!)),
-                };
-                opt.Events = new JwtBearerEvents
-                {
-                    OnChallenge = JwtEventHandlers.OnChallenge,
-                    OnForbidden = JwtEventHandlers.OnForbidden,
-                    OnTokenValidated = JwtEventHandlers.OnTokenValidated,
-                    OnAuthenticationFailed = JwtEventHandlers.OnAuthenticationFailed,
-                };
+                opt.CookieName = ZapMeAuthenticationDefaults.AuthenticationScheme + ".Authentication";
+                opt.SlidingExpiration = true;
             })
             .AddGoogle(opt =>
             {

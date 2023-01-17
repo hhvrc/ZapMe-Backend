@@ -9,7 +9,7 @@ namespace ZapMe.Controllers.Api.V1;
 /// </summary>
 [Authorize]
 [ApiController]
-[Route("api/v1/account/")]
+[Route("api/v1/[Controller]/")]
 public sealed partial class AccountController : ControllerBase
 {
     public string ControllerRoute { get; private set; } = String.Empty;

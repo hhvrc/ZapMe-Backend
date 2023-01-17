@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RichardSzalay.MockHttp;
-using ZapMe.DTOs;
+using System.Text.Json;
 using ZapMe.Services;
 using ZapMe.Services.Interfaces;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Tests.Services;
@@ -14,33 +13,35 @@ public sealed class GoogleReCaptchaServiceTests
     private readonly string _reCaptchaSecret;
     private readonly IGoogleReCaptchaService _sut;
     private readonly IConfiguration _configuration;
-    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly Mock<IHttpClientFactory> _httpClientFactoryMock;
     private readonly Mock<ILogger<GoogleReCaptchaService>> _loggerMock = new();
-    private readonly MockHttpMessageHandler _handlerMock = new MockHttpMessageHandler();
-    private readonly Bogus.Faker _faker = new Bogus.Faker();
+    private readonly MockHttpMessageHandler _httpMessageHandlerMock;
+    private readonly Bogus.Faker _faker;
 
     public GoogleReCaptchaServiceTests()
     {
-        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
-        httpClientFactoryMock
-            .Setup(_ => _.CreateClient(It.IsAny<string>()))
-            .Returns(() => new HttpClient(_handlerMock) { BaseAddress = new Uri("https://www.google.com/recaptcha/api/", UriKind.Absolute) });
-
+        _faker = new Bogus.Faker();
+        _loggerMock = new Mock<ILogger<GoogleReCaptchaService>>();
+        _httpMessageHandlerMock = new MockHttpMessageHandler();
+        _httpClientFactoryMock = new Mock<IHttpClientFactory>();
         _reCaptchaSecret = _faker.Random.AlphaNumeric(32);
-
+        
         _configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new KeyValuePair<string, string?>[] {
                 new("Authorization:ReCaptcha:Secret", _reCaptchaSecret)
             })
             .Build();
-
-        _httpClientFactory = httpClientFactoryMock.Object;
-        _sut = new GoogleReCaptchaService(_httpClientFactory, _configuration, _loggerMock.Object);
+        
+        _httpClientFactoryMock
+            .Setup(_ => _.CreateClient(It.IsAny<string>()))
+            .Returns(() => new HttpClient(_httpMessageHandlerMock) { BaseAddress = new Uri("https://www.google.com/recaptcha/api/", UriKind.Absolute) });
+        
+        _sut = new GoogleReCaptchaService(_httpClientFactoryMock.Object, _configuration, _loggerMock.Object);
     }
-    
+
     void ArrangeMock(string userResponseToken, string remoteIp, string responseBody)
     {
-        _handlerMock
+        _httpMessageHandlerMock
             .When(HttpMethod.Post, "https://www.google.com/recaptcha/api/siteverify")
             .With(req => req.Content?.Headers?.ContentType?.MediaType == "application/x-www-form-urlencoded")
             .WithExactFormData(new KeyValuePair<string, string?>[] {
@@ -50,6 +51,38 @@ public sealed class GoogleReCaptchaServiceTests
             })
             .Respond(Application.Json, responseBody);
     }
+    static string CreateResponseBody(bool success, string hostName, params string[] errorCodes)
+    {
+        Dictionary<string, object> document = new Dictionary<string, object>
+        {
+            { "success", success },
+            { "challenge_ts", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ") },
+            { "hostname", hostName }
+        };
+
+        if (errorCodes.Length > 0)
+        {
+            document.Add("error-codes", errorCodes);
+        }
+
+        return JsonSerializer.Serialize(document);
+    }
+    static string CreateResponseBodyApk(bool success, string apkPackageName, params string[] errorCodes)
+    {
+        Dictionary<string, object> document = new Dictionary<string, object>
+        {
+            { "success", success },
+            { "challenge_ts", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ") },
+            { "apk_package_name", apkPackageName }
+        };
+
+        if (errorCodes.Length > 0)
+        {
+            document.Add("error-codes", errorCodes);
+        }
+
+        return JsonSerializer.Serialize(document);
+    }
 
     [Fact]
     public async Task VerifyUserResponseTokenAsync_GoodToken_ReturnsSuccess()
@@ -58,19 +91,10 @@ public sealed class GoogleReCaptchaServiceTests
         string remoteIp = _faker.Internet.Ip();
         string domainName = _faker.Internet.DomainName();
         string userResponseToken = _faker.Random.AlphaNumeric(32);
-        string responseBody =
-        """
-        {
-            "success": true,
-            "challenge_ts": "{DateTime}",
-            "hostname": "{DomainName}"
-        }
-        """
-        .Replace("{DateTime}", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"))
-        .Replace("{DomainName}", domainName);
+        string responseBody = CreateResponseBody(true, domainName);
 
         ArrangeMock(userResponseToken, remoteIp, responseBody);
-        
+
         // Act
         var result = await _sut.VerifyUserResponseTokenAsync(userResponseToken, remoteIp);
 
@@ -88,16 +112,7 @@ public sealed class GoogleReCaptchaServiceTests
         string remoteIp = _faker.Internet.Ip();
         string apkPackageName = _faker.Internet.DomainName();
         string userResponseToken = _faker.Random.AlphaNumeric(32);
-        string responseBody =
-        """
-        {
-            "success": true,
-            "challenge_ts": "{DateTime}",
-            "apk_package_name": "{ApkPackageName}"
-        }
-        """
-        .Replace("{DateTime}", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"))
-        .Replace("{ApkPackageName}", apkPackageName);
+        string responseBody = CreateResponseBodyApk(true, apkPackageName);
 
         ArrangeMock(userResponseToken, remoteIp, responseBody);
 
@@ -112,29 +127,12 @@ public sealed class GoogleReCaptchaServiceTests
     }
 
     [Fact]
-    public async Task BadToken_MissingInputSecret()
+    public async Task VerifyUserResponseTokenAsync_BadToken_ReturnsErrorCodes()
     {
         string remoteIp = _faker.Internet.Ip();
         string domainName = _faker.Internet.DomainName();
         string userResponseToken = _faker.Random.AlphaNumeric(32);
-        string responseBody =
-        """
-        {
-            "success": false,
-            "challenge_ts": "{DateTime}",
-            "hostname": "{DomainName}",
-            "error-codes": [
-                "missing-input-secret",
-                "invalid-input-secret",
-                "missing-input-response",
-                "invalid-input-response",
-                "bad-request",
-                "timeout-or-duplicate"
-            ]
-        }
-        """
-        .Replace("{DateTime}", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"))
-        .Replace("{DomainName}", domainName);
+        string responseBody = CreateResponseBody(false, domainName, "missing-input-secret", "invalid-input-secret", "missing-input-response", "invalid-input-response", "bad-request", "timeout-or-duplicate");
 
         ArrangeMock(userResponseToken, remoteIp, responseBody);
 
@@ -152,5 +150,18 @@ public sealed class GoogleReCaptchaServiceTests
         Assert.Contains("invalid-input-response", result.ErrorCodes);
         Assert.Contains("bad-request", result.ErrorCodes);
         Assert.Contains("timeout-or-duplicate", result.ErrorCodes);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(null!)]
+    public async Task VerifyUserResponseTokenAsync_NullOrEmptyResponseToken_ReturnsInvalidInputResponseErrorCode(string userResponseToken)
+    {
+        // Act
+        var result = await _sut.VerifyUserResponseTokenAsync(userResponseToken, "");
+
+        // Assert
+        Assert.NotNull(result.ErrorCodes);
+        Assert.Contains("invalid-input-response", result.ErrorCodes);
     }
 }
