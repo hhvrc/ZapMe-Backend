@@ -5,9 +5,11 @@ namespace ZapMe.Views;
 
 public static class EmailDocument
 {
-    public static HtmlElement Build(string title, string previewText, IEnumerable<HtmlElement> children, HtmlElement footer, Color? backgroundColor = null)
+    public static HtmlElement Build(string title, string previewText, IEnumerable<HtmlElement> children, in HtmlElement footer, Color? backgroundColor = null)
     {
         backgroundColor ??= Color.FromArgb(246, 246, 246);
+
+        string backgroundColorHex = backgroundColor.Value.ToHex();
 
         HtmlElement html = new HtmlElement(HtmlTagType.Html);
         HtmlElement head = html.AddChild(HtmlTagType.Head);
@@ -18,7 +20,7 @@ public static class EmailDocument
         head.AddChild(HtmlTagType.Meta, ("http-equiv", "Content-Type"), ("content", "text/html; charset=UTF-8"));
         head.AddChild(HtmlTagType.Title).AddChildString(title);
         head.AddChild(HtmlTagType.Style).AddChildRaw(
-"""
+$$"""
 /* -------------------------------------
     GLOBAL RESETS
 ------------------------------------- */
@@ -32,7 +34,7 @@ img {
 }
 
 body {
-    background-color: #f6f6f6;
+    background-color: {{backgroundColorHex}};
     font-family: sans-serif;
     -webkit-font-smoothing: antialiased;
     font-size: 14px;
@@ -60,7 +62,7 @@ table td {
 ------------------------------------- */
 
 .body {
-background-color: #f6f6f6;
+background-color: {{backgroundColorHex}};
 width: 100%; 
 }
 

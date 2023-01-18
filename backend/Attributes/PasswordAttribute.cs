@@ -5,13 +5,14 @@ using System.ComponentModel.DataAnnotations;
 namespace ZapMe.Attributes;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-public sealed class PasswordAttribute : ValidationAttribute, IOpenApiAttribute
+public sealed class PasswordAttribute : ValidationAttribute, IParameterAttribute
 {
-    private const int MinLength = 10;
-    private const int MaxLength = 256;
-    private const string MsgMustBeString = "Password must be a string";
-    private static readonly string MsgTooShort = $"Password must be at least {MinLength} characters long";
-    private static readonly string MsgTooLong = $"Password must be at most {MaxLength} characters long";
+    public const int MinPasswordLength = 10;
+    public const int MaxPasswordLength = 256;
+    public const string ExamplePassword = "Hq2yP1B^Fho&zRHxHkEu";
+    private const string _ErrMsgMustBeString = "Password must be a string";
+    private static readonly string _ErrMsgTooShort = $"Password must be at least {MinPasswordLength} characters long";
+    private static readonly string _ErrMsgTooLong = $"Password must be at most {MaxPasswordLength} characters long";
 
     public bool ShouldValidate { get; }
 
@@ -31,17 +32,17 @@ public sealed class PasswordAttribute : ValidationAttribute, IOpenApiAttribute
 
         if (value is not string username)
         {
-            return new ValidationResult(MsgMustBeString);
+            return new ValidationResult(_ErrMsgMustBeString);
         }
 
-        if (username.Length < MinLength)
+        if (username.Length < MinPasswordLength)
         {
-            return new ValidationResult(MsgTooShort);
+            return new ValidationResult(_ErrMsgTooShort);
         }
 
-        if (username.Length > MaxLength)
+        if (username.Length > MaxPasswordLength)
         {
-            return new ValidationResult(MsgTooLong);
+            return new ValidationResult(_ErrMsgTooLong);
         }
 
         return ValidationResult.Success;
@@ -51,10 +52,10 @@ public sealed class PasswordAttribute : ValidationAttribute, IOpenApiAttribute
     {
         if (ShouldValidate)
         {
-            schema.MinLength = MinLength;
-            schema.MaxLength = MaxLength;
+            schema.MinLength = MinPasswordLength;
+            schema.MaxLength = MaxPasswordLength;
         }
-        schema.Example = new OpenApiString("Hq2yP1B^Fho&zRHxHkEu");
+        schema.Example = new OpenApiString(ExamplePassword);
     }
     public void Apply(OpenApiParameter parameter)
     {

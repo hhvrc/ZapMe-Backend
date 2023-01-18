@@ -5,7 +5,7 @@ namespace ZapMe.Controllers.Api.V1.Config.Models;
 public struct ApiConfig
 {
     [JsonPropertyName("version")]
-    public Version Version { get; set; }
+    public Version Version { get; set; } // TODO: make this a string
 
     [JsonPropertyName("tos_version")]
     public int TosVersion { get; set; }

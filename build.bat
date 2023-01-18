@@ -1,10 +1,10 @@
-:: Remove build folder
+:: Remove old build files
 rmdir "build" /s /q
-
-:: Remove build files in backend folder
-rmdir "backend\bin"
-rmdir "backend\obj"
-rmdir "backend\build"
+rmdir "backend\bin" /s /q
+rmdir "backend\obj" /s /q
+rmdir "backend\build" /s /q
+rmdir "frontend\build" /s /q
+rmdir "frontend\src\Api\Generated" /s /q
 
 :: Build the backend
 dotnet publish backend/Backend.csproj /p:PublishProfile=backend\Properties\PublishProfiles\FolderProfile.pubxml --configuration Release
@@ -18,12 +18,10 @@ dotnet tool run swagger tofile --yaml --output frontend/api/openapi.yaml build/S
 
 :: Frontend
 cd frontend
-rmdir "build" /s /q
-rmdir "src/Api/Generated" /s /q
-call npm install
-call npm run generate:api
-call npm run build:wasm
-call npm run build
+npm install
+npm run generate:api
+npm run build:wasm
+npm run build
 cd ..
 
 :: Copy the frontend build to the build folder

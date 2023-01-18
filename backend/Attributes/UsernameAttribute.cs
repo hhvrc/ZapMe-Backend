@@ -7,15 +7,17 @@ using ZapMe.Logic;
 namespace ZapMe.Attributes;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-public sealed class UsernameAttribute : ValidationAttribute, IOpenApiAttribute
+public sealed class UsernameAttribute : ValidationAttribute, IParameterAttribute
 {
-    private const int MinLength = 3;
-    private const int MaxLength = 32;
-    private const string MsgMustBeString = "Username must be a string";
-    private static readonly string MsgTooShort = $"Username must be at least {MinLength} characters long";
-    private static readonly string MsgTooLong = $"Username must be at most {MaxLength} characters long";
-    private const string MsgNoWhiteSpaceAtEnds = "Username cannot start or end with whitespace";
-    private const string MsgNoObnoxiousChars = "Username must not contain obnoxious characters";
+    public const int MinUsernameLength = 3;
+    public const int MaxUsernameLength = 32;
+    public const string UsernameRegex = /* lang=regex */ @"^[^\s].*[^\s]$";
+    public const string ExampleUsername = "MyUsername";
+    private const string _ErrMsgMustBeString = "Username must be a string";
+    private static readonly string _ErrMsgTooShort = $"Username must be at least {MinUsernameLength} characters long";
+    private static readonly string _ErrMsgTooLong = $"Username must be at most {MaxUsernameLength} characters long";
+    private const string _ErrMsgNoWhiteSpaceAtEnds = "Username cannot start or end with whitespace";
+    private const string _ErrMsgNoObnoxiousChars = "Username must not contain obnoxious characters";
 
     public bool ShouldValidate { get; }
 
@@ -35,27 +37,27 @@ public sealed class UsernameAttribute : ValidationAttribute, IOpenApiAttribute
 
         if (value is not string username)
         {
-            return new ValidationResult(MsgMustBeString);
+            return new ValidationResult(_ErrMsgMustBeString);
         }
 
-        if (username.Length < MinLength)
+        if (username.Length < MinUsernameLength)
         {
-            return new ValidationResult(MsgTooShort);
+            return new ValidationResult(_ErrMsgTooShort);
         }
 
-        if (username.Length > MaxLength)
+        if (username.Length > MaxUsernameLength)
         {
-            return new ValidationResult(MsgTooLong);
+            return new ValidationResult(_ErrMsgTooLong);
         }
 
         if (username[0].IsWhiteSpaceCharacter() || username[^1].IsWhiteSpaceCharacter())
         {
-            return new ValidationResult(MsgNoWhiteSpaceAtEnds);
+            return new ValidationResult(_ErrMsgNoWhiteSpaceAtEnds);
         }
 
         if (Verifiers.IsBadUiString(username))
         {
-            return new ValidationResult(MsgNoObnoxiousChars);
+            return new ValidationResult(_ErrMsgNoObnoxiousChars);
         }
 
         return ValidationResult.Success;
@@ -65,12 +67,12 @@ public sealed class UsernameAttribute : ValidationAttribute, IOpenApiAttribute
     {
         if (ShouldValidate)
         {
-            schema.MinLength = MinLength;
-            schema.MaxLength = MaxLength;
-            schema.Pattern = /* lang=regex */ @"^[^\s].*[^\s]$";
+            schema.MinLength = MinUsernameLength;
+            schema.MaxLength = MaxUsernameLength;
+            schema.Pattern = UsernameRegex;
         }
 
-        schema.Example = new OpenApiString("MyUsername");
+        schema.Example = new OpenApiString(ExampleUsername);
     }
     public void Apply(OpenApiParameter parameter)
     {

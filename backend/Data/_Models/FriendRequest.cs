@@ -6,10 +6,10 @@ namespace ZapMe.Data.Models;
 public sealed class FriendRequestEntity
 {
     public Guid SenderId { get; set; }
-    public required UserEntity Sender { get; set; }
+    public required AccountEntity Sender { get; set; }
 
     public Guid ReceiverId { get; set; }
-    public required UserEntity Receiver { get; set; }
+    public required AccountEntity Receiver { get; set; }
 
     public DateTime CreatedAt { get; set; }
 }

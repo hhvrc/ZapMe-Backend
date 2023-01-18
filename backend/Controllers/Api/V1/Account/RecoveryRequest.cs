@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ZapMe.Constants;
 using ZapMe.Data.Models;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
@@ -25,20 +26,22 @@ public partial class AccountController
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> RecoveryRequest([FromBody] Account.Models.RecoveryRequest body, [FromServices] IMailGunService mailServiceProvider, CancellationToken cancellationToken)
     {
-        await using TimeLock tl = TimeLock.FromSeconds(1, cancellationToken);
+        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(1, cancellationToken);
 
-        UserEntity? account = await _userManager.GetByEmailAsync(body.Email, cancellationToken);
+        AccountEntity? account = await _accountManager.GetByEmailAsync(body.Email, cancellationToken);
 
         if (account != null)
         {
             // Create/Overwrite recovery secret
-            string? passwordResetToken = await _userManager.GeneratePasswordResetTokenAsync(account.Id, cancellationToken);
+            string? passwordResetToken = await _accountManager.GeneratePasswordResetTokenAsync(account.Id, cancellationToken);
             if (passwordResetToken != null)
             {
-                string render = ResetPassword.Build(account.UserName, "https://heavenvr.tech/zapme/reset-password?token=" + passwordResetToken);
+                string render = ResetPassword.Build(account.Name, App.BackendBaseUrl + "/reset-password?token=" + passwordResetToken);
+
+                // TODO: this is bad, fetch domain from config instead FIXME
 
                 // Send recovery secret to email
-                await mailServiceProvider.SendMailAsync("Hello", "hello", $"{account.UserName} <{account.Email}>", "Password recovery", render, cancellationToken);
+                await mailServiceProvider.SendMailAsync("Hello", "hello", "heavenvr.tech", $"{account.Name} <{account.Email}>", "Password recovery", render, cancellationToken);
             }
         }
 

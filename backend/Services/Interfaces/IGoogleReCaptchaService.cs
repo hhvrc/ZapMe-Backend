@@ -14,5 +14,5 @@ public interface IGoogleReCaptchaService
     /// <param name="remoteIpAddress"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<GoogleReCaptchaVerifyResponse> VerifyUserResponseTokenAsync(string reCaptchaToken, string remoteIpAddress, CancellationToken cancellationToken = default);
+    Task<GoogleReCaptchaVerifyResponse> VerifyUserResponseTokenAsync(string reCaptchaToken, string? remoteIpAddress, CancellationToken cancellationToken = default);
 }

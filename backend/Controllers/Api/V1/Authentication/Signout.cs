@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ZapMe.Data.Models;
+using ZapMe.Authentication;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -17,12 +17,10 @@ public partial class AuthenticationController
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> SignOut(CancellationToken cancellationToken)
     {
-        SignInEntity signIn = this.GetSignIn()!;
+        ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 
-        await _signInManager.SignOutAsync(signIn.Id, cancellationToken);
+        await _sessionManager.SessionStore.DeleteSessionAsync(identity.SessionId, cancellationToken);
 
-        Response.Cookies.Delete("access_token");
-
-        return Ok();
+        return SignOut();
     }
 }

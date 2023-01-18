@@ -1,44 +1,59 @@
-﻿using System.Net.Http.Headers;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using ZapMe.Logic;
 using ZapMe.Services.Interfaces;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Services;
 
 public sealed class DebounceService : IDebounceService
 {
-    private readonly HttpClient _httpClient;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<DebounceService> _logger;
 
-    public DebounceService(HttpClient httpClient, ILogger<DebounceService> logger)
+    public DebounceService(IHttpClientFactory httpClientFactory, ILogger<DebounceService> logger)
     {
-        _httpClient = httpClient;
+        _httpClientFactory = httpClientFactory;
         _logger = logger;
-
-        // Set client defaults
-        _httpClient.BaseAddress = new Uri($"https://disposable.debounce.io", UriKind.Absolute);
-        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
     }
 
     private struct DebounceDisposableResponse
     {
         [JsonPropertyName("disposable")]
-        public bool IsDisposable { get; set; }
+        public string Disposable { get; set; }
     }
 
     public async Task<bool> IsDisposableEmailAsync(string email, CancellationToken cancellationToken)
     {
-        string? anonymizedEmail = Transformers.AnonymizeEmailUser(email);
-        if (anonymizedEmail == null)
+        string anonymizedEmail = Transformers.AnonymizeEmailUser(email);
+
+        HttpClient httpClient = _httpClientFactory.CreateClient("Debounce");
+
+        using HttpResponseMessage response = await httpClient.GetAsync("?email=" + anonymizedEmail, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
         {
+            _logger.LogError("Failed to check email: {} {}", response.StatusCode, await response.Content.ReadAsStringAsync(cancellationToken));
             return false;
         }
 
-        using HttpResponseMessage response = await _httpClient.GetAsync("?email=" + anonymizedEmail, cancellationToken);
+        string isDisposableStr;
 
-        DebounceDisposableResponse content = await response.Content.ReadFromJsonAsync<DebounceDisposableResponse>(cancellationToken: cancellationToken);
+        try
+        {
+            DebounceDisposableResponse content = await response.Content.ReadFromJsonAsync<DebounceDisposableResponse>(cancellationToken: cancellationToken);
+            isDisposableStr = content.Disposable;
+        }
+        catch (Exception)
+        {
+            _logger.LogError("disposable.io sent back invalid return for {}", anonymizedEmail);
+            return false;
+        }
 
-        return content.IsDisposable;
+        if (!Boolean.TryParse(isDisposableStr, out bool isDisposable))
+        {
+            _logger.LogError("disposable.io sent back invalid return for {}", anonymizedEmail);
+            return false;
+        }
+
+        return isDisposable;
     }
 }

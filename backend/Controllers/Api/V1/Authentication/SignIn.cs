@@ -1,6 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ZapMe.Authentication;
+using ZapMe.Authentication.Models;
+using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.Data.Models;
 using ZapMe.Helpers;
+using ZapMe.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
@@ -11,54 +16,75 @@ public partial class AuthenticationController
     /// 
     /// </summary>
     /// <param name="body"></param>
+    /// <param name="userManager"></param>
+    /// <param name="passwordHasher"></param>
+    /// <param name="lockOutManager"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>The user account</returns>
-    /// <response code="200">Returns users account</response>
+    /// <response code="200">Returns SignInOk along with a Cookie with similar data</response>
     /// <response code="400">Error details</response>
     /// <response code="500">Error details</response>
     [RequestSizeLimit(1024)]
     [HttpPost("signin", Name = "AuthSignIn")]
     [Consumes(Application.Json, Application.Xml)]
     [Produces(Application.Json, Application.Xml)]
-    [ProducesResponseType(typeof(Account.Models.AccountDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SignInOk), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, CancellationToken cancellationToken)
+    public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] IAccountManager userManager, [FromServices] IPasswordHasher passwordHasher, [FromServices] ILockOutManager lockOutManager, CancellationToken cancellationToken)
     {
         if (User.Identity?.IsAuthenticated ?? false)
         {
             return this.Error_AnonymousOnly();
         }
 
-        await using TimeLock tl = TimeLock.FromSeconds(4, cancellationToken);
+        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
 
-        DTOs.SignInResult signInResult = await _signInManager.PasswordSignInAsync(body.UserName, body.Password, cancellationToken);
-        switch (signInResult.Result)
+        AccountEntity? account = await userManager.GetByNameAsync(body.Username, cancellationToken) ?? await userManager.GetByEmailAsync(body.Username, cancellationToken);
+        if (account == null)
         {
-            case DTOs.SignInResultType.Success:
-                break;
-            case DTOs.SignInResultType.UserNotFound:
-            case DTOs.SignInResultType.PasswordInvalid:
-                return this.Error_InvalidCredentials("Invalid username/password", "Please check that your entered username and password are correct", "username", "password");
-            case DTOs.SignInResultType.LockedOut:
-                // TODO: get lockout reason and end date
-                return this.Error(StatusCodes.Status400BadRequest, "Account disabled", "Your account has been disabled. Please contact support for more information.");
-            case DTOs.SignInResultType.EmailNotConfirmed:
-                return this.Error(StatusCodes.Status400BadRequest, "Email not confirmed", "Please confirm your email address before signing in.");
-            default:
-            case DTOs.SignInResultType.InternalServerError:
-                return this.Error_InternalServerError();
+            return this.Error_InvalidCredentials("Invalid username/password", "Please check that your entered username and password are correct", "username", "password");
         }
 
-        Data.Models.SignInEntity signIn = signInResult.SignIn!;
-        Response.Cookies.Append("access_token", signIn.Id.ToString(), new CookieOptions
+        if (!passwordHasher.CheckPassword(body.Password, account.PasswordHash))
         {
-            HttpOnly = true,
-            SameSite = SameSiteMode.Strict,
-            Secure = true,
-            Expires = signIn.ExpiresAt
-        });
+            return this.Error_InvalidCredentials("Invalid username/password", "Please check that your entered username and password are correct", "username", "password");
+        }
 
-        return Ok(new Account.Models.AccountDto(signIn.User)); // TODO: use a mapper FFS
+        LockOutEntity[] lockouts = await lockOutManager.ListByUserIdAsync(account.Id).ToArrayAsync(cancellationToken);
+        if (lockouts.Any())
+        {
+            string reason = "Please contact support for more information";
+
+            IEnumerable<LockOutEntity> publicList = lockouts.Where(static x => x.Flags.Split(',').Contains("public"));
+            if (publicList.Any())
+            {
+                reason = "Reason(s):\n" + String.Join("\n", publicList.Select(static x => x.Reason));
+            }
+
+            return this.Error(StatusCodes.Status400BadRequest, "Account disabled", "Account has been disabled either by moderative or administrative reasons", UserNotification.SeverityLevel.Error, "Account disabled", reason);
+        }
+
+        if (!account.EmailVerified)
+        {
+            return this.Error(StatusCodes.Status400BadRequest, "Unverified Email", "Email has not been verified", UserNotification.SeverityLevel.Error, "Email not verified", "Please verify your email address before signing in");
+        }
+
+        if (account.AcceptedTosVersion < 0) // TODO: have a currentTosVerion value
+        {
+            return this.Error(StatusCodes.Status400BadRequest, "TOS Review Required", "User needs to accept new TOS", UserNotification.SeverityLevel.Error, "Terms of Service not accepted", "Please accept the Terms of Service before signing in");
+        }
+
+        string userAgent = this.GetRemoteUserAgent();
+
+        if (userAgent.Length > UserAgentLimits.MaxLength)
+        {
+            // Request body too large
+            return this.Error(StatusCodes.Status413RequestEntityTooLarge, "User-Agent too long", "User-Agent header has a hard limit on 2048 characters", UserNotification.SeverityLevel.Error, "Bad client behaviour", "Your client has unexpected behaviour, please contact it's developers");
+        }
+
+        SessionEntity session = await _sessionManager.CreateAsync(account.Id, body.SessionName, this.GetRemoteIP(), this.GetCloudflareIPCountry(), userAgent, body.RememberMe, cancellationToken);
+
+        return SignIn(new ZapMePrincipal(session));
     }
 }

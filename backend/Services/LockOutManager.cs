@@ -19,19 +19,18 @@ public sealed class LockOutManager : ILockOutManager
         throw new NotImplementedException();
     }
 
-    public Task<List<LockOutEntity>> ListByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<LockOutEntity> ListByUserIdAsync(Guid userId)
     {
-        throw new NotImplementedException();
+        return LockOutStore.ListByUserAsync(userId);
     }
 
-    public async Task LockOutAsync(Guid userId, string? reason, string flags, DateTime? expiresAt, CancellationToken cancellationToken)
+    public Task LockOutAsync(Guid userId, string? reason, string flags, DateTime? expiresAt, CancellationToken cancellationToken)
     {
-        await LockOutStore.CreateAsync(userId, reason, flags, expiresAt, cancellationToken);
+        return LockOutStore.CreateAsync(userId, reason, flags, expiresAt, cancellationToken);
     }
 
-    public async Task<bool> IsLockedOutAsync(Guid userId, CancellationToken cancellationToken)
+    public ValueTask<bool> IsLockedOutAsync(Guid userId, CancellationToken cancellationToken)
     {
-        var lockOuts = await LockOutStore.ListByUserAsync(userId, cancellationToken);
-        return lockOuts?.Any(x => x.ExpiresAt > DateTime.UtcNow) ?? false;
+        return LockOutStore.ListByUserAsync(userId).AnyAsync(x => x.ExpiresAt > DateTime.UtcNow, cancellationToken);
     }
 }

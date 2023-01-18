@@ -11,11 +11,11 @@ public struct FriendRequestList
     /// UserId's of users that has sent friend requests to this account
     /// </summary>
     [JsonPropertyName("incoming")]
-    public Guid[] Incoming { get; set; }
+    public IEnumerable<Guid> Incoming { get; set; }
 
     /// <summary>
     /// UserId's of users that this account has sent friend requests to
     /// </summary>
     [JsonPropertyName("outgoing")]
-    public Guid[] Outgoing { get; set; }
+    public IEnumerable<Guid> Outgoing { get; set; }
 }

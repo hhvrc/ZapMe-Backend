@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Npgsql;
 using ZapMe.Data;
 using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
@@ -9,48 +8,38 @@ namespace ZapMe.Services;
 public sealed class UserRelationStore : IUserRelationStore
 {
     private readonly ZapMeContext _dbContext;
-    private readonly IHybridCache _cache;
     private readonly ILogger<UserRelationStore> _logger;
 
-    public UserRelationStore(ZapMeContext dbContext, IHybridCache cacheProviderService, ILogger<UserRelationStore> logger)
+    public UserRelationStore(ZapMeContext dbContext, ILogger<UserRelationStore> logger)
     {
         _dbContext = dbContext;
-        _cache = cacheProviderService;
         _logger = logger;
     }
 
     public async Task<UserRelationEntity?> CreateAsync(Guid sourceUserId, Guid targetUserId, CancellationToken cancellationToken)
     {
-        try
+        var entity = new UserRelationEntity
         {
-            var entity = new UserRelationEntity
-            {
-                SourceUserId = sourceUserId,
-                TargetUserId = targetUserId,
-                RelationType = UserRelationType.None,
-                SourceUser = null!,
-                TargetUser = null!,
-            };
+            SourceUserId = sourceUserId,
+            TargetUserId = targetUserId,
+            RelationType = UserRelationType.None,
+            SourceUser = null!,
+            TargetUser = null!,
+        };
 
-            await _dbContext.UserRelations.AddAsync(entity, cancellationToken);
+        await _dbContext.UserRelations.AddAsync(entity, cancellationToken);
 
-            return entity;
-        }
-        catch (PostgresException)
-        {
-        }
-
-        return null;
+        return entity;
     }
 
-    public async Task<UserRelationEntity[]> ListOutgoingAsync(Guid sourceUserId, CancellationToken cancellationToken)
+    public IAsyncEnumerable<UserRelationEntity> ListOutgoingAsync(Guid sourceUserId)
     {
-        return await _dbContext.UserRelations.Where(ur => ur.SourceUserId == sourceUserId).ToArrayAsync(cancellationToken);
+        return _dbContext.UserRelations.Where(ur => ur.SourceUserId == sourceUserId).ToAsyncEnumerable();
     }
 
-    public async Task<UserRelationEntity[]> ListIncomingByTypeAsync(Guid targetUserId, UserRelationType relationType, CancellationToken cancellationToken)
+    public IAsyncEnumerable<UserRelationEntity> ListIncomingByTypeAsync(Guid targetUserId, UserRelationType relationType)
     {
-        return await _dbContext.UserRelations.Where(ur => ur.TargetUserId == targetUserId && ur.RelationType == relationType).ToArrayAsync(cancellationToken);
+        return _dbContext.UserRelations.Where(ur => ur.TargetUserId == targetUserId && ur.RelationType == relationType).ToAsyncEnumerable();
     }
 
     public async Task<bool> SetRelationTypeAsync(Guid sourceUserId, Guid targetUserId, UserRelationType relationType, CancellationToken cancellationToken = default)
@@ -79,8 +68,8 @@ public sealed class UserRelationStore : IUserRelationStore
         return await _dbContext.UserRelations.Where(ur => ur.SourceUserId == sourceUserId && ur.TargetUserId == targetUserId).ExecuteDeleteAsync(cancellationToken) > 0;
     }
 
-    public async Task<int> PurgeAsync(Guid userId, UserRelationType? relationType, CancellationToken cancellationToken)
+    public Task<int> PurgeAsync(Guid userId, UserRelationType? relationType, CancellationToken cancellationToken)
     {
-        return await _dbContext.UserRelations.Where(ur => ur.SourceUserId == userId || ur.TargetUserId == userId).ExecuteDeleteAsync(cancellationToken);
+        return _dbContext.UserRelations.Where(ur => ur.SourceUserId == userId || ur.TargetUserId == userId).ExecuteDeleteAsync(cancellationToken);
     }
 }

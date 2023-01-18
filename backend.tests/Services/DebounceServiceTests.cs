@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using RichardSzalay.MockHttp;
+using System.Net;
 using ZapMe.Logic;
 using ZapMe.Services;
 using ZapMe.Services.Interfaces;
@@ -10,65 +11,95 @@ namespace ZapMe.Tests.Services;
 public sealed class DebounceServiceTests
 {
     private readonly IDebounceService _sut;
-    private readonly HttpClient _httpClient;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly Mock<ILogger<DebounceService>> _loggerMock = new();
-    private readonly MockHttpMessageHandler _handler = new MockHttpMessageHandler();
+    private readonly MockHttpMessageHandler _handlerMock = new MockHttpMessageHandler();
 
     public DebounceServiceTests()
     {
-        _httpClient = new HttpClient(_handler);
-        _sut = new DebounceService(_httpClient, _loggerMock.Object);
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        httpClientFactoryMock
+            .Setup(_ => _.CreateClient(It.IsAny<string>()))
+            .Returns(() => new HttpClient(_handlerMock) { BaseAddress = new Uri("https://disposable.debounce.io", UriKind.Absolute) });
+
+        _httpClientFactory = httpClientFactoryMock.Object;
+        _sut = new DebounceService(httpClientFactoryMock.Object, _loggerMock.Object);
     }
 
     [Fact]
-    public async Task CheckDebounce_GoodEmail()
+    public async Task IsDisposableEmailAsync_GoodEmail_ReturnsFalse()
     {
-        string email = "user.name@gmail.com";
-        string anonymousEmail = Transformers.AnonymizeEmailUser(email);
-
-        KeyValuePair<string, string>[] query = new KeyValuePair<string, string>[]
-        {
-            new KeyValuePair<string, string>("email", anonymousEmail)
+        // Arrange
+        var email = "user.name@gmail.com";
+        var query = new KeyValuePair<string, string>[] {
+            new ( "email", Transformers.AnonymizeEmailUser(email) )
         };
 
-        _handler
+        _handlerMock
             .When(HttpMethod.Get, "https://disposable.debounce.io")
             .WithExactQueryString(query)
-            .Respond(Application.Json,
-/* lang=json */
-"""
-{
-    "disposable": false
-}
-"""
-            );
+            .Respond(Application.Json, @"{""disposable"":""false""}");
 
-        Assert.False(await _sut.IsDisposableEmailAsync(email));
+        // Act
+        var result = await _sut.IsDisposableEmailAsync(email);
+
+        // Assert
+        Assert.False(result);
     }
 
     [Fact]
-    public async Task CheckDebounce_BadEmail()
+    public async Task IsDisposableEmailAsync_BadEmail_ReturnsTrue()
     {
-        string email = "user.name@disposeme.com";
-        string anonymousEmail = Transformers.AnonymizeEmailUser(email);
-
-        KeyValuePair<string, string>[] query = new KeyValuePair<string, string>[]
-        {
-            new KeyValuePair<string, string>("email", anonymousEmail)
+        // Arrange
+        var email = "user.name@disposeme.com";
+        var query = new KeyValuePair<string, string>[] {
+            new ( "email", Transformers.AnonymizeEmailUser(email) )
         };
 
-        _handler
+        _handlerMock
             .When(HttpMethod.Get, "https://disposable.debounce.io")
             .WithExactQueryString(query)
-            .Respond(Application.Json,
-/* lang=json */
-"""
-{
-    "disposable": true
-}
-"""
-            );
+            .Respond(Application.Json, @"{""disposable"":""true""}");
 
-        Assert.True(await _sut.IsDisposableEmailAsync(email));
+        // Act
+        var result = await _sut.IsDisposableEmailAsync(email);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public async Task IsDisposableEmailAsync_EmptyResponse_ReturnsFalse()
+    {
+        // Arrange
+        var email = "user.name@disposeme.com";
+
+        _handlerMock
+            .When(HttpMethod.Get, "https://disposable.debounce.io")
+            .Respond(Application.Json, "");
+
+        // Act
+        var result = await _sut.IsDisposableEmailAsync(email);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task IsDisposableEmailAsync_NetworkError_ReturnsFalse()
+    {
+        // Arrange
+        var email = "user.name@disposeme.com";
+
+        _handlerMock
+            .When(HttpMethod.Get, "https://disposable.debounce.io")
+            .WithQueryString("email", Transformers.AnonymizeEmailUser(email))
+            .Respond(HttpStatusCode.InternalServerError);
+
+        // Act
+        var result = await _sut.IsDisposableEmailAsync(email);
+
+        // Assert
+        Assert.False(result);
     }
 }

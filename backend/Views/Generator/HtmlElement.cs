@@ -90,7 +90,6 @@ public sealed partial class HtmlElement
         return htmlTag;
     }
 
-
     public string Render()
     {
         StringBuilder sb = new StringBuilder();

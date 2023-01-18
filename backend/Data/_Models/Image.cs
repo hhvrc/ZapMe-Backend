@@ -16,7 +16,7 @@ public sealed class ImageEntity
     public required long HashPerceptual { get; set; }
 
     public Guid? UploaderId { get; set; }
-    public UserEntity? Uploader { get; set; }
+    public AccountEntity? Uploader { get; set; }
 }
 
 public sealed class ImageEntityConfiguration : IEntityTypeConfiguration<ImageEntity>

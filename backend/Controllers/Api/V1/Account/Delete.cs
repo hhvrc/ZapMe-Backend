@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.Models;
-using ZapMe.Data.Models;
 using ZapMe.DTOs;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -19,13 +19,14 @@ public partial class AccountController
     [HttpDelete(Name = "DeleteAccount")]
     [Produces(Application.Json, Application.Xml)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Delete([FromHeader] string password, [FromQuery] string? reason, CancellationToken cancellationToken)
     {
-        SignInEntity signIn = this.GetSignIn()!;
+        ZapMeIdentity identity = (User as ZapMePrincipal)!.Identity;
 
-        PasswordCheckResult result = _userManager.CheckPassword(signIn.User, password, cancellationToken);
+        // TODO: get the password hash from the database, or get it earlier in the pipeline
+        PasswordCheckResult result = _accountManager.CheckPassword(identity.Account, password, cancellationToken);
         switch (result)
         {
             case PasswordCheckResult.Success:
@@ -37,7 +38,7 @@ public partial class AccountController
                 return this.Error_InternalServerError();
         }
 
-        await _userManager.DeleteAsync(signIn.UserId, cancellationToken);
+        await _accountManager.DeleteAsync(identity.AccountId, cancellationToken);
 
         // TODO: register reason if supplied
 

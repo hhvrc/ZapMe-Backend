@@ -2,20 +2,20 @@
 
 namespace ZapMe.DTOs;
 
-public struct GoogleReCaptchaVerifyResponse
+public readonly struct GoogleReCaptchaVerifyResponse
 {
     [JsonPropertyName("success")]
-    public bool Success { get; set; }
+    public readonly bool Success { get; init; }
 
     [JsonPropertyName("challenge_ts")]
-    public DateTime ChallengeTimeStamp { get; set; }
+    public readonly DateTime ChallengeTimeStamp { get; init; }
 
     [JsonPropertyName("hostname")]
-    public string? Hostname { get; set; }
+    public readonly string? Hostname { get; init; }
 
     [JsonPropertyName("apk_package_name")]
-    public string? ApkPackageName { get; set; }
+    public readonly string? ApkPackageName { get; init; }
 
     [JsonPropertyName("error-codes")]
-    public string[]? ErrorCodes { get; set; }
+    public readonly string[]? ErrorCodes { get; init; }
 }

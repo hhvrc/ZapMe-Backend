@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.Models;
-using ZapMe.Data.Models;
 using ZapMe.DTOs;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -24,15 +24,15 @@ public partial class AccountController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateEmail([FromBody] Account.Models.UpdateEmail body, CancellationToken cancellationToken)
     {
-        SignInEntity signIn = this.GetSignIn()!;
+        ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 
-        PasswordCheckResult result = await _userManager.CheckPasswordAsync(signIn.UserId, body.Password, cancellationToken);
+        PasswordCheckResult result = await _accountManager.CheckPasswordAsync(identity.AccountId, body.Password, cancellationToken);
         if (result != PasswordCheckResult.Success)
         {
             return this.Error_InvalidPassword();
         }
 
-        await _userManager.SetEmailAsync(signIn.UserId, body.NewEmail, cancellationToken);
+        await _accountManager.SetEmailAsync(identity.AccountId, body.NewEmail, cancellationToken);
 
         return Ok();
     }

@@ -10,13 +10,11 @@ namespace ZapMe.Services;
 public sealed class LockOutStore : ILockOutStore
 {
     private readonly ZapMeContext _dbContext;
-    private readonly IHybridCache _cache;
     private readonly ILogger<LockOutStore> _logger;
 
-    public LockOutStore(ZapMeContext dbContext, IHybridCache cacheProviderService, ILogger<LockOutStore> logger)
+    public LockOutStore(ZapMeContext dbContext, ILogger<LockOutStore> logger)
     {
         _dbContext = dbContext;
-        _cache = cacheProviderService;
         _logger = logger;
     }
 
@@ -31,58 +29,30 @@ public sealed class LockOutStore : ILockOutStore
             ExpiresAt = expiresAt
         };
 
-        try
-        {
-            await _dbContext.LockOuts.AddAsync(entity, cancellationToken);
-            int nAdded = await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.LockOuts.AddAsync(entity, cancellationToken);
+        int nAdded = await _dbContext.SaveChangesAsync(cancellationToken);
 
-            if (nAdded > 0)
-            {
-                return entity;
-            }
-        }
-        catch (Exception ex)
+        if (nAdded > 0)
         {
-            _logger.LogCritical(ex, "Failed to create lockout for user {UserId}", userId);
+            return entity;
         }
 
         return null;
     }
 
-    public async Task<LockOutEntity?> GetByIdAsync(Guid lockOutId, CancellationToken cancellationToken)
+    public Task<LockOutEntity?> GetByIdAsync(Guid lockOutId, CancellationToken cancellationToken)
     {
-        return await _cache.GetOrAddAsync("lockOut:id:" + lockOutId, async (_, ct) =>
-            new DTOs.HybridCacheEntry<LockOutEntity?>
-            {
-                Value = await _dbContext.LockOuts.FirstOrDefaultAsync(l => l.Id == lockOutId, ct),
-                ExpiresAtUtc = DateTime.UtcNow + TimeSpan.FromMinutes(5)
-            }
-        , cancellationToken);
+        return _dbContext.LockOuts.FirstOrDefaultAsync(l => l.Id == lockOutId, cancellationToken);
     }
 
-    public async Task<LockOutEntity[]> ListByUserAsync(Guid userId, CancellationToken cancellationToken)
+    public IAsyncEnumerable<LockOutEntity> ListByUserAsync(Guid userId)
     {
-        return await _cache.GetOrAddAsync("lockOut:user:" + userId, async (_, ct) =>
-            new DTOs.HybridCacheEntry<LockOutEntity[]>
-            {
-                Value = await _dbContext.LockOuts.Where(l => l.UserId == userId).ToArrayAsync(ct),
-                ExpiresAtUtc = DateTime.UtcNow + TimeSpan.FromMinutes(5)
-            }
-        , cancellationToken);
+        return _dbContext.LockOuts.Where(l => l.UserId == userId).ToAsyncEnumerable();
     }
 
     private async Task<bool> UpdateAsync(Guid lockOutId, Expression<Func<SetPropertyCalls<LockOutEntity>, SetPropertyCalls<LockOutEntity>>> setPropertyCalls, CancellationToken cancellationToken)
     {
-        try
-        {
-            return (await _dbContext.LockOuts.Where(l => l.Id == lockOutId).ExecuteUpdateAsync(setPropertyCalls, cancellationToken)) > 0;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogCritical(ex, "Failed to update lockout {LockOutId}", lockOutId);
-        }
-
-        return false;
+        return (await _dbContext.LockOuts.Where(l => l.Id == lockOutId).ExecuteUpdateAsync(setPropertyCalls, cancellationToken)) > 0;
     }
 
     public Task<bool> SetReasonAsync(Guid lockOutId, string reason, CancellationToken cancellationToken) =>
@@ -94,29 +64,11 @@ public sealed class LockOutStore : ILockOutStore
 
     public async Task<bool> DeleteAsync(Guid lockOutId, CancellationToken cancellationToken)
     {
-        try
-        {
-            return await _dbContext.LockOuts.Where(l => l.Id == lockOutId).ExecuteDeleteAsync(cancellationToken) > 0;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogCritical(ex, "Failed to delete lockout {LockOutId}", lockOutId);
-        }
-
-        return false;
+        return await _dbContext.LockOuts.Where(l => l.Id == lockOutId).ExecuteDeleteAsync(cancellationToken) > 0;
     }
 
     public async Task<bool> DeleteAllAsync(Guid userId, CancellationToken cancellationToken)
     {
-        try
-        {
-            return await _dbContext.LockOuts.Where(l => l.UserId == userId).ExecuteDeleteAsync(cancellationToken) > 0;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogCritical(ex, "Failed to delete all lockouts for user {UserId}", userId);
-        }
-
-        return false;
+        return await _dbContext.LockOuts.Where(l => l.UserId == userId).ExecuteDeleteAsync(cancellationToken) > 0;
     }
 }

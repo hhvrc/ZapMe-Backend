@@ -14,7 +14,7 @@
         "ASPNETCORE_ENVIRONMENT": "Production"
       },
       "dotnetRunMessages": false,
-      "applicationUrl": "https://localhost:7296;http://localhost:5296",
+      "applicationUrl": "https://localhost:7296;http://localhost:5296;https://heavenvr.tech",
       "hotReloadEnabled": false
     }
   }

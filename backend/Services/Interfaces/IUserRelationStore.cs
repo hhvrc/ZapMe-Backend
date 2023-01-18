@@ -17,18 +17,16 @@ public interface IUserRelationStore
     /// 
     /// </summary>
     /// <param name="sourceUserId"></param>
-    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<UserRelationEntity[]> ListOutgoingAsync(Guid sourceUserId, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<UserRelationEntity> ListOutgoingAsync(Guid sourceUserId);
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="targetUserId"></param>
     /// <param name="relationType"></param>
-    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<UserRelationEntity[]> ListIncomingByTypeAsync(Guid targetUserId, UserRelationType relationType, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<UserRelationEntity> ListIncomingByTypeAsync(Guid targetUserId, UserRelationType relationType);
 
     /// <summary>
     /// 

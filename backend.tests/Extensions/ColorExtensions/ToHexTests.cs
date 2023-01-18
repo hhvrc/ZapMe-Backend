@@ -5,15 +5,29 @@ namespace ZapMe.Tests.Extensions.ColorExtensions;
 public sealed class ToHexTests
 {
     [Fact]
-    public void Black()
+    public void ToHex_Black_ReturnsAllZero()
     {
-        Assert.Equal("#000000", Color.Black.ToHex());
+        // Arrange
+        Color color = Color.Black;
+
+        // Act
+        string hex = color.ToHex();
+
+        // Assert
+        Assert.Equal("#000000", hex);
     }
 
     [Fact]
-    public void White()
+    public void ToHex_Black_ReturnsAllF()
     {
-        Assert.Equal("#FFFFFF", Color.White.ToHex());
+        // Arrange
+        Color color = Color.White;
+
+        // Act
+        string hex = color.ToHex();
+
+        // Assert
+        Assert.Equal("#FFFFFF", hex);
     }
 
     [Fact]

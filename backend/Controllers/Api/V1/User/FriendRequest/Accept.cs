@@ -17,7 +17,7 @@ public partial class UserController
     [RequestSizeLimit(1024)]
     [HttpPut("i/{userId}/friendrequest", Name = "AcceptFriendRequest")]
     [Produces(Application.Json, Application.Xml)]
-    [ProducesResponseType(typeof(User.Models.User), StatusCodes.Status200OK)]        // Accepted
+    [ProducesResponseType(typeof(User.Models.UserDto), StatusCodes.Status200OK)]        // Accepted
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status304NotModified)] // Already friends
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)]    // No friendrequest incoming
     public IActionResult FriendRequestAccept([FromRoute] Guid userId)

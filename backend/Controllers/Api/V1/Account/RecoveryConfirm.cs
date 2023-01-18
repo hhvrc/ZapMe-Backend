@@ -25,9 +25,9 @@ public partial class AccountController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)] // Token invalid, expired, or already used
     public async Task<IActionResult> RecoveryConfirm([FromBody] Account.Models.RecoveryConfirm body, CancellationToken cancellationToken)
     {
-        await using TimeLock tl = TimeLock.FromSeconds(4, cancellationToken);
+        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
 
-        if (!await _userManager.TryCompletePasswordResetAsync(body.Token, body.NewPassword, cancellationToken))
+        if (!await _accountManager.TryCompletePasswordResetAsync(body.Token, body.NewPassword, cancellationToken))
         {
             return this.Error(StatusCodes.Status400BadRequest, "Bad reset token", "The reset token is invalid, expired, or has already been used.", UserNotification.SeverityLevel.Error, "Bad reset token", "The reset token is invalid, expired, or has already been used.");
         }
