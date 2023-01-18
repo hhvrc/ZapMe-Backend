@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
+using ZapMe.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -9,7 +10,7 @@ public static class DatabaseIServiceCollectionExtensions
     {
         services.AddDbContextPool<ZapMe.Data.ZapMeContext>(opt =>
         {
-            opt.UseNpgsql(configuration["PgSQL:ConnectionString"], o => o.SetPostgresVersion(14, 5))
+            opt.UseNpgsql(configuration.GetOrThrow("PgSQL:ConnectionString"), o => o.SetPostgresVersion(14, 5))
                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         });
     }
