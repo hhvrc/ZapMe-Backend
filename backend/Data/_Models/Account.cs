@@ -6,6 +6,10 @@ namespace ZapMe.Data.Models;
 
 public sealed class AccountEntity
 {
+    public static string TableName => "accounts";
+    public static string TableAccountNameIndex => "accounts_name_idx";
+    public static string TableAccountEmailIndex => "accounts_email_idx";
+
     /// <summary>
     /// 
     /// </summary>
@@ -92,7 +96,7 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<AccountEn
 {
     public void Configure(EntityTypeBuilder<AccountEntity> builder)
     {
-        builder.ToTable("accounts");
+        builder.ToTable(AccountEntity.TableName);
 
         builder.HasKey(u => u.Id);
 
@@ -157,11 +161,11 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<AccountEn
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(u => u.Name)
-            .HasDatabaseName("accounts_name_idx")
+            .HasDatabaseName(AccountEntity.TableAccountNameIndex)
             .IsUnique();
 
         builder.HasIndex(u => u.Email)
-            .HasDatabaseName("accounts_email_idx")
+            .HasDatabaseName(AccountEntity.TableAccountEmailIndex)
             .IsUnique();
 
         builder.HasIndex(u => u.PasswordResetToken)

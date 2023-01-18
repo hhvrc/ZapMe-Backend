@@ -1,4 +1,5 @@
 ﻿using ZapMe.Data.Models;
+using ZapMe.DTOs;
 
 namespace ZapMe.Services.Interfaces;
 
@@ -12,7 +13,7 @@ public interface IAccountStore
     /// <param name="passwordHash"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<AccountEntity?> TryCreateAsync(string userName, string email, string passwordHash, CancellationToken cancellationToken = default);
+    Task<AccountCreationResult> TryCreateAsync(string userName, string email, string passwordHash, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 

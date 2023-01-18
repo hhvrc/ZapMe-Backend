@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ZapMe.Controllers.Api.V1.Models;
-using ZapMe.Data.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
@@ -69,12 +68,27 @@ public partial class AccountController
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
 
         // Create account
-        AccountEntity? user = await _accountManager.TryCreateAsync(body.UserName, body.Email, body.Password, cancellationToken);
-        if (user == null)
+        AccountCreationResult result = await _accountManager.TryCreateAsync(body.UserName, body.Email, body.Password, cancellationToken);
+        if (!result.IsSuccess)
         {
-            return this.Error_InvalidModelState((nameof(body.UserName), "Username/Email already taken"), (nameof(body.Email), "Username/Email already taken"));
+            switch (result.Result)
+            {
+                case AccountCreationResult.ResultE.Success:
+                    break;
+                case AccountCreationResult.ResultE.NameAlreadyTaken:
+                case AccountCreationResult.ResultE.EmailAlreadyTaken:
+                    return this.Error(StatusCodes.Status409Conflict, "One or multiple idenitifiers in use", "Fields \"UserName\" or \"Email\" are not available", UserNotification.SeverityLevel.Warning, "Username/Email already taken", "Please choose a different Username or Email");
+                case AccountCreationResult.ResultE.NameOrEmailInvalid:
+                    break;
+                case AccountCreationResult.ResultE.UnknownError:
+                    break;
+                default:
+                    break;
+            }
+
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
-        return CreatedAtAction(nameof(Get), new Account.Models.AccountDto(user)); // TODO: use a mapper FFS
+        return CreatedAtAction(nameof(Get), new Account.Models.AccountDto(result.Entity)); // TODO: use a mapper FFS
     }
 }
