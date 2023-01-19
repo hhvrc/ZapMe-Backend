@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using ZapMe.Constants;
 using ZapMe.Data.Models;
 using ZapMe.Helpers;
-using ZapMe.Services;
 using ZapMe.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -25,7 +24,7 @@ public partial class AccountController
     [HttpPost("recover", Name = "AccountRecoveryRequest")]
     [Consumes(Application.Json, Application.Xml)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> RecoveryRequest([FromBody] Account.Models.RecoveryRequest body, [FromServices] CachedEmailTemplateStore emailTemplateStore, [FromServices] IMailGunService mailServiceProvider, CancellationToken cancellationToken)
+    public async Task<IActionResult> RecoveryRequest([FromBody] Account.Models.RecoveryRequest body, [FromServices] IEmailTemplateStore emailTemplateStore, [FromServices] IMailGunService mailServiceProvider, CancellationToken cancellationToken)
     {
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(1, cancellationToken);
 
@@ -42,8 +41,12 @@ public partial class AccountController
                     throw new NullReferenceException("Email template not found");
 
                 string formattedEmail = new QuickStringReplacer(emailTemplate)
-                    .Replace("{username}", account.Name)
-                    .Replace("{resetPasswordUrl}", App.BackendBaseUrl + "/reset-password?token=" + passwordResetToken)
+                    .Replace("{{UserName}}", account.Name)
+                    .Replace("{{ResetPasswordUrl}}", App.BackendBaseUrl + "/reset-password?token=" + passwordResetToken)
+                    .Replace("{{CompanyName}}", App.AppCreator)
+                    .Replace("{{CompanyAddress}}", App.MadeInText)
+                    .Replace("{{PoweredBy}}", App.AppName)
+                    .Replace("{{PoweredByLink}}", App.MainPageUrl)
                     .ToString();
 
                 // Send recovery secret to email
