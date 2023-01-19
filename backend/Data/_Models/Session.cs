@@ -40,7 +40,7 @@ public sealed class SessionEntity
     public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
 }
 
-public sealed class SessionConfiguration : IEntityTypeConfiguration<SessionEntity>
+public sealed class SessionEntityConfiguration : IEntityTypeConfiguration<SessionEntity>
 {
     public void Configure(EntityTypeBuilder<SessionEntity> builder)
     {

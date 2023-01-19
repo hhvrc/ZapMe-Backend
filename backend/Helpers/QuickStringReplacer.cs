@@ -1,4 +1,4 @@
-﻿namespace ZapMe.Views;
+﻿namespace ZapMe.Helpers;
 
 public sealed class QuickStringReplacer
 {

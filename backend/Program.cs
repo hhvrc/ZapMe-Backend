@@ -54,6 +54,7 @@ services.ZMAddSessions();
 services.ZMAddLockOuts();
 services.ZMAddUserRelations();
 services.ZMAddFriendRequests();
+services.ZMAddEmailTemplates();
 
 services.ZMAddWebSockets();
 services.ZMAddRateLimiter();

@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using ZapMe.Constants;
 using ZapMe.Data.Models;
 using ZapMe.Helpers;
+using ZapMe.Services;
 using ZapMe.Services.Interfaces;
-using ZapMe.Views;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
@@ -15,6 +15,7 @@ public partial class AccountController
     /// Request password recovery of a account, a recovery email will be sent to the user that makes a call to the /recovery-confirm endpoint
     /// </summary>
     /// <param name="body"></param>
+    /// <param name="emailTemplateStore"></param>
     /// <param name="mailServiceProvider"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
@@ -24,7 +25,7 @@ public partial class AccountController
     [HttpPost("recover", Name = "AccountRecoveryRequest")]
     [Consumes(Application.Json, Application.Xml)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> RecoveryRequest([FromBody] Account.Models.RecoveryRequest body, [FromServices] IMailGunService mailServiceProvider, CancellationToken cancellationToken)
+    public async Task<IActionResult> RecoveryRequest([FromBody] Account.Models.RecoveryRequest body, [FromServices] CachedEmailTemplateStore emailTemplateStore, [FromServices] IMailGunService mailServiceProvider, CancellationToken cancellationToken)
     {
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(1, cancellationToken);
 
@@ -36,12 +37,17 @@ public partial class AccountController
             string? passwordResetToken = await _accountManager.GeneratePasswordResetTokenAsync(account.Id, cancellationToken);
             if (passwordResetToken != null)
             {
-                string render = ResetPassword.Build(account.Name, App.BackendBaseUrl + "/reset-password?token=" + passwordResetToken);
+                string? emailTemplate = await emailTemplateStore.GetTemplateAsync(EmailTemplateNames.PasswordReset, cancellationToken);
+                if (emailTemplate is null)
+                    throw new NullReferenceException("Email template not found");
 
-                // TODO: this is bad, fetch domain from config instead FIXME
+                string formattedEmail = new QuickStringReplacer(emailTemplate)
+                    .Replace("{username}", account.Name)
+                    .Replace("{resetPasswordUrl}", App.BackendBaseUrl + "/reset-password?token=" + passwordResetToken)
+                    .ToString();
 
                 // Send recovery secret to email
-                await mailServiceProvider.SendMailAsync("Hello", "hello", "heavenvr.tech", $"{account.Name} <{account.Email}>", "Password recovery", render, cancellationToken);
+                await mailServiceProvider.SendMailAsync("Hello", "hello", "heavenvr.tech", $"{account.Name} <{account.Email}>", "Password recovery", formattedEmail, cancellationToken);
             }
         }
 

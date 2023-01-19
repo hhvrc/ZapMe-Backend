@@ -76,6 +76,13 @@ public static class ZapMeIServiceCollectionExtensions
         //services.AddTransient<IFriendRequestManager, FriendRequestManager>();
     }
 
+    public static void ZMAddEmailTemplates([NotNull] this IServiceCollection services)
+    {
+        //services.AddTransient<EmailTemplateStore>();
+        //services.AddTransient<IEmailTemplateStore, CachedEmailTemplateStore>();
+        services.AddTransient<IEmailTemplateStore, EmailTemplateStore>();
+    }
+
     public static void ZMAddWebSockets([NotNull] this IServiceCollection services)
     {
         services.AddTransient<IWebSocketInstanceManager, WebSocketInstanceManager>();
