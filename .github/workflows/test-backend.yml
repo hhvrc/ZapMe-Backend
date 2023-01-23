@@ -23,5 +23,7 @@ jobs:
         uses: actions/setup-dotnet@v3
       - name: Install dependencies
         run: dotnet restore
+      - name: Install tools
+        run: dotnet tool restore
       - name: Build
         run: dotnet publish backend/Backend.csproj /p:PublishProfile=backend/Properties/PublishProfiles/FolderProfile.pubxml --configuration Release --no-restore
