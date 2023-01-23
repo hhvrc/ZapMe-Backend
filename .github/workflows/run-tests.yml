@@ -25,7 +25,8 @@ jobs:
         run: |
           dotnet restore
           dotnet tool restore
-      - uses: actions/cache@v1
+      - name: Cache nuget packages
+        uses: actions/cache@v1
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }} #hash of project files
