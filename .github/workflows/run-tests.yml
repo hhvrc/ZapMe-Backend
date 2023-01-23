@@ -1,22 +1,22 @@
-name: test backend
+name: run tests
 # run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 
 on:
   push:
-    branches: [ "main", "dev", "feature/*" ]
+    branches: ["main", "dev", "feature/*"]
   pull_request:
-    branches: [ "main", "dev" ]
+    branches: ["main", "dev"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   build:
-  
     runs-on: ubuntu-latest
-    
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Setup .NET Framework SDK
@@ -25,7 +25,5 @@ jobs:
         run: |
           dotnet restore
           dotnet tool restore
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
       - name: Run tests
         run: dotnet test --no-restore --verbosity normal
