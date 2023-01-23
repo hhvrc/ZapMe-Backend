@@ -6,6 +6,7 @@
     <IsPackable>false</IsPackable>
     <AssemblyName>Tests</AssemblyName>
     <RootNamespace>ZapMe.Tests</RootNamespace>
+    <Platforms>x64</Platforms>
   </PropertyGroup>
 
   <PropertyGroup>
