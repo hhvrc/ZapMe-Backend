@@ -4,6 +4,11 @@ root = true
 # C# files
 [*.cs]
 
+### Custom rules ###
+
+# Missing XML comment for publicly visible type or member
+dotnet_diagnostic.CS1591.severity = none
+
 #### Core EditorConfig Options ####
 
 # Indentation and spacing

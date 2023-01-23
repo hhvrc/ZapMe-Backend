@@ -5,14 +5,15 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>09c442f6-0b36-4620-9fc4-bd8d8b6bc23d</UserSecretsId>
-	<GenerateDocumentationFile>true</GenerateDocumentationFile>
-	<AssemblyName>Server</AssemblyName>
-	<RootNamespace>ZapMe</RootNamespace>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Server</AssemblyName>
+    <RootNamespace>ZapMe</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup>
-    <NoWarn>1591;1701</NoWarn>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,7 +24,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="7.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.2" />
-	<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
