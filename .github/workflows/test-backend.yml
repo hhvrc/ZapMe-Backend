@@ -22,8 +22,10 @@ jobs:
       - name: Setup .NET Framework SDK ${{ matrix.dotnet-version }}
         uses: actions/setup-dotnet@v3
       - name: Install dependencies
-        run: dotnet restore
-      - name: Install tools
-        run: dotnet tool restore
+        run: |
+          dotnet restore
+          dotnet tool restore
       - name: Build
-        run: dotnet publish backend/Backend.csproj /p:PublishProfile=backend/Properties/PublishProfiles/FolderProfile.pubxml --configuration Release --no-restore
+        run: dotnet build --configuration Release --no-restore
+      - name: Run tests
+        run: dotnet test --no-restore --verbosity normal
