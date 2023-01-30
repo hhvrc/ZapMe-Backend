@@ -37,7 +37,9 @@ public sealed class SessionEntity
 
     public DateTime ExpiresAt { get; set; }
 
+    public TimeSpan TimeToLive => ExpiresAt - CreatedAt;
     public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
+    public bool IsHalfwayExpired => DateTime.UtcNow >= ExpiresAt.Subtract(TimeToLive.Divide(2));
 }
 
 public sealed class SessionEntityConfiguration : IEntityTypeConfiguration<SessionEntity>

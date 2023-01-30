@@ -2,7 +2,6 @@
 using System.Net.Http.Headers;
 using System.Text;
 using ZapMe.Constants;
-using ZapMe.Extensions;
 using ZapMe.Services;
 using ZapMe.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;

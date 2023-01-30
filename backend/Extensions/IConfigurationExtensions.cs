@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace ZapMe.Extensions;
+namespace Microsoft.Extensions.Configuration;
 
 public static class IConfigurationExtensions
 {

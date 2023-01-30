@@ -3,7 +3,6 @@ using Amazon.Extensions.NETCore.Setup;
 using Amazon.Runtime;
 using Amazon.S3;
 using System.Diagnostics.CodeAnalysis;
-using ZapMe.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection;
 

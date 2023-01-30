@@ -15,9 +15,11 @@ public sealed partial class AccountController : ControllerBase
     public string ControllerRoute { get; private set; } = String.Empty;
 
     private readonly IAccountManager _accountManager;
+    private readonly ILogger<AccountController> _logger;
 
-    public AccountController(IAccountManager userManager)
+    public AccountController(IAccountManager userManager, ILogger<AccountController> logger)
     {
         _accountManager = userManager;
+        _logger = logger;
     }
 }

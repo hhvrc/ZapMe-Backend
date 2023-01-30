@@ -17,17 +17,17 @@ public sealed class SessionStore : ISessionStore
     }
 
 
-    public async Task<SessionEntity> CreateAsync(Guid userId, string sessionName, string ipAddress, string countryCode, UserAgentEntity userAgent, DateTime expiresAt, CancellationToken cancellationToken)
+    public async Task<SessionEntity> CreateAsync(AccountEntity account, string sessionName, string ipAddress, string countryCode, UserAgentEntity userAgent, DateTime expiresAt, CancellationToken cancellationToken)
     {
         SessionEntity session = new SessionEntity
         {
-            Account = null!, // TODO: wtf do i do now? ask on C# discord (null explicitly defined is kinda stupid)
-            UserId = userId,
+            Account = account,
+            UserId = account.Id,
             Name = sessionName,
             IpAddress = ipAddress,
             CountryCode = countryCode,
             UserAgentHash = userAgent.Hash,
-            UserAgent = null!,
+            UserAgent = userAgent,
             ExpiresAt = expiresAt
         };
 
@@ -36,7 +36,7 @@ public sealed class SessionStore : ISessionStore
 
         if (nAdded <= 0)
         {
-            _logger.LogWarning("Failed to create session for user {UserId}", userId);
+            _logger.LogWarning("Failed to create session for user {UserId}", account.Id);
         }
 
         return (await GetByIdAsync(session.Id, cancellationToken))!;

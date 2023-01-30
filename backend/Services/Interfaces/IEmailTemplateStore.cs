@@ -20,5 +20,5 @@ public interface IEmailTemplateStore
     /// <param name="templateName"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<string?> GetTemplateAsync(string templateName, CancellationToken cancellationToken = default);
+    Task<string?> GetEmailTemplateAsync(string templateName, CancellationToken cancellationToken = default);
 }

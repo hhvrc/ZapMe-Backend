@@ -31,8 +31,8 @@ public sealed class CachedEmailTemplateStore : IEmailTemplateStore
         }
     }
 
-    public Task<string?> GetTemplateAsync(string templateName, CancellationToken cancellationToken = default)
+    public Task<string?> GetEmailTemplateAsync(string templateName, CancellationToken cancellationToken = default)
     {
-        return _memoryCache.GetOrCreateAsync("EmailTemplate:" + templateName, async entry => await _emailTemplateStore.GetTemplateAsync(templateName, cancellationToken));
+        return _memoryCache.GetOrCreateAsync("EmailTemplate:" + templateName, async entry => await _emailTemplateStore.GetEmailTemplateAsync(templateName, cancellationToken));
     }
 }

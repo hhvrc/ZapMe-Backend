@@ -25,7 +25,7 @@ public sealed class EmailTemplateStore : IEmailTemplateStore
         return _dbContext.EmailTemplates.Select(static t => t.Name).ToAsyncEnumerable();
     }
 
-    public Task<string?> GetTemplateAsync(string templateName, CancellationToken cancellationToken)
+    public Task<string?> GetEmailTemplateAsync(string templateName, CancellationToken cancellationToken)
     {
         return _dbContext.EmailTemplates.Where(t => t.Name == templateName).Select(static t => t.Body).FirstOrDefaultAsync(cancellationToken);
     }

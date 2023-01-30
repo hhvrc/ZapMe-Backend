@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
-using ZapMe.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection;
 

@@ -36,7 +36,7 @@ public partial class AccountController
             string? passwordResetToken = await _accountManager.GeneratePasswordResetTokenAsync(account.Id, cancellationToken);
             if (passwordResetToken != null)
             {
-                string? emailTemplate = await emailTemplateStore.GetTemplateAsync(EmailTemplateNames.PasswordReset, cancellationToken);
+                string? emailTemplate = await emailTemplateStore.GetEmailTemplateAsync(EmailTemplateNames.PasswordReset, cancellationToken);
                 if (emailTemplate is null)
                     throw new NullReferenceException("Email template not found");
 
@@ -50,7 +50,7 @@ public partial class AccountController
                     .ToString();
 
                 // Send recovery secret to email
-                await mailServiceProvider.SendMailAsync("Hello", "hello", "heavenvr.tech", $"{account.Name} <{account.Email}>", "Password recovery", formattedEmail, cancellationToken);
+                await mailServiceProvider.SendEmailAsync("Hello", "hello", "heavenvr.tech", $"{account.Name} <{account.Email}>", "Password recovery", formattedEmail, cancellationToken);
             }
         }
 

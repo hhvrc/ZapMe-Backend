@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using ZapMe.Authentication;
-using ZapMe.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
