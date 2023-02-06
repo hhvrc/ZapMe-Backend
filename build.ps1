@@ -135,13 +135,7 @@ ReloadEnvironment
 # Build the frontend
 Write-Host "Building frontend..." -ForegroundColor Cyan
 Set-Location frontend
-Write-Host "Building WASM..."
-Invoke-Npm -Command 'run' -Arguments 'build:wasm'
-Write-Host "Installing NPM packages..."
-Invoke-Npm -Command 'install'
-Write-Host "Generating API..."
-Invoke-Npm -Command 'run' -Arguments 'generate:api'
-Write-Host "Finalizing build..."
+Invoke-Npm -Command 'run' -Arguments 'init'
 Invoke-Npm -Command 'run' -Arguments 'build'
 Set-Location ..
 Write-Host "Frontend built!" -ForegroundColor Green
@@ -149,5 +143,6 @@ Write-Host "Frontend built!" -ForegroundColor Green
 # Copy the frontend build to the backend
 Write-Host "Copying frontend build to backend..." -ForegroundColor Cyan
 RemoveFolder -Path '.\build\wwwroot'
-Copy-Item -Path '.\frontend\build\*' -Destination '.\build\wwwroot' -Recurse
+New-Item -ItemType Directory -Path '.\build\wwwroot' | Out-Null
+Copy-Item -Path '.\frontend\dist\*' -Destination '.\build\wwwroot' -Recurse
 Write-Host "Frontend build copied!" -ForegroundColor Green
