@@ -22,11 +22,11 @@
       },
       "AWSSDK.S3": {
         "type": "Direct",
-        "requested": "[3.7.101.58, )",
-        "resolved": "3.7.101.58",
-        "contentHash": "8RXps9IWnsYKeH11O68J1ll0p7oKrywETRcStPpUZDnObG5Iy3fPSoKMScCnCeHPFMif3k76AVvIvQmD8FZ6dg==",
+        "requested": "[3.7.103.3, )",
+        "resolved": "3.7.103.3",
+        "contentHash": "/HsZ42FmquPeYLN8r5z+i1fzgHSlBx89Ji2CSV/yir3VSpgmxZE3fSEtP93SM4DOz3SrFukA3SvHlw6HqlwRLA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.103.20, 4.0.0)"
+          "AWSSDK.Core": "[3.7.104.3, 4.0.0)"
         }
       },
       "BCrypt.Net-Next": {
@@ -167,8 +167,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.103.20",
-        "contentHash": "C56VjFSH4oG0fC87n44CCAgbvagLYul0oB8Gx+3j/2/bpzpXh+WWHXM13ippGd19gr4qFHe3CHXDCGeEcE/+7w=="
+        "resolved": "3.7.104.3",
+        "contentHash": "jqS8N1kd+yaQYzmJ7jazgaCKNBxYLe9jZjMwa37SjhK/rmh/LrlvceyJg1EvkXbKxrvVVxLtaBp5DoMsc83mKw=="
       },
       "Humanizer.Core": {
         "type": "Transitive",

@@ -20,7 +20,7 @@
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.0" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.2" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.101.58" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.103.3" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="7.0.2" />
