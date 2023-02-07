@@ -106,8 +106,6 @@ RemoveFolder -Path '.\build'
 RemoveFolder -Path '.\backend\bin'
 RemoveFolder -Path '.\backend\obj'
 RemoveFolder -Path '.\backend\build'
-RemoveFolder -Path '.\frontend\build'
-RemoveFolder -Path '.\frontend\src\Api\Generated'
 
 # Build the backend
 Write-Host "Building backend..." -ForegroundColor Cyan
