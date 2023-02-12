@@ -126,6 +126,8 @@ app.UseMiddleware<ActivityTracker>();
 
 app.MapControllers();
 
+app.UseSpa(env);
+
 // ########################################
 // ######## RUN APP #######################
 // ########################################
