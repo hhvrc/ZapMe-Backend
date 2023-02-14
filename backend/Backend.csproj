@@ -35,6 +35,7 @@
     <PackageReference Include="NetMQ" Version="4.0.1.10" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.1" />
     <PackageReference Include="PreMailer.Net" Version="2.4.0" />
+    <PackageReference Include="Quartz.AspNetCore" Version="3.6.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />

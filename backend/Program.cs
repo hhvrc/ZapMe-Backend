@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using ZapMe.Constants;
 using ZapMe.Controllers;
+using ZapMe.Extensions.DependencyInjection;
 using ZapMe.Middlewares;
 
 // The services are ordered by dependency requirements.
@@ -63,6 +64,7 @@ services.ZMAddAuthentication(configuration);
 services.ZMAddAuthorization();
 services.ZMAddDatabase(configuration);
 services.ZMAddAmazonAWS(configuration);
+services.ZMAddQuartz();
 
 // ########################################
 // ######## CORS CONFIGURATION ############
