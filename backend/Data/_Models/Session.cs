@@ -14,7 +14,7 @@ public sealed class SessionEntity
     /// <summary>
     /// User provided name for this session
     /// </summary>
-    public required string Name { get; set; }
+    public string? Name { get; set; }
 
     /// <summary>
     /// The visitor's IP address (IPv4 or IPv6)

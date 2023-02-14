@@ -160,6 +160,12 @@
           "Microsoft.Bcl.AsyncInterfaces": "6.0.0"
         }
       },
+      "UAParser": {
+        "type": "Direct",
+        "requested": "[3.1.47, )",
+        "resolved": "3.1.47",
+        "contentHash": "I68Jl/Vs5RQZdz9BbmYtnXgujg0jVd61LhKbyNZOCm9lBxZFGxLbiQo6yFj21VYi7DzPvEvrVOmeC6v41AoLfw=="
+      },
       "AngleSharp": {
         "type": "Transitive",
         "resolved": "0.16.1",

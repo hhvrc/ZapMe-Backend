@@ -4,4 +4,5 @@ public static class UserAgentLimits
 {
     public const int MaxLength = 2048;
     public const int StoredLength = 512;
+    public const int ParsedLength = 64;
 }

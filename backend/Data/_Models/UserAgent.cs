@@ -22,6 +22,21 @@ public class UserAgentEntity
     public required string Value { get; set; }
 
     /// <summary>
+    /// The clean, parsed operating system, based on the user agent string
+    /// </summary>
+    public required string ParsedOperatingSystem { get; set; }
+
+    /// <summary>
+    /// The clean, parsed device, based on the user agent string
+    /// </summary>
+    public required string ParsedDevice { get; set; }
+
+    /// <summary>
+    /// The clean, parsed user agent, based on the user agent string
+    /// </summary>
+    public required string ParsedUserAgent { get; set; }
+
+    /// <summary>
     /// Date this account was created at
     /// </summary>
     public DateTime CreatedAt { get; set; }
@@ -45,6 +60,18 @@ public sealed class UserAgentEntityConfiguration : IEntityTypeConfiguration<User
         builder.Property(u => u.Value)
             .HasColumnName("value")
             .HasMaxLength(UserAgentLimits.StoredLength);
+
+        builder.Property(u => u.ParsedOperatingSystem)
+            .HasColumnName("parsedOS")
+            .HasMaxLength(UserAgentLimits.ParsedLength);
+
+        builder.Property(u => u.ParsedDevice)
+            .HasColumnName("parsedDevice")
+            .HasMaxLength(UserAgentLimits.ParsedLength);
+
+        builder.Property(u => u.ParsedUserAgent)
+            .HasColumnName("parsedUA")
+            .HasMaxLength(UserAgentLimits.ParsedLength);
 
         builder.Property(u => u.CreatedAt)
             .HasColumnName("createdAt")

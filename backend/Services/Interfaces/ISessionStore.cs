@@ -18,7 +18,7 @@ public interface ISessionStore
     /// <param name="expiresAt"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<SessionEntity> CreateAsync(AccountEntity account, string sessionName, string ipAddress, string countryCode, UserAgentEntity userAgent, DateTime expiresAt, CancellationToken cancellationToken = default);
+    Task<SessionEntity> CreateAsync(AccountEntity account, string? sessionName, string ipAddress, string countryCode, UserAgentEntity userAgent, DateTime expiresAt, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
