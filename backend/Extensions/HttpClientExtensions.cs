@@ -1,7 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 
-namespace ZapMe.Extensions;
+namespace System.Net.Http;
 
 public static class HttpClientExtensions
 {

@@ -14,10 +14,7 @@ public class ZapMeIdentity : ClaimsIdentity
         // Add Role Claims
         if (roles != null)
         {
-            foreach (UserRoleEntity userRole in roles)
-            {
-                AddClaim(new Claim(ClaimTypes.Role, userRole.RoleName, ClaimValueTypes.String, ZapMeAuthenticationDefaults.AuthenticationScheme, ZapMeAuthenticationDefaults.AuthenticationScheme, this));
-            }
+            AddClaims(roles.Select(r => new Claim(ClaimTypes.Role, r.RoleName)));
         }
     }
 

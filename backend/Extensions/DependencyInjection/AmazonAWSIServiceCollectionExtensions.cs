@@ -12,8 +12,8 @@ public static class AmazonAWSIServiceCollectionExtensions
     {
         services.AddDefaultAWSOptions(new AWSOptions
         {
-            Region = RegionEndpoint.GetBySystemName(configuration["AmazonAWS:Region"]),
-            Credentials = new BasicAWSCredentials(configuration["AmazonAWS:AccessKey"], configuration["AmazonAWS:SecretKey"])
+            Region = RegionEndpoint.GetBySystemName(configuration.GetOrThrow("AmazonAWS:Region")),
+            Credentials = new BasicAWSCredentials(configuration.GetOrThrow("AmazonAWS:AccessKey"), configuration.GetOrThrow("AmazonAWS:SecretKey"))
         });
         services.AddAWSService<IAmazonS3>();
     }

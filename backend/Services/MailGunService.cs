@@ -13,7 +13,7 @@ public sealed class MailGunService : IMailGunService
         _logger = logger;
     }
 
-    public async Task<bool> SendMailAsync(string senderName, string senderExt, string senderDomain, string recepients, string subject, string htmlbody, CancellationToken cancellationToken)
+    public async Task<bool> SendEmailAsync(string senderName, string senderExt, string senderDomain, string recepients, string subject, string htmlbody, CancellationToken cancellationToken)
     {
         MultipartFormDataContent content = new MultipartFormDataContent
         {

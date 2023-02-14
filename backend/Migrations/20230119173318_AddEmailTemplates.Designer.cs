@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ZapMe.Data;
@@ -11,9 +12,11 @@ using ZapMe.Data;
 namespace ZapMe.Migrations
 {
     [DbContext(typeof(ZapMeContext))]
-    partial class ZapMeContextModelSnapshot : ModelSnapshot
+    [Migration("20230119173318_AddEmailTemplates")]
+    partial class AddEmailTemplates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -289,6 +292,7 @@ namespace ZapMe.Migrations
                         .HasColumnName("ipAddress");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)")
                         .HasColumnName("name");
@@ -328,24 +332,6 @@ namespace ZapMe.Migrations
                     b.Property<int>("Length")
                         .HasColumnType("integer")
                         .HasColumnName("length");
-
-                    b.Property<string>("ParsedDevice")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("parsedDevice");
-
-                    b.Property<string>("ParsedOperatingSystem")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("parsedOS");
-
-                    b.Property<string>("ParsedUserAgent")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("parsedUA");
 
                     b.Property<string>("Value")
                         .IsRequired()

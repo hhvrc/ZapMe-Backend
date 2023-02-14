@@ -14,7 +14,7 @@ public sealed class SessionEntity
     /// <summary>
     /// User provided name for this session
     /// </summary>
-    public required string Name { get; set; }
+    public string? Name { get; set; }
 
     /// <summary>
     /// The visitor's IP address (IPv4 or IPv6)
@@ -37,10 +37,12 @@ public sealed class SessionEntity
 
     public DateTime ExpiresAt { get; set; }
 
+    public TimeSpan TimeToLive => ExpiresAt - CreatedAt;
     public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
+    public bool IsHalfwayExpired => DateTime.UtcNow >= ExpiresAt.Subtract(TimeToLive.Divide(2));
 }
 
-public sealed class SessionConfiguration : IEntityTypeConfiguration<SessionEntity>
+public sealed class SessionEntityConfiguration : IEntityTypeConfiguration<SessionEntity>
 {
     public void Configure(EntityTypeBuilder<SessionEntity> builder)
     {

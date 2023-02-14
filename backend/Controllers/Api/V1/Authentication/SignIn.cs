@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using UAParser;
 using ZapMe.Authentication;
 using ZapMe.Authentication.Models;
 using ZapMe.Constants;
@@ -30,6 +31,9 @@ public partial class AuthenticationController
     [Produces(Application.Json, Application.Xml)]
     [ProducesResponseType(typeof(SignInOk), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status413RequestEntityTooLarge)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] IAccountManager userManager, [FromServices] IPasswordHasher passwordHasher, [FromServices] ILockOutManager lockOutManager, CancellationToken cancellationToken)
     {
@@ -80,10 +84,10 @@ public partial class AuthenticationController
         if (userAgent.Length > UserAgentLimits.MaxLength)
         {
             // Request body too large
-            return this.Error(StatusCodes.Status413RequestEntityTooLarge, "User-Agent too long", "User-Agent header has a hard limit on 2048 characters", UserNotification.SeverityLevel.Error, "Bad client behaviour", "Your client has unexpected behaviour, please contact it's developers");
+            return this.Error(StatusCodes.Status413RequestEntityTooLarge, "User-Agent too long", $"User-Agent header has a hard limit on {UserAgentLimits.MaxLength} characters", UserNotification.SeverityLevel.Error, "Bad client behaviour", "Your client has unexpected behaviour, please contact it's developers");
         }
 
-        SessionEntity session = await _sessionManager.CreateAsync(account.Id, body.SessionName, this.GetRemoteIP(), this.GetCloudflareIPCountry(), userAgent, body.RememberMe, cancellationToken);
+        SessionEntity session = await _sessionManager.CreateAsync(account, body.SessionName, this.GetRemoteIP(), this.GetCloudflareIPCountry(), userAgent, body.RememberMe, cancellationToken);
 
         return SignIn(new ZapMePrincipal(session));
     }

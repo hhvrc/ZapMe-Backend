@@ -9,7 +9,7 @@ public interface ISessionManager
     /// </summary>
     ISessionStore SessionStore { get; }
 
-    Task<SessionEntity> CreateAsync(Guid userId, string sessionName, string ipAddress, string countryCode, string userAgent, bool rememberMe, CancellationToken cancellationToken = default);
+    Task<SessionEntity> CreateAsync(AccountEntity account, string? sessionName, string ipAddress, string countryCode, string userAgent, bool rememberMe, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 

@@ -5,35 +5,43 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>09c442f6-0b36-4620-9fc4-bd8d8b6bc23d</UserSecretsId>
-	<GenerateDocumentationFile>true</GenerateDocumentationFile>
-	<AssemblyName>Server</AssemblyName>
-	<RootNamespace>ZapMe</RootNamespace>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Server</AssemblyName>
+    <RootNamespace>ZapMe</RootNamespace>
+    <Platforms>x64</Platforms>
   </PropertyGroup>
 
   <PropertyGroup>
-    <NoWarn>1591;1701</NoWarn>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.0" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.2" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.101.55" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.103.3" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="7.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="7.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.IdentityModel.Logging" Version="6.25.1" />
+    <PackageReference Include="Microsoft.IdentityModel.Logging" Version="6.26.0" />
     <PackageReference Include="NetMQ" Version="4.0.1.10" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.1" />
     <PackageReference Include="PreMailer.Net" Version="2.4.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+    <PackageReference Include="UAParser" Version="3.1.47" />
   </ItemGroup>
-
+  <Target Name="openapi" AfterTargets="Build">
+    <Message Text="generating openapi" Importance="high" />
+    <Exec Command="dotnet tool run swagger tofile --yaml --output $(ProjectDir)..\frontend\api\openapi.yaml $(OutputPath)$(AssemblyName).dll v1" />
+  </Target>
 </Project>

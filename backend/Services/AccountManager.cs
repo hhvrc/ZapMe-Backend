@@ -18,9 +18,9 @@ public sealed class AccountManager : IAccountManager
         _logger = logger;
     }
 
-    public Task<AccountEntity?> TryCreateAsync(string userName, string email, string password, CancellationToken cancellationToken)
+    public Task<AccountCreationResult> TryCreateAsync(string userName, string email, string password, CancellationToken cancellationToken)
     {
-        var passwordHash = PasswordHasher.HashPassword(password);
+        string passwordHash = PasswordHasher.HashPassword(password);
 
         return AccountStore.TryCreateAsync(userName.TrimAndMinifyWhiteSpaces(), email, passwordHash, cancellationToken);
     }

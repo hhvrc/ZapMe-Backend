@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
+using UAParser;
 using ZapMe.Constants;
 using ZapMe.Data;
 using ZapMe.Data.Models;
@@ -28,6 +29,19 @@ public sealed class UserAgentStore : IUserAgentStore
             return entry;
         }
 
+        string parsedOS, parsedDevice, parsedUserAgent;
+        try
+        {
+            ClientInfo parsed = Parser.GetDefault().Parse(userAgent);
+            parsedOS = parsed.OS.ToString();
+            parsedDevice = parsed.Device.ToString();
+            parsedUserAgent = parsed.UA.ToString();
+        }
+        catch (Exception)
+        {
+            parsedOS = parsedDevice = parsedUserAgent = "Unknown (Parsing failed)";
+        }
+
         if (userAgent.Length > UserAgentLimits.StoredLength)
         {
             userAgent = userAgent[..UserAgentLimits.StoredLength];
@@ -37,7 +51,10 @@ public sealed class UserAgentStore : IUserAgentStore
         {
             Hash = hash,
             Length = length,
-            Value = userAgent
+            Value = userAgent,
+            ParsedOperatingSystem = parsedOS,
+            ParsedDevice = parsedDevice,
+            ParsedUserAgent = parsedUserAgent
         };
 
         await _dbContext.UserAgents.AddAsync(entry, cancellationToken);

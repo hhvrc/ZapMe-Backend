@@ -26,7 +26,7 @@ public static class ZapMeIServiceCollectionExtensions
         });
         services.AddHttpClient("MailGun", cli =>
         {
-            string apiKey = config["Mailgun:ApiKey"] ?? throw new NullReferenceException("Config entry \"Mailgun:ApiKey\" is missing!");
+            string apiKey = config.GetOrThrow("Mailgun:ApiKey");
 
             cli.BaseAddress = new Uri("https://api.mailgun.net/v3/", UriKind.Absolute);
             cli.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
@@ -73,6 +73,13 @@ public static class ZapMeIServiceCollectionExtensions
     {
         services.AddTransient<IFriendRequestStore, FriendRequestStore>();
         //services.AddTransient<IFriendRequestManager, FriendRequestManager>();
+    }
+
+    public static void ZMAddEmailTemplates([NotNull] this IServiceCollection services)
+    {
+        //services.AddTransient<EmailTemplateStore>();
+        //services.AddTransient<IEmailTemplateStore, CachedEmailTemplateStore>();
+        services.AddTransient<IEmailTemplateStore, EmailTemplateStore>();
     }
 
     public static void ZMAddWebSockets([NotNull] this IServiceCollection services)

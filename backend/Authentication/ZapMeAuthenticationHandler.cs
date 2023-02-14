@@ -65,41 +65,48 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
 
         return Task.CompletedTask;
     }
-
+    
     private async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        string? sessionIdString;
-
-        // First check if theres a authorization header, then check if theres a cookie
-        if (Request.Headers.TryGetValue("Authorization", out StringValues authorizationHeader))
+        string? sessionIdString = Request.Headers["Authorization"];
+        if (sessionIdString is not null)
         {
-            string[] authorizationHeaderParts = authorizationHeader.ToString().Split(' ');
-            if (authorizationHeaderParts.Length != 2 || authorizationHeaderParts[0] != "Bearer")
+            if (!sessionIdString.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
-                return AuthenticateResult.Fail("Invalid authorization header.");
+                return AuthenticateResult.Fail("Invalid Authorization header format.");
             }
 
-            sessionIdString = authorizationHeaderParts[1];
+            sessionIdString = sessionIdString["Bearer ".Length..].Trim();
         }
-        else if (!Request.Cookies.TryGetValue(_options.CookieName, out sessionIdString))
+        else
+        {
+            sessionIdString = Request.Cookies[_options.CookieName];
+        }
+        
+        if (sessionIdString is null)
         {
             return AuthenticateResult.NoResult();
         }
 
-        if (String.IsNullOrEmpty(sessionIdString))
-            return AuthenticateResult.Fail("Empty Login Cookie");
-
         if (!Guid.TryParse(sessionIdString, out Guid sessionId))
             return AuthenticateResult.Fail("Malformed Login Cookie");
 
-        SessionEntity? session = await _sessionStore.GetByIdAsync(sessionId, _context.RequestAborted);
+        CancellationToken cancellationToken = _context.RequestAborted;
+
+        SessionEntity? session = await _sessionStore.GetByIdAsync(sessionId, cancellationToken);
         if (session == null)
             return AuthenticateResult.Fail("Invalid Login Cookie");
 
         if (session.IsExpired)
             return AuthenticateResult.Fail("Expired Login Cookie");
 
-        // TODO: some kinda refresh logic for the cookie if it's half way expired
+        // TODO: is this good or bad?
+        // Sliding window refresh
+        if (session.IsHalfwayExpired)
+        {
+            // refresh session
+            _ = _sessionStore.SetExipresAtAsync(session.Id, DateTime.UtcNow.Add(session.TimeToLive), cancellationToken);
+        }
 
         ZapMePrincipal principal = new ZapMePrincipal(session);
 

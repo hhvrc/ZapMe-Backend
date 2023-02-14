@@ -54,6 +54,7 @@ services.ZMAddSessions();
 services.ZMAddLockOuts();
 services.ZMAddUserRelations();
 services.ZMAddFriendRequests();
+services.ZMAddEmailTemplates();
 
 services.ZMAddWebSockets();
 services.ZMAddRateLimiter();
@@ -124,6 +125,8 @@ app.UseSwaggerAndUI();
 app.UseMiddleware<ActivityTracker>();
 
 app.MapControllers();
+
+app.UseSpa(env);
 
 // ########################################
 // ######## RUN APP #######################

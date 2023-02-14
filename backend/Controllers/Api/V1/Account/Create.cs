@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Principal;
+using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
-using ZapMe.Data.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
@@ -17,6 +18,8 @@ public partial class AccountController
     /// <param name="body"></param>
     /// <param name="reCaptchaService"></param>
     /// <param name="debounceService"></param>
+    /// <param name="emailTemplateStore"></param>
+    /// <param name="mailGunService"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <response code="200">Created account</response>
@@ -30,7 +33,13 @@ public partial class AccountController
     [ProducesResponseType(typeof(Account.Models.AccountDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status409Conflict)] // Username/email already taken
-    public async Task<IActionResult> CreateAsync([FromBody] Account.Models.Create body, [FromServices] IGoogleReCaptchaService reCaptchaService, [FromServices] IDebounceService debounceService, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateAsync(
+        [FromBody] Account.Models.Create body,
+        [FromServices] IGoogleReCaptchaService reCaptchaService,
+        [FromServices] IDebounceService debounceService,
+        [FromServices] IEmailTemplateStore emailTemplateStore,
+        [FromServices] IMailGunService mailGunService,
+        CancellationToken cancellationToken)
     {
         if (User.Identity?.IsAuthenticated ?? false)
         {
@@ -69,12 +78,48 @@ public partial class AccountController
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
 
         // Create account
-        AccountEntity? user = await _accountManager.TryCreateAsync(body.UserName, body.Email, body.Password, cancellationToken);
-        if (user == null)
+        AccountCreationResult result = await _accountManager.TryCreateAsync(body.UserName, body.Email, body.Password, cancellationToken);
+        if (!result.IsSuccess)
         {
-            return this.Error_InvalidModelState((nameof(body.UserName), "Username/Email already taken"), (nameof(body.Email), "Username/Email already taken"));
+            switch (result.Result)
+            {
+                case AccountCreationResult.ResultE.Success:
+                    break;
+                case AccountCreationResult.ResultE.NameAlreadyTaken:
+                case AccountCreationResult.ResultE.EmailAlreadyTaken:
+                    return this.Error(StatusCodes.Status409Conflict, "One or multiple idenitifiers in use", "Fields \"UserName\" or \"Email\" are not available", UserNotification.SeverityLevel.Warning, "Username/Email already taken", "Please choose a different Username or Email");
+                case AccountCreationResult.ResultE.NameOrEmailInvalid:
+                    break;
+                case AccountCreationResult.ResultE.UnknownError:
+                    break;
+                default:
+                    break;
+            }
+
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+        
+        string? emailTemplate = await emailTemplateStore.GetEmailTemplateAsync("AccountCreated", cancellationToken);
+        if (emailTemplate != null)
+        {
+            var emailBody = new QuickStringReplacer(emailTemplate)
+                    .Replace("{{UserName}}", body.UserName)
+                    //.Replace("{{ConfirmEmailLink}}", App.BackendBaseUrl + "/Account/ConfirmEmail?token=" + result.ConfirmationToken)
+                    .Replace("{{CompanyName}}", App.AppCreator)
+                    .Replace("{{CompanyAddress}}", App.MadeInText)
+                    .Replace("{{PoweredBy}}", App.AppName)
+                    .Replace("{{PoweredByLink}}", App.MainPageUrl)
+                    .ToString();
+
+            // TODO: change method signature to this: SendEmailAsync(string to, string subject, string body, CancellationToken cancellationToken)
+            await mailGunService.SendEmailAsync("System", "system", "heavenvr.tech", body.Email, "Account Created", emailTemplate, cancellationToken);
+        }
+        else
+        {
+            _logger.LogError("Failed to load email template \"AccountCreated\"");
         }
 
-        return CreatedAtAction(nameof(Get), new Account.Models.AccountDto(user)); // TODO: use a mapper FFS
+        // TODO: Send email verification
+        return CreatedAtAction(nameof(Get), new Account.Models.AccountDto(result.Entity)); // TODO: use a mapper FFS
     }
 }

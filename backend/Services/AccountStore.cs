@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using Npgsql;
 using System.Linq.Expressions;
 using ZapMe.Data;
 using ZapMe.Data.Models;
+using ZapMe.DTOs;
 using ZapMe.Enums;
 using ZapMe.Services.Interfaces;
 
@@ -19,7 +21,7 @@ public sealed class AccountStore : IAccountStore
         _logger = logger;
     }
 
-    public async Task<AccountEntity?> TryCreateAsync(string username, string email, string passwordHash, CancellationToken cancellationToken)
+    public async Task<AccountCreationResult> TryCreateAsync(string username, string email, string passwordHash, CancellationToken cancellationToken)
     {
         var user = new AccountEntity
         {
@@ -31,15 +33,52 @@ public sealed class AccountStore : IAccountStore
             UpdatedAt = DateTime.UtcNow
         };
 
-        await _dbContext.Users.AddAsync(user, cancellationToken);
-        int nAdded = await _dbContext.SaveChangesAsync(cancellationToken);
-
-        if (nAdded > 0)
+        int retryCount = 0;
+        while (retryCount < 3)
         {
-            return user;
+            try
+            {
+                await _dbContext.Users.AddAsync(user, cancellationToken);
+                await _dbContext.SaveChangesAsync(cancellationToken);
+
+                return new AccountCreationResult(AccountCreationResult.ResultE.Success, user);
+            }
+            catch (DbUpdateException exception)
+            {
+                if (exception.InnerException is not PostgresException postgresException)
+                {
+                    return new AccountCreationResult(AccountCreationResult.ResultE.UnknownError, null!, exception.Message);
+                }
+
+                if (postgresException.IsTransient)
+                {
+                    retryCount++;
+                    continue;
+                }
+
+                if (postgresException.SqlState == PostgresErrorCodes.UniqueViolation)
+                {
+                    if (postgresException.ConstraintName == AccountEntity.TableAccountEmailIndex)
+                    {
+                        return new AccountCreationResult(AccountCreationResult.ResultE.EmailAlreadyTaken, null!, exception.Message);
+                    }
+                    else if (postgresException.ConstraintName == AccountEntity.TableAccountNameIndex)
+                    {
+                        return new AccountCreationResult(AccountCreationResult.ResultE.NameAlreadyTaken, null!, exception.Message);
+                    }
+                }
+
+                var errorCode = postgresException.SqlState switch
+                {
+                    "23514" => AccountCreationResult.ResultE.NameOrEmailInvalid,
+                    _ => AccountCreationResult.ResultE.UnknownError
+                };
+
+                return new AccountCreationResult(errorCode, null!, postgresException.MessageText);
+            }
         }
 
-        return null;
+        return new AccountCreationResult(AccountCreationResult.ResultE.UnknownError, null!, "Unknown error, retry count exceeded");
     }
 
     public Task<AccountEntity?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)

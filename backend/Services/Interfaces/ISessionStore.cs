@@ -10,7 +10,7 @@ public interface ISessionStore
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="userId"></param>
+    /// <param name="account"></param>
     /// <param name="sessionName"></param>
     /// <param name="ipAddress"></param>
     /// <param name="countryCode"></param>
@@ -18,7 +18,7 @@ public interface ISessionStore
     /// <param name="expiresAt"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<SessionEntity> CreateAsync(Guid userId, string sessionName, string ipAddress, string countryCode, UserAgentEntity userAgent, DateTime expiresAt, CancellationToken cancellationToken = default);
+    Task<SessionEntity> CreateAsync(AccountEntity account, string? sessionName, string ipAddress, string countryCode, UserAgentEntity userAgent, DateTime expiresAt, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 

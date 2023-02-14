@@ -9,7 +9,7 @@ public static class DatabaseIServiceCollectionExtensions
     {
         services.AddDbContextPool<ZapMe.Data.ZapMeContext>(opt =>
         {
-            opt.UseNpgsql(configuration["PgSQL:ConnectionString"], o => o.SetPostgresVersion(14, 5))
+            opt.UseNpgsql(configuration.GetOrThrow("PgSQL:ConnectionString"), o => o.SetPostgresVersion(14, 5))
                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         });
     }

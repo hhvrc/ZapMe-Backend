@@ -16,17 +16,17 @@ public static class AuthenticationIServiceCollectionExtensions
             })
             .AddGoogle(opt =>
             {
-                opt.ClientId = configuration["Authorization:Google:ClientId"]!;
-                opt.ClientSecret = configuration["Authorization:Google:ClientSecret"]!;
-                opt.CallbackPath = configuration["Authorization:Google:CallbackPath"]!;
+                opt.ClientId = configuration.GetOrThrow("Authorization:Google:ClientId");
+                opt.ClientSecret = configuration.GetOrThrow("Authorization:Google:ClientSecret");
+                opt.CallbackPath = configuration.GetOrThrow("Authorization:Google:CallbackPath");
                 opt.Scope.Add("openid");
                 opt.Scope.Add(".../auth/userinfo.email");
             })
             .AddGitHub(opt =>
             {
-                opt.ClientId = configuration["Authorization:GitHub:ClientId"]!;
-                opt.ClientSecret = configuration["Authorization:GitHub:ClientSecret"]!;
-                opt.CallbackPath = configuration["Authorization:GitHub:CallbackPath"]!;
+                opt.ClientId = configuration.GetOrThrow("Authorization:GitHub:ClientId");
+                opt.ClientSecret = configuration.GetOrThrow("Authorization:GitHub:ClientSecret");
+                opt.CallbackPath = configuration.GetOrThrow("Authorization:GitHub:CallbackPath");
                 opt.Scope.Add("user:email");
             });/*
             .AddTwitter(options => {

@@ -29,7 +29,7 @@ public struct AuthSignIn
     /// </summary>
     [StringLength(32, MinimumLength = 1)]
     [JsonPropertyName("sessionName")]
-    public string SessionName { get; set; }
+    public string? SessionName { get; set; }
 
     /// <summary>
     /// Make this login persist for a longer period of time

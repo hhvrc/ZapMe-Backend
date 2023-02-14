@@ -23,7 +23,7 @@ public interface IAccountManager
     /// <param name="password"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<AccountEntity?> TryCreateAsync(string name, string email, string password, CancellationToken cancellationToken = default);
+    Task<AccountCreationResult> TryCreateAsync(string name, string email, string password, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 

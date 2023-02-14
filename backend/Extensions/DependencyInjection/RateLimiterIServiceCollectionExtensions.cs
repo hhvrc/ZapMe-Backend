@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Threading.RateLimiting;
 using ZapMe.Authentication;
+using ZapMe.Constants;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -13,6 +14,13 @@ public static class RateLimiterIServiceCollectionExtensions
             opt.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             opt.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
             {
+                // TODO: Consider rate limiting frontend too
+                // Do not rate limit if it is not a api request
+                if (!ctx.Request.Path.StartsWithSegments(FrontendConstants.NonFrontendPathSegments))
+                {
+                    return RateLimitPartition.GetNoLimiter("frontend");
+                }
+
                 ZapMeIdentity? identity = (ctx.User as ZapMePrincipal)?.Identity;
 
                 if (identity == null)

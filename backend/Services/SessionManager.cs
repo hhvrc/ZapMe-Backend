@@ -16,11 +16,11 @@ public sealed class SessionManager : ISessionManager
         _logger = logger;
     }
 
-    public async Task<SessionEntity> CreateAsync(Guid userId, string sessionName, string ipAddress, string countryCode, string userAgent, bool rememberMe, CancellationToken cancellationToken = default)
+    public async Task<SessionEntity> CreateAsync(AccountEntity account, string? sessionName, string ipAddress, string countryCode, string userAgent, bool rememberMe, CancellationToken cancellationToken = default)
     {
         UserAgentEntity userAgentEntity = await UserAgentStore.EnsureCreatedAsync(userAgent, cancellationToken);
         DateTime expiresAt = DateTime.UtcNow.Add(rememberMe ? TimeSpan.FromDays(30) : TimeSpan.FromHours(1));
-        return await SessionStore.CreateAsync(userId, sessionName, ipAddress, countryCode, userAgentEntity, expiresAt, cancellationToken);
+        return await SessionStore.CreateAsync(account, sessionName, ipAddress, countryCode, userAgentEntity, expiresAt, cancellationToken);
     }
 
     /// <inheritdoc/>

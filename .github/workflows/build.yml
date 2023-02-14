@@ -1,0 +1,42 @@
+name: Build
+# run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+
+on:
+  push:
+    branches: ["main"]
+    paths-ignore:
+      - "**/*.md"
+      - "**/LICENSE"
+
+  workflow_dispatch:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Setup .NET Framework SDK
+        uses: actions/setup-dotnet@v3
+      - name: Restore cached nuget packages
+        id: cache-nugets-restore
+        uses: actions/cache/restore@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+      - name: Install dependencies
+        run: |
+          dotnet restore
+          dotnet tool restore
+      - name: Save nuget packages
+        id: cache-nugets-save
+        uses: actions/cache/save@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ steps.cache-nugets-restore.outputs.cache-primary-key }}
+      - name: Build
+        run: dotnet publish .\backend\backend.csproj /p:PublishProfile=backend\Properties\PublishProfiles\FolderProfile.pubxml --configuration Release --no-restore
