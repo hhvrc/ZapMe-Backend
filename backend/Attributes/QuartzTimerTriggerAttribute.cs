@@ -58,6 +58,25 @@ public static class QuartzTimer
         /// </summary>
         Minute
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public enum Weekly
+    {
+        Monday,
+        Tuesday,
+        Wedensday,
+        Thursday,
+        Friday,
+        Saturday,
+        Sunday
+    }
+
+    public static string ToCronString(this Weekly weekly)
+    {
+        return weekly.ToString()[..3].ToUpperInvariant();
+    }
 }
 
 /// <summary>
@@ -82,13 +101,13 @@ public class QuartzTimerAttribute : Attribute
         {
             QuartzTimer.Predefined.Yearly => "0 0 0 1 1 ?",
             QuartzTimer.Predefined.Monthly => "0 0 0 1 1/1 ?",
-            QuartzTimer.Predefined.Weekly => "0 0 0 ? * MON *",
+            QuartzTimer.Predefined.Weekly => "0 0 0 ? * MON",
             QuartzTimer.Predefined.Daily => "0 0 0 1/1 * ?",
             QuartzTimer.Predefined.Hourly => "0 0 0/1 1/1 * ?",
             _ => throw new ArgumentOutOfRangeException(nameof(predefined), (int)predefined, null)
         };
     }
-    public QuartzTimerAttribute(string triggerName, QuartzTimer.Interval timeUnit, int interval)
+    public QuartzTimerAttribute(string triggerName, int interval, QuartzTimer.Interval timeUnit)
     {
         TriggerName = triggerName;
         CronExpression = timeUnit switch
@@ -99,5 +118,21 @@ public class QuartzTimerAttribute : Attribute
             QuartzTimer.Interval.Minute => $"0 0/{interval} * * * ?",
             _ => throw new ArgumentOutOfRangeException(nameof(timeUnit), (int)timeUnit, null)
         };
+    }
+    public QuartzTimerAttribute(string triggerName, int hour, int minute, QuartzTimer.Weekly weekday)
+    {
+        TriggerName = triggerName;
+        CronExpression = $"0 {minute} {hour} ? * {weekday.ToCronString()}";
+    }
+    public QuartzTimerAttribute(string triggerName, int hour, int minute, params QuartzTimer.Weekly[] weekdays)
+    {
+        TriggerName = triggerName;
+        CronExpression = $"0 {minute} {hour} ? * {String.Join(',', weekdays.Select(static wd => wd.ToCronString()))}";
+    }
+    public QuartzTimerAttribute(string triggerName, QuartzTimer.Weekly weekday) : this(triggerName, 0, 0, weekday)
+    {
+    }
+    public QuartzTimerAttribute(string triggerName, params QuartzTimer.Weekly[] weekdays) : this(triggerName, 0, 0, weekdays)
+    {
     }
 }
