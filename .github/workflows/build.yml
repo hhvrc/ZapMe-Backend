@@ -7,6 +7,9 @@ on:
     paths-ignore:
       - "**/*.md"
       - "**/LICENSE"
+      - "**/.editorconfig"
+      - "**/.vscode/**"
+      
 
   workflow_dispatch:
     branches: ["main"]

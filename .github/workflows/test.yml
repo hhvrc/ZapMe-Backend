@@ -3,19 +3,22 @@ name: Test
 
 on:
   push:
-    branches: ["main", "dev", "feature/*"]
+    branches: ["main", "dev"]
     paths-ignore:
       - "**/*.md"
       - "**/LICENSE"
+      - "**/.editorconfig"
+      - "**/.vscode/**"
 
   pull_request:
     branches: ["main", "dev"]
     paths-ignore:
       - "**/*.md"
       - "**/LICENSE"
+      - "**/.editorconfig"
+      - "**/.vscode/**"
 
   workflow_dispatch:
-    branches: ["main", "dev", "feature/*"]
 
 jobs:
   build:
