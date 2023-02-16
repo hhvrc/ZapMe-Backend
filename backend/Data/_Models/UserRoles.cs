@@ -5,11 +5,28 @@ namespace ZapMe.Data.Models;
 
 public sealed class UserRoleEntity
 {
+    public static string TableName => "userRoles";
+    public static string TableUserIdIndex => "userRoles_userId_idx";
+    public static string TableRoleNameIndex => "userRoles_roleName_idx";
+
+    /// <summary>
+    /// 
+    /// </summary>
     public Guid UserId { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public required AccountEntity User { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public required string RoleName { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public DateTime CreatedAt { get; set; }
 }
 
@@ -17,7 +34,7 @@ public sealed class UserRoleEntityConfiguration : IEntityTypeConfiguration<UserR
 {
     public void Configure(EntityTypeBuilder<UserRoleEntity> builder)
     {
-        builder.ToTable("userRoles");
+        builder.ToTable(UserRoleEntity.TableName);
 
         builder.HasKey(ur => new { ur.UserId, ur.RoleName });
 
@@ -33,9 +50,9 @@ public sealed class UserRoleEntityConfiguration : IEntityTypeConfiguration<UserR
             .HasDefaultValueSql("now()");
 
         builder.HasIndex(ur => ur.UserId)
-            .HasDatabaseName("userRoles_userId_idx");
+            .HasDatabaseName(UserRoleEntity.TableUserIdIndex);
 
         builder.HasIndex(ur => ur.RoleName)
-            .HasDatabaseName("userRoles_roleName_idx");
+            .HasDatabaseName(UserRoleEntity.TableRoleNameIndex);
     }
 }

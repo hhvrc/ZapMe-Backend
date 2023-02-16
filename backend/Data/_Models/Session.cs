@@ -6,9 +6,21 @@ namespace ZapMe.Data.Models;
 
 public sealed class SessionEntity
 {
+    public static string TableName => "sessions";
+
+    /// <summary>
+    /// 
+    /// </summary>
     public Guid Id { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public Guid UserId { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public required AccountEntity Account { get; set; }
 
     /// <summary>
@@ -30,15 +42,39 @@ public sealed class SessionEntity
     /// </summary>
     public required string CountryCode { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public required byte[] UserAgentHash { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public required UserAgentEntity UserAgent { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public DateTime CreatedAt { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public DateTime ExpiresAt { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public TimeSpan TimeToLive => ExpiresAt - CreatedAt;
+
+    /// <summary>
+    /// 
+    /// </summary>
     public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
+
+    /// <summary>
+    /// 
+    /// </summary>
     public bool IsHalfwayExpired => DateTime.UtcNow >= ExpiresAt.Subtract(TimeToLive.Divide(2));
 }
 
@@ -46,7 +82,7 @@ public sealed class SessionEntityConfiguration : IEntityTypeConfiguration<Sessio
 {
     public void Configure(EntityTypeBuilder<SessionEntity> builder)
     {
-        builder.ToTable("sessions");
+        builder.ToTable(SessionEntity.TableName);
 
         builder.HasKey(si => si.Id);
 

@@ -4,8 +4,10 @@ using ZapMe.Constants;
 
 namespace ZapMe.Data.Models;
 
-public class UserAgentEntity
+public sealed class UserAgentEntity
 {
+    public static string TableName => "userAgents";
+
     /// <summary>
     /// Sha256 hash of the user agent string before truncation
     /// </summary>
@@ -46,7 +48,7 @@ public sealed class UserAgentEntityConfiguration : IEntityTypeConfiguration<User
 {
     public void Configure(EntityTypeBuilder<UserAgentEntity> builder)
     {
-        builder.ToTable("userAgents");
+        builder.ToTable(UserAgentEntity.TableName);
 
         builder.HasKey(u => u.Hash);
 
