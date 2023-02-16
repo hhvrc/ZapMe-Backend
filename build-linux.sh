@@ -21,6 +21,7 @@ function refresh_cargo_environment_if_required {
         echo_blue "Refreshing cargo environment"
         source "$HOME/.cargo/env"
         source "$HOME/.cargo/bin"
+        echo 'export PATH="$HOME/.cargo/env:$PATH"' >> ~/.bashrc
         CARGO_ENV_REFRESH_REQUIRED=false
         ENVIRONMENT_REFRESH_REQUIRED=true
     fi
