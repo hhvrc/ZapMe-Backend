@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using ZapMe.Attributes;
 
 namespace ZapMe.Controllers.Api.V1.Account.Models;
 
@@ -10,6 +11,7 @@ public struct RecoveryRequest
     /// <summary>
     /// Email of your account you want to recover
     /// </summary>
+    [EmailAddress(true)]
     [JsonPropertyName("email")]
     public string Email { get; set; }
 
