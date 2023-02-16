@@ -5,13 +5,31 @@ namespace ZapMe.Data.Models;
 
 public sealed class OAuthConnectionEntity
 {
+    public static string TableName => "oauthConnections";
+
+    /// <summary>
+    /// 
+    /// </summary>
     public Guid UserId { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public required AccountEntity User { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public required string ProviderName { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public required string ProviderId { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public DateTime CreatedAt { get; set; }
 }
 
@@ -19,7 +37,7 @@ public sealed class OAuthConnectionEntityConfiguration : IEntityTypeConfiguratio
 {
     public void Configure(EntityTypeBuilder<OAuthConnectionEntity> builder)
     {
-        builder.ToTable("oauthConnections");
+        builder.ToTable(OAuthConnectionEntity.TableName);
 
         builder.HasKey(oac => new { oac.UserId, oac.ProviderName });
 

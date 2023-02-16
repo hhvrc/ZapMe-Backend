@@ -9,6 +9,7 @@ public sealed class AccountEntity
     public static string TableName => "accounts";
     public static string TableAccountNameIndex => "accounts_name_idx";
     public static string TableAccountEmailIndex => "accounts_email_idx";
+    public static string TablePasswordResetTokenIndex => "accounts_passwordResetToken_idx";
 
     /// <summary>
     /// 
@@ -169,7 +170,7 @@ public sealed class AccountEntityConfiguration : IEntityTypeConfiguration<Accoun
             .IsUnique();
 
         builder.HasIndex(u => u.PasswordResetToken)
-            .HasDatabaseName("accounts_passwordResetToken_idx")
+            .HasDatabaseName(AccountEntity.TablePasswordResetTokenIndex)
             .IsUnique();
     }
 }

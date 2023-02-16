@@ -12,18 +12,46 @@ public enum UserRelationType
 
 public sealed class UserRelationEntity
 {
+    public static string TableName => "userRelations";
+
+    /// <summary>
+    /// 
+    /// </summary>
     public Guid SourceUserId { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public required AccountEntity SourceUser { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public Guid TargetUserId { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public required AccountEntity TargetUser { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public UserRelationType RelationType { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public string? NickName { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public string? Notes { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public DateTime CreatedAt { get; set; }
 }
 
@@ -31,7 +59,7 @@ public sealed class UserRelationEntityConfiguration : IEntityTypeConfiguration<U
 {
     public void Configure(EntityTypeBuilder<UserRelationEntity> builder)
     {
-        builder.ToTable("userRelations");
+        builder.ToTable(UserRelationEntity.TableName);
 
         builder.HasKey(ur => new { ur.SourceUserId, ur.TargetUserId });
 

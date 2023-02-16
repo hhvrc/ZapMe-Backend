@@ -5,6 +5,8 @@ namespace ZapMe.Data.Models;
 
 public sealed class EmailTemplateEntity
 {
+    public static string TableName => "emailTemplates";
+
     /// <summary>
     /// 
     /// </summary>
@@ -20,7 +22,7 @@ public sealed class EmailTemplateEntityConfiguration : IEntityTypeConfiguration<
 {
     public void Configure(EntityTypeBuilder<EmailTemplateEntity> builder)
     {
-        builder.ToTable("emailTemplates");
+        builder.ToTable(EmailTemplateEntity.TableName);
 
         builder.HasKey(u => u.Name);
 

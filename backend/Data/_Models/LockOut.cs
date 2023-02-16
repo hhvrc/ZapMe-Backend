@@ -5,17 +5,41 @@ namespace ZapMe.Data.Models;
 
 public sealed class LockOutEntity
 {
+    public static string TableName => "lockOuts";
+
+    /// <summary>
+    /// 
+    /// </summary>
     public Guid Id { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public Guid UserId { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public required AccountEntity User { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public string? Reason { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public required string Flags { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public DateTime CreatedAt { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public DateTime? ExpiresAt { get; set; }
 }
 
@@ -23,7 +47,7 @@ public sealed class LockOutEntityConfiguration : IEntityTypeConfiguration<LockOu
 {
     public void Configure(EntityTypeBuilder<LockOutEntity> builder)
     {
-        builder.ToTable("lockOuts");
+        builder.ToTable(LockOutEntity.TableName);
 
         builder.HasKey(lo => lo.Id);
 

@@ -5,17 +5,46 @@ namespace ZapMe.Data.Models;
 
 public sealed class ImageEntity
 {
+    public static string TableName => "images";
+
+    /// <summary>
+    /// 
+    /// </summary>
     public Guid Id { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public int Height { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public int Width { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public int SizeBytes { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public required string HashSha256 { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public required long HashPerceptual { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public Guid? UploaderId { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public AccountEntity? Uploader { get; set; }
 }
 
@@ -23,7 +52,7 @@ public sealed class ImageEntityConfiguration : IEntityTypeConfiguration<ImageEnt
 {
     public void Configure(EntityTypeBuilder<ImageEntity> builder)
     {
-        builder.ToTable("images");
+        builder.ToTable(ImageEntity.TableName);
 
         builder.HasKey(i => i.Id);
 

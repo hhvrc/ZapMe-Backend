@@ -5,12 +5,31 @@ namespace ZapMe.Data.Models;
 
 public sealed class FriendRequestEntity
 {
+    public static string TableName => "friendRequests";
+
+    /// <summary>
+    /// 
+    /// </summary>
     public Guid SenderId { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public required AccountEntity Sender { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public Guid ReceiverId { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public required AccountEntity Receiver { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public DateTime CreatedAt { get; set; }
 }
 
@@ -18,7 +37,7 @@ public sealed class FriendRequestEntityConfiguration : IEntityTypeConfiguration<
 {
     public void Configure(EntityTypeBuilder<FriendRequestEntity> builder)
     {
-        builder.ToTable("friendRequests");
+        builder.ToTable(FriendRequestEntity.TableName);
 
         builder.HasKey(fr => new { fr.SenderId, fr.ReceiverId });
 
