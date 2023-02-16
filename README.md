@@ -8,4 +8,13 @@ Dev
 ![Dev Build](https://github.com/hhvrc/ZapMe/actions/workflows/build.yml/badge.svg?branch=dev)
 ![Dev Tests](https://github.com/hhvrc/ZapMe/actions/workflows/test.yml/badge.svg?branch=dev)
 
-This project is under development and is not yet functional
+## Building
+
+```bash
+sudo apt update
+sudo apt install wget git build-essential -y
+
+git clone --recurse-submodules -j8 https://github.com/hhvrc/ZapMe
+cd ZapMe/
+./build-linux.sh
+```
