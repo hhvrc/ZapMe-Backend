@@ -101,6 +101,21 @@ function ReloadEnvironment {
    }
 }
 
+# Install Rust
+if (!(Test-Path "$env:USERPROFILE\.cargo\bin\rustup.exe")) {
+    Write-Host "Installing Rust..." -ForegroundColor Cyan
+    DownloadAndRun -Url 'https://win.rustup.rs/x86_64' -FileName 'rustup-init.exe' -Arguments '-y'
+    Write-Host "Rust installed" -ForegroundColor Green
+}
+
+# Install wasm-pack
+$wasmPackPath = "$env:USERPROFILE\.cargo\bin\wasm-pack.exe"
+if (!(Test-Path $wasmPackPath)) {
+    Write-Host "Downloading wasm-pack..." -ForegroundColor Cyan
+    (New-Object Net.WebClient).DownloadFile('https://github.com/rustwasm/wasm-pack/releases/download/v0.10.3/wasm-pack-init.exe', $wasmPackPath)
+    Write-Host "wasm-pack installed" -ForegroundColor Green
+}
+
 # Remove all build artifacts
 RemoveFolder -Path '.\build'
 RemoveFolder -Path '.\backend\bin'
@@ -109,23 +124,9 @@ RemoveFolder -Path '.\backend\build'
 
 # Build the backend
 Write-Host "Building backend..." -ForegroundColor Cyan
+Invoke-Dotnet -Command 'tool' -Arguments 'restore'
 Invoke-Dotnet -Command 'publish' -Arguments '.\backend\backend.csproj /p:PublishProfile=backend\Properties\PublishProfiles\FolderProfile.pubxml -c Release'
-Write-Host "Backend built!" -ForegroundColor Green
-
-# Install Rust
-if (!(Test-Path "$env:USERPROFILE\.cargo\bin\rustup.exe")) {
-    Write-Host "Installing Rust..." -ForegroundColor Cyan
-    DownloadAndRun -Url 'https://win.rustup.rs/x86_64' -FileName 'rustup-init.exe' -Arguments '-y'
-    Write-Host "Rust installed!" -ForegroundColor Green
-}
-
-# Install wasm-pack
-$wasmPackPath = "$env:USERPROFILE\.cargo\bin\wasm-pack.exe"
-if (!(Test-Path $wasmPackPath)) {
-    Write-Host "Downloading wasm-pack..." -ForegroundColor Cyan
-    (New-Object Net.WebClient).DownloadFile('https://github.com/rustwasm/wasm-pack/releases/download/v0.10.3/wasm-pack-init.exe', $wasmPackPath)
-    Write-Host "wasm-pack installed!" -ForegroundColor Green
-}
+Write-Host "Backend build complete" -ForegroundColor Green
 
 # Reload environment variables
 ReloadEnvironment
@@ -136,10 +137,10 @@ Set-Location frontend
 Invoke-Npm -Command 'run' -Arguments 'init'
 Invoke-Npm -Command 'run' -Arguments 'build'
 Set-Location ..
-Write-Host "Frontend built!" -ForegroundColor Green
+Write-Host "Frontend build complete" -ForegroundColor Green
 
 # Copy the frontend build to the backend
-Write-Host "Copying frontend build to backend..." -ForegroundColor Cyan
+Write-Host "Copying frontend build to backend" -ForegroundColor Cyan
 RemoveFolder -Path '.\build\wwwroot'
 New-Item -ItemType Directory -Path '.\build\wwwroot' | Out-Null
 Copy-Item -Path '.\frontend\dist\*' -Destination '.\build\wwwroot' -Recurse
