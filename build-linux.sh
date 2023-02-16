@@ -10,14 +10,14 @@ function echo_green {
     echo -e "\e[32m$1\e[0m"
 }
 function refresh_environment_if_required {
-    if [ $ENVIRONMENT_REFRESH_REQUIRED = true ]; then
+    if [[ $ENVIRONMENT_REFRESH_REQUIRED = true ]]; then
         echo_blue "Refreshing environment variables"
         source ~/.bashrc
         ENVIRONMENT_REFRESH_REQUIRED=false
     fi
 }
 function refresh_cargo_environment_if_required {
-    if [ $CARGO_ENV_REFRESH_REQUIRED = true ]; then
+    if [[ $CARGO_ENV_REFRESH_REQUIRED = true ]]; then
         echo_blue "Refreshing cargo environment"
         source "$HOME/.cargo/env"
         source "$HOME/.cargo/bin"
@@ -66,14 +66,14 @@ if hash dotnet 2>/dev/null; then
 fi
 
 # Download dotnet install script
-if [ $DOTNET_INSTALLED = false ] || [ $DOTNET_6_INSTALLED = false ] || [ $DOTNET_7_INSTALLED = false ]; then
-    if [ $DOTNET_INSTALLED = false ]; then
+if [[ $DOTNET_INSTALLED = false ]] || [[ $DOTNET_6_INSTALLED = false ]] || [[ $DOTNET_7_INSTALLED = false ]]; then
+    if [[ $DOTNET_INSTALLED = false ]]; then
         echo_cyan "Installing dotnet, and SDKs 6 and 7"
-    elif [ $DOTNET_6_INSTALLED = false ] && [ $DOTNET_7_INSTALLED = false ]; then
+    elif [[ $DOTNET_6_INSTALLED = false ]] && [[ $DOTNET_7_INSTALLED = false ]]; then
         echo_cyan "Updating dotnet: Installing 6 and 7 SDKs"
-    elif [ $DOTNET_6_INSTALLED = false ]; then
+    elif [[ $DOTNET_6_INSTALLED = false ]]; then
         echo_cyan "Updating dotnet: Installing dotnet 6 SDK"
-    elif [ $DOTNET_7_INSTALLED = false ]; then
+    elif [[ $DOTNET_7_INSTALLED = false ]]; then
         echo_cyan "Updating dotnet: Installing dotnet 7 SDK"
     fi
 
@@ -82,14 +82,12 @@ if [ $DOTNET_INSTALLED = false ] || [ $DOTNET_6_INSTALLED = false ] || [ $DOTNET
     chmod +x ./dotnet-install.sh
 
     # Install dotnet 6 if not already installed
-    if [ $DOTNET_6_INSTALLED = false ]
-    then
+    if [[ $DOTNET_6_INSTALLED = false ]]; then
         ./dotnet-install.sh --version 6.0.309
     fi
 
     # Install dotnet 7 if not already installed
-    if [ $DOTNET_7_INSTALLED = false ]
-    then
+    if [[ $DOTNET_7_INSTALLED = false ]]; then
         ./dotnet-install.sh --version 7.0.102
     fi
 
@@ -108,15 +106,15 @@ else
 fi
 
 # Install node version manager if not already installed (This doesnt work specifically for checking if nvm is installed, but script is fast enough to not matter)
-if ! [ -d "${HOME}/.nvm/.git" ]; then
+if ! [[ -d "${HOME}/.nvm/.git" ]]; then
     echo_cyan "Installing nvm"
 
     # Download and execute nvm install script
     wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 
     # Set environment variables
-    export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ]] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+    [[ -s "$NVM_DIR/nvm.sh" ]] && \. "$NVM_DIR/nvm.sh"
 
     echo_green "Nvm installed"
     
@@ -190,7 +188,7 @@ else
 fi
 
 # Install node 18 if not already installed
-if [ $INSTALL_NODE_18 = true ]; then
+if [[ $INSTALL_NODE_18 = true ]]; then
     echo_cyan "Installing node 18"
     nvm install 18
     nvm use 18
