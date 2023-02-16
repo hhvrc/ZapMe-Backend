@@ -19,8 +19,8 @@
 
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.0" />
-    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.3" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.103.9" />
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.4" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.103.10" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="7.0.3" />
@@ -31,9 +31,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.IdentityModel.Logging" Version="6.26.1" />
+    <PackageReference Include="Microsoft.IdentityModel.Logging" Version="6.27.0" />
     <PackageReference Include="NetMQ" Version="4.0.1.10" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.1" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.3" />
     <PackageReference Include="PreMailer.Net" Version="2.4.0" />
     <PackageReference Include="Quartz.AspNetCore" Version="3.6.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />

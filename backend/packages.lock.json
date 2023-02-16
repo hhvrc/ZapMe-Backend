@@ -10,9 +10,9 @@
       },
       "AWSSDK.Extensions.NETCore.Setup": {
         "type": "Direct",
-        "requested": "[3.7.3, )",
-        "resolved": "3.7.3",
-        "contentHash": "CTA8FrYKJPs1QdwQhKqAy8aryXgsaExJ7w0v8Ah/Fj1oVxVhFxeJfcTGTTRqUYBGnLWJ4vqMwrif5mfUoZxGYg==",
+        "requested": "[3.7.4, )",
+        "resolved": "3.7.4",
+        "contentHash": "P1N5+kfoWMWu/GyMUsREAICeFo5QUP7nqF4vN3hP3ocMmzTnOLMPUtJdjmdFQ8STiYyr5UlNL4hhZ9C5mgq3jg==",
         "dependencies": {
           "AWSSDK.Core": "3.7.6",
           "Microsoft.Extensions.Configuration.Abstractions": "2.0.0",
@@ -22,11 +22,11 @@
       },
       "AWSSDK.S3": {
         "type": "Direct",
-        "requested": "[3.7.103.9, )",
-        "resolved": "3.7.103.9",
-        "contentHash": "BdnjeNZDk+4Qt5HdK1+RewvaBoYP+KPKOc2ag1WkBvRlqwJj0BlyUk4GwH9Tv1lVjO5sMwKZ9NWuRdpyeF0+Nw==",
+        "requested": "[3.7.103.10, )",
+        "resolved": "3.7.103.10",
+        "contentHash": "FLMbSDf24CGYtCf4rhIiSQvhupXo/TfEWV7SIj8kuYIaCN5UdkAnXM5A4haHNoR9YSjIX3sxvJ9ZA6+70ieLlw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.105.2, 4.0.0)"
+          "AWSSDK.Core": "[3.7.105.3, 4.0.0)"
         }
       },
       "BCrypt.Net-Next": {
@@ -90,11 +90,11 @@
       },
       "Microsoft.IdentityModel.Logging": {
         "type": "Direct",
-        "requested": "[6.26.1, )",
-        "resolved": "6.26.1",
-        "contentHash": "ujS5+a2L3uquqeWa3i9uNjXAfEFuDzIfKlDqZ09aKTR2M6eLqQcc0BBhh0FtJkTmsfa8GJjKDEYVcbgVzNARfQ==",
+        "requested": "[6.27.0, )",
+        "resolved": "6.27.0",
+        "contentHash": "4IzWb/CjtSYzq4FRcxRZSkkhhosj6DuDltBjj7BIq8f83O0J0lS8Wv50puiGyzAJH3WMjpZXz0TVOTjBi+BhQA==",
         "dependencies": {
-          "Microsoft.IdentityModel.Abstractions": "6.26.1"
+          "Microsoft.IdentityModel.Abstractions": "6.27.0"
         }
       },
       "NetMQ": {
@@ -111,14 +111,14 @@
       },
       "Npgsql.EntityFrameworkCore.PostgreSQL": {
         "type": "Direct",
-        "requested": "[7.0.1, )",
-        "resolved": "7.0.1",
-        "contentHash": "8txq2CsPWvWO4azZSBmKLKmYsL6dkGrarX2hJZY0Djx6uWZJGH9W0OTE1oHqn+aC5L+xrzyS+TM3kiKw2gdXuA==",
+        "requested": "[7.0.3, )",
+        "resolved": "7.0.3",
+        "contentHash": "3iVz7vcPAZt6iBSjJ8XyjtIP19jilNOJqTiTCs2UHWhpTyP+FbNhnzCBE/oyD3n49McmmenjKpva+yTy7q1z/g==",
         "dependencies": {
-          "Microsoft.EntityFrameworkCore": "[7.0.1, 8.0.0)",
-          "Microsoft.EntityFrameworkCore.Abstractions": "[7.0.1, 8.0.0)",
-          "Microsoft.EntityFrameworkCore.Relational": "[7.0.1, 8.0.0)",
-          "Npgsql": "7.0.1"
+          "Microsoft.EntityFrameworkCore": "[7.0.3, 8.0.0)",
+          "Microsoft.EntityFrameworkCore.Abstractions": "[7.0.3, 8.0.0)",
+          "Microsoft.EntityFrameworkCore.Relational": "[7.0.3, 8.0.0)",
+          "Npgsql": "7.0.2"
         }
       },
       "PreMailer.Net": {
@@ -193,8 +193,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.105.2",
-        "contentHash": "XJvfbYRMBjfg4FI2mHb2HVUGJG7K5QcWwELlGtqZ2kPC4AVsD2wL+2LAPJKG3usv2DuIB0sTCfIISlYybnaNmA=="
+        "resolved": "3.7.105.3",
+        "contentHash": "q7nXbG1n+fPc6I2XM3w6pwEB7ooWYcuohzwuyapq4N13Xc4iC7ccO75UVUR7e8h4aatWv8acqhuNXv5/kkp7Qw=="
       },
       "Humanizer.Core": {
         "type": "Transitive",
@@ -368,8 +368,8 @@
       },
       "Microsoft.IdentityModel.Abstractions": {
         "type": "Transitive",
-        "resolved": "6.26.1",
-        "contentHash": "YE6pc6/TG1axQU5U1zGmgpcV4vKhEl4t0MTjqxdnnrorrozeBPkTECyZk9djysKTLfd8moBe7VHVpuf+jvmlkA=="
+        "resolved": "6.27.0",
+        "contentHash": "HO3yJcG+9gp/qTlwBuiGfqvvRMyul/BKbflMC4+rnxoTvVQIto0iSCmhGTqsC4LXYK8GPU3etd4kMw6mBuvnQg=="
       },
       "Microsoft.NETCore.Platforms": {
         "type": "Transitive",
@@ -401,8 +401,8 @@
       },
       "Npgsql": {
         "type": "Transitive",
-        "resolved": "7.0.1",
-        "contentHash": "+s2gUPA37wDy9B3mE7ZN8xhfnSrf56OCR8ELMZkEbNxk9MyWS54o7ttrngmu7s7/C2ldjAWMdggkpMMPCZsKSg==",
+        "resolved": "7.0.2",
+        "contentHash": "/k12hfmg4PI0IU2UTLN6n0s/FKUfox8+RdWtzgADYZoyks7GH82WLyXm27eeqatsi/nmiK9lO3HyULlTD87szg==",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "6.0.0"
         }
