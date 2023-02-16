@@ -34,6 +34,21 @@ DOTNET_7_INSTALLED=false
 CARGO_ENV_REFRESH_REQUIRED=false
 ENVIRONMENT_REFRESH_REQUIRED=false
 
+# Check if necessary compilers are installed
+if ! hash cc 2>/dev/null; then
+    COMPILER_MISSING=true
+fi
+if ! hash gcc 2>/dev/null; then
+    COMPILER_MISSING=true
+fi
+if [[ $COMPILER_MISSING = true ]]; then
+    echo_cyan "C/C++ compiler toolchain is not installed, please run the following command:"
+    echo "sudo apt update && sudo apt install build-essential -y"
+    exit 1
+else
+    echo_green "Found C/C++ compiler toolchain"
+fi
+
 # Check if dotnet is installed
 if hash dotnet 2>/dev/null; then
     DOTNET_INSTALLED=true
