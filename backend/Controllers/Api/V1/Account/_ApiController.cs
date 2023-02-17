@@ -12,8 +12,6 @@ namespace ZapMe.Controllers.Api.V1;
 [Route("api/v1/[Controller]/")]
 public sealed partial class AccountController : ControllerBase
 {
-    public string ControllerRoute { get; private set; } = String.Empty;
-
     private readonly IAccountManager _accountManager;
     private readonly ILogger<AccountController> _logger;
 

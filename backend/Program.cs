@@ -121,7 +121,7 @@ if (isDevelopment)
 app.UseAuthorization();
 
 app.UseRateLimiter(); // As early as possible
-// App!.UseHealthChecks("/api/v1/health/"); // TODO: explore thisl
+// App!.UseHealthChecks("/api/v1/health/"); // TODO: explore this
 
 app.UseSwaggerAndUI();
 app.UseMiddleware<ActivityTracker>();
