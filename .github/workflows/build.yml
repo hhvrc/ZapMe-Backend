@@ -9,10 +9,8 @@ on:
       - "**/LICENSE"
       - "**/.editorconfig"
       - "**/.vscode/**"
-      
-
+  
   workflow_dispatch:
-    branches: ["main"]
 
 jobs:
   build:
@@ -47,7 +45,7 @@ jobs:
           key: ${{ steps.cache-nugets-restore.outputs.cache-primary-key }}
 
       - name: Build
-        run: dotnet publish .\backend\backend.csproj /p:PublishProfile=backend\Properties\PublishProfiles\FolderProfile.pubxml --configuration Release --no-restore
+        run: dotnet publish ./backend/Backend.csproj /p:PublishProfile=backend/Properties/PublishProfiles/FolderProfile.pubxml --configuration Release --no-restore
 
       - uses: release-drafter/release-drafter@v5
         env:
