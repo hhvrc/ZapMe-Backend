@@ -18,6 +18,6 @@ public partial class ConfigController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
     public Config.Models.Config GetConfig()
     {
-        return new Config.Models.Config();
+        return new Config.Models.Config { ProductName = "ZapMe" };
     }
 }

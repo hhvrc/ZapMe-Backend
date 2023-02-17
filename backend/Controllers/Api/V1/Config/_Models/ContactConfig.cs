@@ -3,7 +3,7 @@ using ZapMe.Attributes;
 
 namespace ZapMe.Controllers.Api.V1.Config.Models;
 
-public struct Emailconfig
+public struct ContactConfig
 {
     [EmailAddress(true)]
     [JsonPropertyName("support")]
