@@ -2,7 +2,7 @@
 
 namespace ZapMe.Utils;
 
-public static class Utils
+public static class StringUtils
 {
     public static string GenerateRandomString(int length)
     {

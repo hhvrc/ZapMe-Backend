@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using ZapMe.Utils;
 
-namespace ZapMe.Tests.Logic;
+namespace ZapMe.Tests.Utils;
 
 public sealed class VerifiersTests
 {

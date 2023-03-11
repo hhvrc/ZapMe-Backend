@@ -60,7 +60,7 @@ public sealed class AccountManager : IAccountManager
 
     public async Task<string?> GeneratePasswordResetTokenAsync(Guid userId, CancellationToken cancellationToken)
     {
-        string token = Utils.Utils.GenerateRandomString(32);
+        string token = Utils.StringUtils.GenerateRandomString(32);
 
         if (!await AccountStore.SetPasswordResetTokenAsync(userId, token, cancellationToken))
         {
