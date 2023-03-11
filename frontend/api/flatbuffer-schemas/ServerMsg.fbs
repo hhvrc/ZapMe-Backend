@@ -1,0 +1,24 @@
+﻿attribute "fs_serializer";
+
+namespace ZapMe.FlatMsgs;
+
+table LogOn {
+	username : string;
+	password : string;
+}
+
+table LogOff {
+	username : string;
+}
+
+union ServerPayload {
+	LogOn,
+	LogOff
+}
+
+table ServerMsg (fs_serializer) {
+	timeStamp : long;
+	payload : ServerPayload;
+}
+
+root_type ServerMsg;
