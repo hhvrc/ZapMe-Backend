@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Net.WebSockets;
-using ZapMe.Controllers;
 using ZapMe.Services.Interfaces;
+using ZapMe.Websocket;
 
 namespace ZapMe.Services;
 

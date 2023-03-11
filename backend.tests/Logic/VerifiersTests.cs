@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using ZapMe.Logic;
+using ZapMe.Utils;
 
 namespace ZapMe.Tests.Logic;
 

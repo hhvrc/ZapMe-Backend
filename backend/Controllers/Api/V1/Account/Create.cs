@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Principal;
+using System.Net.Mail;
 using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.DTOs;
@@ -68,7 +68,7 @@ public partial class AccountController
 
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
-
+        
         // Attempt to check against debounce if the email is a throwaway email
         if (await debounceService.IsDisposableEmailAsync(body.Email, cancellationToken))
         {
@@ -98,21 +98,21 @@ public partial class AccountController
 
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
-        
+
         string? emailTemplate = await emailTemplateStore.GetEmailTemplateAsync("AccountCreated", cancellationToken);
         if (emailTemplate != null)
         {
-            var emailBody = new QuickStringReplacer(emailTemplate)
+            string emailBody = new QuickStringReplacer(emailTemplate)
                     .Replace("{{UserName}}", body.UserName)
                     //.Replace("{{ConfirmEmailLink}}", App.BackendBaseUrl + "/Account/ConfirmEmail?token=" + result.ConfirmationToken)
                     .Replace("{{CompanyName}}", App.AppCreator)
                     .Replace("{{CompanyAddress}}", App.MadeInText)
                     .Replace("{{PoweredBy}}", App.AppName)
-                    .Replace("{{PoweredByLink}}", App.MainPageUrl)
+                    .Replace("{{PoweredByLink}}", App.WebsiteUrl)
                     .ToString();
 
             // TODO: change method signature to this: SendEmailAsync(string to, string subject, string body, CancellationToken cancellationToken)
-            await mailGunService.SendEmailAsync("System", "system", "heavenvr.tech", body.Email, "Account Created", emailTemplate, cancellationToken);
+            await mailGunService.SendEmailAsync("System", body.UserName, body.Email, "Account Created", emailTemplate, cancellationToken);
         }
         else
         {

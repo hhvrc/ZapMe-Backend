@@ -2,8 +2,9 @@
 using NetMQ.Sockets;
 using System.Net.WebSockets;
 using System.Security.Claims;
+using ZapMe.FlatMsgs;
 
-namespace ZapMe.Controllers;
+namespace ZapMe.Websocket;
 
 public sealed class WebSocketInstance : IDisposable
 {
@@ -15,22 +16,24 @@ public sealed class WebSocketInstance : IDisposable
         return new WebSocketInstance(ws, user, logger);
     }
 
-    private const int WebSocketBufferSize = 4096;
-    private const int ZeroMqBufferSize = 4096;
+    private const int _WebSocketBufferSize = 4096;
+    private const int _ZeroMqBufferSize = 4096;
     private readonly ILogger<WebSocketInstance> _logger;
     private readonly WebSocket _webSocket;
     private readonly byte[] _webSocketBuffer;
+    private ArraySegment<byte> _webSocketBufferData;
     private WebSocketMessageType _webSocketMessageType;
     private readonly SubscriberSocket _zmqSub;
-    private readonly byte[] _zmqSubBuffer;
+    private readonly byte[] _zmqBuffer;
+    private ArraySegment<byte> _zmqBufferData;
     private readonly ClaimsPrincipal _user;
 
     private WebSocketInstance(WebSocket webSocket, ClaimsPrincipal user, ILogger<WebSocketInstance> logger)
     {
         _webSocket = webSocket;
-        _webSocketBuffer = new byte[WebSocketBufferSize];
+        _webSocketBuffer = new byte[_WebSocketBufferSize];
         _zmqSub = new SubscriberSocket();
-        _zmqSubBuffer = new byte[ZeroMqBufferSize];
+        _zmqBuffer = new byte[_ZeroMqBufferSize];
         _user = user;
         _logger = logger;
 
@@ -70,6 +73,8 @@ public sealed class WebSocketInstance : IDisposable
 
     private async Task<bool> ReadZeroMqBytesAsync(CancellationToken cs)
     {
+        _zmqBufferData = new ArraySegment<byte>(_zmqBuffer);
+
         byte[] data;
         bool endOfMsg;
         int bufferOffset = 0;
@@ -77,17 +82,19 @@ public sealed class WebSocketInstance : IDisposable
         do
         {
             (data, endOfMsg) = await _zmqSub.ReceiveFrameBytesAsync(cs);
-            if (bufferOffset + data.Length > ZeroMqBufferSize)
+            if (bufferOffset + data.Length > _ZeroMqBufferSize)
             {
                 // TODO: possibly log message too big
 
                 return false;
             }
 
-            Buffer.BlockCopy(data, 0, _zmqSubBuffer, bufferOffset, data.Length);
+            Buffer.BlockCopy(data, 0, _zmqBuffer, bufferOffset, data.Length);
             bufferOffset += data.Length;
         }
         while (!endOfMsg);
+
+        _zmqBufferData = _zmqBufferData[..bufferOffset];
 
         return bufferOffset > 0;
     }
@@ -101,66 +108,88 @@ public sealed class WebSocketInstance : IDisposable
     {
         while (_webSocket.State == WebSocketState.Open)
         {
-            if (await ReadWebSocketBytesAsync(cs))
-            {
-                if (_webSocketMessageType == WebSocketMessageType.Close)
-                {
-                    await _webSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Byebye :)", cs);
-                    return;
-                }
+            if (!await ReadWebSocketBytesAsync(cs)) break;
 
-                await ProcessWebSocketBytesAsync(cs);
+            if (_webSocketMessageType switch
+            {
+                WebSocketMessageType.Text => await ProcessWebSocketTextAsync(cs),
+                WebSocketMessageType.Binary => await ProcessWebSocketBinaryAsync(cs),
+                _ => false
+            })
+            {
+                break;
             }
         }
     }
 
     private async Task<bool> ReadWebSocketBytesAsync(CancellationToken cs)
     {
-        int bufferOffset = 0;
-        WebSocketReceiveResult msg;
+        _webSocketBufferData = new ArraySegment<byte>(_webSocketBuffer);
 
-        do
+        WebSocketReceiveResult msg = await _webSocket.ReceiveAsync(_webSocketBufferData, cs);
+
+        if (msg.Count <= 0)
         {
-            // Buffer overflow
-            if (bufferOffset >= WebSocketBufferSize)
-            {
-                await CloseAsync(WebSocketCloseStatus.MessageTooBig, $"Payload exceeded max size of {WebSocketBufferSize}", cs);
-                return false;
-            }
-
-            msg = await _webSocket.ReceiveAsync(new ArraySegment<byte>(_webSocketBuffer, 0, bufferOffset), cs);
-
-            // Null
-            if (msg == null)
-            {
-                // TODO: figure this out
-                await CloseAsync(WebSocketCloseStatus.InternalServerError, "Unknown error on receive", cs);
-                return false;
-            }
-
-            // Set messageType if beginning of message, else check if it has changed mid-message
-            if (bufferOffset == 0)
-            {
-                _webSocketMessageType = msg.MessageType;
-            }
-            else if (_webSocketMessageType != msg.MessageType)
-            {
-                // TODO: log this
-                await CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Payload type malformed!", cs);
-                return false;
-            }
-
-            // Increment bytes received
-            bufferOffset += msg.Count;
+            await CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Payload size invalid!", cs);
+            return false;
         }
-        while (!msg.EndOfMessage);
 
-        return bufferOffset > 0;
+        _webSocketMessageType = msg.MessageType;
+        _webSocketBufferData = _webSocketBufferData[..msg.Count];
+
+        if (_webSocketMessageType == WebSocketMessageType.Close)
+        {
+            await CloseAsync(cs: cs);
+            return false;
+        }
+
+        if (!msg.EndOfMessage)
+        {
+            await CloseAsync(WebSocketCloseStatus.MessageTooBig, "Payload size too big!", cs);
+            return false;
+        }
+
+        return true;
     }
 
-    private async Task ProcessWebSocketBytesAsync(CancellationToken cs)
+    private Task<bool> ProcessWebSocketTextAsync(CancellationToken cs)
     {
-        await Task.CompletedTask; // TODO: implement me
+        return Task.FromResult(false); // TODO: implement me
+    }
+    private async Task<bool> ProcessWebSocketBinaryAsync(CancellationToken cs)
+    {
+        ClientMsg msg;
+
+        try
+        {
+            msg = ClientMsg.Serializer.Parse(_webSocketBufferData.ToFlatSharpMemory());
+        }
+        catch (Exception)
+        {
+            await CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Payload invalid!", cs);
+            return false;
+        }
+
+        if (!msg.Payload.HasValue)
+        {
+            await CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Payload invalid!", cs);
+            return false;
+        }
+
+        switch (msg.Payload.Value.Kind)
+        {
+            case ClientPayload.ItemKind.SendShock:
+                _logger.LogDebug("Shock!");
+                break;
+            case ClientPayload.ItemKind.SendVibrate:
+                _logger.LogDebug("Vibrate!");
+                break;
+            case ClientPayload.ItemKind.NONE:
+            default:
+                return false;
+        }
+
+        return true;
     }
 
     public async Task CloseAsync(WebSocketCloseStatus closeStatus = WebSocketCloseStatus.NormalClosure, string reason = "ByeBye ❤️", CancellationToken cs = default)
@@ -169,8 +198,9 @@ public sealed class WebSocketInstance : IDisposable
         {
             await _webSocket.CloseAsync(closeStatus, reason, cs);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Error while closing websocket: {0}", ex.Message);
         }
     }
 

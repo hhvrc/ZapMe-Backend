@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using RichardSzalay.MockHttp;
 using System.Net;
-using ZapMe.Logic;
 using ZapMe.Services;
 using ZapMe.Services.Interfaces;
+using ZapMe.Utils;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Tests.Services;

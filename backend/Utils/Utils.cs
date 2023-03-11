@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace ZapMe.Logic;
+namespace ZapMe.Utils;
 
 public static class Utils
 {

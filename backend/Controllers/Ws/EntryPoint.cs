@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ZapMe.Authentication;
+using ZapMe.Websocket;
 
 namespace ZapMe.Controllers.Ws;
 

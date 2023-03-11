@@ -1,4 +1,4 @@
-﻿using ZapMe.Logic;
+﻿using ZapMe.Utils;
 
 namespace ZapMe.Tests.Logic;
 
@@ -9,7 +9,7 @@ public sealed class UtilTests
     {
         for (int i = 0; i < 1000; i++)
         {
-            Assert.Equal(32, Utils.GenerateRandomString(32).Length);
+            Assert.Equal(32, Utils.Utils.GenerateRandomString(32).Length);
         }
     }
 }

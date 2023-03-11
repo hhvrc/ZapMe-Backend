@@ -1,4 +1,4 @@
-﻿using ZapMe.Controllers;
+﻿using ZapMe.Websocket;
 
 namespace ZapMe.Services.Interfaces;
 

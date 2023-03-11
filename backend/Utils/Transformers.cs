@@ -1,6 +1,6 @@
 ﻿using System.Net.Mail;
 
-namespace ZapMe.Logic;
+namespace ZapMe.Utils;
 
 public static class Transformers
 {

@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Logging;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using ZapMe.Constants;
 using ZapMe.Controllers;
-using ZapMe.Extensions.DependencyInjection;
 using ZapMe.Middlewares;
 
 // The services are ordered by dependency requirements.
@@ -31,17 +31,31 @@ bool isDevelopment = env.IsDevelopment();
 // ######## CONFIGURE LOGGING #############
 // ########################################
 
-logging.ZMAddLogging();
+IdentityModelEventSource.ShowPII = isDevelopment;
+logging.AddSimpleConsole(opt =>
+{
+    opt.IncludeScopes = true;
+    opt.SingleLine = false;
+    opt.UseUtcTimestamp = true;
+    opt.TimestampFormat = "[yyyy-MM-dd HH:mm:ss.fff] ";
+});
 
 // ########################################
 // ######## CORE SERVICES #################
 // ########################################
 
 services.AddRouting();
-services.AddControllers().AddJsonOptions(static opt => opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, true)));
-services.AddResponseCompression();
+services.AddControllers().AddJsonOptions(opt =>
+{
+    opt.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    opt.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, true));
+});
 //services.AddHealthChecks().AddCheck("sql" ) //TODO: explore this
-services.Configure<ApiBehaviorOptions>(static opt => opt.InvalidModelStateResponseFactory = ErrorResponseFactory.CreateErrorResult);
+services.Configure<ApiBehaviorOptions>(opt =>
+{
+    opt.InvalidModelStateResponseFactory = ErrorResponseFactory.CreateErrorResult;
+});
 
 // ########################################
 // ######## ZAPME SERVICES ################
@@ -70,10 +84,19 @@ services.ZMAddQuartz();
 // ######## CORS CONFIGURATION ############
 // ########################################
 
-if (isDevelopment)
+services.AddCors(opt =>
 {
-    services.ZMAddDevelopment();
-}
+    if (isDevelopment)
+    {
+        // Allow all origins in development
+        opt.AddDefaultPolicy(builder =>
+        {
+            builder.AllowAnyOrigin();
+            builder.AllowAnyHeader();
+            builder.AllowAnyMethod();
+        });
+    }
+});
 
 // ########################################
 // ######## BUILD APP #####################
@@ -88,47 +111,33 @@ WebApplication app = builder.Build();
 if (isDevelopment)
 {
     app.UseDeveloperExceptionPage();
+    app.UseCors(); // Use default policy
 }
 else
 {
     app.UseExceptionHandler("/error");
 }
 
-app.UseForwardedHeaders();
-
-if (!isDevelopment)
+app.Map("/api", true, app =>
 {
-    app.UseHsts();
-}
+    // App!.UseHealthChecks("/api/v1/health/"); // TODO: explore this
 
-//app.UseHttpsRedirection(); // Bad if behind localhost proxy
-
-app.UseResponseCompression();
-
-app.UseDefaultFiles();
-app.UseStaticFiles();
-
-app.UseCookiePolicy();
-
-app.UseRouting();
-
-if (isDevelopment)
+    app.UseRouting();
+    app.UseAuthorization();
+    app.UseRateLimiter();
+    app.UseMiddleware<ActivityTracker>();
+    app.UseEndpoints(endpoints => endpoints.MapControllers());
+});
+app.Map("/swagger", true, app =>
 {
-    app.UseCors(App.DevelopmentCorsPolicyName);
-}
-
-// UseAuthentication is not required in .NET 7 because it is automatically called by UseAuthorization
-app.UseAuthorization();
-
-app.UseRateLimiter(); // As early as possible
-// App!.UseHealthChecks("/api/v1/health/"); // TODO: explore this
-
-app.UseSwaggerAndUI();
-app.UseMiddleware<ActivityTracker>();
-
-app.MapControllers();
-
-app.UseSpa(env);
+    app.UseHeaderValue("Cache-Control", "public, max-age=86400");
+    app.UseSwagger();
+    app.UseSwaggerUI(opt =>
+    {
+        opt.SwaggerEndpoint("/swagger/v1/swagger.json", App.AppName + " API - json");
+        opt.SwaggerEndpoint("/swagger/v1/swagger.yaml", App.AppName + " API - yaml");
+    });
+});
 
 // ########################################
 // ######## RUN APP #######################

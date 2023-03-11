@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Mail;
 using ZapMe.Constants;
 using ZapMe.Data.Models;
 using ZapMe.Helpers;
@@ -42,15 +43,15 @@ public partial class AccountController
 
                 string formattedEmail = new QuickStringReplacer(emailTemplate)
                     .Replace("{{UserName}}", account.Name)
-                    .Replace("{{ResetPasswordUrl}}", App.BackendBaseUrl + "/reset-password?token=" + passwordResetToken)
+                    .Replace("{{ResetPasswordUrl}}", App.WebsiteUrl + "/reset-password?token=" + passwordResetToken)
                     .Replace("{{CompanyName}}", App.AppCreator)
                     .Replace("{{CompanyAddress}}", App.MadeInText)
                     .Replace("{{PoweredBy}}", App.AppName)
-                    .Replace("{{PoweredByLink}}", App.MainPageUrl)
+                    .Replace("{{PoweredByLink}}", App.WebsiteUrl)
                     .ToString();
 
                 // Send recovery secret to email
-                await mailServiceProvider.SendEmailAsync("Hello", "hello", "heavenvr.tech", $"{account.Name} <{account.Email}>", "Password recovery", formattedEmail, cancellationToken);
+                await mailServiceProvider.SendEmailAsync("Hello", account.Name, account.Email, "Password recovery", formattedEmail, cancellationToken);
             }
         }
 

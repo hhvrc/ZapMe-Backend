@@ -1,4 +1,4 @@
-using ZapMe.Logic;
+using ZapMe.Utils;
 
 namespace ZapMe.Tests.Logic;
 

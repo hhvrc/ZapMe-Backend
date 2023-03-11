@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using ZapMe.Attributes;
 
-namespace ZapMe.Extensions.DependencyInjection;
+namespace Microsoft.Extensions.DependencyInjection;
 
 public static class QuartzIServiceCollectionExtensions
 {

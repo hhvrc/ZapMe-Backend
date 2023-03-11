@@ -1,6 +1,6 @@
 ﻿using ZapMe.Data.Models;
 using ZapMe.DTOs;
-using ZapMe.Logic;
+using ZapMe.Utils;
 using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Services;
@@ -60,7 +60,7 @@ public sealed class AccountManager : IAccountManager
 
     public async Task<string?> GeneratePasswordResetTokenAsync(Guid userId, CancellationToken cancellationToken)
     {
-        string token = Utils.GenerateRandomString(32);
+        string token = Utils.Utils.GenerateRandomString(32);
 
         if (!await AccountStore.SetPasswordResetTokenAsync(userId, token, cancellationToken))
         {
