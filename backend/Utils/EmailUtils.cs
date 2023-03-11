@@ -38,8 +38,8 @@ public static class EmailUtils
         public ReadOnlySpan<char> EmailAddress => _str;
         public ReadOnlySpan<char> DisplayName => EmailAddress[..(_addrStartIndex - 2)];
         public ReadOnlySpan<char> User => EmailAddress[_addrStartIndex.._atIndex];
+        public ReadOnlySpan<char> UserAlias => EmailAddress[_addrStartIndex.._plusIndex];
         public ReadOnlySpan<char> UserAddr => EmailAddress[_addrStartIndex.._plusIndex];
-        public ReadOnlySpan<char> UserAlias => EmailAddress[(_plusIndex + 1).._atIndex];
         public ReadOnlySpan<char> Host => EmailAddress[(_atIndex + 1).._addrStopIndex];
 
         public static implicit operator bool(ParsedResult parsedEmail) => parsedEmail.Success;
@@ -188,40 +188,45 @@ public static class EmailUtils
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ParsedResult Parse(string str)
     {
+        if (str is null)
+            return ParsedResult.Invalid;
+
+        ReadOnlySpan<char> email = str.AsSpan();
+
         // "a@b.c" (5 chars)
-        if (str.AsSpan().Length < 5)
+        if (email.Length < 5)
             return ParsedResult.Invalid;
 
         // @ cannot be the first character
-        int atPos = str.LastIndexOf('@');
+        int atPos = email.LastIndexOf('@');
         if (atPos < 1)
             return ParsedResult.Invalid;
 
-        int addrStartIndex = 0;
-        int addrStopIndex = str.AsSpan().Length;
-
-        int openBracketPos = str.AsSpan().IndexOf('<');
-        if (openBracketPos != -1)
+        int addrStart = email.IndexOf('<') + 1;
+        int addrStop = email.Length;
+        if (addrStart > 0)
         {
-            addrStartIndex = openBracketPos + 1;
-
-            if ((atPos - addrStartIndex) < 1 || str.AsSpan()[^1] != '>')
+            if (atPos < addrStart || email[^1] != '>')
                 return ParsedResult.Invalid;
 
-            ReadOnlySpan<char> displayName = str.AsSpan()[..openBracketPos].Trim();
+            ReadOnlySpan<char> displayName = email[..(addrStart - 1)].Trim();
 
-            if (displayName.Length != 0 || displayName.Contains('>'))
+            if (displayName.Length == 0 || displayName.Contains('>'))
                 return ParsedResult.Invalid;
 
-            addrStopIndex--;
+            addrStop -= 1;
         }
 
-        if (!IsValidUser(str.AsSpan()[..atPos]) || !IsValidHost(str.AsSpan()[(atPos + 1)..]))
+        ReadOnlySpan<char> userPart = email[addrStart..atPos];
+        if (!IsValidUser(userPart))
             return ParsedResult.Invalid;
 
-        int plusPos = str.AsSpan()[..atPos].IndexOf('+');
+        if (!IsValidHost(email[(atPos + 1)..addrStop]))
+            return ParsedResult.Invalid;
 
-        return new ParsedResult(str, addrStartIndex, atPos, plusPos, addrStopIndex);
+        int plusPos = addrStart + userPart.IndexOf('+');
+
+        return new ParsedResult(str, addrStart, atPos, plusPos, addrStop);
     }
 
     /// <summary>
