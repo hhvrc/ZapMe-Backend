@@ -149,33 +149,35 @@ public static class EmailUtils
         if (str.Length < 3)
             return false;
 
-        int partLen = 0;
-        int dotCount = 0;
-        bool wasAlphaNum = false;
+        int dotPos = 0;
+        bool wasAlpha = false;
 
-        foreach (char c in str)
+        for (int i = 0; i < str.Length; i++)
         {
+            char c = str[i];
             switch (c)
             {
                 case '.':
-                    if (partLen is 0 or >= 64)
+                    int len = i - dotPos;
+                    if (!wasAlpha || len is 0 or >= 64)
                         return false;
-                    partLen = 0;
-                    dotCount++;
-                    goto case '-';
+                    dotPos = i;
+                    wasAlpha = false;
+                    continue;
                 case '-':
-                    if (!wasAlphaNum) return false;
-                    wasAlphaNum = false;
-                    break;
+                    if (!wasAlpha)
+                        return false;
+                    wasAlpha = false;
+                    continue;
                 default:
                     if (!CharsetMatchers.IsAlphaNumericLower(c))
                         return false;
-                    wasAlphaNum = true;
-                    break;
+                    wasAlpha = true;
+                    continue;
             }
         }
 
-        return dotCount > 0 && wasAlphaNum;
+        return dotPos != 0 && wasAlpha;
     }
 
     /// <summary>
