@@ -22,8 +22,8 @@ public static class PasswordUtils
 
     private const string _Chars = "abcdefghijklmnopqrstuvwxyz" +
                                   "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-                                  "01234567890123456789012345" +
-                                  "!@#$&%!@#$&%!@#$&%!@#$&%!@";
+                                  "01234567890123456789" +
+                                  "!#$%()*+,-./:;<=>?@[]^_{}~";
     public static string GeneratePassword(int length = 32)
     {
         return String.Create(length, false, (span, _) =>
