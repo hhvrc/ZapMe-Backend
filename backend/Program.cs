@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using ZapMe.Constants;
 using ZapMe.Controllers;
+using ZapMe.Data;
 using ZapMe.Middlewares;
 
 // The services are ordered by dependency requirements.
@@ -102,6 +104,19 @@ services.AddCors(opt =>
 // ########################################
 
 WebApplication app = builder.Build();
+
+// ########################################
+// ######## SET UP DATABASE ###############
+// ########################################
+
+using (IServiceScope scope = app.Services.CreateScope())
+{
+    IServiceProvider serviceProvider = scope.ServiceProvider;
+    ZapMeContext context = serviceProvider.GetRequiredService<ZapMeContext>();
+    await context.Database.EnsureCreatedAsync();
+    await context.Database.MigrateAsync();
+    DataSeeders.Seed(context);
+}
 
 // ########################################
 // ######## MIDDLEWARE PIPELINE ###########
