@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -15,12 +16,27 @@ namespace ZapMe.Migrations
                 incrementBy: 10);
 
             migrationBuilder.CreateTable(
+                name: "emailTemplates",
+                columns: table => new
+                {
+                    name = table.Column<string>(type: "text", nullable: false),
+                    body = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_emailTemplates", x => x.name);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "userAgents",
                 columns: table => new
                 {
                     hash = table.Column<byte[]>(type: "bytea", maxLength: 32, nullable: false),
                     length = table.Column<int>(type: "integer", nullable: false),
                     value = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
+                    parsedOS = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    parsedDevice = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    parsedUA = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     createdAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
                 },
                 constraints: table =>
@@ -81,7 +97,7 @@ namespace ZapMe.Migrations
                 name: "images",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     height = table.Column<int>(type: "integer", nullable: false),
                     width = table.Column<int>(type: "integer", nullable: false),
                     sizeBytes = table.Column<int>(type: "integer", nullable: false),
@@ -91,7 +107,7 @@ namespace ZapMe.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_images", x => x.Id);
+                    table.PrimaryKey("PK_images", x => x.id);
                     table.ForeignKey(
                         name: "FK_images_accounts_uploaderId",
                         column: x => x.uploaderId,
@@ -146,9 +162,9 @@ namespace ZapMe.Migrations
                 name: "sessions",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     userId = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    name = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
                     ipAddress = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
                     country = table.Column<string>(type: "character varying(2)", maxLength: 2, nullable: false),
                     userAgent = table.Column<byte[]>(type: "bytea", maxLength: 32, nullable: false),
@@ -157,7 +173,7 @@ namespace ZapMe.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_sessions", x => x.Id);
+                    table.PrimaryKey("PK_sessions", x => x.id);
                     table.ForeignKey(
                         name: "FK_sessions_accounts_userId",
                         column: x => x.userId,
@@ -287,7 +303,7 @@ namespace ZapMe.Migrations
                 table: "accounts",
                 column: "profilePictureId",
                 principalTable: "images",
-                principalColumn: "Id",
+                principalColumn: "id",
                 onDelete: ReferentialAction.SetNull);
         }
 
@@ -297,6 +313,9 @@ namespace ZapMe.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_accounts_images_profilePictureId",
                 table: "accounts");
+
+            migrationBuilder.DropTable(
+                name: "emailTemplates");
 
             migrationBuilder.DropTable(
                 name: "friendRequests");

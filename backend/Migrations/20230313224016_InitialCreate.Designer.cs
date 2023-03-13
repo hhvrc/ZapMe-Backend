@@ -12,15 +12,15 @@ using ZapMe.Data;
 namespace ZapMe.Migrations
 {
     [DbContext(typeof(ZapMeContext))]
-    [Migration("20230119173318_AddEmailTemplates")]
-    partial class AddEmailTemplates
+    [Migration("20230313224016_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.2")
+                .HasAnnotation("ProductVersion", "7.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseHiLo(modelBuilder, "EntityFrameworkHiLoSequence");
@@ -165,7 +165,9 @@ namespace ZapMe.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<long>("HashPerceptual")
                         .HasColumnType("bigint")
@@ -267,7 +269,9 @@ namespace ZapMe.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<string>("CountryCode")
                         .IsRequired()
@@ -292,7 +296,6 @@ namespace ZapMe.Migrations
                         .HasColumnName("ipAddress");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)")
                         .HasColumnName("name");
@@ -332,6 +335,24 @@ namespace ZapMe.Migrations
                     b.Property<int>("Length")
                         .HasColumnType("integer")
                         .HasColumnName("length");
+
+                    b.Property<string>("ParsedDevice")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("parsedDevice");
+
+                    b.Property<string>("ParsedOperatingSystem")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("parsedOS");
+
+                    b.Property<string>("ParsedUserAgent")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("parsedUA");
 
                     b.Property<string>("Value")
                         .IsRequired()

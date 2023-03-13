@@ -38,7 +38,7 @@ public sealed class AccountStore : IAccountStore
         {
             try
             {
-                await _dbContext.Users.AddAsync(user, cancellationToken);
+                await _dbContext.Accounts.AddAsync(user, cancellationToken);
                 await _dbContext.SaveChangesAsync(cancellationToken);
 
                 return new AccountCreationResult(AccountCreationResult.ResultE.Success, user);
@@ -83,32 +83,32 @@ public sealed class AccountStore : IAccountStore
 
     public Task<AccountEntity?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
     {
-        return _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        return _dbContext.Accounts.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
     }
 
     public Task<AccountEntity?> GetByNameAsync(string userName, CancellationToken cancellationToken)
     {
-        return _dbContext.Users.FirstOrDefaultAsync(u => u.Name == userName, cancellationToken);
+        return _dbContext.Accounts.FirstOrDefaultAsync(u => u.Name == userName, cancellationToken);
     }
 
     public Task<AccountEntity?> GetByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        return _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+        return _dbContext.Accounts.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
     }
 
     public Task<AccountEntity?> GetByUsernameOrEmail(string userNameOrEmail, CancellationToken cancellationToken)
     {
-        return _dbContext.Users.FirstOrDefaultAsync(u => u.Name == userNameOrEmail || u.Email == userNameOrEmail, cancellationToken);
+        return _dbContext.Accounts.FirstOrDefaultAsync(u => u.Name == userNameOrEmail || u.Email == userNameOrEmail, cancellationToken);
     }
 
     public Task<AccountEntity?> GetByPasswordResetTokenAsync(string passwordResetToken, CancellationToken cancellationToken)
     {
-        return _dbContext.Users.FirstOrDefaultAsync(u => u.PasswordResetToken == passwordResetToken, cancellationToken);
+        return _dbContext.Accounts.FirstOrDefaultAsync(u => u.PasswordResetToken == passwordResetToken, cancellationToken);
     }
 
     private async Task<bool> UpdateAsync(Expression<Func<AccountEntity, bool>> whereSelector, Expression<Func<SetPropertyCalls<AccountEntity>, SetPropertyCalls<AccountEntity>>> setPropertyCalls, CancellationToken cancellationToken)
     {
-        return (await _dbContext.Users.Where(whereSelector).ExecuteUpdateAsync(setPropertyCalls, cancellationToken)) > 0;
+        return (await _dbContext.Accounts.Where(whereSelector).ExecuteUpdateAsync(setPropertyCalls, cancellationToken)) > 0;
     }
     private Task<bool> UpdateAsync(Guid userId, Expression<Func<SetPropertyCalls<AccountEntity>, SetPropertyCalls<AccountEntity>>> setPropertyCalls, CancellationToken cancellationToken) =>
         UpdateAsync(u => u.Id == userId, setPropertyCalls, cancellationToken);
@@ -138,6 +138,6 @@ public sealed class AccountStore : IAccountStore
 
     public async Task<bool> DeleteAsync(Guid userId, CancellationToken cancellationToken)
     {
-        return await _dbContext.Users.Where(u => u.Id == userId).ExecuteDeleteAsync(cancellationToken) > 0;
+        return await _dbContext.Accounts.Where(u => u.Id == userId).ExecuteDeleteAsync(cancellationToken) > 0;
     }
 }

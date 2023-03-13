@@ -86,6 +86,10 @@ public sealed class SessionEntityConfiguration : IEntityTypeConfiguration<Sessio
 
         builder.HasKey(si => si.Id);
 
+        builder.Property(si => si.Id)
+            .HasColumnName("id")
+            .HasDefaultValueSql("gen_random_uuid()");
+
         builder.Property(si => si.UserId)
             .HasColumnName("userId");
 
