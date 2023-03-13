@@ -39,11 +39,6 @@ public static class ZapMeIServiceCollectionExtensions
         services.AddTransient<IMailGunService, MailGunService>();
     }
 
-    public static void ZMAddPasswordHashing([NotNull] this IServiceCollection services)
-    {
-        services.AddScoped<IPasswordHasher, PasswordHasher>();
-    }
-
     public static void ZMAddUsers([NotNull] this IServiceCollection services)
     {
         services.AddTransient<IAccountStore, AccountStore>();

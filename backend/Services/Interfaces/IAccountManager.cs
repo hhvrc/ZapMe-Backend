@@ -13,11 +13,6 @@ public interface IAccountManager
     /// <summary>
     /// 
     /// </summary>
-    IPasswordHasher PasswordHasher { get; }
-
-    /// <summary>
-    /// 
-    /// </summary>
     /// <param name="name"></param>
     /// <param name="email"></param>
     /// <param name="password"></param>

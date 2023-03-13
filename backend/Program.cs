@@ -62,7 +62,6 @@ services.Configure<ApiBehaviorOptions>(opt =>
 // ########################################
 
 services.ZMAddHttpClients(configuration);
-services.ZMAddPasswordHashing();
 
 services.ZMAddUsers();
 services.ZMAddSessions();

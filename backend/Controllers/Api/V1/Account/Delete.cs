@@ -5,6 +5,7 @@ using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.DTOs;
 using ZapMe.Services.Interfaces;
+using ZapMe.Utils;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
@@ -27,14 +28,13 @@ public partial class AccountController
     public async Task<IActionResult> Delete(
         [FromHeader] [Password(true)] string password,
         [FromHeader] [StringLength(1024)] string? reason,
-        [FromServices] IPasswordHasher passwordHasher,
         CancellationToken cancellationToken
         )
     {
         ZapMeIdentity identity = (User as ZapMePrincipal)!.Identity;
 
         // TODO: get the password hash from the database, or get it earlier in the pipeline
-        if (!passwordHasher.CheckPassword(password, identity.Account.PasswordHash))
+        if (!PasswordUtils.CheckPassword(password, identity.Account.PasswordHash))
         {
             return this.Error_InvalidPassword();
         }
