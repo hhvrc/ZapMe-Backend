@@ -106,6 +106,6 @@ public static class DataSeeders
         }
 
         context.SaveChanges();
-        File.WriteAllText("passwords.json", JsonSerializer.Serialize(accountPasswords));
+        File.WriteAllText("passwords.json", JsonSerializer.Serialize(accountPasswords, new JsonSerializerOptions { WriteIndented = true }));
     }
 }
