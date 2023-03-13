@@ -9,7 +9,7 @@ public static class PasswordUtils
     {
         ArgumentNullException.ThrowIfNull(password);
         
-        return BCrypt.Net.BCrypt.EnhancedHashPassword(password, HashType.SHA512, 15);
+        return BCrypt.Net.BCrypt.EnhancedHashPassword(password, HashType.SHA512, 13);
     }
     
     public static bool CheckPassword(string submittedPassword, string hashedPassword)
@@ -23,8 +23,8 @@ public static class PasswordUtils
     private const string _Chars = "abcdefghijklmnopqrstuvwxyz" +
                                   "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
                                   "01234567890123456789" +
-                                  "!#$%()*+,-./:;<=>?@[]^_{}~";
-    public static string GeneratePassword(int length = 32)
+                                  "!#$%()*,-./:;=?@[]^_{}~";
+    public static string GeneratePassword(byte length = 32)
     {
         return String.Create(length, false, (span, _) =>
         {
