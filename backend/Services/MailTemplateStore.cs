@@ -5,10 +5,10 @@ namespace ZapMe.Services;
 
 public sealed class MailTemplateStore : IMailTemplateStore
 {
-    private readonly AmazonS3Client _s3Client;
+    private readonly IAmazonS3 _s3Client;
     private readonly ILogger<MailTemplateStore> _logger;
 
-    public MailTemplateStore(AmazonS3Client s3Client, ILogger<MailTemplateStore> logger)
+    public MailTemplateStore(IAmazonS3 s3Client, ILogger<MailTemplateStore> logger)
     {
         _s3Client = s3Client;
         _logger = logger;
