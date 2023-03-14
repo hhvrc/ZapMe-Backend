@@ -74,7 +74,7 @@ public static class ZapMeIServiceCollectionExtensions
     {
         //services.AddTransient<EmailTemplateStore>();
         //services.AddTransient<IEmailTemplateStore, CachedEmailTemplateStore>();
-        services.AddTransient<IEmailTemplateStore, EmailTemplateStore>();
+        services.AddTransient<IMailTemplateStore, MailTemplateStore>();
     }
 
     public static void ZMAddWebSockets([NotNull] this IServiceCollection services)

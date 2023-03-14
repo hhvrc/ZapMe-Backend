@@ -17,7 +17,6 @@ public sealed class ZapMeContext : DbContext
     public required DbSet<UserAgentEntity> UserAgents { get; set; }
     public required DbSet<UserRelationEntity> UserRelations { get; set; }
     public required DbSet<FriendRequestEntity> FriendRequests { get; set; }
-    public required DbSet<EmailTemplateEntity> EmailTemplates { get; set; }
     public required DbSet<OAuthConnectionEntity> OAuthConnections { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -32,7 +31,6 @@ public sealed class ZapMeContext : DbContext
         new UserAgentEntityConfiguration().Configure(modelBuilder.Entity<UserAgentEntity>());
         new UserRelationEntityConfiguration().Configure(modelBuilder.Entity<UserRelationEntity>());
         new FriendRequestEntityConfiguration().Configure(modelBuilder.Entity<FriendRequestEntity>());
-        new EmailTemplateEntityConfiguration().Configure(modelBuilder.Entity<EmailTemplateEntity>());
         new OAuthConnectionEntityConfiguration().Configure(modelBuilder.Entity<OAuthConnectionEntity>());
     }
 }

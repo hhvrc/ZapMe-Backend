@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Mail;
 using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.DTOs;
@@ -37,7 +36,7 @@ public partial class AccountController
         [FromBody] Account.Models.Create body,
         [FromServices] IGoogleReCaptchaService reCaptchaService,
         [FromServices] IDebounceService debounceService,
-        [FromServices] IEmailTemplateStore emailTemplateStore,
+        [FromServices] IMailTemplateStore emailTemplateStore,
         [FromServices] IMailGunService mailGunService,
         CancellationToken cancellationToken)
     {
@@ -68,7 +67,7 @@ public partial class AccountController
 
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
-        
+
         // Attempt to check against debounce if the email is a throwaway email
         if (await debounceService.IsDisposableEmailAsync(body.Email, cancellationToken))
         {
@@ -99,7 +98,7 @@ public partial class AccountController
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
-        string? emailTemplate = await emailTemplateStore.GetEmailTemplateAsync("AccountCreated", cancellationToken);
+        string? emailTemplate = await emailTemplateStore.GetTemplateAsync("AccountCreated", cancellationToken);
         if (emailTemplate != null)
         {
             string emailBody = new QuickStringReplacer(emailTemplate)

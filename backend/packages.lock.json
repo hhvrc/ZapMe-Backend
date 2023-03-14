@@ -29,6 +29,24 @@
           "AWSSDK.Core": "[3.7.105.18, 4.0.0)"
         }
       },
+      "AWSSDK.SimpleNotificationService": {
+        "type": "Direct",
+        "requested": "[3.7.101.25, )",
+        "resolved": "3.7.101.25",
+        "contentHash": "F1xxvG8SfDhKxFMBFM62VI9CmklHhSMkst0Kixl+E3graa6bcguMjxnSlLgFCTnXYyupEZNyKTxXXqmWJ+OGSQ==",
+        "dependencies": {
+          "AWSSDK.Core": "[3.7.105.18, 4.0.0)"
+        }
+      },
+      "AWSSDK.SQS": {
+        "type": "Direct",
+        "requested": "[3.7.100.89, )",
+        "resolved": "3.7.100.89",
+        "contentHash": "cm/R0hzmlgZ0pu4BcEXPkqNgG//yqpH1iY1qnMFWmi/UF2DJ84ooyL0mJIps4FChaiqgvcZDGjh+O/Q3YGoZRg==",
+        "dependencies": {
+          "AWSSDK.Core": "[3.7.105.18, 4.0.0)"
+        }
+      },
       "BCrypt.Net-Next": {
         "type": "Direct",
         "requested": "[4.0.3, )",

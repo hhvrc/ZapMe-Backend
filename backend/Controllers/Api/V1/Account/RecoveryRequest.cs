@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Mail;
 using ZapMe.Constants;
 using ZapMe.Data.Models;
 using ZapMe.Helpers;
@@ -25,7 +24,7 @@ public partial class AccountController
     [HttpPost("recover", Name = "AccountRecoveryRequest")]
     [Consumes(Application.Json, Application.Xml)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> RecoveryRequest([FromBody] Account.Models.RecoveryRequest body, [FromServices] IEmailTemplateStore emailTemplateStore, [FromServices] IMailGunService mailServiceProvider, CancellationToken cancellationToken)
+    public async Task<IActionResult> RecoveryRequest([FromBody] Account.Models.RecoveryRequest body, [FromServices] IMailTemplateStore emailTemplateStore, [FromServices] IMailGunService mailServiceProvider, CancellationToken cancellationToken)
     {
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(1, cancellationToken);
 
@@ -37,7 +36,7 @@ public partial class AccountController
             string? passwordResetToken = await _accountManager.GeneratePasswordResetTokenAsync(account.Id, cancellationToken);
             if (passwordResetToken != null)
             {
-                string? emailTemplate = await emailTemplateStore.GetEmailTemplateAsync(EmailTemplateNames.PasswordReset, cancellationToken);
+                string? emailTemplate = await emailTemplateStore.GetTemplateAsync(EmailTemplateNames.PasswordReset, cancellationToken);
                 if (emailTemplate is null)
                     throw new NullReferenceException("Email template not found");
 

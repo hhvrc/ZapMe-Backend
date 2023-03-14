@@ -25,6 +25,8 @@
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.0" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.5" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.103.26" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.101.25" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.7.100.89" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="FlatSharp.Compiler" Version="7.1.0">
       <PrivateAssets>all</PrivateAssets>
