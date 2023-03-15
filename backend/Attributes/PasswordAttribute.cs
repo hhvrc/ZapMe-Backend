@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ZapMe.Attributes;
 
-[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = false)]
 public sealed class PasswordAttribute : ValidationAttribute, IParameterAttribute
 {
     public const int MinPasswordLength = 10;

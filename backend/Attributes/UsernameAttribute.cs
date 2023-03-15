@@ -2,7 +2,7 @@
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using System.ComponentModel.DataAnnotations;
-using ZapMe.Logic;
+using ZapMe.Utils;
 
 namespace ZapMe.Attributes;
 

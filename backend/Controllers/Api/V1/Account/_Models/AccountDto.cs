@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using ZapMe.Attributes;
 using ZapMe.Controllers.Api.V1.User.Models;
-using ZapMe.Logic;
+using ZapMe.Utils;
 
 namespace ZapMe.Controllers.Api.V1.Account.Models;
 

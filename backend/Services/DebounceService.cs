@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
-using ZapMe.Logic;
 using ZapMe.Services.Interfaces;
+using ZapMe.Utils;
 
 namespace ZapMe.Services;
 
@@ -21,13 +21,24 @@ public sealed class DebounceService : IDebounceService
         public string Disposable { get; set; }
     }
 
-    public async Task<bool> IsDisposableEmailAsync(string email, CancellationToken cancellationToken)
+    public async Task<bool> IsDisposableEmailAsync(string mailAddress, CancellationToken cancellationToken)
     {
-        string anonymizedEmail = Transformers.AnonymizeEmailUser(email);
+        EmailUtils.ParsedResult parsed = EmailUtils.Parse(mailAddress);
+        if (!parsed.Success)
+        {
+            _logger.LogError("Failed to parse email: {}", mailAddress);
+            return false;
+        }
+
+        // We want to forward aliases, but not the user part
+        // Aliases might help identify if the mail address is disposable or not
+        // But if we forward the user part and the external service sells the data, user might get spammed, we don't want that
+        string query = parsed.HasAlias ? $"?email={parsed.UserAlias}+user@{parsed.Host}" : $"?email=user@{parsed.Host}";
+
 
         HttpClient httpClient = _httpClientFactory.CreateClient("Debounce");
 
-        using HttpResponseMessage response = await httpClient.GetAsync("?email=" + anonymizedEmail, cancellationToken);
+        using HttpResponseMessage response = await httpClient.GetAsync(query, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -44,13 +55,13 @@ public sealed class DebounceService : IDebounceService
         }
         catch (Exception)
         {
-            _logger.LogError("disposable.io sent back invalid return for {}", anonymizedEmail);
+            _logger.LogError("disposable.io sent back invalid return for {}", mailAddress);
             return false;
         }
 
         if (!Boolean.TryParse(isDisposableStr, out bool isDisposable))
         {
-            _logger.LogError("disposable.io sent back invalid return for {}", anonymizedEmail);
+            _logger.LogError("disposable.io sent back invalid return for {}", mailAddress);
             return false;
         }
 

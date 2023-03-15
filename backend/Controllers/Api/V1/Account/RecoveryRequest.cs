@@ -24,7 +24,7 @@ public partial class AccountController
     [HttpPost("recover", Name = "AccountRecoveryRequest")]
     [Consumes(Application.Json, Application.Xml)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> RecoveryRequest([FromBody] Account.Models.RecoveryRequest body, [FromServices] IEmailTemplateStore emailTemplateStore, [FromServices] IMailGunService mailServiceProvider, CancellationToken cancellationToken)
+    public async Task<IActionResult> RecoveryRequest([FromBody] Account.Models.RecoveryRequest body, [FromServices] IMailTemplateStore emailTemplateStore, [FromServices] IMailGunService mailServiceProvider, CancellationToken cancellationToken)
     {
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(1, cancellationToken);
 
@@ -36,21 +36,21 @@ public partial class AccountController
             string? passwordResetToken = await _accountManager.GeneratePasswordResetTokenAsync(account.Id, cancellationToken);
             if (passwordResetToken != null)
             {
-                string? emailTemplate = await emailTemplateStore.GetEmailTemplateAsync(EmailTemplateNames.PasswordReset, cancellationToken);
+                string? emailTemplate = await emailTemplateStore.GetTemplateAsync(EmailTemplateNames.PasswordReset, cancellationToken);
                 if (emailTemplate is null)
                     throw new NullReferenceException("Email template not found");
 
                 string formattedEmail = new QuickStringReplacer(emailTemplate)
                     .Replace("{{UserName}}", account.Name)
-                    .Replace("{{ResetPasswordUrl}}", App.BackendBaseUrl + "/reset-password?token=" + passwordResetToken)
+                    .Replace("{{ResetPasswordUrl}}", App.WebsiteUrl + "/reset-password?token=" + passwordResetToken)
                     .Replace("{{CompanyName}}", App.AppCreator)
                     .Replace("{{CompanyAddress}}", App.MadeInText)
                     .Replace("{{PoweredBy}}", App.AppName)
-                    .Replace("{{PoweredByLink}}", App.MainPageUrl)
+                    .Replace("{{PoweredByLink}}", App.WebsiteUrl)
                     .ToString();
 
                 // Send recovery secret to email
-                await mailServiceProvider.SendEmailAsync("Hello", "hello", "heavenvr.tech", $"{account.Name} <{account.Email}>", "Password recovery", formattedEmail, cancellationToken);
+                await mailServiceProvider.SendEmailAsync("Hello", account.Name, account.Email, "Password recovery", formattedEmail, cancellationToken);
             }
         }
 

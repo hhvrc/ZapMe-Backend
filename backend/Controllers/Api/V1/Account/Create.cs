@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Principal;
 using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.DTOs;
@@ -37,7 +36,7 @@ public partial class AccountController
         [FromBody] Account.Models.Create body,
         [FromServices] IGoogleReCaptchaService reCaptchaService,
         [FromServices] IDebounceService debounceService,
-        [FromServices] IEmailTemplateStore emailTemplateStore,
+        [FromServices] IMailTemplateStore emailTemplateStore,
         [FromServices] IMailGunService mailGunService,
         CancellationToken cancellationToken)
     {
@@ -98,21 +97,21 @@ public partial class AccountController
 
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
-        
-        string? emailTemplate = await emailTemplateStore.GetEmailTemplateAsync("AccountCreated", cancellationToken);
+
+        string? emailTemplate = await emailTemplateStore.GetTemplateAsync("AccountCreated", cancellationToken);
         if (emailTemplate != null)
         {
-            var emailBody = new QuickStringReplacer(emailTemplate)
+            string emailBody = new QuickStringReplacer(emailTemplate)
                     .Replace("{{UserName}}", body.UserName)
                     //.Replace("{{ConfirmEmailLink}}", App.BackendBaseUrl + "/Account/ConfirmEmail?token=" + result.ConfirmationToken)
                     .Replace("{{CompanyName}}", App.AppCreator)
                     .Replace("{{CompanyAddress}}", App.MadeInText)
                     .Replace("{{PoweredBy}}", App.AppName)
-                    .Replace("{{PoweredByLink}}", App.MainPageUrl)
+                    .Replace("{{PoweredByLink}}", App.WebsiteUrl)
                     .ToString();
 
             // TODO: change method signature to this: SendEmailAsync(string to, string subject, string body, CancellationToken cancellationToken)
-            await mailGunService.SendEmailAsync("System", "system", "heavenvr.tech", body.Email, "Account Created", emailTemplate, cancellationToken);
+            await mailGunService.SendEmailAsync("System", body.UserName, body.Email, "Account Created", emailTemplate, cancellationToken);
         }
         else
         {

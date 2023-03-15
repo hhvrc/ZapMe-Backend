@@ -6,25 +6,21 @@ namespace ZapMe.Middlewares;
 public sealed class ActivityTracker
 {
     private readonly RequestDelegate _next;
-    private readonly ILogger<ActivityTracker> _logger;
 
-    public ActivityTracker(RequestDelegate next, ILogger<ActivityTracker> logger)
+    public ActivityTracker(RequestDelegate next)
     {
         _next = next;
-        _logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext context, IAccountManager userManager)
     {
-        ZapMeIdentity? identity = context.User?.Identity as ZapMeIdentity;
-
         try
         {
             await _next(context);
         }
         finally
         {
-            if (identity != null)
+            if (context.User?.Identity is ZapMeIdentity identity)
             {
                 await userManager.SetLastOnlineAsync(identity.AccountId, DateTime.UtcNow, context.RequestAborted);
             }

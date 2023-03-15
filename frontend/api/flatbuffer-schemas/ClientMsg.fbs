@@ -1,0 +1,25 @@
+﻿attribute "fs_serializer";
+
+namespace ZapMe.FlatMsgs;
+
+table SendShock {
+	targetId : int;
+	strength : float;
+}
+
+table SendVibrate {
+	targetId : int;
+	strength : float;
+}
+
+union ClientPayload {
+	SendShock,
+	SendVibrate
+}
+
+table ClientMsg (fs_serializer) {
+	timeStamp : long;
+	payload : ClientPayload;
+}
+
+root_type ClientMsg;

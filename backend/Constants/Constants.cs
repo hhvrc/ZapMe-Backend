@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Net.Mail;
+using System.Reflection;
 
 namespace ZapMe.Constants;
 
@@ -19,22 +20,24 @@ public static class App
     }
 
     public const string AppDescription = "Open source application to control things";
-    public const string WebsiteUrl = "https://heavenvr.tech/";
-    public const string BackendBaseUrl = "https://heavenvr.tech/zapme";
+    public const string Domain = "zapme.app";
+    public const string WebsiteUrl = $"https://{Domain}";
 
-    public const string MainPageUrl = BackendBaseUrl;
-
-    public const string TermsOfServiceUrl = BackendBaseUrl + "/tos";
+    public const string TermsOfServiceUrl = WebsiteUrl + "/tos";
 
     public const string ContactText = "Contact me";
-    public const string ContactUrl = BackendBaseUrl + "/contact";
+    public const string ContactUrl = WebsiteUrl + "/contact";
 
     public const string LicenseText = "The Apache License, Version 2.0";
-    public const string LicenseUrl = BackendBaseUrl + "/license";
+    public const string LicenseUrl = WebsiteUrl + "/license";
 
-    public const string PrivacyPolicyUrl = BackendBaseUrl + "/privacy";
+    public const string PrivacyPolicyUrl = WebsiteUrl + "/privacy";
 
-    public const string DevelopmentCorsPolicyName = AppName + ".AllowAll";
+    public static readonly MailAddress HelloMailAddress = new MailAddress("hello@" + Domain, "Hello");
+    public static readonly MailAddress SystemMailAddress = new MailAddress("system@" + Domain, "System");
+    public static readonly MailAddress SupportMailAddress = new MailAddress("support@" + Domain, "Support");
+    public static readonly MailAddress ContactMailAddress = new MailAddress("contact@" + Domain, "Contact");
+    public static readonly MailAddress PrivacyMailAddress = new MailAddress("privacy@" + Domain, "Privacy");
 
     public static readonly string AssemblyXmlPath = Path.Combine(AppContext.BaseDirectory, Assembly.GetExecutingAssembly().GetName().Name + ".xml");
 }
