@@ -1,0 +1,1266 @@
+openapi: 3.0.1
+info:
+  title: ZapMe
+  description: Open source application to control things
+  termsOfService: https://zapme.app/tos
+  contact:
+    name: Contact me
+    url: https://zapme.app/contact
+  license:
+    name: 'The Apache License, Version 2.0'
+    url: https://zapme.app/license
+  version: v1
+paths:
+  /api/v1/Account:
+    post:
+      tags:
+        - Account
+      summary: Create a new account
+      operationId: CreateAccount
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Create'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Create'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+        '400':
+          description: Error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '409':
+          description: Error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '200':
+          description: Created account
+    delete:
+      tags:
+        - Account
+      summary: Delete currently logged in account
+      operationId: DeleteAccount
+      parameters:
+        - name: password
+          in: header
+          schema:
+            maxLength: 256
+            minLength: 10
+            type: string
+            example: Hq2yP1B^Fho&zRHxHkEu
+        - name: reason
+          in: header
+          schema:
+            maxLength: 1024
+            minLength: 0
+            type: string
+      responses:
+        '200':
+          description: Empty
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '500':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '400':
+          description: ''
+    get:
+      tags:
+        - Account
+      summary: ''
+      operationId: GetAccount
+      responses:
+        '200':
+          description: Account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '404':
+          description: Error details
+  '/api/v1/Account/oauth/{providerName}':
+    post:
+      tags:
+        - Account
+      summary: Add a oauth connection to account
+      operationId: AddOAuthProvider
+      parameters:
+        - name: providerName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountOAuthAdd'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/AccountOAuthAdd'
+      responses:
+        '200':
+          description: Success
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    delete:
+      tags:
+        - Account
+      summary: Remove a oauth connection from account
+      operationId: RemoveOAuthProvider
+      parameters:
+        - name: providerName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/Account/recover-confirm:
+    post:
+      tags:
+        - Account
+      summary: Complete the password reset request using the token that was received in the users email
+      operationId: AccountRecoveryConfirm
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecoveryConfirm'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/RecoveryConfirm'
+      responses:
+        '200':
+          description: Ok
+        '404':
+          description: Error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/Account/recover:
+    post:
+      tags:
+        - Account
+      summary: 'Request password recovery of a account, a recovery email will be sent to the user that makes a call to the /recovery-confirm endpoint'
+      operationId: AccountRecoveryRequest
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecoveryRequest'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/RecoveryRequest'
+      responses:
+        '200':
+          description: Account
+  /api/v1/Account/email:
+    put:
+      tags:
+        - Account
+      summary: Updates the account email
+      operationId: UpdateEmail
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEmail'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/UpdateEmail'
+      responses:
+        '200':
+          description: New email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+        '400':
+          description: Error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/Account/password:
+    put:
+      tags:
+        - Account
+      summary: Updates the account password
+      operationId: UpdatePassword
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePassword'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/UpdatePassword'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+        '400':
+          description: Error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/Account/pfp:
+    put:
+      tags:
+        - Account
+      summary: Updates the account username
+      operationId: UpdateProfilePicture
+      requestBody:
+        content:
+          image/png:
+            schema:
+              type: string
+              description: payload
+              format: binary
+          image/jpeg:
+            schema:
+              type: string
+              description: payload
+              format: binary
+          image/webp:
+            schema:
+              type: string
+              description: payload
+              format: binary
+          image/gif:
+            schema:
+              type: string
+              description: payload
+              format: binary
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+        '400':
+          description: Error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '200':
+          description: New username
+  /api/v1/Account/username:
+    put:
+      tags:
+        - Account
+      summary: Updates the account username
+      operationId: UpdateUserName
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserName'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/UpdateUserName'
+      responses:
+        '200':
+          description: New username
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+        '400':
+          description: Error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/auth/oauth-providers:
+    get:
+      tags:
+        - Authentication
+      summary: ''
+      operationId: AuthGetOAuthProviders
+      responses:
+        '200':
+          description: Returns supported OAuth providers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProviderList'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/OAuthProviderList'
+  /api/v1/auth/signin:
+    post:
+      tags:
+        - Authentication
+      summary: ''
+      operationId: AuthSignIn
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthSignIn'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/AuthSignIn'
+      responses:
+        '200':
+          description: Returns SignInOk along with a Cookie with similar data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignInOk'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/SignInOk'
+        '400':
+          description: Error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '413':
+          description: Client Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '500':
+          description: Error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/auth/oauth-signin:
+    post:
+      tags:
+        - Authentication
+      summary: ''
+      operationId: AuthSignInOAuth
+      parameters:
+        - name: provider
+          in: query
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns SignInOk along with a Cookie with similar data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignInOk'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/SignInOk'
+        '403':
+          description: Error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '401':
+          description: Error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/auth/signout:
+    post:
+      tags:
+        - Authentication
+      summary: ''
+      operationId: AuthSignOut
+      responses:
+        '200':
+          description: Ok
+  /api/v1/config:
+    get:
+      tags:
+        - Config
+      summary: ''
+      operationId: GetConfig
+      responses:
+        '200':
+          description: Returns the service config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Config'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/health:
+    get:
+      tags:
+        - Health
+      summary: ''
+      operationId: GetHealth
+      responses:
+        '200':
+          description: Health status
+  '/api/v1/user/i/{userId}/friendrequest':
+    put:
+      tags:
+        - User
+      summary: Accept incoming friend request
+      operationId: AcceptFriendRequest
+      parameters:
+        - name: userId
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        '304':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    delete:
+      tags:
+        - User
+      summary: Delete outgoing/Reject incoming friend request
+      operationId: DenyFriendRequest
+      parameters:
+        - name: userId
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    post:
+      tags:
+        - User
+      summary: Send friend request
+      operationId: SendFriendRequest
+      parameters:
+        - name: userId
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: ''
+        '404':
+          description: ''
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/v1/user/friendrequests:
+    get:
+      tags:
+        - User
+      summary: List all incoming and outgoing friend requests
+      operationId: ListFriendRequests
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FriendRequestList'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FriendRequestList'
+  '/api/v1/user/i/{userId}':
+    get:
+      tags:
+        - User
+      summary: Get user
+      operationId: GetUser
+      parameters:
+        - name: userId
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  '/api/v1/user/u/{userName}':
+    get:
+      tags:
+        - User
+      summary: Look up user by name
+      operationId: LookUpUser
+      parameters:
+        - name: userName
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/user/report:
+    post:
+      tags:
+        - User
+      summary: Report a user
+      operationId: ReportUser
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserReport'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/UserReport'
+      responses:
+        '200':
+          description: ''
+        '404':
+          description: ''
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /ws:
+    get:
+      tags:
+        - WebSocket
+      summary: "Websocket endpoint for pub/sub communication (e.g. chat, notifications, events)\r\n\r\nDocumentation:\r\nYes"
+      responses:
+        '200':
+          description: Connection closed
+        '400':
+          description: This endpoint is purely just a websocket endpoint
+components:
+  schemas:
+    AccountDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ''
+          format: uuid
+        username:
+          type: string
+          description: ''
+          example: MyUsername
+        profile_picture_id:
+          type: string
+          description: ''
+          format: uuid
+        status:
+          $ref: '#/components/schemas/UserOnlineStatus'
+        status_text:
+          type: string
+          description: ''
+        created_at:
+          type: string
+          description: Date this account was created at
+          format: date-time
+        last_online:
+          type: string
+          description: Last time this user was online
+          format: date-time
+        email:
+          type: string
+          description: Obfuscated email of your account
+          format: email
+          example: user.name@example.com
+        email_verified:
+          type: boolean
+          description: True if email address has been verified
+        accepted_tos_version:
+          type: integer
+          description: ''
+          format: int32
+        friends:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Id of friends this account has
+        connected_accounts:
+          type: array
+          items:
+            type: string
+          description: OAuth2 providers this account is connected to
+      additionalProperties: false
+      description: 'Account object, this can only retrieved for the user you are logged in as'
+    AccountOAuthAdd:
+      type: object
+      properties:
+        oauth_code:
+          type: string
+      additionalProperties: false
+      description: Request sent to server to add a oauth connection to a account
+    ApiConfig:
+      type: object
+      properties:
+        version:
+          type: string
+          description: The current version of the API
+        tos_version:
+          type: integer
+          description: 'The current Terms of Service version, if the user has not accepted this version, they will be prompted to accept it'
+          format: int32
+        sentry_dsn:
+          type: string
+          description: "The DSN for Sentry, used for error reporting\r\nIf this is null, Sentry reporting is disabled"
+          format: uri
+          nullable: true
+        sentry_trace_sample_rate:
+          type: number
+          description: 'Trace sample rate for Sentry, used for performance monitoring'
+          format: double
+        authentication:
+          $ref: '#/components/schemas/AuthenticationConfig'
+        disabled_features:
+          $ref: '#/components/schemas/ApiDisabledFeatures'
+      additionalProperties: false
+    ApiDisabledFeatures:
+      type: object
+      properties:
+        webrtc:
+          type: boolean
+          description: 'If true, WebRTC is disabled'
+        websockets:
+          type: boolean
+          description: 'If true, WebSockets are disabled'
+        endpoints:
+          type: array
+          items:
+            type: string
+          description: 'List of disabled endpoints, if an endpoint is in this list, it will return a "503 Service Unavailable"'
+      additionalProperties: false
+    AppConfig:
+      type: object
+      properties:
+        version:
+          type: string
+          description: 'The current version of the App, if the local version is lower than this, the user will be notified of an update'
+      additionalProperties: false
+    AuthSignIn:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Username or email address
+          example: MyUsername
+        password:
+          type: string
+          description: Password
+          example: Hq2yP1B^Fho&zRHxHkEu
+        sessionName:
+          maxLength: 32
+          minLength: 1
+          type: string
+          description: "Session name to remember this sign in by, e.g. \"My home computer\"\r\nThis is for the users to be able to see which devices they have logged in their user settings"
+          nullable: true
+        rememberMe:
+          type: boolean
+          description: Make this login persist for a longer period of time
+      additionalProperties: false
+      description: Message sent to server to authenticate user using username and password
+    AuthenticationConfig:
+      type: object
+      properties:
+        google_client_id:
+          type: string
+          description: 'Google Client ID for OAuth, if null, Google login will be disabled'
+          nullable: true
+        github_client_id:
+          type: string
+          description: 'Github Client ID for OAuth, if null, Github login will be disabled'
+          nullable: true
+        recaptcha_site_key:
+          type: string
+          description: 'ReCaptcha Client ID for bot detection, if null, ReCaptcha will be disabled'
+          nullable: true
+      additionalProperties: false
+    CommunityConfig:
+      type: object
+      properties:
+        discord_invite_uri:
+          type: string
+          description: Invite uri to the community discord server
+          format: uri
+        socials:
+          type: array
+          items:
+            $ref: '#/components/schemas/SocialEntry'
+          description: Social media links to project founder's accounts
+      additionalProperties: false
+    Config:
+      type: object
+      properties:
+        name:
+          type: string
+          description: 'Name of the product, e.g. "ZapMe"'
+        app:
+          $ref: '#/components/schemas/AppConfig'
+        api:
+          $ref: '#/components/schemas/ApiConfig'
+        contact:
+          $ref: '#/components/schemas/ContactConfig'
+        community:
+          $ref: '#/components/schemas/CommunityConfig'
+      additionalProperties: false
+    ContactConfig:
+      type: object
+      properties:
+        support:
+          type: string
+          format: email
+          example: user.name@example.com
+        contact:
+          type: string
+          format: email
+          example: user.name@example.com
+      additionalProperties: false
+    Create:
+      type: object
+      properties:
+        username:
+          maxLength: 32
+          minLength: 3
+          pattern: '^[^\s].*[^\s]$'
+          type: string
+          description: ''
+          example: MyUsername
+        password:
+          maxLength: 256
+          minLength: 10
+          type: string
+          description: ''
+          example: Hq2yP1B^Fho&zRHxHkEu
+        email:
+          type: string
+          description: ''
+          format: email
+          example: user.name@example.com
+        acceptedTosVersion:
+          type: integer
+          description: ''
+          format: int32
+        recaptcha_response:
+          type: string
+          description: Response from google recaptcha request
+      additionalProperties: false
+      description: Message sent to server to create a new account
+    ErrorDetails:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title for developer to understand what went wrong (not user friendly)
+        detail:
+          type: string
+          description: More detailed description of what this error is about (not user friendly)
+        traceId:
+          type: string
+          description: ''
+        suggestion:
+          type: string
+          description: Suggestion to developer on how they might be able to midegate this error
+          nullable: true
+        fields:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+            nullable: true
+          description: Errors for specific fields in the request
+          nullable: true
+        notification:
+          $ref: '#/components/schemas/UserNotification'
+      additionalProperties: false
+      description: Details about the error
+    FriendRequestList:
+      type: object
+      properties:
+        incoming:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: UserId's of users that has sent friend requests to this account
+        outgoing:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: UserId's of users that this account has sent friend requests to
+      additionalProperties: false
+      description: List of incoming and outgoing friendrequests
+    IconSource:
+      enum:
+        - uri
+        - emoji
+        - googleMaterialDesign
+      type: string
+      description: "The source of an icon, this is used to determine how to fetch the icon\r\n- uri: The icon is a URI to an image\r\n- emoji: The icon is an emoji\r\n- google: The icon is a Google Material Design icon name (https://fonts.google.com/icons)"
+    OAuthProviderList:
+      type: object
+      properties:
+        providers:
+          type: array
+          items:
+            type: string
+          description: ''
+      additionalProperties: false
+      description: ''
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          nullable: true
+        title:
+          type: string
+          nullable: true
+        status:
+          type: integer
+          format: int32
+          nullable: true
+        detail:
+          type: string
+          nullable: true
+        instance:
+          type: string
+          nullable: true
+      additionalProperties: { }
+    RecoveryConfirm:
+      type: object
+      properties:
+        new_password:
+          maxLength: 256
+          minLength: 10
+          type: string
+          description: The new password to set
+          example: Hq2yP1B^Fho&zRHxHkEu
+        token:
+          type: string
+          description: The token sent to the user's email address
+      additionalProperties: false
+      description: Request sent to server to commit a password reset
+    RecoveryRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email of your account you want to recover
+          format: email
+          example: user.name@example.com
+        recaptcha_response:
+          type: string
+          description: Response from google recaptcha request
+      additionalProperties: false
+      description: Request sent to server to request a password reset token
+    SeverityLevel:
+      enum:
+        - info
+        - warning
+        - error
+      type: string
+    SignInOk:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          description: ''
+          format: uuid
+        issuedAtUtc:
+          type: string
+          description: ''
+          format: date-time
+        expiresAtUtc:
+          type: string
+          description: ''
+          format: date-time
+      additionalProperties: false
+      description: ''
+    SocialEntry:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the social platform
+        uri:
+          type: string
+          description: Uri to the target page on the platform
+          format: uri
+        icon_type:
+          $ref: '#/components/schemas/IconSource'
+        icon:
+          type: string
+          description: 'The icon URI, fetched from source defined by ZapMe.Controllers.Api.V1.Config.Models.SocialEntry.IconSource'
+      additionalProperties: false
+    UpdateEmail:
+      type: object
+      properties:
+        new_email:
+          type: string
+          description: ''
+          format: email
+          example: user.name@example.com
+        password:
+          type: string
+          description: ''
+          example: Hq2yP1B^Fho&zRHxHkEu
+      additionalProperties: false
+      description: Request sent to server to update account email address
+    UpdatePassword:
+      type: object
+      properties:
+        new:
+          maxLength: 256
+          minLength: 10
+          type: string
+          description: ''
+          example: Hq2yP1B^Fho&zRHxHkEu
+        old:
+          type: string
+          description: ''
+          example: Hq2yP1B^Fho&zRHxHkEu
+      additionalProperties: false
+      description: Request sent to server to update account password
+    UpdateUserName:
+      type: object
+      properties:
+        new_username:
+          maxLength: 32
+          minLength: 3
+          pattern: '^[^\s].*[^\s]$'
+          type: string
+          description: ''
+          example: MyUsername
+        password:
+          type: string
+          description: ''
+          example: Hq2yP1B^Fho&zRHxHkEu
+      additionalProperties: false
+      description: Request sent to server to update account username
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ''
+          format: uuid
+        username:
+          type: string
+          description: ''
+          example: MyUsername
+        profile_picture_id:
+          type: string
+          description: ''
+          format: uuid
+        status:
+          $ref: '#/components/schemas/UserOnlineStatus'
+        status_text:
+          type: string
+          description: ''
+        created_at:
+          type: string
+          description: Date this account was created at
+          format: date-time
+        last_online:
+          type: string
+          description: Last time this user was online
+          format: date-time
+      additionalProperties: false
+    UserNotification:
+      type: object
+      properties:
+        severity:
+          $ref: '#/components/schemas/SeverityLevel'
+        title:
+          type: string
+          description: Message title to display to the user
+        message:
+          type: string
+          description: User friendly message about this notification
+          nullable: true
+      additionalProperties: false
+      description: "System notification to be displayed to the user, do not confuse with user notifications\r\nThis is a hint and clients can choose to ignore it or implement notifications to be independent of this"
+    UserOnlineStatus:
+      enum:
+        - offline
+        - doNotDisturb
+        - inactive
+        - online
+        - downBad
+      type: string
+    UserReport:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          description: ''
+        explenation:
+          type: string
+          description: ''
+      additionalProperties: false
+      description: Message sent to server to report a user

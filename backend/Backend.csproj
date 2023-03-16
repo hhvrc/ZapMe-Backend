@@ -54,9 +54,12 @@
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     <PackageReference Include="UAParser" Version="3.1.47" />
   </ItemGroup>
-  
+  <Target Name="openapi" AfterTargets="Build">
+	<Message Text="generating openapi" Importance="high" />
+	<Exec Command="dotnet tool run swagger tofile --yaml --output $(ProjectDir)..\api\openapi.yaml $(OutputPath)$(AssemblyName).dll v1" />
+  </Target>
   <Target Name="fbs-copy" AfterTargets="Build">
     <Message Text="Copying Flatbuffer Schemas" Importance="high" />
-    <Copy SourceFiles="@(FlatSharpSchema)" DestinationFolder="$(ProjectDir)..\frontend\api\flatbuffer-schemas" />
+    <Copy SourceFiles="@(FlatSharpSchema)" DestinationFolder="$(ProjectDir)..\api\flatbuffer-schemas" />
   </Target>
 </Project>
