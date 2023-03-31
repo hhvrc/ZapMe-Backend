@@ -24,17 +24,22 @@ AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMill
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 IWebHostEnvironment env = builder.Environment;
-ILoggingBuilder logging = builder.Logging;
 IServiceCollection services = builder.Services;
-IConfiguration configuration = builder.Configuration;
 bool isDevelopment = env.IsDevelopment();
+
+// ########################################
+// ######## CONFIGURE CONFIGURATION #######
+// ########################################
+
+builder.Configuration.AddUserSecrets<Program>();
+IConfiguration configuration = builder.Configuration;
 
 // ########################################
 // ######## CONFIGURE LOGGING #############
 // ########################################
 
 IdentityModelEventSource.ShowPII = isDevelopment;
-logging.AddSimpleConsole(opt =>
+builder.Logging.AddSimpleConsole(opt =>
 {
     opt.IncludeScopes = true;
     opt.SingleLine = false;
