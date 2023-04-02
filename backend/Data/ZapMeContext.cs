@@ -23,14 +23,14 @@ public sealed class ZapMeContext : DbContext
     {
         modelBuilder.UseHiLo();
 
-        new AccountEntityConfiguration().Configure(modelBuilder.Entity<AccountEntity>());
-        new ImageEntityConfiguration().Configure(modelBuilder.Entity<ImageEntity>());
-        new SessionEntityConfiguration().Configure(modelBuilder.Entity<SessionEntity>());
-        new LockOutEntityConfiguration().Configure(modelBuilder.Entity<LockOutEntity>());
-        new UserRoleEntityConfiguration().Configure(modelBuilder.Entity<UserRoleEntity>());
-        new UserAgentEntityConfiguration().Configure(modelBuilder.Entity<UserAgentEntity>());
-        new UserRelationEntityConfiguration().Configure(modelBuilder.Entity<UserRelationEntity>());
-        new FriendRequestEntityConfiguration().Configure(modelBuilder.Entity<FriendRequestEntity>());
-        new OAuthConnectionEntityConfiguration().Configure(modelBuilder.Entity<OAuthConnectionEntity>());
+        modelBuilder.ApplyConfiguration(new AccountEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ImageEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new SessionEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new LockOutEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new UserRoleEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new UserAgentEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new UserRelationEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new FriendRequestEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new OAuthConnectionEntityConfiguration());
     }
 }
