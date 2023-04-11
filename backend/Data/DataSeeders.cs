@@ -97,8 +97,6 @@ public static class DataSeeders
                 ProfilePictureId = _DefaultImageId,
                 OnlineStatus = UserOnlineStatus.Online,
                 OnlineStatusText = "I'm online!",
-                PasswordResetToken = null,
-                PasswordResetRequestedAt = null,
                 CreatedAt = _CreationTime,
                 UpdatedAt = _CreationTime,
                 LastOnline = _CreationTime,

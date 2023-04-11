@@ -30,7 +30,7 @@ public sealed class UsernameAttribute : ValidationAttribute, IParameterAttribute
     {
         if (!ShouldValidate) return ValidationResult.Success;
 
-        if (value is null)
+        if (value == null)
         {
             return ValidationResult.Success;
         }

@@ -5,9 +5,9 @@ namespace ZapMe.Data.Models;
 
 public sealed class UserRoleEntity
 {
-    public static string TableName => "userRoles";
-    public static string TableUserIdIndex => "userRoles_userId_idx";
-    public static string TableRoleNameIndex => "userRoles_roleName_idx";
+    public const string TableName = "userRoles";
+    public const string TableUserIdIndex = TableName + "_userId_idx";
+    public const string TableRoleNameIndex = TableName + "_roleName_idx";
 
     /// <summary>
     /// 

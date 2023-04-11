@@ -4,7 +4,7 @@ using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Services;
 
-public class FriendRequestStore : IFriendRequestStore
+public sealed class FriendRequestStore : IFriendRequestStore
 {
     private readonly ZapMeContext _dbContext;
     private readonly ILogger<FriendRequestStore> _logger;

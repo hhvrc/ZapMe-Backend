@@ -50,14 +50,6 @@ public interface IAccountStore
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="passwordResetToken"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    Task<AccountEntity?> GetByPasswordResetTokenAsync(string passwordResetToken, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// 
-    /// </summary>
     /// <param name="userId"></param>
     /// <param name="userName"></param>
     /// <param name="cancellationToken"></param>
@@ -107,13 +99,4 @@ public interface IAccountStore
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<bool> DeleteAsync(Guid userId, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="token"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    Task<bool> SetPasswordResetTokenAsync(Guid userId, string? token, CancellationToken cancellationToken);
 }

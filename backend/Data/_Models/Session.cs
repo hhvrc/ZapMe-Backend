@@ -6,7 +6,7 @@ namespace ZapMe.Data.Models;
 
 public sealed class SessionEntity
 {
-    public static string TableName => "sessions";
+    public const string TableName = "sessions";
 
     /// <summary>
     /// 

@@ -16,7 +16,6 @@ public sealed class SessionStore : ISessionStore
         _logger = logger;
     }
 
-
     public async Task<SessionEntity> CreateAsync(AccountEntity account, string? sessionName, string ipAddress, string countryCode, UserAgentEntity userAgent, DateTime expiresAt, CancellationToken cancellationToken)
     {
         SessionEntity session = new SessionEntity

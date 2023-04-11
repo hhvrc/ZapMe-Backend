@@ -9,7 +9,7 @@ public sealed class UtilTests
     {
         for (int i = 0; i < 1000; i++)
         {
-            Assert.Equal(32, StringUtils.GenerateRandomString(32).Length);
+            Assert.Equal(32, StringUtils.GenerateUrlSafeRandomString(32).Length);
         }
     }
 }

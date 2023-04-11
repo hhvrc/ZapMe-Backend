@@ -27,7 +27,7 @@ public sealed class SessionManager : ISessionManager
     public async Task<bool> IsValidSessionAsync(Guid sessionId, CancellationToken cancellationToken)
     {
         SessionEntity? session = await SessionStore.GetByIdAsync(sessionId, cancellationToken);
-        if (session is null)
+        if (session == null)
         {
             return false;
         }

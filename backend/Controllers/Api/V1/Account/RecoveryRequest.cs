@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ZapMe.Constants;
-using ZapMe.Data.Models;
+using ZapMe.DTOs;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;
@@ -14,8 +13,8 @@ public partial class AccountController
     /// Request password recovery of a account, a recovery email will be sent to the user that makes a call to the /recovery-confirm endpoint
     /// </summary>
     /// <param name="body"></param>
-    /// <param name="emailTemplateStore"></param>
-    /// <param name="mailServiceProvider"></param>
+    /// <param name="googleReCaptchaService"></param>
+    /// <param name="passwordResetRequestManager"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <response code="200">Account</response>
@@ -24,35 +23,33 @@ public partial class AccountController
     [HttpPost("recover", Name = "AccountRecoveryRequest")]
     [Consumes(Application.Json, Application.Xml)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> RecoveryRequest([FromBody] Account.Models.RecoveryRequest body, [FromServices] IMailTemplateStore emailTemplateStore, [FromServices] IMailGunService mailServiceProvider, CancellationToken cancellationToken)
+    public async Task<IActionResult> RecoveryRequest([FromBody] Account.Models.RecoveryRequest body, [FromServices] IGoogleReCaptchaService googleReCaptchaService, [FromServices] IPasswordResetRequestManager passwordResetRequestManager, CancellationToken cancellationToken)
     {
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(1, cancellationToken);
 
-        AccountEntity? account = await _accountManager.GetByEmailAsync(body.Email, cancellationToken);
-
-        if (account != null)
+        GoogleReCaptchaVerifyResponse reCaptchaResponse = await googleReCaptchaService.VerifyUserResponseTokenAsync(body.ReCaptchaResponse, this.GetRemoteIP(), cancellationToken);
+        if (!reCaptchaResponse.Success)
         {
-            // Create/Overwrite recovery secret
-            string? passwordResetToken = await _accountManager.GeneratePasswordResetTokenAsync(account.Id, cancellationToken);
-            if (passwordResetToken != null)
+            if (reCaptchaResponse.ErrorCodes != null)
             {
-                string? emailTemplate = await emailTemplateStore.GetTemplateAsync(EmailTemplateNames.PasswordReset, cancellationToken);
-                if (emailTemplate is null)
-                    throw new NullReferenceException("Email template not found");
-
-                string formattedEmail = new QuickStringReplacer(emailTemplate)
-                    .Replace("{{UserName}}", account.Name)
-                    .Replace("{{ResetPasswordUrl}}", App.WebsiteUrl + "/reset-password?token=" + passwordResetToken)
-                    .Replace("{{CompanyName}}", App.AppCreator)
-                    .Replace("{{CompanyAddress}}", App.MadeInText)
-                    .Replace("{{PoweredBy}}", App.AppName)
-                    .Replace("{{PoweredByLink}}", App.WebsiteUrl)
-                    .ToString();
-
-                // Send recovery secret to email
-                await mailServiceProvider.SendEmailAsync("Hello", account.Name, account.Email, "Password recovery", formattedEmail, cancellationToken);
+                foreach (string errorCode in reCaptchaResponse.ErrorCodes)
+                {
+                    switch (errorCode)
+                    {
+                        case "invalid-input-response":
+                            return this.Error_InvalidModelState((nameof(body.ReCaptchaResponse), "Invalid ReCaptcha Response"));
+                        case "timeout-or-duplicate":
+                            return this.Error_InvalidModelState((nameof(body.ReCaptchaResponse), "ReCaptcha Response Expired or Already Used"));
+                        default:
+                            break;
+                    };
+                }
             }
+
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
+
+        bool success = await passwordResetRequestManager.InitiatePasswordReset(body.Email, cancellationToken);
 
         return Ok();
     }

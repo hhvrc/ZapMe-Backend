@@ -84,7 +84,7 @@ public static class QuartzTimer
 /// This attribute must be put on a class that inherits from IJob, and will automatically get registered if ZMAddQuartz() has been ran in the service builder
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-public class QuartzTimerAttribute : Attribute
+public sealed class QuartzTimerAttribute : Attribute
 {
     public string TriggerName { get; }
     public string CronExpression { get; }

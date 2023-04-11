@@ -5,7 +5,7 @@ namespace ZapMe.Authentication.Models;
 /// <summary>
 /// 
 /// </summary>
-public class SignInOk
+public sealed class SignInOk
 {
     /// <summary>
     /// 

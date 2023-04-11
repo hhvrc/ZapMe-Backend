@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace ZapMe.ActionFilters;
 
-public class DisabledEndpointFilter : ActionFilterAttribute
+public sealed class DisabledEndpointFilter : ActionFilterAttribute
 {
     public string EndpointName { get; set; }
 

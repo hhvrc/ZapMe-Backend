@@ -4,7 +4,12 @@ namespace ZapMe.Utils;
 
 public static class StringUtils
 {
-    public static string GenerateRandomString(int length)
+    /// <summary>
+    /// Generates a random string of <paramref name="length"/> length, consisting of these characters: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_
+    /// </summary>
+    /// <param name="length">Length of the generated string</param>
+    /// <returns></returns>
+    public static string GenerateUrlSafeRandomString(int length)
     {
         const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
 

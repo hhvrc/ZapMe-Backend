@@ -101,11 +101,6 @@ public sealed class AccountStore : IAccountStore
         return _dbContext.Accounts.FirstOrDefaultAsync(u => u.Name == userNameOrEmail || u.Email == userNameOrEmail, cancellationToken);
     }
 
-    public Task<AccountEntity?> GetByPasswordResetTokenAsync(string passwordResetToken, CancellationToken cancellationToken)
-    {
-        return _dbContext.Accounts.FirstOrDefaultAsync(u => u.PasswordResetToken == passwordResetToken, cancellationToken);
-    }
-
     private async Task<bool> UpdateAsync(Expression<Func<AccountEntity, bool>> whereSelector, Expression<Func<SetPropertyCalls<AccountEntity>, SetPropertyCalls<AccountEntity>>> setPropertyCalls, CancellationToken cancellationToken)
     {
         return (await _dbContext.Accounts.Where(whereSelector).ExecuteUpdateAsync(setPropertyCalls, cancellationToken)) > 0;
@@ -125,16 +120,6 @@ public sealed class AccountStore : IAccountStore
         UpdateAsync(userId, s => s.SetProperty(static u => u.PasswordHash, _ => passwordHash).SetProperty(static u => u.UpdatedAt, _ => DateTime.UtcNow), cancellationToken);
     public Task<bool> SetLastOnlineAsync(Guid userId, DateTime lastOnline, CancellationToken cancellationToken) =>
         UpdateAsync(userId, s => s.SetProperty(static u => u.LastOnline, _ => lastOnline), cancellationToken);
-
-    public Task<bool> SetPasswordResetTokenAsync(Guid userId, string? token, CancellationToken cancellationToken)
-    {
-        DateTime? createdAt = String.IsNullOrEmpty(token) ? null : DateTime.UtcNow;
-
-        return UpdateAsync(userId, s => s.
-                        SetProperty(static u => u.PasswordResetToken, _ => token).
-                        SetProperty(static u => u.PasswordResetRequestedAt, _ => createdAt),
-                        cancellationToken);
-    }
 
     public async Task<bool> DeleteAsync(Guid userId, CancellationToken cancellationToken)
     {

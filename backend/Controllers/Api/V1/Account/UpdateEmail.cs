@@ -32,7 +32,7 @@ public partial class AccountController
             return this.Error_InvalidPassword();
         }
 
-        await _accountManager.SetEmailAsync(identity.AccountId, body.NewEmail, cancellationToken);
+        await _accountManager.Store.SetEmailAsync(identity.AccountId, body.NewEmail, cancellationToken);
 
         return Ok();
     }

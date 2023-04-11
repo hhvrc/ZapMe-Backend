@@ -5,7 +5,7 @@ namespace ZapMe.Data.Models;
 
 public sealed class LockOutEntity
 {
-    public static string TableName => "lockOuts";
+    public const string TableName = "lockOuts";
 
     /// <summary>
     /// 

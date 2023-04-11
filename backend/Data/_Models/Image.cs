@@ -5,7 +5,7 @@ namespace ZapMe.Data.Models;
 
 public sealed class ImageEntity
 {
-    public static string TableName => "images";
+    public const string TableName = "images";
 
     /// <summary>
     /// 

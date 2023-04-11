@@ -21,7 +21,7 @@ public partial class UserController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)] // User not found
     public async Task<IActionResult> Get([FromRoute] Guid userId, CancellationToken cancellationToken)
     {
-        var account = await _userManager.GetByIdAsync(userId, cancellationToken);
+        var account = await _accountManager.Store.GetByIdAsync(userId, cancellationToken);
 
         if (account == null)
         {

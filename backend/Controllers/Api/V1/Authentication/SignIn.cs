@@ -18,8 +18,8 @@ public partial class AuthenticationController
     /// 
     /// </summary>
     /// <param name="body"></param>
-    /// <param name="userManager"></param>
-    /// <param name="lockOutManager"></param>
+    /// <param name="userStore"></param>
+    /// <param name="lockOutStore"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>The user account</returns>
     /// <response code="200">Returns SignInOk along with a Cookie with similar data</response>
@@ -35,7 +35,7 @@ public partial class AuthenticationController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status413RequestEntityTooLarge)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] IAccountManager userManager, [FromServices] ILockOutManager lockOutManager, CancellationToken cancellationToken)
+    public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] IAccountStore userStore, [FromServices] ILockOutStore lockOutStore, CancellationToken cancellationToken)
     {
         if (User.Identity?.IsAuthenticated ?? false)
         {
@@ -44,7 +44,7 @@ public partial class AuthenticationController
 
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
 
-        AccountEntity? account = await userManager.GetByNameAsync(body.Username, cancellationToken) ?? await userManager.GetByEmailAsync(body.Username, cancellationToken);
+        AccountEntity? account = await userStore.GetByNameAsync(body.Username, cancellationToken) ?? await userStore.GetByEmailAsync(body.Username, cancellationToken);
         if (account == null)
         {
             return this.Error_InvalidCredentials("Invalid username/password", "Please check that your entered username and password are correct", "username", "password");
@@ -55,7 +55,7 @@ public partial class AuthenticationController
             return this.Error_InvalidCredentials("Invalid username/password", "Please check that your entered username and password are correct", "username", "password");
         }
 
-        LockOutEntity[] lockouts = await lockOutManager.ListByUserIdAsync(account.Id).ToArrayAsync(cancellationToken);
+        LockOutEntity[] lockouts = await lockOutStore.ListByUserIdAsync(account.Id).ToArrayAsync(cancellationToken);
         if (lockouts.Any())
         {
             string reason = "Please contact support for more information";
