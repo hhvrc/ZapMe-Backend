@@ -39,7 +39,7 @@ public partial class AccountController
             return this.Error_InvalidPassword();
         }
 
-        await _accountManager.DeleteAsync(identity.AccountId, cancellationToken);
+        await _accountManager.Store.DeleteAsync(identity.AccountId, cancellationToken);
 
         // TODO: register reason if supplied
 

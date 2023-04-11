@@ -48,7 +48,7 @@ public sealed class PasswordResetRequestManager : IPasswordResetRequestManager
 
     public async Task<bool> InitiatePasswordReset(Guid accountId, CancellationToken cancellationToken)
     {
-        AccountEntity? accountEntity = await _accountManager.GetByIdAsync(accountId, cancellationToken);
+        AccountEntity? accountEntity = await _accountManager.Store.GetByIdAsync(accountId, cancellationToken);
         if (accountEntity == null) return false;
 
         return await InitiatePasswordReset(accountEntity, cancellationToken);
@@ -56,7 +56,7 @@ public sealed class PasswordResetRequestManager : IPasswordResetRequestManager
 
     public async Task<bool> InitiatePasswordReset(string accountEmail, CancellationToken cancellationToken)
     {
-        AccountEntity? accountEntity = await _accountManager.GetByEmailAsync(accountEmail, cancellationToken);
+        AccountEntity? accountEntity = await _accountManager.Store.GetByEmailAsync(accountEmail, cancellationToken);
         if (accountEntity == null) return false;
 
         return await InitiatePasswordReset(accountEntity, cancellationToken);

@@ -32,7 +32,7 @@ public partial class AccountController
             return this.Error_InvalidPassword();
         }
 
-        await _accountManager.SetNameAsync(identity.AccountId, body.NewUserName, cancellationToken);
+        await _accountManager.Store.SetUserNameAsync(identity.AccountId, body.NewUserName, cancellationToken);
 
         return Ok();
     }
