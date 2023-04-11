@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ZapMe.Constants;
-using ZapMe.Data.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;

@@ -24,25 +24,25 @@
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.0" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.5" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.103.37" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.101.36" />
-    <PackageReference Include="AWSSDK.SQS" Version="3.7.100.100" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.103.47" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.101.46" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.7.100.110" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="FlatSharp.Compiler" Version="7.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="FlatSharp.Runtime" Version="7.1.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="7.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="7.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.4">
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="7.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="7.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.IdentityModel.Logging" Version="6.27.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Logging" Version="6.28.1" />
     <PackageReference Include="MimeTypesMap" Version="1.0.8" />
     <PackageReference Include="NetMQ" Version="4.0.1.11" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.3" />

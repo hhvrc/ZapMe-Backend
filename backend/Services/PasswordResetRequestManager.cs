@@ -1,5 +1,4 @@
 ﻿using ZapMe.Constants;
-using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data.Models;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
@@ -26,7 +25,7 @@ public sealed class PasswordResetRequestManager : IPasswordResetRequestManager
 
     public async Task<bool> InitiatePasswordReset(AccountEntity account, CancellationToken cancellationToken)
     {
-        string token = StringUtils.GenerateRandomString(16);
+        string token = StringUtils.GenerateUrlSafeRandomString(16);
         string tokenHash = HashingUtils.Sha256_String(token);
 
         await _passwordResetRequestStore.UpsertAsync(account.Id, tokenHash, cancellationToken);
