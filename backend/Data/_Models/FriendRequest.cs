@@ -5,7 +5,7 @@ namespace ZapMe.Data.Models;
 
 public sealed class FriendRequestEntity
 {
-    public static string TableName => "friendRequests";
+    public const string TableName = "friendRequests";
 
     /// <summary>
     /// 

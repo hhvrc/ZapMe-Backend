@@ -8,10 +8,10 @@ public interface IPasswordResetRequestStore
     /// 
     /// </summary>
     /// <param name="accountId"></param>
-    /// <param name="token"></param>
+    /// <param name="tokenHash"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<PasswordResetRequestEntity?> UpsertAsync(Guid accountId, string token, CancellationToken cancellationToken = default);
+    public Task<PasswordResetRequestEntity> UpsertAsync(Guid accountId, string tokenHash, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -24,18 +24,10 @@ public interface IPasswordResetRequestStore
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="token"></param>
+    /// <param name="tokenHash"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<PasswordResetRequestEntity?> GetByTokenAsync(string token, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="token"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public Task<PasswordResetRequestEntity?> TakeByTokenAsync(string token, CancellationToken cancellationToken = default);
+    public Task<PasswordResetRequestEntity?> GetByTokenHashAsync(string tokenHash, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -48,10 +40,10 @@ public interface IPasswordResetRequestStore
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="token"></param>
+    /// <param name="tokenHash"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<bool> DeleteByTokenAsync(string token, CancellationToken cancellationToken = default);
+    public Task<bool> DeleteByTokenHashAsync(string tokenHash, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 

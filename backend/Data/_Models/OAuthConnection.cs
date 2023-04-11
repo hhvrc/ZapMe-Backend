@@ -5,7 +5,7 @@ namespace ZapMe.Data.Models;
 
 public sealed class OAuthConnectionEntity
 {
-    public static string TableName => "oauthConnections";
+    public const string TableName = "oauthConnections";
 
     /// <summary>
     /// 

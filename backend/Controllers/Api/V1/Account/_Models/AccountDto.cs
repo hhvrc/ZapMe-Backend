@@ -8,7 +8,7 @@ namespace ZapMe.Controllers.Api.V1.Account.Models;
 /// <summary>
 /// Account object, this can only retrieved for the user you are logged in as
 /// </summary>
-public class AccountDto : UserDto
+public sealed class AccountDto : UserDto
 {
     public AccountDto(Data.Models.AccountEntity user)
         : base(user)

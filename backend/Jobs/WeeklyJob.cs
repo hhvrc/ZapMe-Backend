@@ -7,7 +7,7 @@ namespace ZapMe.Jobs;
 /// For now, this is just a example/placeholder for the weekly job.
 /// </summary>
 [QuartzTimer("WeeklyJob", QuartzTimer.Predefined.Weekly)]
-public class WeeklyJob : IJob
+public sealed class WeeklyJob : IJob
 {
     private readonly ILogger<WeeklyJob> _logger;
 

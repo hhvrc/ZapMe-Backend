@@ -2,7 +2,7 @@
 
 namespace ZapMe.Controllers.Api.V1.Config.Models;
 
-public class Config
+public sealed class Config
 {
     /// <summary>
     /// Name of the product, e.g. "ZapMe"

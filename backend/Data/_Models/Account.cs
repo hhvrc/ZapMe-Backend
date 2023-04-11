@@ -6,10 +6,9 @@ namespace ZapMe.Data.Models;
 
 public sealed class AccountEntity
 {
-    public static string TableName => "accounts";
-    public static string TableAccountNameIndex => "accounts_name_idx";
-    public static string TableAccountEmailIndex => "accounts_email_idx";
-    public static string TablePasswordResetTokenIndex => "accounts_passwordResetToken_idx";
+    public const string TableName = "accounts";
+    public const string TableAccountNameIndex = TableName + "_name_idx";
+    public const string TableAccountEmailIndex = TableName + "_email_idx";
 
     /// <summary>
     /// 

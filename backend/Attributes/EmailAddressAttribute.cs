@@ -27,7 +27,7 @@ public sealed class EmailAddressAttribute : ValidationAttribute, IParameterAttri
     {
         if (!ShouldValidate) return ValidationResult.Success;
 
-        if (value is null)
+        if (value == null)
         {
             return ValidationResult.Success;
         }

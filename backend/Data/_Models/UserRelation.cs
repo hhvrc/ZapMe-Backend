@@ -12,7 +12,7 @@ public enum UserRelationType
 
 public sealed class UserRelationEntity
 {
-    public static string TableName => "userRelations";
+    public const string TableName = "userRelations";
 
     /// <summary>
     /// 

@@ -3,7 +3,7 @@ using ZapMe.Data.Models;
 
 namespace ZapMe.Authentication;
 
-public class ZapMeIdentity : ClaimsIdentity
+public sealed class ZapMeIdentity : ClaimsIdentity
 {
     public ZapMeIdentity(SessionEntity session) : base(ZapMeAuthenticationDefaults.AuthenticationScheme)
     {

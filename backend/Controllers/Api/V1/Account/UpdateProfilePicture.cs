@@ -27,7 +27,7 @@ public partial class AccountController
     public async Task<IActionResult> Update([FromServices] IAmazonS3 s3Client, CancellationToken cancellationToken)
     {
         long? length = Request.ContentLength;
-        if (length is null)
+        if (length == null)
         {
             return BadRequest();
         }
@@ -37,7 +37,7 @@ public partial class AccountController
         }
 
         string? contentType = Request.ContentType;
-        if (contentType is null)
+        if (contentType == null)
         {
             return BadRequest();
         }

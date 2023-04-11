@@ -16,24 +16,26 @@ public sealed class PasswordResetRequestStore : IPasswordResetRequestStore
         _logger = logger;
     }
 
-    public async Task<PasswordResetRequestEntity?> UpsertAsync(Guid accountId, string token, CancellationToken cancellationToken)
+    public async Task<PasswordResetRequestEntity> UpsertAsync(Guid accountId, string tokenHash, CancellationToken cancellationToken)
     {
+        if (tokenHash.Length != 32) throw new ArgumentException("Tokenhash should be 32 characters ( hex of sha256 digest )", nameof(tokenHash));
+
         PasswordResetRequestEntity? request = await _dbContext.PasswordResetRequests.AsTracking().FirstOrDefaultAsync(s => s.AccountId == accountId, cancellationToken);
 
-        if (request is null)
+        if (request == null)
         {
             request = new PasswordResetRequestEntity
             {
                 AccountId = accountId,
                 Account = null!,
-                Token = token
+                TokenHash = tokenHash
             };
 
             await _dbContext.PasswordResetRequests.AddAsync(request, cancellationToken);
         }
         else
         {
-            request.Token = token;
+            request.TokenHash = tokenHash;
             request.CreatedAt = DateTime.UtcNow;
 
             _dbContext.PasswordResetRequests.Update(request);
@@ -56,11 +58,11 @@ public sealed class PasswordResetRequestStore : IPasswordResetRequestStore
             .FirstOrDefaultAsync(s => s.AccountId == accountId, cancellationToken);
     }
 
-    public Task<PasswordResetRequestEntity?> GetByTokenAsync(string token, CancellationToken cancellationToken = default)
+    public Task<PasswordResetRequestEntity?> GetByTokenHashAsync(string tokenHash, CancellationToken cancellationToken = default)
     {
         return _dbContext.PasswordResetRequests
             .Include(static s => s.Account)
-            .FirstOrDefaultAsync(s => s.Token == token, cancellationToken);
+            .FirstOrDefaultAsync(s => s.TokenHash == tokenHash, cancellationToken);
     }
 
     public async Task<bool> DeleteByAccountIdAsync(Guid accountId, CancellationToken cancellationToken)
@@ -68,9 +70,9 @@ public sealed class PasswordResetRequestStore : IPasswordResetRequestStore
         return await _dbContext.PasswordResetRequests.Where(s => s.AccountId == accountId).ExecuteDeleteAsync(cancellationToken) > 0;
     }
 
-    public async Task<bool> DeleteByTokenAsync(string token, CancellationToken cancellationToken)
+    public async Task<bool> DeleteByTokenHashAsync(string tokenHash, CancellationToken cancellationToken)
     {
-        return await _dbContext.PasswordResetRequests.Where(s => s.Token == token).ExecuteDeleteAsync(cancellationToken) > 0;
+        return await _dbContext.PasswordResetRequests.Where(s => s.TokenHash == tokenHash).ExecuteDeleteAsync(cancellationToken) > 0;
     }
 
     public Task<int> DeleteExpiredAsync(TimeSpan maxAge, CancellationToken cancellationToken)
@@ -78,6 +80,4 @@ public sealed class PasswordResetRequestStore : IPasswordResetRequestStore
         DateTime expiresAt = DateTime.UtcNow - maxAge;
         return _dbContext.PasswordResetRequests.Where(s => s.CreatedAt < expiresAt).ExecuteDeleteAsync(cancellationToken);
     }
-
-    public Task<PasswordResetRequestEntity?> TakeByTokenAsync(string token, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 }

@@ -6,7 +6,7 @@ namespace ZapMe.Data.Models;
 
 public sealed class UserAgentEntity
 {
-    public static string TableName => "userAgents";
+    public const string TableName = "userAgents";
 
     /// <summary>
     /// Sha256 hash of the user agent string before truncation

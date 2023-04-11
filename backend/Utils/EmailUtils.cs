@@ -188,7 +188,7 @@ public static class EmailUtils
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ParsedResult Parse(string str)
     {
-        if (str is null)
+        if (str == null)
             return ParsedResult.Invalid;
 
         ReadOnlySpan<char> email = str.AsSpan();

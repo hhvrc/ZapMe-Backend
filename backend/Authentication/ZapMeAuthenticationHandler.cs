@@ -83,7 +83,7 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             sessionIdString = Request.Cookies[_options.CookieName];
         }
         
-        if (sessionIdString is null)
+        if (sessionIdString == null)
         {
             return AuthenticateResult.NoResult();
         }

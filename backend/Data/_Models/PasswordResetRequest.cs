@@ -5,7 +5,8 @@ namespace ZapMe.Data.Models;
 
 public sealed class PasswordResetRequestEntity
 {
-    public static string TableName => "passwordResetRequests";
+    public const string TableName = "passwordResetRequests";
+    public const string TableTokenIndex = TableName + "_tokenHash_idx";
 
     /// <summary>
     /// 
@@ -20,7 +21,7 @@ public sealed class PasswordResetRequestEntity
     /// <summary>
     /// 
     /// </summary>
-    public string Token { get; set; } = null!;
+    public string TokenHash { get; set; } = null!;
 
     /// <summary>
     /// 
@@ -40,9 +41,9 @@ public sealed class PasswordResetRequestEntityConfiguration : IEntityTypeConfigu
             .HasColumnName("accountId")
             .IsRequired();
 
-        builder.Property(pr => pr.Token)
-            .HasColumnName("token")
-            .HasMaxLength(128)
+        builder.Property(pr => pr.TokenHash)
+            .HasColumnName("tokenHash")
+            .HasMaxLength(32) // Sha256 hash digest
             .IsRequired();
 
         builder.Property(pr => pr.CreatedAt)
@@ -54,5 +55,9 @@ public sealed class PasswordResetRequestEntityConfiguration : IEntityTypeConfigu
             .WithOne()
             .HasForeignKey<PasswordResetRequestEntity>(pr => pr.AccountId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(pr => pr.TokenHash)
+            .HasDatabaseName(PasswordResetRequestEntity.TableTokenIndex)
+            .IsUnique();
     }
 }
