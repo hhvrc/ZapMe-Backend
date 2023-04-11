@@ -18,6 +18,7 @@ public sealed class ZapMeContext : DbContext
     public required DbSet<UserRelationEntity> UserRelations { get; set; }
     public required DbSet<FriendRequestEntity> FriendRequests { get; set; }
     public required DbSet<OAuthConnectionEntity> OAuthConnections { get; set; }
+    public required DbSet<PasswordResetRequestEntity> PasswordResetRequests { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -32,5 +33,6 @@ public sealed class ZapMeContext : DbContext
         modelBuilder.ApplyConfiguration(new UserRelationEntityConfiguration());
         modelBuilder.ApplyConfiguration(new FriendRequestEntityConfiguration());
         modelBuilder.ApplyConfiguration(new OAuthConnectionEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new PasswordResetRequestEntityConfiguration());
     }
 }

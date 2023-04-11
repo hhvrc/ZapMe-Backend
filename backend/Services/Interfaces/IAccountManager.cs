@@ -113,21 +113,4 @@ public interface IAccountManager
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<PasswordCheckResult> CheckPasswordAsync(Guid accountId, string password, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="accountId"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    Task<string?> GeneratePasswordResetTokenAsync(Guid accountId, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="passwordResetToken"></param>
-    /// <param name="password"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    Task<bool> TryCompletePasswordResetAsync(string passwordResetToken, string password, CancellationToken cancellationToken = default);
 }

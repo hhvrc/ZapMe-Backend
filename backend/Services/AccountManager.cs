@@ -1,7 +1,7 @@
 ﻿using ZapMe.Data.Models;
 using ZapMe.DTOs;
-using ZapMe.Utils;
 using ZapMe.Services.Interfaces;
+using ZapMe.Utils;
 
 namespace ZapMe.Services;
 
@@ -54,45 +54,5 @@ public sealed class AccountManager : IAccountManager
         }
 
         return CheckPassword(user, password, cancellationToken);
-    }
-
-    public async Task<string?> GeneratePasswordResetTokenAsync(Guid userId, CancellationToken cancellationToken)
-    {
-        string token = Utils.StringUtils.GenerateRandomString(32);
-
-        if (!await AccountStore.SetPasswordResetTokenAsync(userId, token, cancellationToken))
-        {
-            return null;
-        }
-
-        return token;
-    }
-
-    public async Task<bool> TryCompletePasswordResetAsync(string passwordResetToken, string password, CancellationToken cancellationToken)
-    {
-        bool result = false;
-
-        AccountEntity? user = await AccountStore.GetByPasswordResetTokenAsync(passwordResetToken, cancellationToken);
-        if (user?.PasswordResetRequestedAt.HasValue ?? false)
-        {
-            TimeSpan tokenAge = DateTime.UtcNow - user.PasswordResetRequestedAt.Value;
-
-            if (tokenAge < TimeSpan.FromHours(1))
-            {
-                result = await SetPasswordAsync(user.Id, password, cancellationToken);
-            }
-            else
-            {
-                _logger.LogWarning("Password reset token for user {} expired", user.Id);
-            }
-
-            await AccountStore.SetPasswordResetTokenAsync(user.Id, null, cancellationToken);
-        }
-        else
-        {
-            _logger.LogWarning("Password reset token {} not found", passwordResetToken);
-        }
-
-        return result;
     }
 }

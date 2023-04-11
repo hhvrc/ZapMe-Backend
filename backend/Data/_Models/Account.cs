@@ -60,16 +60,6 @@ public sealed class AccountEntity
     public string OnlineStatusText { get; set; } = null!;
 
     /// <summary>
-    /// 
-    /// </summary>
-    public string? PasswordResetToken { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public DateTime? PasswordResetRequestedAt { get; set; }
-
-    /// <summary>
     /// Date this account was created at
     /// </summary>
     public DateTime CreatedAt { get; set; }
@@ -133,13 +123,6 @@ public sealed class AccountEntityConfiguration : IEntityTypeConfiguration<Accoun
             .HasColumnName("statusText")
             .HasMaxLength(128);
 
-        builder.Property(u => u.PasswordResetToken)
-            .HasColumnName("passwordResetToken")
-            .HasMaxLength(128);
-
-        builder.Property(u => u.PasswordResetRequestedAt)
-            .HasColumnName("passwordResetRequestedAt");
-
         builder.Property(u => u.CreatedAt)
             .HasColumnName("createdAt")
             .HasDefaultValueSql("now()");
@@ -167,10 +150,6 @@ public sealed class AccountEntityConfiguration : IEntityTypeConfiguration<Accoun
 
         builder.HasIndex(u => u.Email)
             .HasDatabaseName(AccountEntity.TableAccountEmailIndex)
-            .IsUnique();
-
-        builder.HasIndex(u => u.PasswordResetToken)
-            .HasDatabaseName(AccountEntity.TablePasswordResetTokenIndex)
             .IsUnique();
     }
 }
