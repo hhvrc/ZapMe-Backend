@@ -31,7 +31,7 @@ public interface ILockOutStore
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    IAsyncEnumerable<LockOutEntity> ListByUserAsync(Guid userId);
+    IAsyncEnumerable<LockOutEntity> ListByUserIdAsync(Guid userId);
 
     /// <summary>
     /// 

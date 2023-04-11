@@ -57,13 +57,11 @@ public static class ZapMeIServiceCollectionExtensions
     public static void ZMAddLockOuts([NotNull] this IServiceCollection services)
     {
         services.AddTransient<ILockOutStore, LockOutStore>();
-        services.AddTransient<ILockOutManager, LockOutManager>();
     }
 
     public static void ZMAddUserRelations([NotNull] this IServiceCollection services)
     {
         services.AddTransient<IUserRelationStore, UserRelationStore>();
-        services.AddTransient<IUserRelationManager, UserRelationManager>();
     }
 
     public static void ZMAddFriendRequests([NotNull] this IServiceCollection services)
