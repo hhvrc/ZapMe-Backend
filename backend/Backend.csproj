@@ -54,7 +54,7 @@
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     <PackageReference Include="UAParser" Version="3.1.47" />
   </ItemGroup>
-  <Target Name="openapi" AfterTargets="Build">
+  <Target Name="openapi" AfterTargets="Build" Condition="Exists('$(OutputPath)$(AssemblyName).dll') And ('$(Configuration)' == 'Release')">
 	<Message Text="generating openapi" Importance="high" />
 	<Exec Command="dotnet tool run swagger tofile --yaml --output $(ProjectDir)..\api\openapi.yaml $(OutputPath)$(AssemblyName).dll v1" />
   </Target>
