@@ -88,5 +88,5 @@ rm -rf "backend/build"
 # Build the backend
 echo_cyan "Building backend"
 dotnet tool restore
-dotnet publish backend/Backend.csproj /p:PublishProfile=backend/Properties/PublishProfiles/FolderProfile.pubxml -c Release
+dotnet publish backend/Backend.csproj /p:PublishProfile=backend/Properties/PublishProfiles/Linux-x64.pubxml -c Release
 echo_green "Backend build complete"
