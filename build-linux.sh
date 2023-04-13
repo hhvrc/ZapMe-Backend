@@ -89,11 +89,13 @@ else
     git clone https://github.com/google/flatbuffers.git tmp-flatbuffers
     cd tmp-flatbuffers
     cmake -G "Unix Makefiles"
-    make
-    make install
-    ldconfig
+    make -j$(nproc)
+    mkdir ~/.flatbuffers
+    cp flatc ~/.flatbuffers/
     cd ..
     rm -rf tmp-flatbuffers
+    export PATH="$PATH:$HOME/.flatbuffers"
+    echo 'export PATH="$PATH:$HOME/.flatbuffers"' >> ~/.bashrc
 fi
 
 # Remove all build artifacts
