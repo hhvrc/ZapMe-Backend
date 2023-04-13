@@ -2,7 +2,7 @@
 using NetMQ.Sockets;
 using System.Net.WebSockets;
 using System.Security.Claims;
-using ZapMe.FlatMsgs;
+//using ZapMe.FlatMsgs;
 
 namespace ZapMe.Websocket;
 
@@ -158,6 +158,7 @@ public sealed class WebSocketInstance : IDisposable
     }
     private async Task<bool> ProcessWebSocketBinaryAsync(CancellationToken cs)
     {
+        /*
         ClientMsg msg;
 
         try
@@ -188,6 +189,8 @@ public sealed class WebSocketInstance : IDisposable
             default:
                 return false;
         }
+        */
+        await Task.CompletedTask;
 
         return true;
     }
