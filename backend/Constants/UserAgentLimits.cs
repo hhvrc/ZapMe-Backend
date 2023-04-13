@@ -2,7 +2,9 @@
 
 public static class UserAgentLimits
 {
-    public const int MaxLength = 2048;
-    public const int StoredLength = 512;
-    public const int ParsedLength = 64;
+    public const int MaxUploadLength = 2048;
+    public const int StoredValueLength = 1024;
+    public const int StoredOperatingSystemLength = 32;
+    public const int StoredDeviceLength = 32;
+    public const int StoredBrowserLength = 32;
 }

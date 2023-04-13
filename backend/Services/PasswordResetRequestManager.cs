@@ -8,33 +8,33 @@ namespace ZapMe.Services;
 
 public sealed class PasswordResetRequestManager : IPasswordResetRequestManager
 {
-    private readonly IAccountManager _accountManager;
+    private readonly IUserManager _userManager;
     private readonly IMailTemplateStore _mailTemplateStore;
     private readonly IMailGunService _mailGunService;
     private readonly IPasswordResetRequestStore _passwordResetRequestStore;
     private readonly ILogger<PasswordResetRequestManager> _logger;
 
-    public PasswordResetRequestManager(IAccountManager accountManager, IMailTemplateStore mailTemplateStore, IMailGunService mailGunService, IPasswordResetRequestStore passwordResetRequestStore, ILogger<PasswordResetRequestManager> logger)
+    public PasswordResetRequestManager(IUserManager userManager, IMailTemplateStore mailTemplateStore, IMailGunService mailGunService, IPasswordResetRequestStore passwordResetRequestStore, ILogger<PasswordResetRequestManager> logger)
     {
-        _accountManager = accountManager;
+        _userManager = userManager;
         _mailTemplateStore = mailTemplateStore;
         _mailGunService = mailGunService;
         _passwordResetRequestStore = passwordResetRequestStore;
         _logger = logger;
     }
 
-    public async Task<bool> InitiatePasswordReset(AccountEntity account, CancellationToken cancellationToken)
+    public async Task<bool> InitiatePasswordReset(UserEntity user, CancellationToken cancellationToken)
     {
         string token = StringUtils.GenerateUrlSafeRandomString(16);
         string tokenHash = HashingUtils.Sha256_String(token);
 
-        await _passwordResetRequestStore.UpsertAsync(account.Id, tokenHash, cancellationToken);
+        await _passwordResetRequestStore.UpsertAsync(user.Id, tokenHash, cancellationToken);
 
         string? emailTemplate = await _mailTemplateStore.GetTemplateAsync(EmailTemplateNames.PasswordReset, cancellationToken);
         if (emailTemplate == null) return false;
 
         string formattedEmail = new QuickStringReplacer(emailTemplate)
-            .Replace("{{UserName}}", account.Name)
+            .Replace("{{UserName}}", user.Name)
             .Replace("{{ResetPasswordUrl}}", App.WebsiteUrl + "/reset-password?token=" + token)
             .Replace("{{CompanyName}}", App.AppCreator)
             .Replace("{{CompanyAddress}}", App.MadeInText)
@@ -43,23 +43,23 @@ public sealed class PasswordResetRequestManager : IPasswordResetRequestManager
             .ToString();
 
         // Send recovery secret to email
-        return await _mailGunService.SendEmailAsync("Hello", account.Name, account.Email, "Password recovery", formattedEmail, cancellationToken);
+        return await _mailGunService.SendEmailAsync("Hello", user.Name, user.Email, "Password recovery", formattedEmail, cancellationToken);
     }
 
     public async Task<bool> InitiatePasswordReset(Guid accountId, CancellationToken cancellationToken)
     {
-        AccountEntity? accountEntity = await _accountManager.Store.GetByIdAsync(accountId, cancellationToken);
-        if (accountEntity == null) return false;
+        UserEntity? userEntity = await _userManager.Store.GetByIdAsync(accountId, cancellationToken);
+        if (userEntity == null) return false;
 
-        return await InitiatePasswordReset(accountEntity, cancellationToken);
+        return await InitiatePasswordReset(userEntity, cancellationToken);
     }
 
     public async Task<bool> InitiatePasswordReset(string accountEmail, CancellationToken cancellationToken)
     {
-        AccountEntity? accountEntity = await _accountManager.Store.GetByEmailAsync(accountEmail, cancellationToken);
-        if (accountEntity == null) return false;
+        UserEntity? userEntity = await _userManager.Store.GetByEmailAsync(accountEmail, cancellationToken);
+        if (userEntity == null) return false;
 
-        return await InitiatePasswordReset(accountEntity, cancellationToken);
+        return await InitiatePasswordReset(userEntity, cancellationToken);
     }
 
     public async Task<bool> CompletePasswordReset(string token, string newPassword, CancellationToken cancellationToken)
@@ -77,7 +77,7 @@ public sealed class PasswordResetRequestManager : IPasswordResetRequestManager
         if (passwordResetRequest.CreatedAt.AddMinutes(30) < DateTime.UtcNow) return false;
 
         // Finally set the new password
-        return await _accountManager.SetPasswordAsync(passwordResetRequest.AccountId, newPassword, cancellationToken);
+        return await _userManager.SetPasswordAsync(passwordResetRequest.UserId, newPassword, cancellationToken);
     }
 
     public Task<int> RemoveExpiredRequests(CancellationToken cancellationToken)

@@ -17,7 +17,7 @@ public class UserDto
         CreatedAt = DateTime.MinValue;
         LastOnline = DateTime.MinValue;
     }
-    public UserDto(AccountEntity user)
+    public UserDto(UserEntity user)
     {
         Id = user.Id;
         Username = user.Name;
@@ -65,7 +65,7 @@ public class UserDto
     public string OnlineStatusText { get; set; }
 
     /// <summary>
-    /// Date this account was created at
+    /// Date this user was created at
     /// </summary>
     [JsonPropertyOrder(15)]
     [JsonPropertyName("created_at")]

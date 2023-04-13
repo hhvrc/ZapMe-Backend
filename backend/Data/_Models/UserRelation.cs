@@ -22,7 +22,7 @@ public sealed class UserRelationEntity
     /// <summary>
     /// 
     /// </summary>
-    public required AccountEntity SourceUser { get; set; }
+    public UserEntity? SourceUser { get; set; }
 
     /// <summary>
     /// 
@@ -32,7 +32,7 @@ public sealed class UserRelationEntity
     /// <summary>
     /// 
     /// </summary>
-    public required AccountEntity TargetUser { get; set; }
+    public UserEntity? TargetUser { get; set; }
 
     /// <summary>
     /// 

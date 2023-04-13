@@ -1,6 +1,7 @@
 ﻿using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using System.ComponentModel.DataAnnotations;
+using ZapMe.Constants;
 using ZapMe.Utils;
 
 namespace ZapMe.Attributes;
@@ -10,23 +11,21 @@ public sealed class EmailAddressAttribute : ValidationAttribute, IParameterAttri
 {
     public const string ExampleEmail = "user.name@example.com";
     private const string _ErrMsgMustBeString = "Email address must be a string";
+    private static readonly string _ErrMsgTooShort = $"Email address must be at least {GeneralHardLimits.EmailAddressMinLength} characters long";
+    private static readonly string _ErrMsgTooLong = $"Email address must be at most {GeneralHardLimits.EmailAddressMaxLength} characters long";
     private const string _ErrMsgInvalid = "Email address is invalid";
     private const string _ErrMsgDisplayNameNotAllowed = "Display name is not allowed in email address";
     private const string _ErrMsgAliasesNotAllowed = "Email address aliases are not allowed";
 
-    public bool ShouldValidate { get; }
     public bool AllowDisplayName { get; }
 
-    public EmailAddressAttribute(bool shouldValidate, bool allowDisplayName = false)
+    public EmailAddressAttribute(bool allowDisplayName = false)
     {
-        ShouldValidate = shouldValidate;
         AllowDisplayName = allowDisplayName;
     }
 
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
-        if (!ShouldValidate) return ValidationResult.Success;
-
         if (value == null)
         {
             return ValidationResult.Success;
@@ -35,6 +34,16 @@ public sealed class EmailAddressAttribute : ValidationAttribute, IParameterAttri
         if (value is not string email)
         {
             return new ValidationResult(_ErrMsgMustBeString);
+        }
+
+        if (email.Length < GeneralHardLimits.EmailAddressMinLength)
+        {
+            return new ValidationResult(_ErrMsgTooShort);
+        }
+
+        if (email.Length > GeneralHardLimits.EmailAddressMaxLength)
+        {
+            return new ValidationResult(_ErrMsgTooLong);
         }
 
         EmailUtils.ParsedResult parsed = EmailUtils.Parse(email);
@@ -58,9 +67,8 @@ public sealed class EmailAddressAttribute : ValidationAttribute, IParameterAttri
 
     public void Apply(OpenApiSchema schema)
     {
-        if (ShouldValidate)
-        {
-        }
+        schema.MinLength = GeneralHardLimits.EmailAddressMinLength;
+        schema.MaxLength = GeneralHardLimits.EmailAddressMaxLength;
         schema.Format = "email";
         schema.Example = new OpenApiString(ExampleEmail);
     }

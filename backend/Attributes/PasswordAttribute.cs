@@ -1,18 +1,17 @@
 ﻿using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using System.ComponentModel.DataAnnotations;
+using ZapMe.Constants;
 
 namespace ZapMe.Attributes;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = false)]
 public sealed class PasswordAttribute : ValidationAttribute, IParameterAttribute
 {
-    public const int MinPasswordLength = 10;
-    public const int MaxPasswordLength = 256;
     public const string ExamplePassword = "Hq2yP1B^Fho&zRHxHkEu";
     private const string _ErrMsgMustBeString = "Password must be a string";
-    private static readonly string _ErrMsgTooShort = $"Password must be at least {MinPasswordLength} characters long";
-    private static readonly string _ErrMsgTooLong = $"Password must be at most {MaxPasswordLength} characters long";
+    private static readonly string _ErrMsgTooShort = $"Password must be at least {GeneralHardLimits.PasswordMinLength} characters long";
+    private static readonly string _ErrMsgTooLong = $"Password must be at most {GeneralHardLimits.PasswordMaxLength} characters long";
 
     public bool ShouldValidate { get; }
 
@@ -35,12 +34,12 @@ public sealed class PasswordAttribute : ValidationAttribute, IParameterAttribute
             return new ValidationResult(_ErrMsgMustBeString);
         }
 
-        if (username.Length < MinPasswordLength)
+        if (username.Length < GeneralHardLimits.PasswordMinLength)
         {
             return new ValidationResult(_ErrMsgTooShort);
         }
 
-        if (username.Length > MaxPasswordLength)
+        if (username.Length > GeneralHardLimits.PasswordMaxLength)
         {
             return new ValidationResult(_ErrMsgTooLong);
         }
@@ -52,8 +51,8 @@ public sealed class PasswordAttribute : ValidationAttribute, IParameterAttribute
     {
         if (ShouldValidate)
         {
-            schema.MinLength = MinPasswordLength;
-            schema.MaxLength = MaxPasswordLength;
+            schema.MinLength = GeneralHardLimits.PasswordMinLength;
+            schema.MaxLength = GeneralHardLimits.PasswordMaxLength;
         }
         schema.Example = new OpenApiString(ExamplePassword);
     }

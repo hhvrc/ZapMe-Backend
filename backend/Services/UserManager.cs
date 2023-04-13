@@ -5,12 +5,12 @@ using ZapMe.Utils;
 
 namespace ZapMe.Services;
 
-public sealed class AccountManager : IAccountManager
+public sealed class UserManager : IUserManager
 {
-    public IAccountStore Store { get; }
-    private readonly ILogger<AccountManager> _logger;
+    public IUserStore Store { get; }
+    private readonly ILogger<UserManager> _logger;
 
-    public AccountManager(IAccountStore userStore, ILogger<AccountManager> logger)
+    public UserManager(IUserStore userStore, ILogger<UserManager> logger)
     {
         Store = userStore;
         _logger = logger;
@@ -31,13 +31,13 @@ public sealed class AccountManager : IAccountManager
 
     public async Task<PasswordCheckResult> CheckPasswordAsync(Guid userId, string password, CancellationToken cancellationToken)
     {
-        AccountEntity? account = await Store.GetByIdAsync(userId, cancellationToken);
-        if (account == null)
+        UserEntity? user = await Store.GetByIdAsync(userId, cancellationToken);
+        if (user == null)
         {
             return PasswordCheckResult.UserNotFound;
         }
 
-        if (!PasswordUtils.CheckPassword(password, account.PasswordHash))
+        if (!PasswordUtils.CheckPassword(password, user.PasswordHash))
         {
             return PasswordCheckResult.PasswordInvalid;
         }

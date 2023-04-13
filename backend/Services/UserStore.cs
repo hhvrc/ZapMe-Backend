@@ -10,24 +10,26 @@ using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Services;
 
-public sealed class AccountStore : IAccountStore
+public sealed class UserStore : IUserStore
 {
     private readonly ZapMeContext _dbContext;
-    private readonly ILogger<AccountStore> _logger;
+    private readonly ILogger<UserStore> _logger;
 
-    public AccountStore(ZapMeContext dbContext, ILogger<AccountStore> logger)
+    public UserStore(ZapMeContext dbContext, ILogger<UserStore> logger)
     {
         _dbContext = dbContext;
         _logger = logger;
     }
 
-    public async Task<AccountCreationResult> TryCreateAsync(string username, string email, string passwordHash, CancellationToken cancellationToken)
+    public async Task<AccountCreationResult> TryCreateAsync(string name, string email, string passwordHash, CancellationToken cancellationToken)
     {
-        var user = new AccountEntity
+        var user = new UserEntity
         {
-            Name = username,
+            Name = name,
             Email = email,
             PasswordHash = passwordHash,
+            AcceptedTosVersion = 0,
+            ProfilePictureId = ImageEntity.DefaultImageId,
             OnlineStatus = UserOnlineStatus.Online,
             OnlineStatusText = String.Empty,
             UpdatedAt = DateTime.UtcNow
@@ -58,11 +60,11 @@ public sealed class AccountStore : IAccountStore
 
                 if (postgresException.SqlState == PostgresErrorCodes.UniqueViolation)
                 {
-                    if (postgresException.ConstraintName == AccountEntity.TableAccountEmailIndex)
+                    if (postgresException.ConstraintName == UserEntity.TableAccountEmailIndex)
                     {
                         return new AccountCreationResult(AccountCreationResult.ResultE.EmailAlreadyTaken, null!, exception.Message);
                     }
-                    else if (postgresException.ConstraintName == AccountEntity.TableAccountNameIndex)
+                    else if (postgresException.ConstraintName == UserEntity.TableAccountNameIndex)
                     {
                         return new AccountCreationResult(AccountCreationResult.ResultE.NameAlreadyTaken, null!, exception.Message);
                     }
@@ -81,37 +83,37 @@ public sealed class AccountStore : IAccountStore
         return new AccountCreationResult(AccountCreationResult.ResultE.UnknownError, null!, "Unknown error, retry count exceeded");
     }
 
-    public Task<AccountEntity?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
+    public Task<UserEntity?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
     {
         return _dbContext.Accounts.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
     }
 
-    public Task<AccountEntity?> GetByNameAsync(string userName, CancellationToken cancellationToken)
+    public Task<UserEntity?> GetByNameAsync(string name, CancellationToken cancellationToken)
     {
-        return _dbContext.Accounts.FirstOrDefaultAsync(u => u.Name == userName, cancellationToken);
+        return _dbContext.Accounts.FirstOrDefaultAsync(u => u.Name == name, cancellationToken);
     }
 
-    public Task<AccountEntity?> GetByEmailAsync(string email, CancellationToken cancellationToken)
+    public Task<UserEntity?> GetByEmailAsync(string email, CancellationToken cancellationToken)
     {
         return _dbContext.Accounts.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
     }
 
-    public Task<AccountEntity?> GetByUsernameOrEmail(string userNameOrEmail, CancellationToken cancellationToken)
+    public Task<UserEntity?> GetByNameOrEmail(string nameOrEmail, CancellationToken cancellationToken)
     {
-        return _dbContext.Accounts.FirstOrDefaultAsync(u => u.Name == userNameOrEmail || u.Email == userNameOrEmail, cancellationToken);
+        return _dbContext.Accounts.FirstOrDefaultAsync(u => u.Name == nameOrEmail || u.Email == nameOrEmail, cancellationToken);
     }
 
-    private async Task<bool> UpdateAsync(Expression<Func<AccountEntity, bool>> whereSelector, Expression<Func<SetPropertyCalls<AccountEntity>, SetPropertyCalls<AccountEntity>>> setPropertyCalls, CancellationToken cancellationToken)
+    private async Task<bool> UpdateAsync(Expression<Func<UserEntity, bool>> whereSelector, Expression<Func<SetPropertyCalls<UserEntity>, SetPropertyCalls<UserEntity>>> setPropertyCalls, CancellationToken cancellationToken)
     {
         return (await _dbContext.Accounts.Where(whereSelector).ExecuteUpdateAsync(setPropertyCalls, cancellationToken)) > 0;
     }
-    private Task<bool> UpdateAsync(Guid userId, Expression<Func<SetPropertyCalls<AccountEntity>, SetPropertyCalls<AccountEntity>>> setPropertyCalls, CancellationToken cancellationToken) =>
+    private Task<bool> UpdateAsync(Guid userId, Expression<Func<SetPropertyCalls<UserEntity>, SetPropertyCalls<UserEntity>>> setPropertyCalls, CancellationToken cancellationToken) =>
         UpdateAsync(u => u.Id == userId, setPropertyCalls, cancellationToken);
-    private Task<bool> UpdateAsync(string userName, Expression<Func<SetPropertyCalls<AccountEntity>, SetPropertyCalls<AccountEntity>>> setPropertyCalls, CancellationToken cancellationToken) =>
-        UpdateAsync(u => u.Name == userName, setPropertyCalls, cancellationToken);
+    private Task<bool> UpdateAsync(string name, Expression<Func<SetPropertyCalls<UserEntity>, SetPropertyCalls<UserEntity>>> setPropertyCalls, CancellationToken cancellationToken) =>
+        UpdateAsync(u => u.Name == name, setPropertyCalls, cancellationToken);
 
-    public Task<bool> SetUserNameAsync(Guid userId, string userName, CancellationToken cancellationToken) =>
-        UpdateAsync(userId, s => s.SetProperty(static u => u.Name, _ => userName).SetProperty(static u => u.UpdatedAt, _ => DateTime.UtcNow), cancellationToken);
+    public Task<bool> SetUserNameAsync(Guid userId, string name, CancellationToken cancellationToken) =>
+        UpdateAsync(userId, s => s.SetProperty(static u => u.Name, _ => name).SetProperty(static u => u.UpdatedAt, _ => DateTime.UtcNow), cancellationToken);
     public Task<bool> SetEmailAsync(Guid userId, string email, CancellationToken cancellationToken) =>
         UpdateAsync(userId, s => s.SetProperty(static u => u.Email, _ => email).SetProperty(static u => u.UpdatedAt, _ => DateTime.UtcNow), cancellationToken);
     public Task<bool> SetEmailVerifiedAsync(Guid userId, bool emailVerified, CancellationToken cancellationToken) =>

@@ -12,7 +12,7 @@ public sealed class ActivityTracker
         _next = next;
     }
 
-    public async Task InvokeAsync(HttpContext context, IAccountManager userManager)
+    public async Task InvokeAsync(HttpContext context, IUserManager userManager)
     {
         try
         {
@@ -22,7 +22,7 @@ public sealed class ActivityTracker
         {
             if (context.User?.Identity is ZapMeIdentity identity)
             {
-                await userManager.Store.SetLastOnlineAsync(identity.AccountId, DateTime.UtcNow, context.RequestAborted);
+                await userManager.Store.SetLastOnlineAsync(identity.UserId, DateTime.UtcNow, context.RequestAborted);
             }
         }
     }

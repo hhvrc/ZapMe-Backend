@@ -12,10 +12,10 @@ namespace ZapMe.Controllers.Api.V1;
 [Route("api/v1/user/")]
 public sealed partial class UserController : ControllerBase
 {
-    private readonly IAccountManager _accountManager;
+    private readonly IUserManager _userManager;
 
-    public UserController(IAccountManager userManager)
+    public UserController(IUserManager userManager)
     {
-        _accountManager = userManager;
+        _userManager = userManager;
     }
 }

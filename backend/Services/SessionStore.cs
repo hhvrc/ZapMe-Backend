@@ -16,17 +16,17 @@ public sealed class SessionStore : ISessionStore
         _logger = logger;
     }
 
-    public async Task<SessionEntity> CreateAsync(AccountEntity account, string? sessionName, string ipAddress, string countryCode, UserAgentEntity userAgent, DateTime expiresAt, CancellationToken cancellationToken)
+    public async Task<SessionEntity> CreateAsync(UserEntity user, string? sessionName, string ipAddress, string countryCode, UserAgentEntity userAgent, DateTime expiresAt, CancellationToken cancellationToken)
     {
         SessionEntity session = new SessionEntity
         {
-            Account = account,
-            UserId = account.Id,
+            User = null!,
+            UserId = user.Id,
             Name = sessionName,
             IpAddress = ipAddress,
             CountryCode = countryCode,
-            UserAgentHash = userAgent.Hash,
-            UserAgent = userAgent,
+            UserAgentId = userAgent.Id,
+            UserAgent = null!,
             ExpiresAt = expiresAt
         };
 
@@ -35,7 +35,7 @@ public sealed class SessionStore : ISessionStore
 
         if (nAdded <= 0)
         {
-            _logger.LogWarning("Failed to create session for user {UserId}", account.Id);
+            _logger.LogWarning("Failed to create session for user {UserId}", user.Id);
         }
 
         return (await GetByIdAsync(session.Id, cancellationToken))!;
@@ -44,8 +44,8 @@ public sealed class SessionStore : ISessionStore
     public Task<SessionEntity?> GetByIdAsync(Guid sessionId, CancellationToken cancellationToken)
     {
         return _dbContext.Sessions
-            .Include(static s => s.Account)
-            .ThenInclude(static a => a.UserRoles)
+            .Include(static s => s.User)
+            .ThenInclude(static a => a!.UserRoles)
             .FirstOrDefaultAsync(s => s.Id == sessionId, cancellationToken);
     }
 

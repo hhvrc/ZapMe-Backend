@@ -12,12 +12,12 @@ namespace ZapMe.Controllers.Api.V1;
 [Route("api/v1/[Controller]/")]
 public sealed partial class AccountController : ControllerBase
 {
-    private readonly IAccountManager _accountManager;
+    private readonly IUserManager _userManager;
     private readonly ILogger<AccountController> _logger;
 
-    public AccountController(IAccountManager userManager, ILogger<AccountController> logger)
+    public AccountController(IUserManager userManager, ILogger<AccountController> logger)
     {
-        _accountManager = userManager;
+        _userManager = userManager;
         _logger = logger;
     }
 }

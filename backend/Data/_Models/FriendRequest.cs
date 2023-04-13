@@ -15,7 +15,7 @@ public sealed class FriendRequestEntity
     /// <summary>
     /// 
     /// </summary>
-    public required AccountEntity Sender { get; set; }
+    public UserEntity? Sender { get; set; }
 
     /// <summary>
     /// 
@@ -25,7 +25,7 @@ public sealed class FriendRequestEntity
     /// <summary>
     /// 
     /// </summary>
-    public required AccountEntity Receiver { get; set; }
+    public UserEntity? Receiver { get; set; }
 
     /// <summary>
     /// 

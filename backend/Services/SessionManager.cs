@@ -6,21 +6,21 @@ namespace ZapMe.Services;
 public sealed class SessionManager : ISessionManager
 {
     public ISessionStore SessionStore { get; }
-    public IUserAgentStore UserAgentStore { get; }
+    public IUserAgentManager UserAgentManager { get; }
     private readonly ILogger<SessionManager> _logger;
 
-    public SessionManager(ISessionStore sessionStore, IUserAgentStore userAgentStore, ILogger<SessionManager> logger)
+    public SessionManager(ISessionStore sessionStore, IUserAgentManager userAgentManager, ILogger<SessionManager> logger)
     {
         SessionStore = sessionStore;
-        UserAgentStore = userAgentStore;
+        UserAgentManager = userAgentManager;
         _logger = logger;
     }
 
-    public async Task<SessionEntity> CreateAsync(AccountEntity account, string? sessionName, string ipAddress, string countryCode, string userAgent, bool rememberMe, CancellationToken cancellationToken = default)
+    public async Task<SessionEntity> CreateAsync(UserEntity user, string? sessionName, string ipAddress, string countryCode, string userAgent, bool rememberMe, CancellationToken cancellationToken = default)
     {
-        UserAgentEntity userAgentEntity = await UserAgentStore.EnsureCreatedAsync(userAgent, cancellationToken);
+        UserAgentEntity userAgentEntity = await UserAgentManager.EnsureCreatedAsync(userAgent, cancellationToken);
         DateTime expiresAt = DateTime.UtcNow.Add(rememberMe ? TimeSpan.FromDays(30) : TimeSpan.FromHours(1));
-        return await SessionStore.CreateAsync(account, sessionName, ipAddress, countryCode, userAgentEntity, expiresAt, cancellationToken);
+        return await SessionStore.CreateAsync(user, sessionName, ipAddress, countryCode, userAgentEntity, expiresAt, cancellationToken);
     }
 
     /// <inheritdoc/>

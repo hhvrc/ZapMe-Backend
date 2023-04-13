@@ -77,7 +77,7 @@ public partial class AccountController
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
 
         // Create account
-        AccountCreationResult result = await _accountManager.TryCreateAsync(body.UserName, body.Email, body.Password, cancellationToken);
+        AccountCreationResult result = await _userManager.TryCreateAsync(body.UserName, body.Email, body.Password, cancellationToken);
         if (!result.IsSuccess)
         {
             switch (result.Result)

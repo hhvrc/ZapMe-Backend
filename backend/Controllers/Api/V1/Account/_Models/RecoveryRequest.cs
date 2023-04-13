@@ -11,7 +11,7 @@ public struct RecoveryRequest
     /// <summary>
     /// Email of your account you want to recover
     /// </summary>
-    [EmailAddress(true)]
+    [EmailAddress]
     [JsonPropertyName("email")]
     public string Email { get; set; }
 

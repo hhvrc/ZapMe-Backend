@@ -19,7 +19,7 @@ public struct Create
     public string Password { get; set; }
 
     /// <summary/>
-    [EmailAddress(true)]
+    [EmailAddress]
     [JsonPropertyName("email")]
     public string Email { get; set; }
 

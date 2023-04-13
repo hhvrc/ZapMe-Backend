@@ -7,41 +7,52 @@ namespace ZapMe.Data.Models;
 public sealed class UserAgentEntity
 {
     public const string TableName = "userAgents";
+    public const string TableHashIndex = TableName + "_hash_idx";
 
     /// <summary>
-    /// Sha256 hash of the user agent string before truncation
+    /// 
     /// </summary>
-    public required byte[] Hash { get; set; }
+    public Guid Id { get; set; }
 
     /// <summary>
-    /// Length of user agent string before truncation
+    /// 
     /// </summary>
-    public int Length { get; set; }
+    public required string Sha256 { get; set; }
 
     /// <summary>
-    /// Truncated useragent
+    /// 
+    /// </summary>
+    public uint Length { get; set; }
+
+    /// <summary>
+    /// 
     /// </summary>
     public required string Value { get; set; }
 
     /// <summary>
-    /// The clean, parsed operating system, based on the user agent string
+    /// 
     /// </summary>
-    public required string ParsedOperatingSystem { get; set; }
+    public required string OperatingSystem { get; set; }
 
     /// <summary>
-    /// The clean, parsed device, based on the user agent string
+    /// 
     /// </summary>
-    public required string ParsedDevice { get; set; }
+    public required string Device { get; set; }
 
     /// <summary>
-    /// The clean, parsed user agent, based on the user agent string
+    /// 
     /// </summary>
-    public required string ParsedUserAgent { get; set; }
+    public required string Browser { get; set; }
 
     /// <summary>
-    /// Date this account was created at
+    /// 
     /// </summary>
     public DateTime CreatedAt { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public ICollection<SessionEntity>? Sessions { get; set; }
 }
 
 public sealed class UserAgentEntityConfiguration : IEntityTypeConfiguration<UserAgentEntity>
@@ -50,33 +61,41 @@ public sealed class UserAgentEntityConfiguration : IEntityTypeConfiguration<User
     {
         builder.ToTable(UserAgentEntity.TableName);
 
-        builder.HasKey(u => u.Hash);
+        builder.HasKey(u => u.Id);
 
-        builder.Property(u => u.Hash)
-            .HasColumnName("hash")
-            .HasMaxLength(HashConstants.Sha256LengthBin);
+        builder.Property(u => u.Id)
+            .HasColumnName("id")
+            .HasDefaultValueSql("gen_random_uuid()");
+
+        builder.Property(u => u.Sha256)
+            .HasColumnName("sha256")
+            .HasMaxLength(HashConstants.Sha256LengthHex);
 
         builder.Property(u => u.Length)
             .HasColumnName("length");
 
         builder.Property(u => u.Value)
             .HasColumnName("value")
-            .HasMaxLength(UserAgentLimits.StoredLength);
+            .HasMaxLength(UserAgentLimits.StoredValueLength);
 
-        builder.Property(u => u.ParsedOperatingSystem)
-            .HasColumnName("parsedOS")
-            .HasMaxLength(UserAgentLimits.ParsedLength);
+        builder.Property(u => u.OperatingSystem)
+            .HasColumnName("operatingSystem")
+            .HasMaxLength(UserAgentLimits.StoredOperatingSystemLength);
 
-        builder.Property(u => u.ParsedDevice)
-            .HasColumnName("parsedDevice")
-            .HasMaxLength(UserAgentLimits.ParsedLength);
+        builder.Property(u => u.Device)
+            .HasColumnName("device")
+            .HasMaxLength(UserAgentLimits.StoredDeviceLength);
 
-        builder.Property(u => u.ParsedUserAgent)
-            .HasColumnName("parsedUA")
-            .HasMaxLength(UserAgentLimits.ParsedLength);
+        builder.Property(u => u.Browser)
+            .HasColumnName("browser")
+            .HasMaxLength(UserAgentLimits.StoredBrowserLength);
 
         builder.Property(u => u.CreatedAt)
             .HasColumnName("createdAt")
             .HasDefaultValueSql("now()");
+
+        builder.HasIndex(u => u.Sha256)
+            .HasDatabaseName(UserAgentEntity.TableHashIndex)
+            .IsUnique();
     }
 }

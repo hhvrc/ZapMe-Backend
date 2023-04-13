@@ -7,8 +7,21 @@ public interface IUserAgentStore
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="userAgent"></param>
+    /// <param name="hash"></param>
+    /// <param name="length"></param>
+    /// <param name="value">Trunkated value</param>
+    /// <param name="operatingSystem"></param>
+    /// <param name="device"></param>
+    /// <param name="browser"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<UserAgentEntity> EnsureCreatedAsync(string userAgent, CancellationToken cancellationToken = default);
+    public Task<UserAgentEntity> CreateAsync(string hash, uint length, string value, string operatingSystem, string device, string browser, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="hash"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task<UserAgentEntity?> GetByHashAsync(string hash, CancellationToken cancellationToken = default);
 }

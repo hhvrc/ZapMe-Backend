@@ -16,10 +16,10 @@ public interface IPasswordResetRequestStore
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="accountId"></param>
+    /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<PasswordResetRequestEntity?> GetByAccountIdAsync(Guid accountId, CancellationToken cancellationToken = default);
+    public Task<PasswordResetRequestEntity?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -32,10 +32,10 @@ public interface IPasswordResetRequestStore
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="accountId"></param>
+    /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<bool> DeleteByAccountIdAsync(Guid accountId, CancellationToken cancellationToken = default);
+    public Task<bool> DeleteByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 

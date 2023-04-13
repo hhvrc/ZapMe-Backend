@@ -22,6 +22,6 @@ public partial class AccountController
     {
         ZapMeIdentity identity = (User as ZapMePrincipal)!.Identity;
 
-        return new AccountDto(identity.Account); // TODO: use a mapper FFS
+        return new AccountDto(identity.User); // TODO: use a mapper FFS
     }
 }

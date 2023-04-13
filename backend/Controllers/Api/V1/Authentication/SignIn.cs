@@ -35,7 +35,7 @@ public partial class AuthenticationController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status413RequestEntityTooLarge)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] IAccountStore userStore, [FromServices] ILockOutStore lockOutStore, CancellationToken cancellationToken)
+    public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] IUserStore userStore, [FromServices] ILockOutStore lockOutStore, CancellationToken cancellationToken)
     {
         if (User.Identity?.IsAuthenticated ?? false)
         {
@@ -44,18 +44,18 @@ public partial class AuthenticationController
 
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
 
-        AccountEntity? account = await userStore.GetByNameAsync(body.Username, cancellationToken) ?? await userStore.GetByEmailAsync(body.Username, cancellationToken);
-        if (account == null)
+        UserEntity? user = await userStore.GetByNameAsync(body.Username, cancellationToken) ?? await userStore.GetByEmailAsync(body.Username, cancellationToken);
+        if (user == null)
         {
             return this.Error_InvalidCredentials("Invalid username/password", "Please check that your entered username and password are correct", "username", "password");
         }
 
-        if (!PasswordUtils.CheckPassword(body.Password, account.PasswordHash))
+        if (!PasswordUtils.CheckPassword(body.Password, user.PasswordHash))
         {
             return this.Error_InvalidCredentials("Invalid username/password", "Please check that your entered username and password are correct", "username", "password");
         }
 
-        LockOutEntity[] lockouts = await lockOutStore.ListByUserIdAsync(account.Id).ToArrayAsync(cancellationToken);
+        LockOutEntity[] lockouts = await lockOutStore.ListByUserIdAsync(user.Id).ToArrayAsync(cancellationToken);
         if (lockouts.Any())
         {
             string reason = "Please contact support for more information";
@@ -69,25 +69,25 @@ public partial class AuthenticationController
             return this.Error(StatusCodes.Status400BadRequest, "Account disabled", "Account has been disabled either by moderative or administrative reasons", UserNotification.SeverityLevel.Error, "Account disabled", reason);
         }
 
-        if (!account.EmailVerified)
+        if (!user.EmailVerified)
         {
             return this.Error(StatusCodes.Status400BadRequest, "Unverified Email", "Email has not been verified", UserNotification.SeverityLevel.Error, "Email not verified", "Please verify your email address before signing in");
         }
 
-        if (account.AcceptedTosVersion < 0) // TODO: have a currentTosVerion value
+        if (user.AcceptedTosVersion < 0) // TODO: have a currentTosVerion value
         {
             return this.Error(StatusCodes.Status400BadRequest, "TOS Review Required", "User needs to accept new TOS", UserNotification.SeverityLevel.Error, "Terms of Service not accepted", "Please accept the Terms of Service before signing in");
         }
 
         string userAgent = this.GetRemoteUserAgent();
 
-        if (userAgent.Length > UserAgentLimits.MaxLength)
+        if (userAgent.Length > UserAgentLimits.MaxUploadLength)
         {
             // Request body too large
-            return this.Error(StatusCodes.Status413RequestEntityTooLarge, "User-Agent too long", $"User-Agent header has a hard limit on {UserAgentLimits.MaxLength} characters", UserNotification.SeverityLevel.Error, "Bad client behaviour", "Your client has unexpected behaviour, please contact it's developers");
+            return this.Error(StatusCodes.Status413RequestEntityTooLarge, "User-Agent too long", $"User-Agent header has a hard limit on {UserAgentLimits.MaxUploadLength} characters", UserNotification.SeverityLevel.Error, "Bad client behaviour", "Your client has unexpected behaviour, please contact it's developers");
         }
 
-        SessionEntity session = await _sessionManager.CreateAsync(account, body.SessionName, this.GetRemoteIP(), this.GetCloudflareIPCountry(), userAgent, body.RememberMe, cancellationToken);
+        SessionEntity session = await _sessionManager.CreateAsync(user, body.SessionName, this.GetRemoteIP(), this.GetCloudflareIPCountry(), userAgent, body.RememberMe, cancellationToken);
 
         return SignIn(new ZapMePrincipal(session));
     }

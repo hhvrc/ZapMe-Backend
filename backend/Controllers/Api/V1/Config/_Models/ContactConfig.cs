@@ -5,11 +5,11 @@ namespace ZapMe.Controllers.Api.V1.Config.Models;
 
 public struct ContactConfig
 {
-    [EmailAddress(true)]
+    [EmailAddress]
     [JsonPropertyName("support")]
     public string EmailSupport { get; set; }
 
-    [EmailAddress(true)]
+    [EmailAddress]
     [JsonPropertyName("contact")]
     public string EmailContact { get; set; }
 }

@@ -3,12 +3,12 @@ using ZapMe.DTOs;
 
 namespace ZapMe.Services.Interfaces;
 
-public interface IAccountManager
+public interface IUserManager
 {
     /// <summary>
     /// 
     /// </summary>
-    IAccountStore Store { get; }
+    IUserStore Store { get; }
 
     /// <summary>
     /// 
@@ -23,18 +23,18 @@ public interface IAccountManager
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="accountId"></param>
+    /// <param name="userId"></param>
     /// <param name="password"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> SetPasswordAsync(Guid accountId, string password, CancellationToken cancellationToken = default);
+    Task<bool> SetPasswordAsync(Guid userId, string password, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="accountId"></param>
+    /// <param name="userId"></param>
     /// <param name="password"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<PasswordCheckResult> CheckPasswordAsync(Guid accountId, string password, CancellationToken cancellationToken = default);
+    Task<PasswordCheckResult> CheckPasswordAsync(Guid userId, string password, CancellationToken cancellationToken = default);
 }

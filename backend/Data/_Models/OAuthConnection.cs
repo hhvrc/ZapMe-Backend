@@ -15,7 +15,7 @@ public sealed class OAuthConnectionEntity
     /// <summary>
     /// 
     /// </summary>
-    public required AccountEntity User { get; set; }
+    public required UserEntity User { get; set; }
 
     /// <summary>
     /// 

@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using ZapMe.Constants;
 using ZapMe.Enums;
 
 namespace ZapMe.Data.Models;
 
-public sealed class AccountEntity
+public sealed class UserEntity
 {
-    public const string TableName = "accounts";
+    public const string TableName = "users";
     public const string TableAccountNameIndex = TableName + "_name_idx";
     public const string TableAccountEmailIndex = TableName + "_email_idx";
 
@@ -18,12 +19,12 @@ public sealed class AccountEntity
     /// <summary>
     /// 
     /// </summary>
-    public string Name { get; set; } = null!;
+    public required string Name { get; set; }
 
     /// <summary>
     /// 
     /// </summary>
-    public string Email { get; set; } = null!;
+    public required string Email { get; set; }
 
     /// <summary>
     /// 
@@ -33,7 +34,7 @@ public sealed class AccountEntity
     /// <summary>
     /// 
     /// </summary>
-    public string PasswordHash { get; set; } = null!;
+    public required string PasswordHash { get; set; }
 
     /// <summary>
     /// 
@@ -56,7 +57,7 @@ public sealed class AccountEntity
     /// <summary>
     /// 
     /// </summary>
-    public string OnlineStatusText { get; set; } = null!;
+    public required string OnlineStatusText { get; set; }
 
     /// <summary>
     /// Date this account was created at
@@ -82,11 +83,11 @@ public sealed class AccountEntity
     public ICollection<OAuthConnectionEntity>? OauthConnections { get; set; }
 }
 
-public sealed class AccountEntityConfiguration : IEntityTypeConfiguration<AccountEntity>
+public sealed class AccountEntityConfiguration : IEntityTypeConfiguration<UserEntity>
 {
-    public void Configure(EntityTypeBuilder<AccountEntity> builder)
+    public void Configure(EntityTypeBuilder<UserEntity> builder)
     {
-        builder.ToTable(AccountEntity.TableName);
+        builder.ToTable(UserEntity.TableName);
 
         builder.HasKey(u => u.Id);
 
@@ -96,11 +97,11 @@ public sealed class AccountEntityConfiguration : IEntityTypeConfiguration<Accoun
 
         builder.Property(u => u.Name)
             .HasColumnName("name")
-            .HasMaxLength(32);
+            .HasMaxLength(GeneralHardLimits.UsernameMaxLength);
 
         builder.Property(u => u.Email)
             .HasColumnName("email")
-            .HasMaxLength(320);
+            .HasMaxLength(GeneralHardLimits.EmailAddressMaxLength);
 
         builder.Property(u => u.EmailVerified)
             .HasColumnName("emailVerified");
@@ -144,11 +145,11 @@ public sealed class AccountEntityConfiguration : IEntityTypeConfiguration<Accoun
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(u => u.Name)
-            .HasDatabaseName(AccountEntity.TableAccountNameIndex)
+            .HasDatabaseName(UserEntity.TableAccountNameIndex)
             .IsUnique();
 
         builder.HasIndex(u => u.Email)
-            .HasDatabaseName(AccountEntity.TableAccountEmailIndex)
+            .HasDatabaseName(UserEntity.TableAccountEmailIndex)
             .IsUnique();
     }
 }

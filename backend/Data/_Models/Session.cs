@@ -21,7 +21,7 @@ public sealed class SessionEntity
     /// <summary>
     /// 
     /// </summary>
-    public required AccountEntity Account { get; set; }
+    public UserEntity? User { get; set; }
 
     /// <summary>
     /// User provided name for this session
@@ -45,12 +45,12 @@ public sealed class SessionEntity
     /// <summary>
     /// 
     /// </summary>
-    public required byte[] UserAgentHash { get; set; }
+    public Guid UserAgentId { get; set; }
 
     /// <summary>
     /// 
     /// </summary>
-    public required UserAgentEntity UserAgent { get; set; }
+    public UserAgentEntity? UserAgent { get; set; }
 
     /// <summary>
     /// 
@@ -105,9 +105,8 @@ public sealed class SessionEntityConfiguration : IEntityTypeConfiguration<Sessio
             .HasColumnName("country")
             .HasMaxLength(2);
 
-        builder.Property(si => si.UserAgentHash)
-            .HasColumnName("userAgent")
-            .HasMaxLength(HashConstants.Sha256LengthBin);
+        builder.Property(si => si.UserAgentId)
+            .HasColumnName("userAgentId");
 
         builder.Property(si => si.CreatedAt)
             .HasColumnName("createdAt")
@@ -118,13 +117,13 @@ public sealed class SessionEntityConfiguration : IEntityTypeConfiguration<Sessio
 
         builder.Ignore(si => si.IsExpired);
 
-        builder.HasOne(si => si.Account)
+        builder.HasOne(si => si.User)
             .WithMany(u => u.Sessions)
             .HasForeignKey(si => si.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(si => si.UserAgent)
-            .WithMany()
-            .HasForeignKey(si => si.UserAgentHash);
+            .WithMany(ua => ua.Sessions)
+            .HasForeignKey(si => si.UserAgentId);
     }
 }

@@ -10,7 +10,7 @@ namespace ZapMe.Controllers.Api.V1.Account.Models;
 /// </summary>
 public sealed class AccountDto : UserDto
 {
-    public AccountDto(Data.Models.AccountEntity user)
+    public AccountDto(Data.Models.UserEntity user)
         : base(user)
     {
         ObscuredEmail = Transformers.ObscureEmail(user.Email);
@@ -23,7 +23,7 @@ public sealed class AccountDto : UserDto
     /// <summary>
     /// Obfuscated email of your account
     /// </summary>
-    [EmailAddress(false)]
+    [EmailAddress]
     [JsonPropertyOrder(3)]
     [JsonPropertyName("email")]
     public string ObscuredEmail { get; set; }

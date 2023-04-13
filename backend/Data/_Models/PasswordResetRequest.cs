@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using ZapMe.Constants;
 
 namespace ZapMe.Data.Models;
 
@@ -11,17 +12,17 @@ public sealed class PasswordResetRequestEntity
     /// <summary>
     /// 
     /// </summary>
-    public Guid AccountId { get; set; }
+    public Guid UserId { get; set; }
 
     /// <summary>
     /// 
     /// </summary>
-    public required AccountEntity Account { get; set; }
+    public UserEntity? User { get; set; }
 
     /// <summary>
     /// 
     /// </summary>
-    public string TokenHash { get; set; } = null!;
+    public required string TokenHash { get; set; }
 
     /// <summary>
     /// 
@@ -35,25 +36,22 @@ public sealed class PasswordResetRequestEntityConfiguration : IEntityTypeConfigu
     {
         builder.ToTable(PasswordResetRequestEntity.TableName);
 
-        builder.HasKey(pr => pr.AccountId);
+        builder.HasKey(pr => pr.UserId);
 
-        builder.Property(pr => pr.AccountId)
-            .HasColumnName("accountId")
-            .IsRequired();
+        builder.Property(pr => pr.UserId)
+            .HasColumnName("userId");
 
         builder.Property(pr => pr.TokenHash)
             .HasColumnName("tokenHash")
-            .HasMaxLength(32) // Sha256 hash digest
-            .IsRequired();
+            .HasMaxLength(HashConstants.Sha256LengthHex);
 
         builder.Property(pr => pr.CreatedAt)
             .HasColumnName("createdAt")
-            .HasDefaultValueSql("now()")
-            .IsRequired();
+            .HasDefaultValueSql("now()");
 
-        builder.HasOne(pr => pr.Account)
+        builder.HasOne(pr => pr.User)
             .WithOne()
-            .HasForeignKey<PasswordResetRequestEntity>(pr => pr.AccountId)
+            .HasForeignKey<PasswordResetRequestEntity>(pr => pr.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(pr => pr.TokenHash)

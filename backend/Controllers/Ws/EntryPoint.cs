@@ -40,7 +40,7 @@ public sealed partial class WebSocketController
             }
 
             // Register instance globally, the manager will have the ability to kill this connection
-            if (!await _webSocketInstanceManager.RegisterInstanceAsync(identity.AccountId, instanceId, instance, cancellationToken))
+            if (!await _webSocketInstanceManager.RegisterInstanceAsync(identity.UserId, instanceId, instance, cancellationToken))
             {
                 return this.Error_InternalServerError();
             }

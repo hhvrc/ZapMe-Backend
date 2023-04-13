@@ -9,7 +9,7 @@ namespace ZapMe.Controllers.Api.V1.Account.Models;
 public struct UpdateEmail
 {
     /// <summary/>
-    [EmailAddress(true)]
+    [EmailAddress]
     [JsonPropertyName("new_email")]
     public string NewEmail { get; set; }
 

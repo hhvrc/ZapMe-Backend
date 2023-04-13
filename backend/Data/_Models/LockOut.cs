@@ -20,7 +20,7 @@ public sealed class LockOutEntity
     /// <summary>
     /// 
     /// </summary>
-    public required AccountEntity User { get; set; }
+    public UserEntity? User { get; set; }
 
     /// <summary>
     /// 

@@ -9,7 +9,7 @@ public sealed class ZapMeIdentity : ClaimsIdentity
     {
         Session = session;
 
-        ICollection<UserRoleEntity>? roles = session.Account.UserRoles;
+        ICollection<UserRoleEntity>? roles = session.User?.UserRoles;
 
         // Add Role Claims
         if (roles != null)
@@ -20,8 +20,8 @@ public sealed class ZapMeIdentity : ClaimsIdentity
 
     public SessionEntity Session { get; }
     public Guid SessionId => Session.Id;
-    public AccountEntity Account => Session.Account;
-    public Guid AccountId => Account.Id;
-    public IEnumerable<string> Roles => Account.UserRoles?.Select(x => x.RoleName) ?? Enumerable.Empty<string>();
+    public UserEntity User => Session.User ?? throw new NullReferenceException("Session must contain a user");
+    public Guid UserId => User.Id;
+    public IEnumerable<string> Roles => User?.UserRoles?.Select(x => x.RoleName) ?? Enumerable.Empty<string>();
 }
 

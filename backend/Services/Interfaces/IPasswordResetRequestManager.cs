@@ -11,26 +11,26 @@ public interface IPasswordResetRequestManager
     /// <para>3. Inserts or Updates the database with the token hash</para>
     /// <para>4. Sends a mail to the accounts mail address containing a link to reset the password</para>
     /// </summary>
-    /// <param name="account"></param>
+    /// <param name="user"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<bool> InitiatePasswordReset(AccountEntity account, CancellationToken cancellationToken = default);
+    public Task<bool> InitiatePasswordReset(UserEntity user, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Helper method for <see cref="InitiatePasswordReset(AccountEntity, CancellationToken)"/>
+    /// Helper method for <see cref="InitiatePasswordReset(UserEntity, CancellationToken)"/>
     /// </summary>
-    /// <param name="accountId"></param>
+    /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<bool> InitiatePasswordReset(Guid accountId, CancellationToken cancellationToken = default);
+    public Task<bool> InitiatePasswordReset(Guid userId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Helper method for <see cref="InitiatePasswordReset(AccountEntity, CancellationToken)"/>
+    /// Helper method for <see cref="InitiatePasswordReset(UserEntity, CancellationToken)"/>
     /// </summary>
-    /// <param name="accountEmail"></param>
+    /// <param name="userEmail"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<bool> InitiatePasswordReset(string accountEmail, CancellationToken cancellationToken = default);
+    public Task<bool> InitiatePasswordReset(string userEmail, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 

@@ -41,7 +41,7 @@ public static class RateLimiterIServiceCollectionExtensions
                     return RateLimitPartition.GetNoLimiter("admin");
                 }
 
-                return RateLimitPartition.GetTokenBucketLimiter(identity.AccountId.ToString(), key => new TokenBucketRateLimiterOptions()
+                return RateLimitPartition.GetTokenBucketLimiter(identity.UserId.ToString(), key => new TokenBucketRateLimiterOptions()
                 {
                     TokenLimit = 10,
                     QueueProcessingOrder = QueueProcessingOrder.OldestFirst,

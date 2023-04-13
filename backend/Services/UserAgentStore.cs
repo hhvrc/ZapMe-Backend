@@ -18,48 +18,28 @@ public sealed class UserAgentStore : IUserAgentStore
         _dbContext = dbContext;
     }
 
-    public async Task<UserAgentEntity> EnsureCreatedAsync(string userAgent, CancellationToken cancellationToken = default)
+    public async Task<UserAgentEntity> CreateAsync(string sha256, uint length, string value, string operatingSystem, string device, string browser, CancellationToken cancellationToken)
     {
-        int length = userAgent.Length;
-        byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(userAgent));
+        if (sha256.Length != HashConstants.Sha256LengthHex) throw new ArgumentException($"Hash should be {HashConstants.Sha256LengthHex} characters", nameof(sha256));
 
-        UserAgentEntity? entry = await _dbContext.UserAgents.Where(x => x.Hash == hash).FirstOrDefaultAsync(cancellationToken);
-        if (entry != null)
+        UserAgentEntity userAgentEntity = new UserAgentEntity
         {
-            return entry;
-        }
-
-        string parsedOS, parsedDevice, parsedUserAgent;
-        try
-        {
-            ClientInfo parsed = Parser.GetDefault().Parse(userAgent);
-            parsedOS = parsed.OS.ToString();
-            parsedDevice = parsed.Device.ToString();
-            parsedUserAgent = parsed.UA.ToString();
-        }
-        catch (Exception)
-        {
-            parsedOS = parsedDevice = parsedUserAgent = "Unknown (Parsing failed)";
-        }
-
-        if (userAgent.Length > UserAgentLimits.StoredLength)
-        {
-            userAgent = userAgent[..UserAgentLimits.StoredLength];
-        }
-
-        entry = new UserAgentEntity
-        {
-            Hash = hash,
+            Sha256 = sha256,
             Length = length,
-            Value = userAgent,
-            ParsedOperatingSystem = parsedOS,
-            ParsedDevice = parsedDevice,
-            ParsedUserAgent = parsedUserAgent
+            Value = value,
+            OperatingSystem = operatingSystem,
+            Device = device,
+            Browser = browser
         };
 
-        await _dbContext.UserAgents.AddAsync(entry, cancellationToken);
+        await _dbContext.UserAgents.AddAsync(userAgentEntity, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return entry;
+        return userAgentEntity;
+    }
+
+    public Task<UserAgentEntity?> GetByHashAsync(string sha256, CancellationToken cancellationToken = default)
+    {
+        return _dbContext.UserAgents.FirstOrDefaultAsync(s => s.Sha256 == sha256, cancellationToken);
     }
 }

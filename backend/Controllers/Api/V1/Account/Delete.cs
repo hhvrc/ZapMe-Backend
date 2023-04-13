@@ -34,12 +34,12 @@ public partial class AccountController
         ZapMeIdentity identity = (User as ZapMePrincipal)!.Identity;
 
         // TODO: get the password hash from the database, or get it earlier in the pipeline
-        if (!PasswordUtils.CheckPassword(password, identity.Account.PasswordHash))
+        if (!PasswordUtils.CheckPassword(password, identity.User.PasswordHash))
         {
             return this.Error_InvalidPassword();
         }
 
-        await _accountManager.Store.DeleteAsync(identity.AccountId, cancellationToken);
+        await _userManager.Store.DeleteAsync(identity.UserId, cancellationToken);
 
         // TODO: register reason if supplied
 

@@ -41,8 +41,8 @@ public static class ZapMeIServiceCollectionExtensions
 
     public static void ZMAddUsers([NotNull] this IServiceCollection services)
     {
-        services.AddTransient<IAccountStore, AccountStore>();
-        services.AddTransient<IAccountManager, AccountManager>();
+        services.AddTransient<IUserStore, UserStore>();
+        services.AddTransient<IUserManager, UserManager>();
         services.AddTransient<IPasswordResetRequestStore, PasswordResetRequestStore>();
         services.AddTransient<IPasswordResetRequestManager, PasswordResetRequestManager>();
     }
@@ -50,6 +50,7 @@ public static class ZapMeIServiceCollectionExtensions
     public static void ZMAddSessions([NotNull] this IServiceCollection services)
     {
         services.AddTransient<IUserAgentStore, UserAgentStore>();
+        services.AddTransient<IUserAgentManager, UserAgentManager>();
         services.AddTransient<ISessionStore, SessionStore>();
         services.AddTransient<ISessionManager, SessionManager>();
     }

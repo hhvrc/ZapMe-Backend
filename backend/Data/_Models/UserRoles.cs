@@ -17,7 +17,7 @@ public sealed class UserRoleEntity
     /// <summary>
     /// 
     /// </summary>
-    public required AccountEntity User { get; set; }
+    public UserEntity? User { get; set; }
 
     /// <summary>
     /// 

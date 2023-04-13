@@ -19,7 +19,7 @@ public static class EncodingUtils
 
     public static string ToHex(byte[] bytes)
     {
-        return BitConverter.ToString(bytes).Replace("-", "").ToUpper();
+        return BitConverter.ToString(bytes).Replace("-", "");
     }
 
     public static byte[] FromHex(string hex)

@@ -30,16 +30,15 @@ public static class DataSeeders
         }
     }
 
-    private static readonly Guid _DefaultImageId = Guid.Parse("00000000-0000-0000-0000-000000000001");
     private static void SeedImages([NotNull] ZapMeContext context)
     {
         context.Images.Add(new ImageEntity
         {
-            Id = _DefaultImageId,
+            Id = ImageEntity.DefaultImageId,
             Height = 0,
             Width = 0,
             SizeBytes = 0,
-            HashSha256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            Sha256 = "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
             HashPerceptual = 0,
             UploaderId = null,
             Uploader = null
@@ -86,7 +85,7 @@ public static class DataSeeders
 
             accountPasswords.Add(name, new { email , password });
 
-            context.Accounts.Add(new AccountEntity
+            context.Accounts.Add(new UserEntity
             {
                 Id = id,
                 Name = name,
@@ -94,7 +93,7 @@ public static class DataSeeders
                 EmailVerified = true,
                 PasswordHash = passwordHash,
                 AcceptedTosVersion = Int32.MaxValue,
-                ProfilePictureId = _DefaultImageId,
+                ProfilePictureId = ImageEntity.DefaultImageId,
                 OnlineStatus = UserOnlineStatus.Online,
                 OnlineStatusText = "I'm online!",
                 CreatedAt = _CreationTime,

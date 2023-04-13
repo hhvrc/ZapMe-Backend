@@ -3,17 +3,17 @@ using ZapMe.DTOs;
 
 namespace ZapMe.Services.Interfaces;
 
-public interface IAccountStore
+public interface IUserStore
 {
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="userName"></param>
+    /// <param name="name"></param>
     /// <param name="email"></param>
     /// <param name="passwordHash"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<AccountCreationResult> TryCreateAsync(string userName, string email, string passwordHash, CancellationToken cancellationToken = default);
+    Task<AccountCreationResult> TryCreateAsync(string name, string email, string passwordHash, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -21,15 +21,15 @@ public interface IAccountStore
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<AccountEntity?> GetByIdAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<UserEntity?> GetByIdAsync(Guid userId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="userName"></param>
+    /// <param name="name"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<AccountEntity?> GetByNameAsync(string userName, CancellationToken cancellationToken = default);
+    Task<UserEntity?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -37,24 +37,24 @@ public interface IAccountStore
     /// <param name="email"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<AccountEntity?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
+    Task<UserEntity?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="userNameOrEmail"></param>
+    /// <param name="nameOrEmail"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<AccountEntity?> GetByUsernameOrEmail(string userNameOrEmail, CancellationToken cancellationToken = default);
+    Task<UserEntity?> GetByNameOrEmail(string nameOrEmail, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="userId"></param>
-    /// <param name="userName"></param>
+    /// <param name="name"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> SetUserNameAsync(Guid userId, string userName, CancellationToken cancellationToken = default);
+    Task<bool> SetUserNameAsync(Guid userId, string name, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
