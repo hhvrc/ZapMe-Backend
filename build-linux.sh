@@ -68,9 +68,11 @@ if [[ $DOTNET_INSTALLED = false ]] || [[ $DOTNET_6_INSTALLED = false ]] || [[ $D
     # Remove dotnet install script
     rm dotnet-install.sh
 
-    # Set environment variables
-    echo 'export DOTNET_ROOT=$HOME/.dotnet' >> ~/.bashrc
-    echo 'export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools' >> ~/.bashrc
+    # Set environment variables and add them to .bashrc to persist
+    export DOTNET_ROOT="$HOME/.dotnet"
+    export PATH="$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools"
+    echo 'export DOTNET_ROOT="$HOME/.dotnet"' >> ~/.bashrc
+    echo 'export PATH="$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools"' >> ~/.bashrc
 
     echo_green "Dotnet installed"
     
