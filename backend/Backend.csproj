@@ -57,7 +57,7 @@
   <Target Name="openapi" AfterTargets="PostBuildEvent" Condition="Exists('$(OutputPath)$(AssemblyName).dll') And ('$(Configuration)' == 'Release')">
 	<Message Text="generating openapi" Importance="high" />
 	<Exec Command="dotnet tool restore" />
-	<Exec Command="dotnet tool run swagger tofile --yaml --output $(ProjectDir)..\api\openapi.yaml $(OutputPath)$(AssemblyName).dll v1" />
+	<Exec Command="dotnet swagger tofile --yaml --output $(ProjectDir)..\api\openapi.yaml $(OutputPath)$(AssemblyName).dll v1" />
   </Target>
   <Target Name="fbs-copy" AfterTargets="PostBuildEvent">
     <Message Text="Copying Flatbuffer Schemas" Importance="high" />
