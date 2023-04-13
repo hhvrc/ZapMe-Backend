@@ -24,5 +24,6 @@ sudo apt install wget git build-essential -y
 
 git clone --recurse-submodules -j8 https://github.com/hhvrc/ZapMe
 cd ZapMe/
+chmod +x build-linux.sh
 ./build-linux.sh
 ```
