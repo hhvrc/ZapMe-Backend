@@ -24,6 +24,12 @@ public static class ZapMeIServiceCollectionExtensions
             cli.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
             cli.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(App.AppName, App.AppVersion.String));
         });
+        services.AddHttpClient("CloudflareTurnstile", cli =>
+        {
+            cli.BaseAddress = new Uri("https://challenges.cloudflare.com/turnstile/v0/", UriKind.Absolute);
+            cli.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
+            cli.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(App.AppName, App.AppVersion.String));
+        });
         services.AddHttpClient("MailGun", cli =>
         {
             string apiKey = config.GetOrThrow("Mailgun:ApiKey");
