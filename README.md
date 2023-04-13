@@ -20,7 +20,7 @@ powershell.exe -File .\build-windows.ps1 -ExecutionPolicy Bypass
 ### Ubuntu 22.04
 ```bash
 sudo apt update
-sudo apt install wget git build-essential cmake -y
+sudo apt install wget git build-essential make cmake -y
 
 git clone --recurse-submodules -j8 https://github.com/hhvrc/ZapMe
 cd ZapMe/

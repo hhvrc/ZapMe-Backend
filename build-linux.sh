@@ -81,6 +81,21 @@ else
     echo_green "Found dotnet runtime with SDKs 6 and 7"
 fi
 
+# Check if flatc is installed
+if hash flatc 2>/dev/null; then
+    echo_green "Found flatc"
+else
+    echo_cyan "Installing flatc"
+    git clone https://github.com/google/flatbuffers.git
+    cd tmp-flatbuffers
+    cmake -G "Unix Makefiles"
+    make
+    make install
+    ldconfig
+    cd ..
+    rm -rf tmp-flatbuffers
+fi
+
 # Remove all build artifacts
 rm -rf "build"
 rm -rf "backend/bin"
