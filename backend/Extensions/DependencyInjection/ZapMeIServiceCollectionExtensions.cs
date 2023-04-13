@@ -35,7 +35,8 @@ public static class ZapMeIServiceCollectionExtensions
         });
 
         services.AddTransient<IDebounceService, DebounceService>();
-        services.AddTransient<IGoogleReCaptchaService, GoogleReCaptchaService>();
+        //services.AddTransient<IGoogleReCaptchaService, GoogleReCaptchaService>();
+        services.AddTransient<ICloudFlareTurnstileService, CloudFlareTurnstileService>();
         services.AddTransient<IMailGunService, MailGunService>();
     }
 

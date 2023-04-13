@@ -15,7 +15,7 @@ public partial class AccountController
     /// Create a new account
     /// </summary>
     /// <param name="body"></param>
-    /// <param name="reCaptchaService"></param>
+    /// <param name="cfTurnstileService"></param>
     /// <param name="debounceService"></param>
     /// <param name="emailTemplateStore"></param>
     /// <param name="mailGunService"></param>
@@ -34,7 +34,7 @@ public partial class AccountController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status409Conflict)] // Username/email already taken
     public async Task<IActionResult> CreateAsync(
         [FromBody] Account.Models.Create body,
-        [FromServices] IGoogleReCaptchaService reCaptchaService,
+        [FromServices] ICloudFlareTurnstileService cfTurnstileService,
         [FromServices] IDebounceService debounceService,
         [FromServices] IMailTemplateStore emailTemplateStore,
         [FromServices] IMailGunService mailGunService,
@@ -46,7 +46,7 @@ public partial class AccountController
         }
 
         // Verify captcha
-        GoogleReCaptchaVerifyResponse reCaptchaResponse = await reCaptchaService.VerifyUserResponseTokenAsync(body.ReCaptchaResponse, this.GetRemoteIP(), cancellationToken);
+        CloudflareTurnstileVerifyResponse reCaptchaResponse = await cfTurnstileService.VerifyUserResponseTokenAsync(body.TurnstileResponse, this.GetRemoteIP(), cancellationToken);
         if (!reCaptchaResponse.Success)
         {
             if (reCaptchaResponse.ErrorCodes != null)
@@ -56,9 +56,9 @@ public partial class AccountController
                     switch (errorCode)
                     {
                         case "invalid-input-response":
-                            return this.Error_InvalidModelState((nameof(body.ReCaptchaResponse), "Invalid ReCaptcha Response"));
+                            return this.Error_InvalidModelState((nameof(body.TurnstileResponse), "Invalid ReCaptcha Response"));
                         case "timeout-or-duplicate":
-                            return this.Error_InvalidModelState((nameof(body.ReCaptchaResponse), "ReCaptcha Response Expired or Already Used"));
+                            return this.Error_InvalidModelState((nameof(body.TurnstileResponse), "ReCaptcha Response Expired or Already Used"));
                         default:
                             break;
                     };

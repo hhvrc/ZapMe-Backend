@@ -16,8 +16,8 @@ public struct RecoveryRequest
     public string Email { get; set; }
 
     /// <summary>
-    /// Response from google recaptcha request
+    /// Response from cloudflare turnstile request
     /// </summary>
-    [JsonPropertyName("recaptcha_response")]
-    public string ReCaptchaResponse { get; set; }
+    [JsonPropertyName("turnstile_response")]
+    public string TurnstileResponse { get; set; }
 }
