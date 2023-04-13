@@ -86,7 +86,7 @@ if hash flatc 2>/dev/null; then
     echo_green "Found flatc"
 else
     echo_cyan "Installing flatc"
-    git clone https://github.com/google/flatbuffers.git
+    git clone https://github.com/google/flatbuffers.git tmp-flatbuffers
     cd tmp-flatbuffers
     cmake -G "Unix Makefiles"
     make
