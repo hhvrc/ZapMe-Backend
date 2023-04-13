@@ -813,13 +813,15 @@ components:
           description: ''
         created_at:
           type: string
-          description: Date this account was created at
+          description: Date this user was created at
           format: date-time
         last_online:
           type: string
           description: Last time this user was online
           format: date-time
         email:
+          maxLength: 320
+          minLength: 5
           type: string
           description: Obfuscated email of your account
           format: email
@@ -967,10 +969,14 @@ components:
       type: object
       properties:
         support:
+          maxLength: 320
+          minLength: 5
           type: string
           format: email
           example: user.name@example.com
         contact:
+          maxLength: 320
+          minLength: 5
           type: string
           format: email
           example: user.name@example.com
@@ -992,6 +998,8 @@ components:
           description: ''
           example: Hq2yP1B^Fho&zRHxHkEu
         email:
+          maxLength: 320
+          minLength: 5
           type: string
           description: ''
           format: email
@@ -1000,9 +1008,9 @@ components:
           type: integer
           description: ''
           format: int32
-        recaptcha_response:
+        turnstile_response:
           type: string
-          description: Response from google recaptcha request
+          description: Response from cloudflare turnstile request
       additionalProperties: false
       description: Message sent to server to create a new account
     ErrorDetails:
@@ -1042,13 +1050,13 @@ components:
           items:
             type: string
             format: uuid
-          description: UserId's of users that has sent friend requests to this account
+          description: UserId's of users that has sent friend requests to this user
         outgoing:
           type: array
           items:
             type: string
             format: uuid
-          description: UserId's of users that this account has sent friend requests to
+          description: UserId's of users that this user has sent friend requests to
       additionalProperties: false
       description: List of incoming and outgoing friendrequests
     IconSource:
@@ -1106,13 +1114,15 @@ components:
       type: object
       properties:
         email:
+          maxLength: 320
+          minLength: 5
           type: string
           description: Email of your account you want to recover
           format: email
           example: user.name@example.com
-        recaptcha_response:
+        turnstile_response:
           type: string
-          description: Response from google recaptcha request
+          description: Response from cloudflare turnstile request
       additionalProperties: false
       description: Request sent to server to request a password reset token
     SeverityLevel:
@@ -1158,6 +1168,8 @@ components:
       type: object
       properties:
         new_email:
+          maxLength: 320
+          minLength: 5
           type: string
           description: ''
           format: email
@@ -1221,7 +1233,7 @@ components:
           description: ''
         created_at:
           type: string
-          description: Date this account was created at
+          description: Date this user was created at
           format: date-time
         last_online:
           type: string
