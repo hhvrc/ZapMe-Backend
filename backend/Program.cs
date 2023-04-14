@@ -2,12 +2,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.IdentityModel.Logging;
+using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using ZapMe.Constants;
 using ZapMe.Controllers;
 using ZapMe.Data;
 using ZapMe.Middlewares;
+
+bool ranByDotnet = Process.GetCurrentProcess().MainModule?.FileName.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase) ?? false;
+
+Console.WriteLine();
 
 // The services are ordered by dependency requirements.
 // The middlewares are ordered by execution order.
@@ -115,16 +120,23 @@ WebApplication app = builder.Build();
 // ######## SET UP DATABASE ###############
 // ########################################
 
-using (IServiceScope scope = app.Services.CreateScope())
+if (!ranByDotnet)
 {
-    IServiceProvider serviceProvider = scope.ServiceProvider;
-
-    if (!((serviceProvider.GetService<IDatabaseCreator>() as RelationalDatabaseCreator)?.Exists() ?? false))
+    using (IServiceScope scope = app.Services.CreateScope())
     {
-        ZapMeContext context = serviceProvider.GetRequiredService<ZapMeContext>();
-        await context.Database.MigrateAsync();
-        await DataSeeders.SeedAsync(context);
+        IServiceProvider serviceProvider = scope.ServiceProvider;
+
+        if (!((serviceProvider.GetService<IDatabaseCreator>() as RelationalDatabaseCreator)?.Exists() ?? false))
+        {
+            ZapMeContext context = serviceProvider.GetRequiredService<ZapMeContext>();
+            await context.Database.MigrateAsync();
+            await DataSeeders.SeedAsync(context);
+        }
     }
+}
+else
+{
+    Console.WriteLine("Skipping database migration because the app is not running in production environment.");
 }
 
 // ########################################
