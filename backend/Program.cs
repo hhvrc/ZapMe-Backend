@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.IdentityModel.Logging;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -117,10 +118,13 @@ WebApplication app = builder.Build();
 using (IServiceScope scope = app.Services.CreateScope())
 {
     IServiceProvider serviceProvider = scope.ServiceProvider;
-    ZapMeContext context = serviceProvider.GetRequiredService<ZapMeContext>();
-    await context.Database.EnsureCreatedAsync();
-    await context.Database.MigrateAsync();
-    DataSeeders.Seed(context);
+
+    if (!((serviceProvider.GetService<IDatabaseCreator>() as RelationalDatabaseCreator)?.Exists() ?? false))
+    {
+        ZapMeContext context = serviceProvider.GetRequiredService<ZapMeContext>();
+        await context.Database.MigrateAsync();
+        await DataSeeders.SeedAsync(context);
+    }
 }
 
 // ########################################

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using ZapMe.Constants;
 using ZapMe.Data.Models;
@@ -11,28 +10,28 @@ namespace ZapMe.Data;
 public static class DataSeeders
 {
     private static readonly DateTime _CreationTime = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-    public static void Seed(ZapMeContext context)
+    public static async Task SeedAsync(ZapMeContext context, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(context);
 
         if (!context.Images.Any())
-            SeedImages(context);
-        
+            await SeedImagesAsync(context, cancellationToken);
+
         if (!context.Accounts.Any())
-            SeedAccounts(context);
+            await SeedAccountsAsync(context, cancellationToken);
 
         if (File.Exists("passwords.json"))
         {
-            Console.WriteLine("Please save the passwords contained in \"passwords.json\" SECURELY, and delete them COMPLETELY from the server.");
-            Console.WriteLine("Server will refuse to start as long as that file exists in order to avoid passwords getting leaked");
-            Console.WriteLine("Server shutting down...");
+            Console.WriteLine("Please save the passwords contained in \"passwords.json\" SECURELY, and delete them COMPLETELY from the server.", cancellationToken);
+            Console.WriteLine("Server will refuse to start as long as that file exists in order to avoid passwords getting leaked", cancellationToken);
+            Console.WriteLine("Server shutting down...", cancellationToken);
             Environment.Exit(0);
         }
     }
 
-    private static void SeedImages([NotNull] ZapMeContext context)
+    private static async Task SeedImagesAsync([NotNull] ZapMeContext context, CancellationToken cancellationToken)
     {
-        context.Images.Add(new ImageEntity
+        await context.Images.AddAsync(new ImageEntity
         {
             Id = ImageEntity.DefaultImageId,
             Height = 0,
@@ -42,11 +41,11 @@ public static class DataSeeders
             HashPerceptual = 0,
             UploaderId = null,
             Uploader = null
-        });
-        context.SaveChanges();
+        }, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
-    private static void SeedAccounts([NotNull] ZapMeContext context)
+    private static async Task SeedAccountsAsync([NotNull] ZapMeContext context, CancellationToken cancellationToken)
     {
         string[] accounts = new string[] {
             "Admin",
@@ -72,7 +71,7 @@ public static class DataSeeders
         };
 
         Dictionary<string, object> accountPasswords = new Dictionary<string, object>();
-        
+
         for (int i = 0; i < accounts.Length; i++)
         {
             Guid id = Guid.Parse($"00000000-0000-0000-0000-{i + 1:X12}");
@@ -81,11 +80,11 @@ public static class DataSeeders
             string password = PasswordUtils.GeneratePassword();
             string passwordHash = PasswordUtils.HashPassword(password);
 
-            Console.WriteLine($"Creating account {name} ({email})");
+            Console.WriteLine($"Creating account {name} ({email})", cancellationToken);
 
-            accountPasswords.Add(name, new { email , password });
+            accountPasswords.Add(name, new { email, password });
 
-            context.Accounts.Add(new UserEntity
+            await context.Accounts.AddAsync(new UserEntity
             {
                 Id = id,
                 Name = name,
@@ -99,10 +98,10 @@ public static class DataSeeders
                 CreatedAt = _CreationTime,
                 UpdatedAt = _CreationTime,
                 LastOnline = _CreationTime,
-            });
+            }, cancellationToken);
         }
 
-        context.SaveChanges();
-        File.WriteAllText("passwords.json", JsonSerializer.Serialize(accountPasswords, new JsonSerializerOptions { WriteIndented = true }));
+        await context.SaveChangesAsync(cancellationToken);
+        await File.WriteAllTextAsync("passwords.json", JsonSerializer.Serialize(accountPasswords, new JsonSerializerOptions { WriteIndented = true }), cancellationToken);
     }
 }
