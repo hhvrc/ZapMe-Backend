@@ -53,21 +53,6 @@
         "resolved": "4.0.3",
         "contentHash": "W+U9WvmZQgi5cX6FS5GDtDoPzUCV4LkBLkywq/kRZhuDwcbavOzcDAr3LXJFqHUi952Yj3LEYoWW0jbEUQChsA=="
       },
-      "FlatSharp.Compiler": {
-        "type": "Direct",
-        "requested": "[7.1.1, )",
-        "resolved": "7.1.1",
-        "contentHash": "AbxPb0tuW1kdhh+pl7ICNLnXiSUPB4KQNygzALYCauKxARV4KopsWuGhKWMgZ/QdwIid5aV9WeQNa6Gt5GFJfw=="
-      },
-      "FlatSharp.Runtime": {
-        "type": "Direct",
-        "requested": "[7.1.1, )",
-        "resolved": "7.1.1",
-        "contentHash": "OY8LPiVXtnsd9YEhVckDxkbcpWMnyXvhXNEQPjxwhR090Ty5xo/Q4WbPcPsvN8d5VP+YFJOrHnq3hLp/GV3GAQ==",
-        "dependencies": {
-          "System.Memory": "4.5.5"
-        }
-      },
       "Microsoft.AspNetCore.Authentication.Google": {
         "type": "Direct",
         "requested": "[7.0.5, )",
@@ -539,11 +524,6 @@
         "type": "Transitive",
         "resolved": "5.0.0",
         "contentHash": "MTvUIktmemNB+El0Fgw9egyqT9AYSIk6DTJeoDSpc3GIHxHCMo8COqkWT1mptX5tZ1SlQ6HJZ0OsSvMth1c12w=="
-      },
-      "System.Memory": {
-        "type": "Transitive",
-        "resolved": "4.5.5",
-        "contentHash": "XIWiDvKPXaTveaB7HVganDlOCRoj03l+jrwNvcge/t8vhGYKvqV+dMv6G4SAX2NoNmN0wZfVPTAlFwZcZvVOUw=="
       },
       "System.Numerics.Vectors": {
         "type": "Transitive",

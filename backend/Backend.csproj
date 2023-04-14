@@ -18,21 +18,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <FlatSharpSchema Include="FlatbufferSchemas\*.fbs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.0" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.5" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.103.47" />
     <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.101.46" />
     <PackageReference Include="AWSSDK.SQS" Version="3.7.100.110" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-    <PackageReference Include="FlatSharp.Compiler" Version="7.1.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="FlatSharp.Runtime" Version="7.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="7.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="7.0.5" />
@@ -54,13 +45,10 @@
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     <PackageReference Include="UAParser" Version="3.1.47" />
   </ItemGroup>
+
   <Target Name="openapi" AfterTargets="PostBuildEvent" Condition="Exists('$(OutputPath)$(AssemblyName).dll') And ('$(Configuration)' == 'Release')">
 	<Message Text="generating openapi" Importance="high" />
 	<Exec Command="dotnet tool restore" />
 	<Exec Command="dotnet swagger tofile --yaml --output $(ProjectDir)..\api\openapi.yaml $(OutputPath)$(AssemblyName).dll v1" />
-  </Target>
-  <Target Name="fbs-copy" AfterTargets="PostBuildEvent">
-    <Message Text="Copying Flatbuffer Schemas" Importance="high" />
-    <Copy SourceFiles="@(FlatSharpSchema)" DestinationFolder="$(ProjectDir)..\api\flatbuffer-schemas" />
   </Target>
 </Project>
