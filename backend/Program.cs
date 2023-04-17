@@ -146,7 +146,6 @@ else
 if (isDevelopment)
 {
     app.UseDeveloperExceptionPage();
-    app.UseCors(); // Use default policy
 }
 else
 {
@@ -158,6 +157,7 @@ app.Map("/api", true, app =>
     // App!.UseHealthChecks("/api/v1/health/"); // TODO: explore this
 
     app.UseRouting();
+    if (isDevelopment) app.UseCors(); // Use default policy
     app.UseAuthorization();
     app.UseRateLimiter();
     app.UseMiddleware<ActivityTracker>();
