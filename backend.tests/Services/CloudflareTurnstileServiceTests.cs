@@ -152,13 +152,13 @@ public sealed class CloudflareTurnstileServiceTests
     [Theory]
     [InlineData("")]
     [InlineData(null!)]
-    public async Task VerifyUserResponseTokenAsync_NullOrEmptyResponseToken_ReturnsInvalidInputResponseErrorCode(string userResponseToken)
+    public async Task VerifyUserResponseTokenAsync_NullOrEmptyResponseToken_ReturnsMissingInputResponseErrorCode(string userResponseToken)
     {
         // Act
         var result = await _sut.VerifyUserResponseTokenAsync(userResponseToken, "");
 
         // Assert
         Assert.NotNull(result.ErrorCodes);
-        Assert.Contains("invalid-input-response", result.ErrorCodes);
+        Assert.Contains("missing-input-response", result.ErrorCodes);
     }
 }

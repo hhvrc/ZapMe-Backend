@@ -45,7 +45,7 @@ public partial class AccountController
             return this.Error_AnonymousOnly();
         }
 
-        // Verify captcha
+        // Verify turnstile token
         CloudflareTurnstileVerifyResponse reCaptchaResponse = await cfTurnstileService.VerifyUserResponseTokenAsync(body.TurnstileResponse, this.GetRemoteIP(), cancellationToken);
         if (!reCaptchaResponse.Success)
         {
@@ -55,10 +55,24 @@ public partial class AccountController
                 {
                     switch (errorCode)
                     {
-                        case "invalid-input-response":
-                            return this.Error_InvalidModelState((nameof(body.TurnstileResponse), "Invalid ReCaptcha Response"));
-                        case "timeout-or-duplicate":
-                            return this.Error_InvalidModelState((nameof(body.TurnstileResponse), "ReCaptcha Response Expired or Already Used"));
+                        case "missing-input-response": // The response parameter was not passed.
+                            return this.Error_InvalidModelState((nameof(body.TurnstileResponse), "Missing Cloudflare Turnstile Response"));
+                        case "invalid-input-response": // The response parameter is invalid or has expired.
+                            return this.Error_InvalidModelState((nameof(body.TurnstileResponse), "Invalid Cloudflare Turnstile Response"));
+                        case "timeout-or-duplicate": // The response parameter has already been validated before.
+                            return this.Error_InvalidModelState((nameof(body.TurnstileResponse), "Cloudflare Turnstile Response Expired or Already Used"));
+                        case "missing-input-secret": // The secret parameter was not passed.
+                            _logger.LogError("Missing Cloudflare Turnstile Secret");
+                            break;
+                        case "invalid-input-secret": // The secret parameter was invalid or did not exist.
+                            _logger.LogError("Invalid Cloudflare Turnstile Secret");
+                            break;
+                        case "bad-request": // The request was rejected because it was malformed.
+                            _logger.LogError("Bad Cloudflare Turnstile Request");
+                            break;
+                        case "internal-error": // An internal error happened while validating the response. The request can be retried.
+                            _logger.LogError("Cloudflare Turnstile Internal Error");
+                            break;
                         default:
                             break;
                     };
