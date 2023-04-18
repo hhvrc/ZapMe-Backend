@@ -856,12 +856,13 @@ components:
     ApiConfig:
       type: object
       properties:
-        version:
-          type: string
-          description: The current version of the API
         tos_version:
           type: integer
           description: 'The current Terms of Service version, if the user has not accepted this version, they will be prompted to accept it'
+          format: int32
+        privacy_version:
+          type: integer
+          description: 'The current Privacy Policy version, if the user has not accepted this version, they will be prompted to accept it'
           format: int32
         sentry_dsn:
           type: string
@@ -891,13 +892,6 @@ components:
           items:
             type: string
           description: 'List of disabled endpoints, if an endpoint is in this list, it will return a "503 Service Unavailable"'
-      additionalProperties: false
-    AppConfig:
-      type: object
-      properties:
-        version:
-          type: string
-          description: 'The current version of the App, if the local version is lower than this, the user will be notified of an update'
       additionalProperties: false
     AuthSignIn:
       type: object
@@ -937,33 +931,21 @@ components:
           description: 'ReCaptcha Client ID for bot detection, if null, ReCaptcha will be disabled'
           nullable: true
       additionalProperties: false
-    CommunityConfig:
-      type: object
-      properties:
-        discord_invite_uri:
-          type: string
-          description: Invite uri to the community discord server
-          format: uri
-        socials:
-          type: array
-          items:
-            $ref: '#/components/schemas/SocialEntry'
-          description: Social media links to project founder's accounts
-      additionalProperties: false
     Config:
       type: object
       properties:
-        name:
+        appName:
           type: string
           description: 'Name of the product, e.g. "ZapMe"'
-        app:
-          $ref: '#/components/schemas/AppConfig'
+        appVersion:
+          type: string
+          description: 'Version of the product, e.g. "1.0.0"'
         api:
           $ref: '#/components/schemas/ApiConfig'
         contact:
           $ref: '#/components/schemas/ContactConfig'
-        community:
-          $ref: '#/components/schemas/CommunityConfig'
+        founderSocials:
+          $ref: '#/components/schemas/SocialsConfig'
       additionalProperties: false
     ContactConfig:
       type: object
@@ -972,14 +954,20 @@ components:
           maxLength: 320
           minLength: 5
           type: string
+          description: Email address to contact the support of the service
           format: email
           example: user.name@example.com
         contact:
           maxLength: 320
           minLength: 5
           type: string
+          description: Email address to contact the owner of the service
           format: email
           example: user.name@example.com
+        discord:
+          type: string
+          description: Invite URL to the Discord server where users can get support
+          format: uri
       additionalProperties: false
     Create:
       type: object
@@ -1059,13 +1047,6 @@ components:
           description: UserId's of users that this user has sent friend requests to
       additionalProperties: false
       description: List of incoming and outgoing friendrequests
-    IconSource:
-      enum:
-        - uri
-        - emoji
-        - googleMaterialDesign
-      type: string
-      description: "The source of an icon, this is used to determine how to fetch the icon\r\n- uri: The icon is a URI to an image\r\n- emoji: The icon is an emoji\r\n- google: The icon is a Google Material Design icon name (https://fonts.google.com/icons)"
     OAuthProviderList:
       type: object
       properties:
@@ -1156,24 +1137,29 @@ components:
           $ref: '#/components/schemas/AccountDto'
       additionalProperties: false
       description: ''
-    SocialEntry:
+    SocialsConfig:
       type: object
       properties:
-        name:
+        githubUri:
           type: string
-          description: The name of the social platform
-        uri:
-          type: string
-          description: Uri to the target page on the platform
+          description: Uri pointing to a github account
           format: uri
-        icon_type:
-          $ref: '#/components/schemas/IconSource'
-        iconDark:
+          nullable: true
+        twitterUri:
           type: string
-          description: 'The icon URI for dark theme, fetched from source defined by ZapMe.Controllers.Api.V1.Config.Models.SocialEntry.IconSource'
-        iconLight:
+          description: Uri pointing to a twitter account
+          format: uri
+          nullable: true
+        redditUri:
           type: string
-          description: 'The icon URI for light theme, fetched from source defined by ZapMe.Controllers.Api.V1.Config.Models.SocialEntry.IconSource'
+          description: Uri pointing to a reddit account
+          format: uri
+          nullable: true
+        websiteUri:
+          type: string
+          description: Uri pointing to a personal website
+          format: uri
+          nullable: true
       additionalProperties: false
     UpdateEmail:
       type: object

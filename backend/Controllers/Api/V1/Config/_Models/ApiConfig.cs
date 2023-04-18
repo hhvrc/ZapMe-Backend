@@ -5,16 +5,16 @@ namespace ZapMe.Controllers.Api.V1.Config.Models;
 public struct ApiConfig
 {
     /// <summary>
-    /// The current version of the API
-    /// </summary>
-    [JsonPropertyName("version")]
-    public string Version { get; set; }
-
-    /// <summary>
     /// The current Terms of Service version, if the user has not accepted this version, they will be prompted to accept it
     /// </summary>
     [JsonPropertyName("tos_version")]
     public int TosVersion { get; set; }
+
+    /// <summary>
+    /// The current Privacy Policy version, if the user has not accepted this version, they will be prompted to accept it
+    /// </summary>
+    [JsonPropertyName("privacy_version")]
+    public int PrivacyVersion { get; set; }
 
     /// <summary>
     /// The DSN for Sentry, used for error reporting
