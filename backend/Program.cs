@@ -70,6 +70,10 @@ services.Configure<ApiBehaviorOptions>(opt =>
 {
     opt.InvalidModelStateResponseFactory = ErrorResponseFactory.CreateErrorResult;
 });
+services.AddResponseCaching(opt =>
+{
+    opt.MaximumBodySize = 64 * 1024;
+});
 
 // ########################################
 // ######## ZAPME SERVICES ################
@@ -173,7 +177,13 @@ app.Map("/swagger", true, app =>
     {
         opt.SwaggerEndpoint("/swagger/v1/swagger.json", App.AppName + " API - json");
         opt.SwaggerEndpoint("/swagger/v1/swagger.yaml", App.AppName + " API - yaml");
+        opt.InjectStylesheet("/static/SwaggerDark.css");
     });
+});
+app.Map("/static", false, app =>
+{
+    app.UseResponseCaching();
+    app.UseStaticFiles();
 });
 
 // ########################################
