@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
+using System.Text.Json;
 using ZapMe.Authentication.Models;
-using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
 
@@ -15,12 +16,14 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
     private ZapMeAuthenticationOptions _options = default!;
     private Task<AuthenticateResult>? _authenticateTask = null;
     private readonly ISessionStore _sessionStore;
+    private readonly JsonSerializerOptions _jsonSerializerOptions;
     private readonly IOptionsMonitor<ZapMeAuthenticationOptions> _optionsMonitor;
     private readonly ILogger<ZapMeAuthenticationHandler> _logger;
 
-    public ZapMeAuthenticationHandler(ISessionStore sessionStore, IOptionsMonitor<ZapMeAuthenticationOptions> optionsMonitor, ILogger<ZapMeAuthenticationHandler> logger)
+    public ZapMeAuthenticationHandler(ISessionStore sessionStore, IOptions<JsonOptions> options, IOptionsMonitor<ZapMeAuthenticationOptions> optionsMonitor, ILogger<ZapMeAuthenticationHandler> logger)
     {
         _sessionStore = sessionStore;
+        _jsonSerializerOptions = options.Value.JsonSerializerOptions;
         _optionsMonitor = optionsMonitor;
         _logger = logger;
     }
@@ -62,7 +65,7 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             }
         );
 
-        await Response.WriteAsJsonAsync(result);
+        await Response.WriteAsJsonAsync(result, _jsonSerializerOptions);
     }
 
     public Task SignOutAsync(AuthenticationProperties? properties)
