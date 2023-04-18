@@ -63,7 +63,7 @@ services.AddControllers().AddJsonOptions(opt =>
 {
     opt.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     opt.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-    opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, true));
+    opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, false));
 });
 //services.AddHealthChecks().AddCheck("sql" ) //TODO: explore this
 services.Configure<ApiBehaviorOptions>(opt =>
