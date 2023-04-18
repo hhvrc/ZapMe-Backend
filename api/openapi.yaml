@@ -1168,9 +1168,12 @@ components:
           format: uri
         icon_type:
           $ref: '#/components/schemas/IconSource'
-        icon:
+        iconDark:
           type: string
-          description: 'The icon URI, fetched from source defined by ZapMe.Controllers.Api.V1.Config.Models.SocialEntry.IconSource'
+          description: 'The icon URI for dark theme, fetched from source defined by ZapMe.Controllers.Api.V1.Config.Models.SocialEntry.IconSource'
+        iconLight:
+          type: string
+          description: 'The icon URI for light theme, fetched from source defined by ZapMe.Controllers.Api.V1.Config.Models.SocialEntry.IconSource'
       additionalProperties: false
     UpdateEmail:
       type: object
