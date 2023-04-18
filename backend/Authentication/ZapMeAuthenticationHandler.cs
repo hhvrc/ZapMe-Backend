@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
 using System.Security.Claims;
 using ZapMe.Authentication.Models;
 using ZapMe.Data.Models;
@@ -48,7 +47,11 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             new CookieOptions
             {
                 Path = "/",
+#if DEBUG
+                SameSite = SameSiteMode.None,
+#else
                 SameSite = SameSiteMode.Strict,
+#endif
                 HttpOnly = true,
                 MaxAge = session.ExpiresAt - DateTime.UtcNow,
                 IsEssential = true,
@@ -65,7 +68,7 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
 
         return Task.CompletedTask;
     }
-    
+
     private async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         string? sessionIdString = Request.Headers["Authorization"];
@@ -82,7 +85,7 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
         {
             sessionIdString = Request.Cookies[_options.CookieName];
         }
-        
+
         if (sessionIdString == null)
         {
             return AuthenticateResult.NoResult();

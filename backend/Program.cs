@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Logging;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using ZapMe.Constants;
 using ZapMe.Controllers;
 using ZapMe.Data;
@@ -103,9 +104,10 @@ services.AddCors(opt =>
         // Allow all origins in development
         opt.AddDefaultPolicy(builder =>
         {
-            builder.AllowAnyOrigin();
+            builder.SetIsOriginAllowed(str => MyRegex().IsMatch(str));
             builder.AllowAnyHeader();
             builder.AllowAnyMethod();
+            builder.AllowCredentials();
         });
     }
 });
@@ -179,3 +181,9 @@ app.Map("/swagger", true, app =>
 // ########################################
 
 app.Run();
+
+partial class Program
+{
+    [GeneratedRegex(@"^(?:https?:\/\/)?(?:zapme\.app|(?:localhost(?::[0-9]{1,5})?))$")]
+    private static partial Regex MyRegex();
+}
