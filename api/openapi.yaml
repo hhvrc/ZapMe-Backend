@@ -1125,16 +1125,10 @@ components:
           description: Response from cloudflare turnstile request
       additionalProperties: false
       description: Request sent to server to request a password reset token
-    SeverityLevel:
-      enum:
-        - info
-        - warning
-        - error
-      type: string
-    SignInOk:
+    SessionDto:
       type: object
       properties:
-        sessionId:
+        id:
           type: string
           description: ''
           format: uuid
@@ -1146,6 +1140,20 @@ components:
           type: string
           description: ''
           format: date-time
+      additionalProperties: false
+    SeverityLevel:
+      enum:
+        - info
+        - warning
+        - error
+      type: string
+    SignInOk:
+      type: object
+      properties:
+        session:
+          $ref: '#/components/schemas/SessionDto'
+        account:
+          $ref: '#/components/schemas/AccountDto'
       additionalProperties: false
       description: ''
     SocialEntry:

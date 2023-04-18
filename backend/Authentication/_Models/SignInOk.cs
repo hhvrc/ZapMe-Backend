@@ -1,4 +1,6 @@
 ﻿using System.Text.Json.Serialization;
+using ZapMe.Controllers.Api.V1.Account.Models;
+using ZapMe.Data.Models;
 
 namespace ZapMe.Authentication.Models;
 
@@ -7,21 +9,23 @@ namespace ZapMe.Authentication.Models;
 /// </summary>
 public sealed class SignInOk
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    [JsonPropertyName("sessionId")]
-    public Guid SessionId { get; set; }
+    public SignInOk(SessionEntity session)
+    {
+        ArgumentNullException.ThrowIfNull(session.User);
+
+        Session = new SessionDto(session);
+        Account = new AccountDto(session.User);
+    }
 
     /// <summary>
     /// 
     /// </summary>
-    [JsonPropertyName("issuedAtUtc")]
-    public DateTime IssuedAtUtc { get; set; }
+    [JsonPropertyName("session")]
+    public SessionDto Session { get; set; }
 
     /// <summary>
     /// 
     /// </summary>
-    [JsonPropertyName("expiresAtUtc")]
-    public DateTime ExpiresAtUtc { get; set; }
+    [JsonPropertyName("account")]
+    public AccountDto Account { get; set; }
 }

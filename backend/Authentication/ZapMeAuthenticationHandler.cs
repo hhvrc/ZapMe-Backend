@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using ZapMe.Authentication.Models;
+using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
 
@@ -40,6 +41,8 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
     {
         SessionEntity session = (claimsIdentity as ZapMePrincipal)!.Identity.Session;
 
+        SignInOk result = new SignInOk(session);
+
         Response.StatusCode = StatusCodes.Status200OK;
         Response.Cookies.Append(
             _options.CookieName,
@@ -59,7 +62,7 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             }
         );
 
-        await Response.WriteAsJsonAsync(new SignInOk { SessionId = session.Id, IssuedAtUtc = session.CreatedAt, ExpiresAtUtc = session.ExpiresAt });
+        await Response.WriteAsJsonAsync(result);
     }
 
     public Task SignOutAsync(AuthenticationProperties? properties)
