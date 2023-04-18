@@ -23,8 +23,14 @@ public struct SocialEntry
     public IconSource IconSource { get; set; }
 
     /// <summary>
-    /// The icon URI, fetched from source defined by <see cref="IconSource"/>
+    /// The icon URI for dark theme, fetched from source defined by <see cref="IconSource"/>
     /// </summary>
-    [JsonPropertyName("icon")]
-    public string Icon { get; set; }
+    [JsonPropertyName("iconDark")]
+    public string IconDarkURI { get; set; }
+
+    /// <summary>
+    /// The icon URI for light theme, fetched from source defined by <see cref="IconSource"/>
+    /// </summary>
+    [JsonPropertyName("iconLight")]
+    public string IconLightURI { get; set; }
 }
