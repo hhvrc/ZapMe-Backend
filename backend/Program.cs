@@ -13,8 +13,6 @@ using ZapMe.Middlewares;
 
 bool ranByDotnet = Process.GetCurrentProcess().MainModule?.FileName.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase) ?? false;
 
-Console.WriteLine();
-
 // The services are ordered by dependency requirements.
 // The middlewares are ordered by execution order.
 
