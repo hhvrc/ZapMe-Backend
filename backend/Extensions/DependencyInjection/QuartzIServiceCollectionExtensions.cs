@@ -67,6 +67,8 @@ public static class QuartzIServiceCollectionExtensions
 
     public static void ZMAddQuartz([NotNull] this IServiceCollection services)
     {
+        Quartz.Logging.LogProvider.IsDisabled = true;
+
         services.AddQuartz(ConfigureQuartz);
         services.AddQuartzServer(ConfigureQuartzServer);
     }
