@@ -2,7 +2,7 @@
 
 namespace ZapMe.Services.Interfaces;
 
-public interface IPasswordResetRequestManager
+public interface IPasswordResetManager
 {
     /// <summary>
     /// Will initiate a password request:
@@ -39,7 +39,7 @@ public interface IPasswordResetRequestManager
     /// <param name="newPassword"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<bool> CompletePasswordReset(string token, string newPassword, CancellationToken cancellationToken = default);
+    public Task<bool> TryCompletePasswordReset(string token, string newPassword, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 

@@ -6,15 +6,15 @@ using ZapMe.Utils;
 
 namespace ZapMe.Services;
 
-public sealed class PasswordResetRequestManager : IPasswordResetRequestManager
+public sealed class PasswordResetManager : IPasswordResetManager
 {
     private readonly IUserManager _userManager;
     private readonly IMailTemplateStore _mailTemplateStore;
     private readonly IMailGunService _mailGunService;
     private readonly IPasswordResetRequestStore _passwordResetRequestStore;
-    private readonly ILogger<PasswordResetRequestManager> _logger;
+    private readonly ILogger<PasswordResetManager> _logger;
 
-    public PasswordResetRequestManager(IUserManager userManager, IMailTemplateStore mailTemplateStore, IMailGunService mailGunService, IPasswordResetRequestStore passwordResetRequestStore, ILogger<PasswordResetRequestManager> logger)
+    public PasswordResetManager(IUserManager userManager, IMailTemplateStore mailTemplateStore, IMailGunService mailGunService, IPasswordResetRequestStore passwordResetRequestStore, ILogger<PasswordResetManager> logger)
     {
         _userManager = userManager;
         _mailTemplateStore = mailTemplateStore;
@@ -62,7 +62,7 @@ public sealed class PasswordResetRequestManager : IPasswordResetRequestManager
         return await InitiatePasswordReset(userEntity, cancellationToken);
     }
 
-    public async Task<bool> CompletePasswordReset(string token, string newPassword, CancellationToken cancellationToken)
+    public async Task<bool> TryCompletePasswordReset(string token, string newPassword, CancellationToken cancellationToken)
     {
         string tokenHash = HashingUtils.Sha256_String(token);
 

@@ -14,7 +14,7 @@ public partial class AccountController
     /// </summary>
     /// <param name="body"></param>
     /// <param name="cfTurnstileService"></param>
-    /// <param name="passwordResetRequestManager"></param>
+    /// <param name="passwordResetManager"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <response code="200">Account</response>
@@ -23,7 +23,7 @@ public partial class AccountController
     [HttpPost("recover", Name = "AccountRecoveryRequest")]
     [Consumes(Application.Json, Application.Xml)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> RecoveryRequest([FromBody] Account.Models.RecoveryRequest body, [FromServices] ICloudFlareTurnstileService cfTurnstileService, [FromServices] IPasswordResetRequestManager passwordResetRequestManager, CancellationToken cancellationToken)
+    public async Task<IActionResult> RecoveryRequest([FromBody] Account.Models.RecoveryRequest body, [FromServices] ICloudFlareTurnstileService cfTurnstileService, [FromServices] IPasswordResetManager passwordResetManager, CancellationToken cancellationToken)
     {
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(1, cancellationToken);
 
@@ -49,8 +49,8 @@ public partial class AccountController
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
-        bool success = await passwordResetRequestManager.InitiatePasswordReset(body.Email, cancellationToken);
+        await passwordResetManager.InitiatePasswordReset(body.Email, cancellationToken);
 
-        return Ok();
+        return Ok(); // Return 200 OK no matter what happens, this is to prevent email enumeration
     }
 }
