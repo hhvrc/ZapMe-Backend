@@ -31,14 +31,9 @@ public sealed class SessionStore : ISessionStore
         };
 
         await _dbContext.Sessions.AddAsync(session, cancellationToken);
-        int nAdded = await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
-        if (nAdded <= 0)
-        {
-            _logger.LogWarning("Failed to create session for user {UserId}", user.Id);
-        }
-
-        return (await GetByIdAsync(session.Id, cancellationToken))!;
+        return session;
     }
 
     public Task<SessionEntity?> GetByIdAsync(Guid sessionId, CancellationToken cancellationToken)

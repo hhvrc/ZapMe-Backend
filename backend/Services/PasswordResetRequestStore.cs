@@ -42,12 +42,7 @@ public sealed class PasswordResetRequestStore : IPasswordResetRequestStore
             _dbContext.PasswordResetRequests.Update(request);
         }
 
-        int nAdded = await _dbContext.SaveChangesAsync(cancellationToken);
-
-        if (nAdded <= 0)
-        {
-            _logger.LogWarning("Failed to create password reset request for user {UserId}", userId);
-        }
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return request;
     }

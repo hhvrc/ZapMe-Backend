@@ -16,9 +16,9 @@ public sealed class UserRelationStore : IUserRelationStore
         _logger = logger;
     }
 
-    public async Task<UserRelationEntity?> CreateAsync(Guid sourceUserId, Guid targetUserId, CancellationToken cancellationToken)
+    public async Task<UserRelationEntity> CreateAsync(Guid sourceUserId, Guid targetUserId, CancellationToken cancellationToken)
     {
-        var entity = new UserRelationEntity
+        var userRelation = new UserRelationEntity
         {
             SourceUserId = sourceUserId,
             TargetUserId = targetUserId,
@@ -27,9 +27,10 @@ public sealed class UserRelationStore : IUserRelationStore
             TargetUser = null!,
         };
 
-        await _dbContext.UserRelations.AddAsync(entity, cancellationToken);
+        await _dbContext.UserRelations.AddAsync(userRelation, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return entity;
+        return userRelation;
     }
 
     public IAsyncEnumerable<UserRelationEntity> ListOutgoingAsync(Guid sourceUserId)

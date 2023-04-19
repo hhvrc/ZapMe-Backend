@@ -17,7 +17,7 @@ public sealed class FriendRequestStore : IFriendRequestStore
 
     public async Task<FriendRequestEntity> CreateAsync(Guid senderId, Guid receiverId, CancellationToken cancellationToken = default)
     {
-        FriendRequestEntity friendRequestEntity = new FriendRequestEntity
+        FriendRequestEntity friendRequest = new FriendRequestEntity
         {
             SenderId = senderId,
             ReceiverId = receiverId,
@@ -25,9 +25,10 @@ public sealed class FriendRequestStore : IFriendRequestStore
             Receiver = null!,
         };
 
-        await _dbContext.FriendRequests.AddAsync(friendRequestEntity, cancellationToken);
+        await _dbContext.FriendRequests.AddAsync(friendRequest, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return friendRequestEntity;
+        return friendRequest;
     }
 
     public IAsyncEnumerable<FriendRequestEntity> ListByUserAsync(Guid userId)

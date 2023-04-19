@@ -11,7 +11,7 @@ public interface IUserRelationStore
     /// <param name="targetUserId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<UserRelationEntity?> CreateAsync(Guid sourceUserId, Guid targetUserId, CancellationToken cancellationToken = default);
+    Task<UserRelationEntity> CreateAsync(Guid sourceUserId, Guid targetUserId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 

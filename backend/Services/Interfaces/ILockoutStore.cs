@@ -16,7 +16,7 @@ public interface ILockOutStore
     /// <param name="expiresAt"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<LockOutEntity?> CreateAsync(Guid userId, string? reason = null, string flags = "", DateTime? expiresAt = null, CancellationToken cancellationToken = default);
+    Task<LockOutEntity> CreateAsync(Guid userId, string? reason = null, string flags = "", DateTime? expiresAt = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 

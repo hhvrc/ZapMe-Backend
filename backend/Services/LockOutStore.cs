@@ -18,9 +18,9 @@ public sealed class LockOutStore : ILockOutStore
         _logger = logger;
     }
 
-    public async Task<LockOutEntity?> CreateAsync(Guid userId, string? reason, string flags, DateTime? expiresAt, CancellationToken cancellationToken)
+    public async Task<LockOutEntity> CreateAsync(Guid userId, string? reason, string flags, DateTime? expiresAt, CancellationToken cancellationToken)
     {
-        var entity = new LockOutEntity
+        LockOutEntity lockout = new LockOutEntity
         {
             User = null!, // TODO: wtf do i do now? ask on C# discord
             UserId = userId,
@@ -29,15 +29,10 @@ public sealed class LockOutStore : ILockOutStore
             ExpiresAt = expiresAt
         };
 
-        await _dbContext.LockOuts.AddAsync(entity, cancellationToken);
-        int nAdded = await _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.LockOuts.AddAsync(lockout, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
-        if (nAdded > 0)
-        {
-            return entity;
-        }
-
-        return null;
+        return lockout;
     }
 
     public Task<LockOutEntity?> GetByIdAsync(Guid lockOutId, CancellationToken cancellationToken)

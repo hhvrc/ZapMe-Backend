@@ -1,7 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
-using System.Text;
-using UAParser;
 using ZapMe.Constants;
 using ZapMe.Data;
 using ZapMe.Data.Models;
@@ -22,7 +19,7 @@ public sealed class UserAgentStore : IUserAgentStore
     {
         if (sha256.Length != HashConstants.Sha256LengthHex) throw new ArgumentException($"Hash should be {HashConstants.Sha256LengthHex} characters", nameof(sha256));
 
-        UserAgentEntity userAgentEntity = new UserAgentEntity
+        UserAgentEntity userAgent = new UserAgentEntity
         {
             Sha256 = sha256,
             Length = length,
@@ -32,10 +29,10 @@ public sealed class UserAgentStore : IUserAgentStore
             Browser = browser
         };
 
-        await _dbContext.UserAgents.AddAsync(userAgentEntity, cancellationToken);
+        await _dbContext.UserAgents.AddAsync(userAgent, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return userAgentEntity;
+        return userAgent;
     }
 
     public Task<UserAgentEntity?> GetByHashAsync(string sha256, CancellationToken cancellationToken = default)
