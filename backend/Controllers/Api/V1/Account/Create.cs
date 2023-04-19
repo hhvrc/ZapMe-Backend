@@ -117,7 +117,7 @@ public partial class AccountController
         {
             string emailBody = new QuickStringReplacer(emailTemplate)
                     .Replace("{{UserName}}", body.UserName)
-                    //.Replace("{{ConfirmEmailLink}}", App.BackendBaseUrl + "/Account/ConfirmEmail?token=" + result.ConfirmationToken)
+                    //.Replace("{{ConfirmEmailLink}}", App.WebsiteUrl + "/Account/ConfirmEmail?token=" + result.ConfirmationToken)
                     .Replace("{{CompanyName}}", App.AppCreator)
                     .Replace("{{CompanyAddress}}", App.MadeInText)
                     .Replace("{{PoweredBy}}", App.AppName)
