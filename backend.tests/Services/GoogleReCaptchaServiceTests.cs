@@ -28,7 +28,7 @@ public sealed class GoogleReCaptchaServiceTests
 
         _configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new KeyValuePair<string, string?>[] {
-                new("Authorization:ReCaptcha:Secret", _reCaptchaSecret)
+                new("Authorization:ReCaptcha:SecretKey", _reCaptchaSecret)
             })
             .Build();
 

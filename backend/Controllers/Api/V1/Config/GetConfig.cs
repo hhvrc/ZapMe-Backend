@@ -10,14 +10,16 @@ public partial class ConfigController
     /// <summary>
     /// 
     /// </summary>
+    /// <param name="configuration"></param>
     /// <returns>The config for the service</returns>
     /// <response code="200">Returns the service config</response>
+    /// <returns></returns>
     [HttpGet(Name = "GetConfig")]
     [Produces(Application.Json, Application.Xml)]
     [ProducesResponseType(typeof(Config.Models.Config), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
-    public Config.Models.Config GetConfig()
+    public Config.Models.Config GetConfig([FromServices] IConfiguration configuration)
     {
         return new Config.Models.Config {
             AppName = App.AppName,
@@ -26,6 +28,15 @@ public partial class ConfigController
             {
                 TosVersion = 1,
                 PrivacyVersion = 1,
+                Authentication = new Config.Models.AuthenticationConfig
+                {
+                    DiscordClientId = configuration["Authorization:Discord:ClientId"],
+                    GithubClientId = configuration["Authorization:Github:ClientId"],
+                    TwitterClientId = configuration["Authorization:Twitter:ClientId"],
+                    GoogleClientId = configuration["Authorization:Google:ClientId"],
+                    RecaptchaSiteKey = configuration["Authorization:ReCaptcha:SiteKey"],
+                    TurnstileSiteKey = configuration["Authorization:Turnstile:SiteKey"]
+                },
             },
             Contact = new Config.Models.ContactConfig
             {

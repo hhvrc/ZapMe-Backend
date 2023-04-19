@@ -13,7 +13,7 @@ public sealed class GoogleReCaptchaService : IGoogleReCaptchaService
     {
         _httpClientFactory = httpClientFactory;
         _logger = logger;
-        _reCaptchaSecret = configuration["Authorization:ReCaptcha:Secret"] ?? throw new KeyNotFoundException("Config entry \"Authorization:ReCaptcha:Secret\" is missing!");
+        _reCaptchaSecret = configuration["Authorization:ReCaptcha:SecretKey"] ?? throw new KeyNotFoundException("Config entry \"Authorization:ReCaptcha:SecretKey\" is missing!");
     }
 
     public async Task<GoogleReCaptchaVerifyResponse> VerifyUserResponseTokenAsync(string reCaptchaToken, string? remoteIpAddress, CancellationToken cancellationToken = default)
