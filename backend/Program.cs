@@ -102,7 +102,7 @@ services.ZMAddQuartz();
 services.AddCors(opt =>
 {
     opt.AddDefaultPolicy(builder => builder
-        .AllowAnyOrigin()
+        .SetIsOriginAllowed(isDevelopment ? DevOriginMatcher().IsMatch : ProdOriginMatcher().IsMatch)
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials()
