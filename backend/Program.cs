@@ -101,17 +101,20 @@ services.ZMAddQuartz();
 
 services.AddCors(opt =>
 {
-    if (isDevelopment)
+    opt.AddDefaultPolicy(builder =>
     {
-        // Allow all origins in development
-        opt.AddDefaultPolicy(builder =>
+        if (isDevelopment)
         {
-            builder.SetIsOriginAllowed(str => MyRegex().IsMatch(str));
-            builder.AllowAnyHeader();
-            builder.AllowAnyMethod();
-            builder.AllowCredentials();
-        });
-    }
+            builder.SetIsOriginAllowed(DevOriginMatcher().IsMatch);
+        }
+        else
+        {
+            builder.WithOrigins(App.BackendUrl);
+        }
+        builder.AllowAnyHeader();
+        builder.AllowAnyMethod();
+        builder.AllowCredentials();
+    });
 });
 
 // ########################################
@@ -192,6 +195,6 @@ app.Run();
 
 partial class Program
 {
-    [GeneratedRegex(@"^(?:https?:\/\/)?(?:zapme\.app|(?:localhost(?::[0-9]{1,5})?))$")]
-    private static partial Regex MyRegex();
+    [GeneratedRegex(@"^(?:https?:\/\/)?(?:localhost(?::[0-9]{1,5})?)$")]
+    private static partial Regex DevOriginMatcher();
 }
