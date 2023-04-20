@@ -110,6 +110,7 @@ services.AddCors(opt =>
         else
         {
             builder.WithOrigins(App.BackendUrl);
+            builder.SetIsOriginAllowed(ProdOriginMatcher().IsMatch);
         }
         builder.AllowAnyHeader();
         builder.AllowAnyMethod();
@@ -197,4 +198,7 @@ partial class Program
 {
     [GeneratedRegex(@"^(?:https?:\/\/)?(?:localhost(?::[0-9]{1,5})?)$")]
     private static partial Regex DevOriginMatcher();
+
+    [GeneratedRegex(@"^(?:https?:\/\/)?api\.zapme\.app$")]
+    private static partial Regex ProdOriginMatcher();
 }
