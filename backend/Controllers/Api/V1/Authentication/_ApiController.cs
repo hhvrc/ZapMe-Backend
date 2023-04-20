@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Controllers.Api.V1;
@@ -7,7 +6,6 @@ namespace ZapMe.Controllers.Api.V1;
 /// <summary>
 /// 
 /// </summary>
-[EnableCors]
 [ApiController]
 [Route("/api/v1/auth/")]
 public sealed partial class AuthenticationController : ControllerBase

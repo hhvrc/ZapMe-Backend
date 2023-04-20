@@ -101,21 +101,12 @@ services.ZMAddQuartz();
 
 services.AddCors(opt =>
 {
-    opt.AddDefaultPolicy(builder =>
-    {
-        if (isDevelopment)
-        {
-            builder.SetIsOriginAllowed(DevOriginMatcher().IsMatch);
-        }
-        else
-        {
-            builder.WithOrigins(App.BackendUrl);
-            builder.SetIsOriginAllowed(ProdOriginMatcher().IsMatch);
-        }
-        builder.AllowAnyHeader();
-        builder.AllowAnyMethod();
-        builder.AllowCredentials();
-    });
+    opt.AddDefaultPolicy(builder => builder
+        .AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials()
+            );
 });
 
 // ########################################
