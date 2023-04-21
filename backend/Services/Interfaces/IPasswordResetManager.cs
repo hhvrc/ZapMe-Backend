@@ -11,7 +11,7 @@ public interface IPasswordResetManager
     /// <para>3. Inserts or Updates the database with the token hash</para>
     /// <para>4. Sends a mail to the accounts mail address containing a link to reset the password</para>
     /// </summary>
-    /// <param name="user"></param>
+    /// <param name="user">User to reset the password for. User must have a verified email address, otherwise an exception will be thrown.</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     public Task<bool> InitiatePasswordReset(UserEntity user, CancellationToken cancellationToken = default);

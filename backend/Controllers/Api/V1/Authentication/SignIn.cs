@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using UAParser;
+using Microsoft.EntityFrameworkCore;
 using ZapMe.Authentication;
 using ZapMe.Authentication.Models;
 using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.Data;
 using ZapMe.Data.Models;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
@@ -18,7 +19,7 @@ public partial class AuthenticationController
     /// 
     /// </summary>
     /// <param name="body"></param>
-    /// <param name="userStore"></param>
+    /// <param name="dbContext"></param>
     /// <param name="lockOutStore"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>The user account</returns>
@@ -35,7 +36,7 @@ public partial class AuthenticationController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status413RequestEntityTooLarge)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] IUserStore userStore, [FromServices] ILockOutStore lockOutStore, CancellationToken cancellationToken)
+    public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] ZapMeContext dbContext, [FromServices] ILockOutStore lockOutStore, CancellationToken cancellationToken)
     {
         if (User.Identity?.IsAuthenticated ?? false)
         {
@@ -44,10 +45,10 @@ public partial class AuthenticationController
 
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
 
-        UserEntity? user = await userStore.GetByNameAsync(body.Username, cancellationToken) ?? await userStore.GetByEmailAsync(body.Username, cancellationToken);
+        UserEntity? user = await dbContext.Users.Where(u => u.Name == body.UsernameOrEmail || u.Email == body.UsernameOrEmail).SingleOrDefaultAsync(cancellationToken);
         if (user == null)
         {
-            return this.Error_InvalidCredentials("Invalid username/password", "Please check that your entered username and password are correct", "username", "password");
+            return this.Error_InvalidCredentials("Invalid username/email/password", "Please check that your entered username/email and password are correct", "username", "password");
         }
 
         if (!PasswordUtils.CheckPassword(body.Password, user.PasswordHash))
@@ -69,7 +70,7 @@ public partial class AuthenticationController
             return this.Error(StatusCodes.Status400BadRequest, "Account disabled", "Account has been disabled either by moderative or administrative reasons", UserNotification.SeverityLevel.Error, "Account disabled", reason);
         }
 
-        if (!user.EmailVerified)
+        if (String.IsNullOrEmpty(user.Email))
         {
             return this.Error(StatusCodes.Status400BadRequest, "Unverified Email", "Email has not been verified", UserNotification.SeverityLevel.Error, "Email not verified", "Please verify your email address before signing in");
         }

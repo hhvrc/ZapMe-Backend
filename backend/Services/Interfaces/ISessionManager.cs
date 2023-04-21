@@ -25,5 +25,5 @@ public interface ISessionManager
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    ValueTask<bool> UserHasSessionAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<bool> UserHasSessionAsync(Guid userId, CancellationToken cancellationToken = default);
 }

@@ -9,7 +9,7 @@ public sealed class ZapMeContext : DbContext
     {
     }
 
-    public required DbSet<UserEntity> Accounts { get; set; }
+    public required DbSet<UserEntity> Users { get; set; }
     public required DbSet<ImageEntity> Images { get; set; }
     public required DbSet<SessionEntity> Sessions { get; set; }
     public required DbSet<LockOutEntity> LockOuts { get; set; }

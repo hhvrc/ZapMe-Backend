@@ -17,7 +17,7 @@ public static class DataSeeders
         if (!context.Images.Any())
             await SeedImagesAsync(context, cancellationToken);
 
-        if (!context.Accounts.Any())
+        if (!context.Users.Any())
             await SeedAccountsAsync(context, cancellationToken);
 
         if (File.Exists("passwords.json"))
@@ -84,12 +84,11 @@ public static class DataSeeders
 
             accountPasswords.Add(name, new { email, password });
 
-            await context.Accounts.AddAsync(new UserEntity
+            await context.Users.AddAsync(new UserEntity
             {
                 Id = id,
                 Name = name,
                 Email = email,
-                EmailVerified = true,
                 PasswordHash = passwordHash,
                 AcceptedTosVersion = Int32.MaxValue,
                 ProfilePictureId = ImageEntity.DefaultImageId,

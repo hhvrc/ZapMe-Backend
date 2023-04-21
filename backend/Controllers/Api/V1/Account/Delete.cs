@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using ZapMe.Attributes;
 using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.Models;
-using ZapMe.DTOs;
-using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -26,20 +25,19 @@ public partial class AccountController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Delete(
-        [FromHeader] [Password(true)] string password,
-        [FromHeader] [StringLength(1024)] string? reason,
+        [FromHeader][Password(true)] string password,
+        [FromHeader][StringLength(1024)] string? reason,
         CancellationToken cancellationToken
         )
     {
         ZapMeIdentity identity = (User as ZapMePrincipal)!.Identity;
 
-        // TODO: get the password hash from the database, or get it earlier in the pipeline
         if (!PasswordUtils.CheckPassword(password, identity.User.PasswordHash))
         {
             return this.Error_InvalidPassword();
         }
 
-        await _userManager.Store.DeleteAsync(identity.UserId, cancellationToken);
+        await _dbContext.Users.Where(u => u.Id == identity.User.Id).ExecuteDeleteAsync(cancellationToken);
 
         // TODO: register reason if supplied
 

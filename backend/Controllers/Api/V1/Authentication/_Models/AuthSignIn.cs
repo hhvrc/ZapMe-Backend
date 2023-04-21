@@ -13,8 +13,8 @@ public struct AuthSignIn
     /// Username or email address
     /// </summary>
     [Username(false)]
-    [JsonPropertyName("username")]
-    public string Username { get; set; }
+    [JsonPropertyName("username_or_email")]
+    public string UsernameOrEmail { get; set; }
 
     /// <summary>
     /// Password

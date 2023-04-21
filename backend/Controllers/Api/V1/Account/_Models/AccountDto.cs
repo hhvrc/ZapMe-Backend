@@ -13,8 +13,17 @@ public sealed class AccountDto : UserDto
     public AccountDto(Data.Models.UserEntity user)
         : base(user)
     {
-        ObscuredEmail = Transformers.ObscureEmail(user.Email);
-        EmailVerified = user.EmailVerified;
+        string? email = user.Email;
+        bool emailVerified = true;
+        if (String.IsNullOrEmpty(email))
+        {
+            emailVerified = false;
+            email = user.MailAddressChangeRequestEntity?.NewEmail;
+            if (email == null) throw new InvalidOperationException("User has no email address and no pending email address change request");
+        }
+
+        ObscuredEmail = Transformers.ObscureEmail(email);
+        EmailVerified = emailVerified;
         AcceptedTosVersion = user.AcceptedTosVersion;
         ConnectedAccounts = user.OauthConnections?.Select(oc => oc.ProviderName).ToArray() ?? Array.Empty<string>();
         Friends = user.Relations?.Select(fs => fs.TargetUserId).ToArray() ?? Array.Empty<Guid>();

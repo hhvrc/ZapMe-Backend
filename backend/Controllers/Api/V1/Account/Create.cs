@@ -117,14 +117,16 @@ public partial class AccountController
         {
             string emailBody = new QuickStringReplacer(emailTemplate)
                     .Replace("{{UserName}}", body.UserName)
-                    //.Replace("{{ConfirmEmailLink}}", App.WebsiteUrl + "/Account/ConfirmEmail?token=" + result.ConfirmationToken)
+                    .Replace("{{ConfirmEmailLink}}", App.BackendUrl + "/Account/ConfirmEmail?token=" + result.ConfirmationToken)
+                    .Replace("{{ContactLink}}", App.ContactUrl)
+                    .Replace("{{PrivacyPolicyLink}}", App.PrivacyPolicyUrl)
+                    .Replace("{{TermsOfServiceLink}}", App.TermsOfServiceUrl)
                     .Replace("{{CompanyName}}", App.AppCreator)
                     .Replace("{{CompanyAddress}}", App.MadeInText)
                     .Replace("{{PoweredBy}}", App.AppName)
                     .Replace("{{PoweredByLink}}", App.WebsiteUrl)
                     .ToString();
 
-            // TODO: change method signature to this: SendEmailAsync(string to, string subject, string body, CancellationToken cancellationToken)
             await mailGunService.SendEmailAsync("System", body.UserName, body.Email, "Account Created", emailTemplate, cancellationToken);
         }
         else

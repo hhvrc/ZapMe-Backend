@@ -7,6 +7,7 @@ namespace ZapMe.Data.Models;
 public sealed class MailAddressChangeRequestEntity
 {
     public const string TableName = "mailAddressVerificationRequest";
+    public const string TableNewEmailIndex = TableName + "_newEmail_idx";
     public const string TableTokenIndex = TableName + "_tokenHash_idx";
 
     /// <summary>
@@ -20,12 +21,14 @@ public sealed class MailAddressChangeRequestEntity
     public UserEntity? User { get; set; }
 
     /// <summary>
-    /// 
+    /// The new email address to be verified.
+    /// <para>Once the user has verified the email address, this will be stored in the <see cref="UserEntity.Email"/> property, and this record will be deleted.</para>
     /// </summary>
     public required string NewEmail { get; set; }
 
     /// <summary>
-    /// 
+    /// This is a hash of the token, not the token itself.
+    /// <para>Storing the token itself would be a security risk if someone got read access to the database.</para>
     /// </summary>
     public required string TokenHash { get; set; }
 
@@ -41,29 +44,33 @@ public sealed class MailAddressChangeRequestEntityConfiguration : IEntityTypeCon
     {
         builder.ToTable(MailAddressChangeRequestEntity.TableName);
 
-        builder.HasKey(pr => pr.UserId);
+        builder.HasKey(macr => macr.UserId);
 
-        builder.Property(pr => pr.UserId)
+        builder.Property(macr => macr.UserId)
             .HasColumnName("userId");
 
-        builder.Property(pr => pr.NewEmail)
+        builder.Property(macr => macr.NewEmail)
             .HasColumnName("newEmail")
             .HasMaxLength(GeneralHardLimits.EmailAddressMaxLength);
 
-        builder.Property(pr => pr.TokenHash)
+        builder.Property(macr => macr.TokenHash)
             .HasColumnName("tokenHash")
             .HasMaxLength(HashConstants.Sha256LengthHex);
 
-        builder.Property(pr => pr.CreatedAt)
+        builder.Property(macr => macr.CreatedAt)
             .HasColumnName("createdAt")
             .HasDefaultValueSql("now()");
 
-        builder.HasOne(pr => pr.User)
-            .WithOne()
-            .HasForeignKey<MailAddressChangeRequestEntity>(pr => pr.UserId)
+        builder.HasOne(macr => macr.User)
+            .WithOne(u => u.MailAddressChangeRequestEntity)
+            .HasForeignKey<MailAddressChangeRequestEntity>(macr => macr.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(pr => pr.TokenHash)
+        builder.HasIndex(macr => macr.NewEmail)
+            .IsUnique()
+            .HasDatabaseName(MailAddressChangeRequestEntity.TableNewEmailIndex);
+
+        builder.HasIndex(macr => macr.TokenHash)
             .HasDatabaseName(MailAddressChangeRequestEntity.TableTokenIndex)
             .IsUnique();
     }

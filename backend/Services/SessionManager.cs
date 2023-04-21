@@ -1,16 +1,20 @@
-﻿using ZapMe.Data.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using ZapMe.Data;
+using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Services;
 
 public sealed class SessionManager : ISessionManager
 {
+    private readonly ZapMeContext _dbContext;
     public ISessionStore SessionStore { get; }
     public IUserAgentManager UserAgentManager { get; }
     private readonly ILogger<SessionManager> _logger;
 
-    public SessionManager(ISessionStore sessionStore, IUserAgentManager userAgentManager, ILogger<SessionManager> logger)
+    public SessionManager(ZapMeContext dbContext, ISessionStore sessionStore, IUserAgentManager userAgentManager, ILogger<SessionManager> logger)
     {
+        _dbContext = dbContext;
         SessionStore = sessionStore;
         UserAgentManager = userAgentManager;
         _logger = logger;
@@ -23,10 +27,15 @@ public sealed class SessionManager : ISessionManager
         return await SessionStore.CreateAsync(user, sessionName, ipAddress, countryCode, userAgentEntity, expiresAt, cancellationToken);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sessionId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async Task<bool> IsValidSessionAsync(Guid sessionId, CancellationToken cancellationToken)
     {
-        SessionEntity? session = await SessionStore.GetByIdAsync(sessionId, cancellationToken);
+        SessionEntity? session = _dbContext.Sessions.Where(s => s.Id == sessionId).FirstOrDefault();
         if (session == null)
         {
             return false;
@@ -34,16 +43,21 @@ public sealed class SessionManager : ISessionManager
 
         if (session.IsExpired)
         {
-            await SessionStore.DeleteSessionAsync(session.Id, cancellationToken);
+            await _dbContext.Sessions.Where(s => s.Id == sessionId).ExecuteDeleteAsync(cancellationToken);
             return false;
         }
 
         return true;
     }
 
-    /// <inheritdoc/>
-    public ValueTask<bool> UserHasSessionAsync(Guid userId, CancellationToken cancellationToken)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task<bool> UserHasSessionAsync(Guid userId, CancellationToken cancellationToken)
     {
-        return SessionStore.ListByUserAsync(userId).AnyAsync(session => !session.IsExpired, cancellationToken);
+        return _dbContext.Sessions.Where(s => s.UserId == userId).AnyAsync(cancellationToken);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data.Models;
 using static System.Net.Mime.MediaTypeNames;
@@ -22,7 +23,7 @@ public partial class UserController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)] // User not found
     public async Task<IActionResult> LookUp([FromRoute] string userName, CancellationToken cancellationToken)
     {
-        UserEntity? user = await _userManager.Store.GetByNameAsync(userName, cancellationToken);
+        UserEntity? user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Name == userName, cancellationToken);
 
         if (user != null)
         {
