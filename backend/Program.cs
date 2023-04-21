@@ -2,16 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.IdentityModel.Logging;
-using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 using ZapMe.Constants;
 using ZapMe.Controllers;
 using ZapMe.Data;
 using ZapMe.Middlewares;
-
-bool ranByDotnet = Process.GetCurrentProcess().MainModule?.FileName.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase) ?? false;
 
 // The services are ordered by dependency requirements.
 // The middlewares are ordered by execution order.
@@ -38,6 +34,7 @@ bool isDevelopment = env.IsDevelopment();
 
 builder.Configuration.AddUserSecrets<Program>();
 IConfiguration configuration = builder.Configuration;
+bool isBuild = configuration.GetValue<bool>("IsBuild", false);
 
 // ########################################
 // ######## CONFIGURE LOGGING #############
@@ -101,12 +98,18 @@ services.ZMAddQuartz();
 
 services.AddCors(opt =>
 {
-    opt.AddDefaultPolicy(builder => builder
-        .SetIsOriginAllowed(isDevelopment ? DevOriginMatcher().IsMatch : ProdOriginMatcher().IsMatch)
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowCredentials()
-            );
+    opt.AddDefaultPolicy(builder =>
+    {
+        if (isDevelopment)
+        {
+            builder.WithOrigins("http://localhost:5173");
+        }
+        else
+        {
+            builder.WithOrigins("https://zapme.app", "https://www.zapme.app");
+        }
+        builder.AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+    });
 });
 
 // ########################################
@@ -119,7 +122,7 @@ WebApplication app = builder.Build();
 // ######## SET UP DATABASE ###############
 // ########################################
 
-if (!ranByDotnet)
+if (!isBuild)
 {
     using (IServiceScope scope = app.Services.CreateScope())
     {
@@ -135,7 +138,7 @@ if (!ranByDotnet)
 }
 else
 {
-    Console.WriteLine("Skipping database migration because the app is not running in production environment.");
+    Console.WriteLine("Project is being built, skipping database setup.");
 }
 
 // ########################################
@@ -184,12 +187,3 @@ app.Map("/static", false, app =>
 // ########################################
 
 app.Run();
-
-partial class Program
-{
-    [GeneratedRegex(@"^(?:https?:\/\/)?(?:localhost(?::[0-9]{1,5})?)$")]
-    private static partial Regex DevOriginMatcher();
-
-    [GeneratedRegex(@"^(?:https?:\/\/)?api\.zapme\.app$")]
-    private static partial Regex ProdOriginMatcher();
-}
