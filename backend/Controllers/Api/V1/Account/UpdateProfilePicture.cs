@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Storage;
 using ZapMe.Attributes;
+using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data.Models;
 using ZapMe.Utils;
