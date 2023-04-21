@@ -53,47 +53,11 @@ public static class EmailUtils
     /// <param name="str"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool IsValidUser_Quoted(ReadOnlySpan<char> str)
+    public static bool IsValidUser(ReadOnlySpan<char> str)
     {
-        bool escaped = false;
+        if (str.IsEmpty && str.Length > 64)
+            return false;
 
-        for (int i = 0; i < str.Length; i++)
-        {
-            char c = str[i];
-
-            switch (c)
-            {
-                case '\r':
-                case '\n':
-                    return false;
-                case '\t':
-                case ' ':
-                case '"':
-                    if (!escaped) return false;
-                    escaped = false;
-                    break;
-                case '\\':
-                    escaped = !escaped;
-                    break;
-                case > '\u0000' and <= '\u007F': // https://unicode-explorer.com/b/0
-                    escaped = false;
-                    break;
-                default:
-                    return false;
-            }
-        }
-
-        return !escaped;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="str"></param>
-    /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool IsValidUser_Normal(ReadOnlySpan<char> str)
-    {
         int lastDot = -1;
 
         for (int i = 0; i < str.Length; i++)
@@ -114,28 +78,6 @@ public static class EmailUtils
         }
 
         return lastDot != str.Length - 1;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="str"></param>
-    /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsValidUser(ReadOnlySpan<char> str)
-    {
-        if (str.IsEmpty)
-            return false;
-
-        if (str[0] == '"')
-        {
-            if (str[^1] != '"')
-                return false;
-
-            return IsValidUser_Quoted(str[1..^1]);
-        }
-
-        return IsValidUser_Normal(str);
     }
 
     /// <summary>
