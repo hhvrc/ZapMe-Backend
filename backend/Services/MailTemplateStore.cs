@@ -17,7 +17,7 @@ public sealed class MailTemplateStore : IMailTemplateStore
     public async Task<string[]> GetTemplateNamesAsync(CancellationToken cancellationToken)
     {
         // TODO: move bucket name to config
-        return await _s3Client.ListObjectsAsync("zapme-email-templates", cancellationToken).ContinueWith(t =>
+        return await _s3Client.ListObjectsAsync("zapme-mail-templates", cancellationToken).ContinueWith(t =>
         {
             if (t.IsFaulted)
             {
@@ -32,7 +32,7 @@ public sealed class MailTemplateStore : IMailTemplateStore
     public async Task<string?> GetTemplateAsync(string templateName, CancellationToken cancellationToken)
     {
         // TODO: move bucket name to config
-        return await _s3Client.GetObjectAsync("zapme-email-templates", templateName, cancellationToken).ContinueWith(t =>
+        return await _s3Client.GetObjectAsync("zapme-mail-templates", templateName, cancellationToken).ContinueWith(t =>
         {
             if (t.IsFaulted)
             {
