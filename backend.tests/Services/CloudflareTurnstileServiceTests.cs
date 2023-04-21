@@ -28,7 +28,7 @@ public sealed class CloudflareTurnstileServiceTests
 
         _configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new KeyValuePair<string, string?>[] {
-                new("Authorization:CloudflareTurnstile:Secret", _reCaptchaSecret)
+                new("Authorization:Turnstile:SecretKey", _reCaptchaSecret)
             })
             .Build();
 

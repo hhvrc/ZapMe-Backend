@@ -12,18 +12,18 @@ Dev
 
 ### Windows
 ```ps1
-git clone --recurse-submodules -j8 https://github.com/hhvrc/ZapMe
-cd ZapMe/
+git clone --recurse-submodules -j8 https://github.com/hhvrc/ZapMe-Backend zapme
+cd zapme/
 powershell.exe -File .\build-windows.ps1 -ExecutionPolicy Bypass
 ```
 
 ### Ubuntu 22.04
 ```bash
 sudo apt update
-sudo apt install wget git build-essential make cmake -y
+sudo apt install wget git -y
 
-git clone --recurse-submodules -j8 https://github.com/hhvrc/ZapMe
-cd ZapMe/
+git clone --recurse-submodules -j8 https://github.com/hhvrc/ZapMe-Backend zapme
+cd zapme/
 chmod +x build-linux.sh
 ./build-linux.sh
 ```

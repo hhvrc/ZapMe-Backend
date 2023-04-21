@@ -21,7 +21,8 @@ public static class App
 
     public const string AppDescription = "Open source application to control things";
     public const string Domain = "zapme.app";
-    public const string WebsiteUrl = $"https://{Domain}";
+    public const string WebsiteUrl = "https://" + Domain;
+    public const string BackendUrl = "https://api." + Domain;
 
     public const string TermsOfServiceUrl = WebsiteUrl + "/tos";
 

@@ -13,7 +13,7 @@ public sealed class CloudFlareTurnstileService : ICloudFlareTurnstileService
     {
         _httpClientFactory = httpClientFactory;
         _logger = logger;
-        _siteSecret = configuration["Authorization:CloudflareTurnstile:Secret"] ?? throw new KeyNotFoundException("Config entry \"Authorization:CloudflareTurnstile:Secret\" is missing!");
+        _siteSecret = configuration["Authorization:Turnstile:SecretKey"] ?? throw new KeyNotFoundException("Config entry \"Authorization:Turnstile:SecretKey\" is missing!");
     }
 
     public async Task<CloudflareTurnstileVerifyResponse> VerifyUserResponseTokenAsync(string token, string remoteIpAddress, CancellationToken cancellationToken = default)
