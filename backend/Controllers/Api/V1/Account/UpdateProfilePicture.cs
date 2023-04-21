@@ -21,7 +21,6 @@ public partial class AccountController
     /// <returns></returns>
     /// <response code="200">New username</response>
     /// <response code="400">Error details</response>
-    [AllowAnonymous] // TODO: Remove this URGENTLY
     [HttpPut("pfp", Name = "UpdateProfilePicture")]
     [Produces(Application.Json, Application.Xml)]
     [BinaryPayload(true, "image/png", "image/jpeg", "image/webp", "image/gif")]
@@ -29,7 +28,7 @@ public partial class AccountController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Update([FromServices] IAmazonS3 s3Client, CancellationToken cancellationToken)
     {
-        //ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
+        ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 
         long? length = Request.ContentLength;
         if (length == null)
@@ -75,7 +74,7 @@ public partial class AccountController
                 SizeBytes = (uint)length,
                 Sha256 = parsed.Hash,
                 HashPerceptual = parsed.Phash,
-                //UploaderId = identity.UserId
+                UploaderId = identity.UserId
             };
         }
         catch (Exception)
