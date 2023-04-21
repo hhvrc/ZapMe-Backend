@@ -58,6 +58,7 @@ public partial class AccountController
         using MemoryStream stream = new MemoryStream((int)length);
         await Request.Body.CopyToAsync(stream, cancellationToken);
 
+        string sha256;
         ImageEntity imageEntity;
         try
         {
@@ -67,6 +68,8 @@ public partial class AccountController
             {
                 return this.Error(StatusCodes.Status413PayloadTooLarge, "Payload too large", "Image too large, max 1024x1024");
             }
+
+            sha256 = HashingUtils.Sha256_String(stream);
 
             imageEntity = new ImageEntity()
             {
@@ -93,7 +96,8 @@ public partial class AccountController
         // Upload file
         await s3Client.PutObjectAsync(new(){
             BucketName = "zapme-public",
-            Key = Guid.NewGuid().ToString(),
+            Key = imageEntity.Id.ToString(),
+            ChecksumSHA256 = sha256,
             InputStream = stream,
             ContentType = contentType,
             CannedACL = S3CannedACL.PublicRead

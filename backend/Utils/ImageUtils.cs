@@ -1,12 +1,8 @@
-﻿using ZapMe.Data.Models;
-using OneOf;
-using System.Security.Cryptography;
-
-namespace ZapMe.Utils;
+﻿namespace ZapMe.Utils;
 
 public static class ImageUtils
 {
-    public readonly record struct ParseResult(bool Ok, uint Width, uint Height, string Hash, ulong Phash);
+    public readonly record struct ParseResult(bool Ok, uint Width, uint Height, ulong Phash);
 
     public static async Task<ParseResult> ParseFromStreamAsync(Stream stream)
     {
@@ -21,14 +17,13 @@ public static class ImageUtils
 
             if (height > 0 && width > 0)
             {
-                string hash = await HashingUtils.Sha256_StringAsync(stream);
-                return new ParseResult(true, (uint)width, (uint)height, hash, 0);
+                return new ParseResult(true, (uint)width, (uint)height, 0);
             }
         }
         catch (Exception)
         {
         }
 
-        return new ParseResult(false, 0, 0, "", 0);
+        return new ParseResult(false, 0, 0, 0);
     }
 }
