@@ -88,7 +88,7 @@ public partial class AccountController
             return this.Error_InvalidModelState((nameof(body.Email), "Disposable Emails are not allowed"));
         }
 
-        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
+        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);
 
         // Create account
         AccountCreationResult result = await _userManager.TryCreateAsync(body.UserName, body.Email, body.Password, cancellationToken);

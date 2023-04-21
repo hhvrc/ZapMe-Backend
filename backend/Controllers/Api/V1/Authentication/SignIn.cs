@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using UAParser;
 using ZapMe.Authentication;
 using ZapMe.Authentication.Models;
 using ZapMe.Constants;
@@ -42,7 +41,7 @@ public partial class AuthenticationController
             return this.Error_AnonymousOnly();
         }
 
-        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
+        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);
 
         UserEntity? user = await userStore.GetByNameAsync(body.Username, cancellationToken) ?? await userStore.GetByEmailAsync(body.Username, cancellationToken);
         if (user == null)
@@ -88,6 +87,8 @@ public partial class AuthenticationController
         }
 
         SessionEntity session = await _sessionManager.CreateAsync(user, body.SessionName, this.GetRemoteIP(), this.GetCloudflareIPCountry(), userAgent, body.RememberMe, cancellationToken);
+
+        session.User = user;
 
         return SignIn(new ZapMePrincipal(session));
     }
