@@ -117,7 +117,7 @@ public partial class AccountController
         {
             string emailBody = new QuickStringReplacer(emailTemplate)
                     .Replace("{{UserName}}", body.UserName)
-                    .Replace("{{ConfirmEmailLink}}", App.BackendUrl + "/Account/ConfirmEmail?token=" + result.ConfirmationToken)
+                    .Replace("{{ConfirmEmailLink}}", App.BackendUrl + "/Account/ConfirmEmail?token=")// + result.ConfirmationToken)
                     .Replace("{{ContactLink}}", App.ContactUrl)
                     .Replace("{{PrivacyPolicyLink}}", App.PrivacyPolicyUrl)
                     .Replace("{{TermsOfServiceLink}}", App.TermsOfServiceUrl)
@@ -128,6 +128,7 @@ public partial class AccountController
                     .ToString();
 
             await mailGunService.SendEmailAsync("System", body.UserName, body.Email, "Account Created", emailTemplate, cancellationToken);
+            throw new NotImplementedException();
         }
         else
         {

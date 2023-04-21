@@ -7,6 +7,8 @@ namespace ZapMe.Data.Models;
 public sealed class ImageEntity
 {
     public const string TableName = "images";
+    public const string TableSha256Index = TableName + "_sha256_idx";
+    public const string TableHashPerceptualIndex = TableName + "_phash_idx";
     public static readonly Guid DefaultImageId = Guid.Parse("00000000-0000-0000-0000-000000000001");
 
     /// <summary>
@@ -17,17 +19,17 @@ public sealed class ImageEntity
     /// <summary>
     /// 
     /// </summary>
-    public int Height { get; set; }
+    public uint Height { get; set; }
 
     /// <summary>
     /// 
     /// </summary>
-    public int Width { get; set; }
+    public uint Width { get; set; }  
 
     /// <summary>
     /// 
     /// </summary>
-    public int SizeBytes { get; set; }
+    public uint SizeBytes { get; set; }
 
     /// <summary>
     /// 
@@ -37,7 +39,7 @@ public sealed class ImageEntity
     /// <summary>
     /// 
     /// </summary>
-    public long HashPerceptual { get; set; }
+    public ulong HashPerceptual { get; set; }
 
     /// <summary>
     /// 
@@ -84,5 +86,14 @@ public sealed class ImageEntityConfiguration : IEntityTypeConfiguration<ImageEnt
         builder.HasOne(i => i.Uploader)
             .WithMany()
             .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasIndex(i => i.Sha256)
+            .HasDatabaseName(ImageEntity.TableSha256Index)
+            .IsUnique();
+
+        builder.HasIndex(i => i.HashPerceptual)
+            .HasDatabaseName(ImageEntity.TableHashPerceptualIndex)
+        //    .IsUnique()
+            ;
     }
 }

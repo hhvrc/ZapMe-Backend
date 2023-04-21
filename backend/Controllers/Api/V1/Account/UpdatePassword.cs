@@ -30,7 +30,12 @@ public partial class AccountController
         string oldPasswordHash = PasswordUtils.HashPassword(body.Password);
         string newPasswordHash = PasswordUtils.HashPassword(body.NewPassword);
 
-        bool success = await _dbContext.Users.Where(u => u.Id == identity.UserId && u.PasswordHash == oldPasswordHash).ExecuteUpdateAsync(spc => spc.SetProperty(u => u.PasswordHash, _ => newPasswordHash).SetProperty(u => u.UpdatedAt, _ => DateTime.UtcNow), cancellationToken) > 0;
+        bool success = await _dbContext.Users
+            .Where(u => u.Id == identity.UserId && u.PasswordHash == oldPasswordHash)
+            .ExecuteUpdateAsync(spc => spc
+                .SetProperty(u => u.PasswordHash, _ => newPasswordHash)
+                .SetProperty(u => u.UpdatedAt, _ => DateTime.UtcNow)
+                , cancellationToken) > 0;
 
         return success ? Ok() : this.Error_InvalidPassword();
     }

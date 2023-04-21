@@ -49,28 +49,17 @@ public sealed class PasswordResetManager : IPasswordResetManager
             .Replace("{{PoweredByLink}}", App.WebsiteUrl)
             .ToString();
 
-        bool success = false;
+        // Start transaction
+        using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 
-        IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+        // Insert token into database
+        await _passwordResetRequestStore.UpsertAsync(user.Id, tokenHash, cancellationToken);
 
-        try
-        {
-            await _passwordResetRequestStore.UpsertAsync(user.Id, tokenHash, cancellationToken);
+        // Send recovery secret to email
+        bool success = await _mailGunService.SendEmailAsync("Hello", user.Name, user.Email, "Password recovery", formattedEmail, cancellationToken);
 
-            // Send recovery secret to email
-            success = await _mailGunService.SendEmailAsync("Hello", user.Name, user.Email, "Password recovery", formattedEmail, cancellationToken);
-        }
-        finally
-        {
-            if (success)
-            {
-                await transaction.CommitAsync(cancellationToken);
-            }
-            else
-            {
-                await transaction.RollbackAsync(cancellationToken);
-            }
-        }
+        // Commit transaction
+        await transaction.CommitAsync(cancellationToken);
 
         return success;
     }
@@ -103,29 +92,19 @@ public sealed class PasswordResetManager : IPasswordResetManager
 
         string newPasswordHash = PasswordUtils.HashPassword(newPassword);
 
-        bool success = false;
-        IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+        // Start transaction
+        using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 
-        try
-        {
-            // Important to delete by token hash, and not account id as if the token has changed, someone else has issued a password reset
-            bool deleted = await _dbContext.PasswordResetRequests.Where(p => p.TokenHash == tokenHash).ExecuteDeleteAsync(cancellationToken) > 0;
-            if (!deleted) return false; // Another caller made it before we did
+        // Important to delete by token hash, and not account id as if the token has changed, someone else has issued a password reset
+        bool deleted = await _dbContext.PasswordResetRequests.Where(p => p.TokenHash == tokenHash).ExecuteDeleteAsync(cancellationToken) > 0;
+        if (!deleted) return false; // Another caller made it before we did
 
-            // Finally set the new password
-            success = await _dbContext.Users.Where(u => u.Id == passwordResetRequest.UserId).ExecuteUpdateAsync(spc => spc.SetProperty(u => u.PasswordHash, _ => newPasswordHash), cancellationToken) > 0;
-        }
-        finally
-        {
-            if (success)
-            {
-                await transaction.CommitAsync(cancellationToken);
-            }
-            else
-            {
-                await transaction.RollbackAsync(cancellationToken);
-            }
-        }
+        // Finally set the new password
+        bool success = await _dbContext.Users.Where(u => u.Id == passwordResetRequest.UserId).ExecuteUpdateAsync(spc => spc.SetProperty(u => u.PasswordHash, _ => newPasswordHash), cancellationToken) > 0;
+        if (!success) return false; // Uhh, race condition?
+
+        // Commit transaction
+        await transaction.CommitAsync(cancellationToken);
 
         return success;
     }

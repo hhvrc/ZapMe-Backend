@@ -83,20 +83,4 @@ public sealed class UserManager : IUserManager
 
         return new AccountCreationResult(AccountCreationResult.ResultE.UnknownError, null!, "Unknown error, retry count exceeded");
     }
-
-    public async Task<PasswordCheckResult> CheckPasswordAsync(Guid userId, string password, CancellationToken cancellationToken)
-    {
-        var user = await _dbContext.Users.Where(u => u.Id == userId).Select(u => new { u.PasswordHash }).FirstOrDefaultAsync(cancellationToken);
-        if (user == null)
-        {
-            return PasswordCheckResult.UserNotFound;
-        }
-
-        if (!PasswordUtils.CheckPassword(password, user.PasswordHash))
-        {
-            return PasswordCheckResult.PasswordInvalid;
-        }
-
-        return PasswordCheckResult.Success;
-    }
 }

@@ -13,23 +13,4 @@ public interface IUserManager
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<AccountCreationResult> TryCreateAsync(string name, string? email, string password, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="password"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    Task<PasswordCheckResult> CheckPasswordAsync(Guid userId, string password, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="oldPassword"></param>
-    /// <param name="newPassword"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    Task<bool> UpdatePasswordAsync(Guid userId, string oldPassword, string newPassword, CancellationToken cancellationToken = default);
 }

@@ -13,7 +13,7 @@ public sealed class ActivityTracker
         _next = next;
     }
 
-    public async Task InvokeAsync(HttpContext context, ZapMeContext dbContext, CancellationToken cancellationToken)
+    public async Task InvokeAsync(HttpContext context, ZapMeContext dbContext)
     {
         try
         {
@@ -23,7 +23,7 @@ public sealed class ActivityTracker
         {
             if (context.User?.Identity is ZapMeIdentity identity)
             {
-                await dbContext.Users.Where(s => s.Id == identity.UserId).ExecuteUpdateAsync(spc => spc.SetProperty(u => u.LastOnline, _ => DateTime.UtcNow), cancellationToken);
+                await dbContext.Users.Where(s => s.Id == identity.UserId).ExecuteUpdateAsync(spc => spc.SetProperty(u => u.LastOnline, _ => DateTime.UtcNow));
             }
         }
     }

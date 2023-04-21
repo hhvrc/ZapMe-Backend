@@ -388,6 +388,23 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/Account/email/verify:
+    post:
+      tags:
+        - Account
+      summary: Verify the users email address
+      operationId: Verify Email Address
+      parameters:
+        - name: token
+          in: query
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+        '404':
+          description: Error details
   /api/v1/auth/oauth-providers:
     get:
       tags:
@@ -896,7 +913,7 @@ components:
     AuthSignIn:
       type: object
       properties:
-        username:
+        username_or_email:
           type: string
           description: Username or email address
           example: MyUsername

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.DTOs;
+using ZapMe.Utils;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
@@ -26,14 +28,18 @@ public partial class AccountController
     {
         ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 
-        PasswordCheckResult result = await _userManager.CheckPasswordAsync(identity.UserId, body.Password, cancellationToken);
-        if (result != PasswordCheckResult.Success)
+        if (identity.User.PasswordHash != PasswordUtils.HashPassword(body.Password))
         {
             return this.Error_InvalidPassword();
         }
 
-        await _userManager.Store.SetUserNameAsync(identity.UserId, body.NewUserName, cancellationToken);
+        bool success = await _dbContext.Users
+            .Where(u => u.Id == identity.UserId)
+            .ExecuteUpdateAsync(spc => spc
+                .SetProperty(u => u.Name, _ => body.NewUserName)
+                .SetProperty(u => u.UpdatedAt, _ => DateTime.UtcNow)
+                , cancellationToken) > 0;
 
-        return Ok();
+        return success ? Ok() : this.Error_InternalServerError();
     }
 }
