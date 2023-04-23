@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ZapMe.Authentication;
+using ZapMe.Helpers;
 using ZapMe.Websocket;
 
 namespace ZapMe.Controllers.Ws;
@@ -36,13 +37,13 @@ public sealed partial class WebSocketController
             {
                 _logger.LogError("Failed to create websocket instance");
 
-                return this.Error_InternalServerError();
+                return CreateHttpError.InternalServerError();
             }
 
             // Register instance globally, the manager will have the ability to kill this connection
             if (!await _webSocketInstanceManager.RegisterInstanceAsync(identity.UserId, instanceId, instance, cancellationToken))
             {
-                return this.Error_InternalServerError();
+                return CreateHttpError.InternalServerError();
             }
 
             try
@@ -58,7 +59,7 @@ public sealed partial class WebSocketController
         }
         else
         {
-            return this.Error(StatusCodes.Status400BadRequest, "Bad request", "This endpoint is purely just a websocket endpoint", "Try to connect with a websocket client instead");
+            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Bad request", "This endpoint is purely just a websocket endpoint", "Try to connect with a websocket client instead").ToActionResult();
         }
 
         return Ok();

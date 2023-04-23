@@ -21,12 +21,12 @@ public partial class AccountController
     [AllowAnonymous]
     [RequestSizeLimit(1024)]
     [HttpPost("email/verify", Name = "Verify Email Address")]
-    [Consumes(Application.Json, Application.Xml)]
-    [Produces(Application.Json, Application.Xml)]
+    [Consumes(Application.Json)]
+    [Produces(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> ConfirmEmail([FromQuery] string token, [FromServices] IMailAddressVerificationRequestStore mailAddressVerificationRequestStore, CancellationToken cancellationToken)
     {
-        string tokenHash = HashingUtils.Sha256_String(token);
+        string tokenHash = HashingUtils.Sha256_Hex(token);
 
         MailAddressChangeRequestEntity? mailAddressVerificationRequest = await mailAddressVerificationRequestStore.GetByTokenHashAsync(tokenHash, cancellationToken);
         /*if (mailAddressVerificationRequest == null)

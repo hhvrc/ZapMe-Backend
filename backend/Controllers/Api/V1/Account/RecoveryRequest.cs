@@ -21,7 +21,7 @@ public partial class AccountController
     [AllowAnonymous]
     [RequestSizeLimit(1024)]
     [HttpPost("recover", Name = "AccountRecoveryRequest")]
-    [Consumes(Application.Json, Application.Xml)]
+    [Consumes(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> RecoveryRequest([FromBody] Account.Models.RecoveryRequest body, [FromServices] ICloudFlareTurnstileService cfTurnstileService, [FromServices] IPasswordResetManager passwordResetManager, CancellationToken cancellationToken)
     {
@@ -37,9 +37,9 @@ public partial class AccountController
                     switch (errorCode)
                     {
                         case "invalid-input-response":
-                            return this.Error_InvalidModelState((nameof(body.TurnstileResponse), "Invalid ReCaptcha Response"));
+                            return CreateHttpError.InvalidModelState((nameof(body.TurnstileResponse), "Invalid ReCaptcha Response")).ToActionResult();
                         case "timeout-or-duplicate":
-                            return this.Error_InvalidModelState((nameof(body.TurnstileResponse), "ReCaptcha Response Expired or Already Used"));
+                            return CreateHttpError.InvalidModelState((nameof(body.TurnstileResponse), "ReCaptcha Response Expired or Already Used")).ToActionResult();
                         default:
                             break;
                     };

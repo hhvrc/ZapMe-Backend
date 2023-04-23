@@ -6,7 +6,7 @@ namespace ZapMe.Controllers.Api.V1.Account.Models;
 /// <summary>
 /// Message sent to server to create a new account
 /// </summary>
-public struct Create
+public struct CreateAccount
 {
     /// <summary/>
     [Username(true)]

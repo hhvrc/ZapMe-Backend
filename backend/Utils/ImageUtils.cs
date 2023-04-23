@@ -1,29 +1,50 @@
-﻿namespace ZapMe.Utils;
+﻿using OneOf;
+using ZapMe.Controllers.Api.V1.Models;
+
+namespace ZapMe.Utils;
 
 public static class ImageUtils
 {
-    public readonly record struct ParseResult(bool Ok, uint Width, uint Height, ulong Phash);
+    public readonly record struct ParseResult(uint Width, uint Height, uint FrameCount, string Extension);
 
-    public static async Task<ParseResult> ParseFromStreamAsync(Stream stream)
+    public static async Task<OneOf<ParseResult, ErrorDetails>> ParseAndRewriteFromStreamAsync(Stream inputStream, Stream outputStream, CancellationToken cancellationToken = default)
     {
         try
         {
-            stream.Position = 0;
-            using Image image = await Image.LoadAsync(stream);
+            inputStream.Position = 0;
+            using Image image = await Image.LoadAsync(inputStream, cancellationToken);
 
             int width = image.Width;
             int height = image.Height;
-            int frames = image.Frames.Count;
+            int frameCount = image.Frames.Count;
 
-            if (height > 0 && width > 0)
+            if (height < 0 || width < 0 || frameCount <= 0)
             {
-                return new ParseResult(true, (uint)width, (uint)height, 0);
+                return new ErrorDetails(StatusCodes.Status400BadRequest, "Malformed image", "Image has invalid dimensions");
+            }
+
+            // Clear metadata
+            image.Metadata.ExifProfile = null;
+            image.Metadata.IccProfile = null;
+            image.Metadata.IptcProfile = null;
+            image.Metadata.XmpProfile = null;
+
+            // Write
+            if (frameCount == 1)
+            {
+                await image.SaveAsWebpAsync(outputStream, cancellationToken);
+                return new ParseResult((uint)width, (uint)height, (uint)frameCount, "webp");
+            }
+            else
+            {
+                await image.SaveAsGifAsync(outputStream, cancellationToken);
+                return new ParseResult((uint)width, (uint)height, (uint)frameCount, "gif");
             }
         }
         catch (Exception)
         {
         }
 
-        return new ParseResult(false, 0, 0, 0);
+        return new ErrorDetails(StatusCodes.Status400BadRequest, "Invalid or Unsupported image", "We were unable to parse the iamge, please check its filetype and integrity");
     }
 }

@@ -15,7 +15,7 @@ public partial class ConfigController
     /// <response code="200">Returns the service config</response>
     /// <returns></returns>
     [HttpGet(Name = "GetConfig")]
-    [Produces(Application.Json, Application.Xml)]
+    [Produces(Application.Json)]
     [ProducesResponseType(typeof(Config.Models.Config), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]

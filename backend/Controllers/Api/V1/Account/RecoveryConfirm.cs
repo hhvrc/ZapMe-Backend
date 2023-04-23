@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -20,15 +21,15 @@ public partial class AccountController
     [AllowAnonymous]
     [RequestSizeLimit(1024)]
     [HttpPost("recover-confirm", Name = "AccountRecoveryConfirm")]
-    [Consumes(Application.Json, Application.Xml)]
-    [Produces(Application.Json, Application.Xml)]
+    [Consumes(Application.Json)]
+    [Produces(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)] // Token invalid, expired, or already used
     public async Task<IActionResult> RecoveryConfirm([FromBody] Account.Models.RecoveryConfirm body, [FromServices] IPasswordResetManager passwordResetManager, CancellationToken cancellationToken)
     {
         if (!await passwordResetManager.TryCompletePasswordReset(body.Token, body.NewPassword, cancellationToken))
         {
-            return this.Error(StatusCodes.Status400BadRequest, "Bad reset token", "The reset token is invalid, expired, or has already been used.", UserNotification.SeverityLevel.Error, "Bad reset token", "The reset token is invalid, expired, or has already been used.");
+            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Bad reset token", "The reset token is invalid, expired, or has already been used.", UserNotification.SeverityLevel.Error, "Bad reset token", "The reset token is invalid, expired, or has already been used.").ToActionResult();
         }
 
         return Ok();

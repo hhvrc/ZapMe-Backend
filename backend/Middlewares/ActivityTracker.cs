@@ -18,6 +18,7 @@ public sealed class ActivityTracker
         try
         {
             await _next(context);
+            context.Response.Headers.Add("Trace-Id", context.TraceIdentifier);
         }
         finally
         {

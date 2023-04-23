@@ -12,7 +12,7 @@ public class UserDto
         Id = Guid.Empty;
         Username = String.Empty;
         ProfilePictureId = Guid.Empty;
-        OnlineStatus = UserOnlineStatus.Offline;
+        OnlineStatus = UserStatus.Offline;
         OnlineStatusText = String.Empty;
         CreatedAt = DateTime.MinValue;
         LastOnline = DateTime.MinValue;
@@ -55,7 +55,7 @@ public class UserDto
     /// </summary>
     [JsonPropertyOrder(8)]
     [JsonPropertyName("status")]
-    public UserOnlineStatus OnlineStatus { get; set; }
+    public UserStatus OnlineStatus { get; set; }
 
     /// <summary>
     /// 

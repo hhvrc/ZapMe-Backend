@@ -92,7 +92,7 @@ public static class DataSeeders
                 PasswordHash = passwordHash,
                 AcceptedTosVersion = Int32.MaxValue,
                 ProfilePictureId = ImageEntity.DefaultImageId,
-                OnlineStatus = UserOnlineStatus.Online,
+                OnlineStatus = UserStatus.Online,
                 OnlineStatusText = "I'm online!",
                 CreatedAt = _CreationTime,
                 UpdatedAt = _CreationTime,

@@ -12,7 +12,7 @@ public partial class AuthenticationController
     /// <returns></returns>
     /// <response code="200">Returns supported OAuth providers</response>
     [HttpGet("oauth-providers", Name = "AuthGetOAuthProviders")]
-    [Produces(Application.Json, Application.Xml)]
+    [Produces(Application.Json)]
     [ProducesResponseType(typeof(OAuthProviderList), StatusCodes.Status200OK)]
     public OAuthProviderList GetOAuthProviders()
     {

@@ -20,7 +20,7 @@ public sealed class UserAgentManager : IUserAgentManager
     public async Task<UserAgentEntity> EnsureCreatedAsync(string userAgent, CancellationToken cancellationToken = default)
     {
         uint length = (uint)userAgent.Length;
-        string sha256 = HashingUtils.Sha256_String(userAgent);
+        string sha256 = HashingUtils.Sha256_Hex(userAgent);
 
         UserAgentEntity? entry = await Store.GetByHashAsync(sha256, cancellationToken);
         if (entry != null) return entry;

@@ -34,7 +34,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
         ArgumentNullException.ThrowIfNull(user.Email);
 
         string token = StringUtils.GenerateUrlSafeRandomString(16);
-        string tokenHash = HashingUtils.Sha256_String(token);
+        string tokenHash = HashingUtils.Sha256_Hex(token);
 
         string? emailTemplate = await _mailTemplateStore.GetTemplateAsync(EmailTemplateNames.PasswordReset, cancellationToken);
         if (emailTemplate == null)
@@ -82,7 +82,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
 
     public async Task<bool> TryCompletePasswordReset(string token, string newPassword, CancellationToken cancellationToken)
     {
-        string tokenHash = HashingUtils.Sha256_String(token);
+        string tokenHash = HashingUtils.Sha256_Hex(token);
 
         PasswordResetRequestEntity? passwordResetRequest = await _dbContext.PasswordResetRequests.FirstOrDefaultAsync(p => p.TokenHash == tokenHash, cancellationToken);
         if (passwordResetRequest == null) return false;

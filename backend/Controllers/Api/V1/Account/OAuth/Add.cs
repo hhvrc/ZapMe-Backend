@@ -12,8 +12,8 @@ public partial class AccountController
     /// </summary>
     /// <returns></returns>
     [HttpPost("oauth/{providerName}", Name = "AddOAuthProvider")]
-    [Consumes(Application.Json, Application.Xml)]
-    [Produces(Application.Json, Application.Xml)]
+    [Consumes(Application.Json)]
+    [Produces(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status409Conflict)] // Provider already added
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)] // Provider not supported

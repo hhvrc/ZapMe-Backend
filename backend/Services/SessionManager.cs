@@ -26,38 +26,4 @@ public sealed class SessionManager : ISessionManager
         DateTime expiresAt = DateTime.UtcNow.Add(rememberMe ? TimeSpan.FromDays(30) : TimeSpan.FromHours(1));
         return await SessionStore.CreateAsync(user, sessionName, ipAddress, countryCode, userAgentEntity, expiresAt, cancellationToken);
     }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="sessionId"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public async Task<bool> IsValidSessionAsync(Guid sessionId, CancellationToken cancellationToken)
-    {
-        SessionEntity? session = _dbContext.Sessions.Where(s => s.Id == sessionId).FirstOrDefault();
-        if (session == null)
-        {
-            return false;
-        }
-
-        if (session.IsExpired)
-        {
-            await _dbContext.Sessions.Where(s => s.Id == sessionId).ExecuteDeleteAsync(cancellationToken);
-            return false;
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public Task<bool> UserHasSessionAsync(Guid userId, CancellationToken cancellationToken)
-    {
-        return _dbContext.Sessions.Where(s => s.UserId == userId).AnyAsync(cancellationToken);
-    }
 }

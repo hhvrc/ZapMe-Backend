@@ -15,7 +15,7 @@ public partial class AccountController
     /// <response code="200">Account</response>
     /// <response code="404">Error details</response>
     [HttpGet(Name = "GetAccount")]
-    [Produces(Application.Json, Application.Xml)]
+    [Produces(Application.Json)]
     [ProducesResponseType(typeof(AccountDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
     public AccountDto Get()

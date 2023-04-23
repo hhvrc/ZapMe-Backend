@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using ZapMe.Attributes;
 using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.Helpers;
 using ZapMe.Utils;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -20,11 +21,11 @@ public partial class AccountController
     /// <response code="500"></response>
     [RequestSizeLimit(1024)]
     [HttpDelete(Name = "DeleteAccount")]
-    [Produces(Application.Json, Application.Xml)]
+    [Produces(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Delete(
+    public async Task<IActionResult> DeleteAccount(
         [FromHeader][Password(true)] string password,
         [FromHeader][StringLength(1024)] string? reason,
         CancellationToken cancellationToken
@@ -34,7 +35,7 @@ public partial class AccountController
 
         if (!PasswordUtils.CheckPassword(password, identity.User.PasswordHash))
         {
-            return this.Error_InvalidPassword();
+            return CreateHttpError.InvalidPassword();
         }
 
         await _dbContext.Users.Where(u => u.Id == identity.User.Id).ExecuteDeleteAsync(cancellationToken);

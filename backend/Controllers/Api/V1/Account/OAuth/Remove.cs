@@ -11,7 +11,7 @@ public partial class AccountController
     /// </summary>
     /// <returns></returns>
     [HttpDelete("oauth/{providerName}", Name = "RemoveOAuthProvider")]
-    [Consumes(Application.Json, Application.Xml)]
+    [Consumes(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)]
     public IActionResult OAuthRemove([FromRoute] string providerName)

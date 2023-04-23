@@ -5,9 +5,9 @@ using Microsoft.IdentityModel.Logging;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using ZapMe.Constants;
-using ZapMe.Controllers;
 using ZapMe.Data;
 using ZapMe.Middlewares;
+using ZapMe.Utils;
 
 // The services are ordered by dependency requirements.
 // The middlewares are ordered by execution order.
@@ -63,11 +63,7 @@ services.AddControllers().AddJsonOptions(opt =>
 //services.AddHealthChecks().AddCheck("sql" ) //TODO: explore this
 services.Configure<ApiBehaviorOptions>(opt =>
 {
-    opt.InvalidModelStateResponseFactory = ErrorResponseFactory.CreateErrorResult;
-});
-services.AddResponseCaching(opt =>
-{
-    opt.MaximumBodySize = 64 * 1024;
+    opt.InvalidModelStateResponseFactory = ActionContextUtils.CreateErrorResult;
 });
 
 // ########################################
@@ -167,7 +163,8 @@ app.Map("/api", true, app =>
 });
 app.Map("/swagger", true, app =>
 {
-    app.UseHeaderValue("Cache-Control", "public, max-age=86400");
+    // Cloudflare caching: Asset is cached for 10 minutes, and can be stale for 30 seconds while cloudflare revalidates it.
+    app.UseHeaderValue("Cache-Control", "public, max-age=600, stale-while-revalidate=30");
     app.UseSwagger();
     app.UseSwaggerUI(opt =>
     {
@@ -178,7 +175,8 @@ app.Map("/swagger", true, app =>
 });
 app.Map("/static", false, app =>
 {
-    app.UseResponseCaching();
+    // Cloudflare caching: Asset is cached for 24 hours, and can be stale for 30 seconds while cloudflare revalidates it.
+    app.UseHeaderValue("Cache-Control", "public, max-age=86400, stale-while-revalidate=30");
     app.UseStaticFiles();
 });
 

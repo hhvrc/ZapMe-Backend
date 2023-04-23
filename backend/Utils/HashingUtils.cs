@@ -11,7 +11,7 @@ public static class HashingUtils
     /// </summary>
     /// <param name="data"></param>
     /// <returns></returns>
-    public static string Sha256_String(Stream data)
+    public static string Sha256_Hex(Stream data)
     {
         data.Position = 0;
         Span<byte> digest = stackalloc byte[HashConstants.Sha256LengthBin];
@@ -25,7 +25,7 @@ public static class HashingUtils
     /// <param name="data"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static async Task<string> Sha256_StringAsync(Stream data, CancellationToken cancellationToken = default)
+    public static async Task<string> Sha256_HexAsync(Stream data, CancellationToken cancellationToken = default)
     {
         data.Position = 0;
         byte[] digest = new byte[HashConstants.Sha256LengthBin];
@@ -38,7 +38,7 @@ public static class HashingUtils
     /// </summary>
     /// <param name="data"></param>
     /// <returns></returns>
-    public static string Sha256_String(Span<byte> data)
+    public static string Sha256_Hex(Span<byte> data)
     {
         Span<byte> digest = stackalloc byte[HashConstants.Sha256LengthBin];
         SHA256.HashData(data, digest);
@@ -50,9 +50,9 @@ public static class HashingUtils
     /// </summary>
     /// <param name="data"></param>
     /// <returns></returns>
-    public static string Sha256_String(string data)
+    public static string Sha256_Hex(string data)
     {
-        return Sha256_String(Encoding.UTF8.GetBytes(data));
+        return Sha256_Hex(Encoding.UTF8.GetBytes(data));
     }
 
     /// <summary>
@@ -103,4 +103,46 @@ public static class HashingUtils
     {
         return Sha256_Bytes(Encoding.UTF8.GetBytes(data));
     }
+
+    /// <summary>
+    /// Hashes the given stream and outputs the digest hash as 64 characters of uppercase hex
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    public static string Sha256_Base64(Stream data)
+    {
+        return Convert.ToBase64String(Sha256_Bytes(data));
+    }
+
+    /// <summary>
+    /// Hashes the given stream and outputs the digest hash as 64 characters of uppercase hex
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public static async Task<string> Sha256_Base64Async(Stream data, CancellationToken cancellationToken = default)
+    {
+        return Convert.ToBase64String(await Sha256_BytesAsync(data, cancellationToken));
+    }
+
+    /// <summary>
+    /// Hashes the given bytes and outputs the digest hash as 64 characters of uppercase hex
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    public static string Sha256_Base64(Span<byte> data)
+    {
+        return Convert.ToBase64String(Sha256_Bytes(data));
+    }
+
+    /// <summary>
+    /// Hashes the given string and outputs the digest hash as 64 characters of uppercase hex
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    public static string Sha256_Base64(string data)
+    {
+        return Convert.ToBase64String(Sha256_Bytes(data));
+    }
+
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ZapMe.Constants;
+using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
@@ -21,19 +22,19 @@ public partial class AccountController
     /// <param name="mailGunService"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    /// <response code="200">Created account</response>
+    /// <response code="201">Created account</response>
     /// <response code="400">Error details</response>
     /// <response code="409">Error details</response>
     [AllowAnonymous]
     [RequestSizeLimit(1024)]
     [HttpPost(Name = "CreateAccount")]
-    [Consumes(Application.Json, Application.Xml)]
-    [Produces(Application.Json, Application.Xml)]
-    [ProducesResponseType(typeof(Account.Models.AccountDto), StatusCodes.Status201Created)]
+    [Consumes(Application.Json)]
+    [Produces(Application.Json)]
+    [ProducesResponseType(typeof(AccountDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status409Conflict)] // Username/email already taken
-    public async Task<IActionResult> CreateAsync(
-        [FromBody] Account.Models.Create body,
+    public async Task<IActionResult> CreateAccount(
+        [FromBody] CreateAccount body,
         [FromServices] ICloudFlareTurnstileService cfTurnstileService,
         [FromServices] IDebounceService debounceService,
         [FromServices] IMailTemplateStore emailTemplateStore,
@@ -42,7 +43,7 @@ public partial class AccountController
     {
         if (User.Identity?.IsAuthenticated ?? false)
         {
-            return this.Error_AnonymousOnly();
+            return CreateHttpError.AnonymousOnly().ToActionResult();
         }
 
         // Verify turnstile token
@@ -56,11 +57,11 @@ public partial class AccountController
                     switch (errorCode)
                     {
                         case "missing-input-response": // The response parameter was not passed.
-                            return this.Error_InvalidModelState((nameof(body.TurnstileResponse), "Missing Cloudflare Turnstile Response"));
+                            return CreateHttpError.InvalidModelState((nameof(body.TurnstileResponse), "Missing Cloudflare Turnstile Response")).ToActionResult();
                         case "invalid-input-response": // The response parameter is invalid or has expired.
-                            return this.Error_InvalidModelState((nameof(body.TurnstileResponse), "Invalid Cloudflare Turnstile Response"));
+                            return CreateHttpError.InvalidModelState((nameof(body.TurnstileResponse), "Invalid Cloudflare Turnstile Response")).ToActionResult();
                         case "timeout-or-duplicate": // The response parameter has already been validated before.
-                            return this.Error_InvalidModelState((nameof(body.TurnstileResponse), "Cloudflare Turnstile Response Expired or Already Used"));
+                            return CreateHttpError.InvalidModelState((nameof(body.TurnstileResponse), "Cloudflare Turnstile Response Expired or Already Used")).ToActionResult();
                         case "missing-input-secret": // The secret parameter was not passed.
                             _logger.LogError("Missing Cloudflare Turnstile Secret");
                             break;
@@ -85,7 +86,7 @@ public partial class AccountController
         // Attempt to check against debounce if the email is a throwaway email
         if (await debounceService.IsDisposableEmailAsync(body.Email, cancellationToken))
         {
-            return this.Error_InvalidModelState((nameof(body.Email), "Disposable Emails are not allowed"));
+            return CreateHttpError.InvalidModelState((nameof(body.Email), "Disposable Emails are not allowed")).ToActionResult();
         }
 
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
@@ -100,7 +101,7 @@ public partial class AccountController
                     break;
                 case AccountCreationResult.ResultE.NameAlreadyTaken:
                 case AccountCreationResult.ResultE.EmailAlreadyTaken:
-                    return this.Error(StatusCodes.Status409Conflict, "One or multiple idenitifiers in use", "Fields \"UserName\" or \"Email\" are not available", UserNotification.SeverityLevel.Warning, "Username/Email already taken", "Please choose a different Username or Email");
+                    return CreateHttpError.Generic(StatusCodes.Status409Conflict, "One or multiple idenitifiers in use", "Fields \"UserName\" or \"Email\" are not available", UserNotification.SeverityLevel.Warning, "Username/Email already taken", "Please choose a different Username or Email").ToActionResult();
                 case AccountCreationResult.ResultE.NameOrEmailInvalid:
                     break;
                 case AccountCreationResult.ResultE.UnknownError:

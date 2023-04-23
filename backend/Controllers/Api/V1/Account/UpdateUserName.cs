@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.DTOs;
+using ZapMe.Helpers;
 using ZapMe.Utils;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -20,8 +21,8 @@ public partial class AccountController
     /// <response code="400">Error details</response>
     [RequestSizeLimit(1024)]
     [HttpPut("username", Name = "UpdateUserName")]
-    [Consumes(Application.Json, Application.Xml)]
-    [Produces(Application.Json, Application.Xml)]
+    [Consumes(Application.Json)]
+    [Produces(Application.Json)]
     [ProducesResponseType(typeof(Account.Models.AccountDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Update([FromBody] Account.Models.UpdateUserName body, CancellationToken cancellationToken)
@@ -30,7 +31,7 @@ public partial class AccountController
 
         if (identity.User.PasswordHash != PasswordUtils.HashPassword(body.Password))
         {
-            return this.Error_InvalidPassword();
+            return CreateHttpError.InvalidPassword();
         }
 
         bool success = await _dbContext.Users
@@ -40,6 +41,6 @@ public partial class AccountController
                 .SetProperty(u => u.UpdatedAt, _ => DateTime.UtcNow)
                 , cancellationToken) > 0;
 
-        return success ? Ok() : this.Error_InternalServerError();
+        return success ? Ok() : CreateHttpError.InternalServerError();
     }
 }

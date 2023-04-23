@@ -36,22 +36,9 @@ public sealed class SessionStore : ISessionStore
         return session;
     }
 
-    public Task<SessionEntity?> GetByIdAsync(Guid sessionId, CancellationToken cancellationToken)
-    {
-        return _dbContext.Sessions
-            .Include(static s => s.User)
-            .ThenInclude(static a => a!.UserRoles)
-            .FirstOrDefaultAsync(s => s.Id == sessionId, cancellationToken);
-    }
-
-    public IAsyncEnumerable<SessionEntity> ListByUserAsync(Guid userId)
-    {
-        return _dbContext.Sessions.Where(s => s.UserId == userId).ToAsyncEnumerable();
-    }
-
     public async Task<bool> SetExipresAtAsync(Guid sessionId, DateTime expiresAt, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Sessions.Where(s => s.Id == sessionId).ExecuteUpdateAsync(s => s.SetProperty(static s => s.ExpiresAt, _ => expiresAt), cancellationToken) > 0;
+        return await _dbContext.Sessions.Where(s => s.Id == sessionId).ExecuteUpdateAsync(s => s.SetProperty(s => s.ExpiresAt, _ => expiresAt), cancellationToken) > 0;
     }
 
     public async Task<bool> DeleteSessionAsync(Guid sessionId, CancellationToken cancellationToken)

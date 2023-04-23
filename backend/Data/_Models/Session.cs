@@ -61,21 +61,6 @@ public sealed class SessionEntity
     /// 
     /// </summary>
     public DateTime ExpiresAt { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public TimeSpan TimeToLive => ExpiresAt - CreatedAt;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public bool IsHalfwayExpired => DateTime.UtcNow >= ExpiresAt.Subtract(TimeToLive.Divide(2));
 }
 
 public sealed class SessionEntityConfiguration : IEntityTypeConfiguration<SessionEntity>
@@ -114,8 +99,6 @@ public sealed class SessionEntityConfiguration : IEntityTypeConfiguration<Sessio
 
         builder.Property(si => si.ExpiresAt)
             .HasColumnName("expiresAt");
-
-        builder.Ignore(si => si.IsExpired);
 
         builder.HasOne(si => si.User)
             .WithMany(u => u.Sessions)

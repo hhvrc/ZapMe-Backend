@@ -1,56 +1,60 @@
-﻿using System.Text.Json.Serialization;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Text.Json.Serialization;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1.Models;
 
 /// <summary>
 /// Details about the error
 /// </summary>
-public struct ErrorDetails
+public readonly struct ErrorDetails
 {
-    public ErrorDetails(string title, string detail, string traceId, string? suggestion = null, Dictionary<string, string[]>? fields = null, UserNotification? notification = null)
+    public ErrorDetails(int httpStatusCode, string title, string detail, string? suggestion = null, Dictionary<string, string[]>? fields = null, UserNotification? notification = null)
     {
         Title = title;
         Detail = detail;
-        TraceId = traceId;
         Suggestion = suggestion;
         Fields = fields;
         Notification = notification;
     }
 
     /// <summary>
+    /// HTTP status code
+    /// </summary>
+    [JsonIgnore]
+    public int HttpStatusCode { get; }
+
+    /// <summary>
     /// Title for developer to understand what went wrong (not user friendly)
     /// </summary>
     [JsonPropertyName("title")]
-    public string Title { get; set; }
+    public string Title { get; }
 
     /// <summary>
     /// More detailed description of what this error is about (not user friendly)
     /// </summary>
     [JsonPropertyName("detail")]
-    public string Detail { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    [JsonPropertyName("traceId")]
-    public string TraceId { get; set; }
+    public string Detail { get; }
 
     /// <summary>
     /// Suggestion to developer on how they might be able to midegate this error
     /// </summary>
     [JsonPropertyName("suggestion")]
-    public string? Suggestion { get; set; }
+    public string? Suggestion { get; }
 
     /// <summary>
     /// Errors for specific fields in the request
     /// </summary>
     [JsonPropertyName("fields")]
-    public Dictionary<string, string[]>? Fields { get; set; }
+    public Dictionary<string, string[]>? Fields { get; }
 
     /// <summary>
     /// This is a user friendly error message, might help the user understand what went wrong and how to fix it
     /// Completely optional, might be null
     /// </summary>
     [JsonPropertyName("notification")]
-    public UserNotification? Notification { get; set; }
+    public UserNotification? Notification { get; }
+
+    public ObjectResult ToActionResult() => new ObjectResult(this) { StatusCode = HttpStatusCode, ContentTypes = { Application.Json } };
+    public static implicit operator ObjectResult(ErrorDetails errorDetails) => errorDetails.ToActionResult();
 }

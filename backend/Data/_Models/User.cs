@@ -48,7 +48,7 @@ public sealed class UserEntity
     /// <summary>
     /// 
     /// </summary>
-    public UserOnlineStatus OnlineStatus { get; set; }
+    public UserStatus OnlineStatus { get; set; }
 
     /// <summary>
     /// 
