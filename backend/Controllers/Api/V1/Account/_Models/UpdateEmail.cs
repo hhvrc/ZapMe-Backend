@@ -10,11 +10,9 @@ public readonly struct UpdateEmail
 {
     /// <summary/>
     [EmailAddress]
-    [JsonPropertyName("new_email")]
     public string NewEmail { get; init; }
 
     /// <summary/>
     [Password(false)]
-    [JsonPropertyName("password")]
     public string Password { get; init; }
 }

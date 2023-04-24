@@ -10,11 +10,9 @@ public readonly struct UpdateUserName
 {
     /// <summary/>
     [Username(true)]
-    [JsonPropertyName("new_username")]
-    public string NewUserName { get; init; }
+    public string NewUsername { get; init; }
 
     /// <summary/>
     [Password(false)]
-    [JsonPropertyName("password")]
     public string Password { get; init; }
 }

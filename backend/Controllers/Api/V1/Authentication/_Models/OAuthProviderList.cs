@@ -10,6 +10,5 @@ public readonly struct OAuthProviderList
     /// <summary>
     /// 
     /// </summary>
-    [JsonPropertyName("providers")]
     public IAsyncEnumerable<string> Providers { get; init; }
 }

@@ -25,18 +25,15 @@ public sealed class UserNotification
     /// <summary>
     /// Severity of the notification, might be used in clients to determine how to display the notification
     /// </summary>
-    [JsonPropertyName("severity")]
     public SeverityLevel Severity { get; set; }
 
     /// <summary>
     /// Message title to display to the user
     /// </summary>
-    [JsonPropertyName("title")]
     public string Title { get; set; }
 
     /// <summary>
     /// User friendly message about this notification
     /// </summary>
-    [JsonPropertyName("message")]
     public string? Message { get; set; }
 }

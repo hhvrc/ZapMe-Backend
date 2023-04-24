@@ -102,14 +102,14 @@ public partial class AccountController
         using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         // Create account
-        OneOf<UserEntity, ErrorDetails> tryCreateAccountResult = await _userManager.TryCreateAsync(body.UserName, body.Email, body.Password, emailVerified: false, cancellationToken);
+        OneOf<UserEntity, ErrorDetails> tryCreateAccountResult = await _userManager.TryCreateAsync(body.Username, body.Email, body.Password, emailVerified: false, cancellationToken);
         if (tryCreateAccountResult.TryPickT1(out ErrorDetails errorDetails, out UserEntity user))
         {
             return errorDetails.ToActionResult();
         }
 
         // Send email verification
-        ErrorDetails? test = await emailVerificationManager.InitiateEmailVerificationAsync(body.UserName, body.Email, cancellationToken);
+        ErrorDetails? test = await emailVerificationManager.InitiateEmailVerificationAsync(body.Username, body.Email, cancellationToken);
         if (test.HasValue)
         {
             return test.Value.ToActionResult();

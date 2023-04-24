@@ -750,42 +750,42 @@ components:
     AccountOAuthAdd:
       type: object
       properties:
-        oauth_code:
+        oauthCode:
           type: string
       additionalProperties: false
       description: Request sent to server to add a oauth connection to a account
     ApiConfig:
       type: object
       properties:
-        tos_version:
+        tosVersion:
           type: integer
           description: 'The current Terms of Service version, if the user has not accepted this version, they will be prompted to accept it'
           format: int32
-        privacy_version:
+        privacyVersion:
           type: integer
           description: 'The current Privacy Policy version, if the user has not accepted this version, they will be prompted to accept it'
           format: int32
-        sentry_dsn:
+        sentryDsn:
           type: string
           description: "The DSN for Sentry, used for error reporting\r\nIf this is null, Sentry reporting is disabled"
           format: uri
           nullable: true
-        sentry_trace_sample_rate:
+        sentryTraceSampleRate:
           type: number
           description: 'Trace sample rate for Sentry, used for performance monitoring'
           format: double
         authentication:
           $ref: '#/components/schemas/AuthenticationConfig'
-        disabled_features:
+        disabledFeatures:
           $ref: '#/components/schemas/ApiDisabledFeatures'
       additionalProperties: false
     ApiDisabledFeatures:
       type: object
       properties:
-        webrtc:
+        webRTC:
           type: boolean
           description: 'If true, WebRTC is disabled'
-        websockets:
+        webSockets:
           type: boolean
           description: 'If true, WebSockets are disabled'
         endpoints:
@@ -797,7 +797,7 @@ components:
     AuthSignIn:
       type: object
       properties:
-        username_or_email:
+        usernameOrEmail:
           type: string
           description: Username or email address
           example: MyUsername
@@ -863,21 +863,21 @@ components:
     ContactConfig:
       type: object
       properties:
-        support:
+        emailSupport:
           maxLength: 320
           minLength: 5
           type: string
           description: Email address to contact the support of the service
           format: email
           example: user.name@example.com
-        contact:
+        emailContact:
           maxLength: 320
           minLength: 5
           type: string
           description: Email address to contact the owner of the service
           format: email
           example: user.name@example.com
-        discord:
+        discordInviteUrl:
           type: string
           description: Invite URL to the Discord server where users can get support
           format: uri
@@ -909,7 +909,7 @@ components:
           type: integer
           description: ''
           format: int32
-        turnstile_response:
+        turnstileResponse:
           type: string
           description: Response from cloudflare turnstile request
       additionalProperties: false
@@ -1001,7 +1001,7 @@ components:
     RecoveryConfirm:
       type: object
       properties:
-        new_password:
+        newPassword:
           maxLength: 256
           minLength: 10
           type: string
@@ -1022,7 +1022,7 @@ components:
           description: Email of your account you want to recover
           format: email
           example: user.name@example.com
-        turnstile_response:
+        turnstileResponse:
           type: string
           description: Response from cloudflare turnstile request
       additionalProperties: false
@@ -1085,7 +1085,7 @@ components:
     UpdateEmail:
       type: object
       properties:
-        new_email:
+        newEmail:
           maxLength: 320
           minLength: 5
           type: string
@@ -1139,7 +1139,7 @@ components:
     UpdateUserName:
       type: object
       properties:
-        new_username:
+        newUsername:
           maxLength: 32
           minLength: 3
           pattern: '^[^\s].*[^\s]$'
@@ -1163,20 +1163,20 @@ components:
           type: string
           description: ''
           example: MyUsername
-        profile_picture_id:
+        profilePictureId:
           type: string
           description: ''
           format: uuid
         status:
           $ref: '#/components/schemas/UserStatus'
-        status_text:
+        statusText:
           type: string
           description: ''
-        created_at:
+        createdAt:
           type: string
           description: Date this user was created at
           format: date-time
-        last_online:
+        lastOnline:
           type: string
           description: Last time this user was online
           format: date-time
@@ -1198,7 +1198,7 @@ components:
     UserReport:
       type: object
       properties:
-        user_id:
+        userId:
           type: string
           format: uuid
         title:

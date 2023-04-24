@@ -17,7 +17,9 @@ public sealed class DebounceService : IDebounceService
 
     private struct DebounceDisposableResponse
     {
-        [JsonPropertyName("disposable")]
+        /// <summary>
+        /// 
+        /// </summary>
         public string Disposable { get; set; }
     }
 

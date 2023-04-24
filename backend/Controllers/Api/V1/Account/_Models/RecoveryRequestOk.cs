@@ -4,6 +4,8 @@ namespace ZapMe.Controllers.Api.V1.Account.Models;
 
 public readonly struct RecoveryRequestOk
 {
-    [JsonPropertyName("message")]
+    /// <summary>
+    /// 
+    /// </summary>
     public required string Message { get; init; }
 }

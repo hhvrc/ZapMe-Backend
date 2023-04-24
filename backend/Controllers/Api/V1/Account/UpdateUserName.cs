@@ -38,7 +38,7 @@ public partial class AccountController
         bool success = await _dbContext.Users
             .Where(u => u.Id == identity.UserId)
             .ExecuteUpdateAsync(spc => spc
-                .SetProperty(u => u.Name, _ => body.NewUserName)
+                .SetProperty(u => u.Name, _ => body.NewUsername)
                 .SetProperty(u => u.UpdatedAt, _ => DateTime.UtcNow)
                 , cancellationToken) > 0;
 

@@ -13,14 +13,12 @@ public readonly struct AuthSignIn
     /// Username or email address
     /// </summary>
     [Username(false)]
-    [JsonPropertyName("username_or_email")]
     public string UsernameOrEmail { get; init; }
 
     /// <summary>
     /// Password
     /// </summary>
     [Password(false)]
-    [JsonPropertyName("password")]
     public string Password { get; init; }
 
     /// <summary>
@@ -28,12 +26,10 @@ public readonly struct AuthSignIn
     /// This is for the users to be able to see which devices they have logged in their user settings
     /// </summary>
     [StringLength(32, MinimumLength = 1)]
-    [JsonPropertyName("sessionName")]
     public string? SessionName { get; init; }
 
     /// <summary>
     /// Make this login persist for a longer period of time
     /// </summary>
-    [JsonPropertyName("rememberMe")]
     public bool RememberMe { get; init; }
 }

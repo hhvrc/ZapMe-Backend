@@ -7,14 +7,11 @@ namespace ZapMe.Controllers.Api.V1.User.Models;
 /// </summary>
 public readonly struct UserReport
 {
-    [JsonPropertyName("user_id")]
     public Guid UserId { get; init; }
 
     /// <summary/>
-    [JsonPropertyName("title")]
     public string Title { get; init; }
 
     /// <summary/>
-    [JsonPropertyName("explenation")]
     public string Explenation { get; init; }
 }

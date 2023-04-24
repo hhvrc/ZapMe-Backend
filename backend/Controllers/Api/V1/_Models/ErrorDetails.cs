@@ -28,32 +28,27 @@ public readonly struct ErrorDetails
     /// <summary>
     /// Title for developer to understand what went wrong (not user friendly)
     /// </summary>
-    [JsonPropertyName("title")]
     public string Title { get; }
 
     /// <summary>
     /// More detailed description of what this error is about (not user friendly)
     /// </summary>
-    [JsonPropertyName("detail")]
     public string Detail { get; }
 
     /// <summary>
     /// Suggestion to developer on how they might be able to midegate this error
     /// </summary>
-    [JsonPropertyName("suggestion")]
     public string? Suggestion { get; }
 
     /// <summary>
     /// Errors for specific fields in the request
     /// </summary>
-    [JsonPropertyName("fields")]
     public Dictionary<string, string[]>? Fields { get; }
 
     /// <summary>
     /// This is a user friendly error message, might help the user understand what went wrong and how to fix it
     /// Completely optional, might be null
     /// </summary>
-    [JsonPropertyName("notification")]
     public UserNotification? Notification { get; }
 
     public ObjectResult ToActionResult() => new ObjectResult(this) { StatusCode = HttpStatusCode, ContentTypes = { Application.Json } };

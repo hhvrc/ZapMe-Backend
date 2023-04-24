@@ -12,12 +12,10 @@ public readonly struct RecoveryRequest
     /// Email of your account you want to recover
     /// </summary>
     [EmailAddress]
-    [JsonPropertyName("email")]
     public string Email { get; init; }
 
     /// <summary>
     /// Response from cloudflare turnstile request
     /// </summary>
-    [JsonPropertyName("turnstile_response")]
     public string TurnstileResponse { get; init; }
 }

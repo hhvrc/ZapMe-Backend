@@ -7,12 +7,10 @@ public readonly struct CreateOk
     /// <summary>
     /// 
     /// </summary>
-    [JsonPropertyName("id")]
     public Guid Id { get; init; }
 
     /// <summary>
     /// 
     /// </summary>
-    [JsonPropertyName("message")]
     public required string Message { get; init; }
 }

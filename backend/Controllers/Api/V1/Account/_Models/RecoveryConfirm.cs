@@ -12,12 +12,10 @@ public readonly struct RecoveryConfirm
     /// The new password to set
     /// </summary>
     [Password(true)]
-    [JsonPropertyName("new_password")]
     public string NewPassword { get; init; }
 
     /// <summary>
     /// The token sent to the user's email address
     /// </summary>
-    [JsonPropertyName("token")]
     public string Token { get; init; }
 }

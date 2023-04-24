@@ -4,6 +4,8 @@ namespace ZapMe.Websocket.Models.ServerPayloads;
 
 public sealed class ReadyMessage
 {
-    [JsonPropertyName("heartbeat_interval")]
+    /// <summary>
+    /// 
+    /// </summary>
     public uint HeartbeatIntervalMs { get; set; }
 }

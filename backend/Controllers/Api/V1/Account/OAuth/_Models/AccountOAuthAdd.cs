@@ -7,6 +7,5 @@ namespace ZapMe.Controllers.Api.V1.Account.OAuth.Models;
 /// </summary>
 public readonly struct AccountOAuthAdd
 {
-    [JsonPropertyName("oauth_code")]
-    public string OAuthCode { get; init; }
+    public string OauthCode { get; init; }
 }

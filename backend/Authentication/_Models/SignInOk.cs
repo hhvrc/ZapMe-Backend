@@ -20,12 +20,10 @@ public sealed class SignInOk
     /// <summary>
     /// 
     /// </summary>
-    [JsonPropertyName("session")]
     public SessionDto Session { get; set; }
 
     /// <summary>
     /// 
     /// </summary>
-    [JsonPropertyName("account")]
     public AccountDto Account { get; set; }
 }

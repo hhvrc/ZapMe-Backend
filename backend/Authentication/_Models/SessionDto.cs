@@ -15,18 +15,15 @@ public sealed class SessionDto
     /// <summary>
     /// 
     /// </summary>
-    [JsonPropertyName("id")]
     public Guid Id { get; set; }
 
     /// <summary>
     /// 
     /// </summary>
-    [JsonPropertyName("issuedAtUtc")]
     public DateTime IssuedAtUtc { get; set; }
 
     /// <summary>
     /// 
     /// </summary>
-    [JsonPropertyName("expiresAtUtc")]
     public DateTime ExpiresAtUtc { get; set; }
 }
