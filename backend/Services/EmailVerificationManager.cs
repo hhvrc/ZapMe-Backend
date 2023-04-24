@@ -46,7 +46,7 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
         // Fill in email template
         string formattedEmail = new QuickStringReplacer(emailTemplate)
                 .Replace("{{UserName}}", user.Name)
-                .Replace("{{ConfirmEmailLink}}", App.BackendUrl + "/Account/ConfirmEmail?token=" + emailVerificationToken)
+                .Replace("{{ConfirmEmailLink}}", App.WebsiteUrl + "/verify-email?token=" + emailVerificationToken)
                 .Replace("{{ContactLink}}", App.ContactUrl)
                 .Replace("{{PrivacyPolicyLink}}", App.PrivacyPolicyUrl)
                 .Replace("{{TermsOfServiceLink}}", App.TermsOfServiceUrl)
