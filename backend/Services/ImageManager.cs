@@ -11,7 +11,7 @@ using ZapMe.Utils;
 
 namespace ZapMe.Services;
 
-public class ImageManager : IImageManager
+public sealed class ImageManager : IImageManager
 {
     readonly ZapMeContext _dbContext;
     readonly IAmazonS3 _s3Client;
@@ -46,7 +46,7 @@ public class ImageManager : IImageManager
         }, cancellationToken);
     }
 
-    public async Task<OneOf<ImageEntity, ErrorDetails>> GetOrCreateRecordAsync(Stream imageStream, ulong imageSizeBytes, Guid? uploaderId, CancellationToken cancellationToken)
+    public async Task<OneOf<ImageEntity, ErrorDetails>> GetOrCreateRecordAsync(Stream imageStream, ulong imageSizeBytes, string? sha256Hash, Guid? uploaderId, CancellationToken cancellationToken)
     {
         if (imageSizeBytes < 0)
         {
@@ -70,6 +70,11 @@ public class ImageManager : IImageManager
         // Hash image data
         byte[] sha256 = HashingUtils.Sha256_Bytes(memoryStream);
         string sha256_hex = Convert.ToHexString(sha256);
+
+        if (sha256Hash != null && !sha256_hex.Equals(sha256Hash, StringComparison.OrdinalIgnoreCase))
+        {
+            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Checksum mismatch", "The provided checksum does not match the image data");
+        }
 
         // Check if image already exists
         ImageEntity? image = await _dbContext.Images.SingleOrDefaultAsync(i => i.Sha256 == sha256_hex, cancellationToken);

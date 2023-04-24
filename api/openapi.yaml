@@ -70,13 +70,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-        '500':
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
         '400':
+          description: ''
+        '500':
           description: ''
     get:
       tags:
@@ -207,12 +203,14 @@ paths:
       responses:
         '200':
           description: New email
+        '400':
+          description: Error details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AccountDto'
-        '400':
-          description: Error details
+                $ref: '#/components/schemas/ErrorDetails'
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema:
@@ -242,12 +240,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
   /api/v1/Account/pfp:
     put:
       tags:
         - Account
       summary: Updates the account profile picture
       operationId: UpdateProfilePicture
+      parameters:
+        - name: Hash-Sha256
+          in: header
+          description: '[Optional] Sha-256 hash of the image bytes to verify the integrity of the image server-side'
+          schema:
+            type: string
       requestBody:
         content:
           image/png:
@@ -277,21 +287,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UpdateProfilePictureResult'
+                $ref: '#/components/schemas/UpdateProfilePictureOk'
         '400':
-          description: Error details
+          description: Payload is unsupported/corrupted or the hash (if provided) does not match the payload
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
         '411':
-          description: Error details
+          description: Length is required
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
         '413':
-          description: Error details
+          description: Image dimensions or byte size is too large
           content:
             application/json:
               schema:
@@ -311,12 +321,14 @@ paths:
       responses:
         '200':
           description: New username
+        '400':
+          description: Error details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AccountDto'
-        '400':
-          description: Error details
+                $ref: '#/components/schemas/ErrorDetails'
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema:
@@ -396,10 +408,6 @@ paths:
                 $ref: '#/components/schemas/ErrorDetails'
         '500':
           description: Error details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
   /api/v1/auth/oauth-signin:
     post:
       tags:
@@ -455,12 +463,6 @@ paths:
                 $ref: '#/components/schemas/Config'
         '400':
           description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-        '500':
-          description: Server Error
           content:
             application/json:
               schema:
@@ -699,6 +701,7 @@ components:
         profilePictureUrl:
           type: string
           description: ''
+          format: uri
           readOnly: true
         status:
           $ref: '#/components/schemas/UserStatus'
@@ -1091,7 +1094,7 @@ components:
           example: Hq2yP1B^Fho&zRHxHkEu
       additionalProperties: false
       description: Request sent to server to update account password
-    UpdateProfilePictureResult:
+    UpdateProfilePictureOk:
       type: object
       properties:
         imageId:
@@ -1101,6 +1104,7 @@ components:
         imageUrl:
           type: string
           description: ''
+          format: uri
         imageHash:
           type: string
           description: ''

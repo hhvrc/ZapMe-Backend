@@ -1,6 +1,6 @@
 ﻿namespace ZapMe.Controllers.Api.V1.Account._Models;
 
-public readonly struct UpdateProfilePictureResult
+public readonly struct UpdateProfilePictureOk
 {
     /// <summary>
     /// 
@@ -10,7 +10,7 @@ public readonly struct UpdateProfilePictureResult
     /// <summary>
     /// 
     /// </summary>
-    public required string ImageUrl { get; init; }
+    public required Uri ImageUrl { get; init; }
 
     /// <summary>
     /// 

@@ -33,8 +33,9 @@ public interface IImageManager
     /// </summary>
     /// <param name="imageStream"></param>
     /// <param name="imageSizeBytes"></param>
+    /// <param name="sha256Hash"></param>
     /// <param name="uploaderId"></param>
     /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    Task<OneOf<ImageEntity, ErrorDetails>> GetOrCreateRecordAsync(Stream imageStream, ulong imageSizeBytes, Guid? uploaderId = null, CancellationToken cancellationToken = default);
+    /// <returns>ImageEntity or ErrorDetails(400/413)</returns>
+    Task<OneOf<ImageEntity, ErrorDetails>> GetOrCreateRecordAsync(Stream imageStream, ulong imageSizeBytes, string? sha256Hash = null, Guid? uploaderId = null, CancellationToken cancellationToken = default);
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ZapMe.Authentication;
+using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data;
 using ZapMe.Helpers;
@@ -24,9 +25,10 @@ public partial class AccountController
     [HttpPut("email", Name = "UpdateEmail")]
     [Consumes(Application.Json)]
     [Produces(Application.Json)]
-    [ProducesResponseType(typeof(Account.Models.AccountDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UpdateEmail([FromBody] Account.Models.UpdateEmail body, [FromServices] ZapMeContext dbContext, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> UpdateEmail([FromBody] UpdateEmail body, [FromServices] ZapMeContext dbContext, CancellationToken cancellationToken)
     {
         ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 

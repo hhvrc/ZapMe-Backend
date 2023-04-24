@@ -33,7 +33,7 @@ public partial class AccountController
     [ProducesResponseType(typeof(AccountDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status409Conflict)] // Username/email already taken
-    public async Task<IActionResult> CreateAccount(
+    public async Task<IActionResult> Create(
         [FromBody] CreateAccount body,
         [FromServices] ICloudFlareTurnstileService cfTurnstileService,
         [FromServices] IDebounceService debounceService,

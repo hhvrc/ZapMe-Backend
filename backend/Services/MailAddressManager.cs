@@ -2,6 +2,6 @@
 
 namespace ZapMe.Services;
 
-public class MailAddressManager : IMailAddressManager
+public sealed class MailAddressManager : IMailAddressManager
 {
 }

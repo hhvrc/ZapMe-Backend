@@ -62,7 +62,7 @@ public readonly struct AccountDto
     /// <summary>
     /// 
     /// </summary>
-    public string ProfilePictureUrl { get; }
+    public Uri ProfilePictureUrl { get; }
 
     /// <summary>
     /// 

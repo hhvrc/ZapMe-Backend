@@ -7,6 +7,13 @@ public static class ImageUtils
 {
     public readonly record struct ParseResult(uint Width, uint Height, uint FrameCount, string Extension);
 
+    /// <summary>
+    /// Parses and rewrites an image from a stream
+    /// </summary>
+    /// <param name="inputStream"></param>
+    /// <param name="outputStream"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Parse result or ErrorDetails(400)</returns>
     public static async Task<OneOf<ParseResult, ErrorDetails>> ParseAndRewriteFromStreamAsync(Stream inputStream, Stream outputStream, CancellationToken cancellationToken = default)
     {
         try

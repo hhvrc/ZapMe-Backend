@@ -24,8 +24,7 @@ public partial class AccountController
     [Produces(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> DeleteAccount(
+    public async Task<IActionResult> Delete(
         [FromHeader][Password(true)] string password,
         [FromHeader][StringLength(1024)] string? reason,
         CancellationToken cancellationToken

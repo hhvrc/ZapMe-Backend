@@ -11,6 +11,7 @@ public readonly struct ErrorDetails
 {
     public ErrorDetails(int httpStatusCode, string title, string detail, string? suggestion = null, Dictionary<string, string[]>? fields = null, UserNotification? notification = null)
     {
+        HttpStatusCode = httpStatusCode;
         Title = title;
         Detail = detail;
         Suggestion = suggestion;

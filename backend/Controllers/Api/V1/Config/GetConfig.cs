@@ -18,7 +18,6 @@ public partial class ConfigController
     [Produces(Application.Json)]
     [ProducesResponseType(typeof(Config.Models.Config), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
     public Config.Models.Config GetConfig([FromServices] IConfiguration configuration)
     {
         return new Config.Models.Config {

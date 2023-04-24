@@ -5,7 +5,7 @@ using ZapMe.Enums;
 
 namespace ZapMe.Controllers.Api.V1.User.Models;
 
-public class UserDto
+public readonly struct UserDto
 {
     public UserDto()
     {
@@ -33,7 +33,7 @@ public class UserDto
     /// </summary>
     [JsonPropertyOrder(0)]
     [JsonPropertyName("id")]
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
     /// <summary>
     /// 
@@ -41,40 +41,40 @@ public class UserDto
     [Username(false)]
     [JsonPropertyOrder(1)]
     [JsonPropertyName("username")]
-    public string Username { get; set; }
+    public string Username { get; init; }
 
     /// <summary>
     /// 
     /// </summary>
     [JsonPropertyOrder(5)]
     [JsonPropertyName("profile_picture_id")]
-    public Guid ProfilePictureId { get; set; }
+    public Guid ProfilePictureId { get; init; }
 
     /// <summary>
     /// 
     /// </summary>
     [JsonPropertyOrder(8)]
     [JsonPropertyName("status")]
-    public UserStatus OnlineStatus { get; set; }
+    public UserStatus OnlineStatus { get; init; }
 
     /// <summary>
     /// 
     /// </summary>
     [JsonPropertyOrder(9)]
     [JsonPropertyName("status_text")]
-    public string OnlineStatusText { get; set; }
+    public string OnlineStatusText { get; init; }
 
     /// <summary>
     /// Date this user was created at
     /// </summary>
     [JsonPropertyOrder(15)]
     [JsonPropertyName("created_at")]
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; init; }
 
     /// <summary>
     /// Last time this user was online
     /// </summary>
     [JsonPropertyOrder(16)]
     [JsonPropertyName("last_online")]
-    public DateTime LastOnline { get; set; }
+    public DateTime LastOnline { get; init; }
 }
