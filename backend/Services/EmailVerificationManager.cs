@@ -25,12 +25,13 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
         _mailGunService = mailGunService;
     }
 
-    public async Task<ErrorDetails?> InitiateEmailVerificationAsync(string userName, string newEmail, CancellationToken cancellationToken)
+    public async Task<ErrorDetails?> InitiateEmailVerificationAsync(UserEntity user, string newEmail, CancellationToken cancellationToken)
     {
         // Create email verification entry
         string emailVerificationToken = StringUtils.GenerateUrlSafeRandomString(16);
         EmailVerificationRequestEntity? emailVerificationRequest = new EmailVerificationRequestEntity
         {
+            UserId = user.Id,
             NewEmail = newEmail,
             TokenHash = HashingUtils.Sha256_Hex(emailVerificationToken)
         };
@@ -44,7 +45,7 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
 
         // Fill in email template
         string formattedEmail = new QuickStringReplacer(emailTemplate)
-                .Replace("{{UserName}}", userName)
+                .Replace("{{UserName}}", user.Name)
                 .Replace("{{ConfirmEmailLink}}", App.BackendUrl + "/Account/ConfirmEmail?token=" + emailVerificationToken)
                 .Replace("{{ContactLink}}", App.ContactUrl)
                 .Replace("{{PrivacyPolicyLink}}", App.PrivacyPolicyUrl)
@@ -63,7 +64,11 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         // Send email
-        await _mailGunService.SendEmailAsync("System", userName, newEmail, "Account Created", formattedEmail, cancellationToken);
+        bool success = await _mailGunService.SendEmailAsync("System", user.Name, newEmail, "Account Created", formattedEmail, cancellationToken);
+        if (!success)
+        {
+            return CreateHttpError.InternalServerError();
+        }
 
         // Commit transaction
         if (transaction != null)

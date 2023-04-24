@@ -36,7 +36,7 @@ public partial class AccountController
             return CreateHttpError.InvalidPassword().ToActionResult();
         }
 
-        ErrorDetails? errorDetails = await emailVerificationManager.InitiateEmailVerificationAsync(identity.User.Name, body.NewEmail, cancellationToken);
+        ErrorDetails? errorDetails = await emailVerificationManager.InitiateEmailVerificationAsync(identity.User, body.NewEmail, cancellationToken);
         if (errorDetails.HasValue)
         {
             return errorDetails.Value.ToActionResult();

@@ -107,7 +107,7 @@ public partial class AccountController
         }
 
         // Send email verification
-        ErrorDetails? test = await emailVerificationManager.InitiateEmailVerificationAsync(body.Username, body.Email, cancellationToken);
+        ErrorDetails? test = await emailVerificationManager.InitiateEmailVerificationAsync(user, body.Email, cancellationToken);
         if (test.HasValue)
         {
             return test.Value.ToActionResult();

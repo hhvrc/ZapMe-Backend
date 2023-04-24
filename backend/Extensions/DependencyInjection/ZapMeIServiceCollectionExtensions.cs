@@ -34,7 +34,7 @@ public static class ZapMeIServiceCollectionExtensions
         {
             string apiKey = config.GetOrThrow("Mailgun:ApiKey");
 
-            cli.BaseAddress = new Uri("https://api.mailgun.net/v3/", UriKind.Absolute);
+            cli.BaseAddress = new Uri("https://api.eu.mailgun.net/v3/", UriKind.Absolute);
             cli.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
             cli.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(App.AppName, App.AppVersion.String));
             cli.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"api:{apiKey}")));
@@ -80,9 +80,8 @@ public static class ZapMeIServiceCollectionExtensions
 
     public static void ZMAddEmailTemplates([NotNull] this IServiceCollection services)
     {
-        //services.AddTransient<EmailTemplateStore>();
-        //services.AddTransient<IEmailTemplateStore, CachedEmailTemplateStore>();
         services.AddTransient<IEmailTemplateStore, EmailTemplateStore>();
+        services.AddTransient<IEmailVerificationManager, EmailVerificationManager>();
     }
 
     public static void ZMAddWebSockets([NotNull] this IServiceCollection services)

@@ -1,4 +1,5 @@
 ﻿using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.Data.Models;
 
 namespace ZapMe.Services.Interfaces;
 
@@ -7,11 +8,11 @@ public interface IEmailVerificationManager
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="userName"></param>
+    /// <param name="user"></param>
     /// <param name="newEmail"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<ErrorDetails?> InitiateEmailVerificationAsync(string userName, string newEmail, CancellationToken cancellationToken = default);
+    Task<ErrorDetails?> InitiateEmailVerificationAsync(UserEntity user, string newEmail, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
