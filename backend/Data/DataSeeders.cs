@@ -36,9 +36,12 @@ public static class DataSeeders
             Id = ImageEntity.DefaultImageId,
             Height = 0,
             Width = 0,
+            FrameCount = 0,
             SizeBytes = 0,
+            Extension = String.Empty,
             Sha256 = "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
-            HashPerceptual = 0,
+            S3BucketName = String.Empty,
+            S3RegionName = String.Empty,
             UploaderId = null,
             Uploader = null
         }, cancellationToken);

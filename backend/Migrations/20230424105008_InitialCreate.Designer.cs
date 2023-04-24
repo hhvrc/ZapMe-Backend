@@ -12,7 +12,7 @@ using ZapMe.Data;
 namespace ZapMe.Migrations
 {
     [DbContext(typeof(ZapMeContext))]
-    [Migration("20230421220554_InitialCreate")]
+    [Migration("20230424105008_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -59,13 +59,31 @@ namespace ZapMe.Migrations
                         .HasColumnName("id")
                         .HasDefaultValueSql("gen_random_uuid()");
 
-                    b.Property<decimal>("HashPerceptual")
-                        .HasColumnType("numeric(20,0)")
-                        .HasColumnName("phash");
+                    b.Property<string>("Extension")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)")
+                        .HasColumnName("extension");
+
+                    b.Property<long>("FrameCount")
+                        .HasColumnType("bigint")
+                        .HasColumnName("frameCount");
 
                     b.Property<long>("Height")
                         .HasColumnType("bigint")
                         .HasColumnName("height");
+
+                    b.Property<string>("S3BucketName")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("s3BucketName");
+
+                    b.Property<string>("S3RegionName")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("s3RegionName");
 
                     b.Property<string>("Sha256")
                         .IsRequired()
@@ -86,9 +104,6 @@ namespace ZapMe.Migrations
                         .HasColumnName("width");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("HashPerceptual")
-                        .HasDatabaseName("images_phash_idx");
 
                     b.HasIndex("Sha256")
                         .IsUnique()

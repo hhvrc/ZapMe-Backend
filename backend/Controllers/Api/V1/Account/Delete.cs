@@ -35,7 +35,7 @@ public partial class AccountController
 
         if (!PasswordUtils.CheckPassword(password, identity.User.PasswordHash))
         {
-            return CreateHttpError.InvalidPassword();
+            return CreateHttpError.InvalidPassword().ToActionResult();
         }
 
         await _dbContext.Users.Where(u => u.Id == identity.User.Id).ExecuteDeleteAsync(cancellationToken);

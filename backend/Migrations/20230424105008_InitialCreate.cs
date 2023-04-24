@@ -53,9 +53,12 @@ namespace ZapMe.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     height = table.Column<long>(type: "bigint", nullable: false),
                     width = table.Column<long>(type: "bigint", nullable: false),
+                    frameCount = table.Column<long>(type: "bigint", nullable: false),
                     sizeBytes = table.Column<long>(type: "bigint", nullable: false),
+                    extension = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
                     sha256 = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    phash = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
+                    s3BucketName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    s3RegionName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
                     uploaderId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -252,11 +255,6 @@ namespace ZapMe.Migrations
                 name: "IX_friendRequests_receiverId",
                 table: "friendRequests",
                 column: "receiverId");
-
-            migrationBuilder.CreateIndex(
-                name: "images_phash_idx",
-                table: "images",
-                column: "phash");
 
             migrationBuilder.CreateIndex(
                 name: "images_sha256_idx",

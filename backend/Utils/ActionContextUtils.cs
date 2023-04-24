@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ZapMe.Helpers;
 
 namespace ZapMe.Utils;
@@ -36,6 +36,6 @@ public static class ActionContextUtils
             return CreateHttpError.InvalidModelState(GetErrors(modelState)).ToActionResult();
         }
 
-        return CreateHttpError.InternalServerError();
+        return CreateHttpError.InternalServerError().ToActionResult();
     }
 }

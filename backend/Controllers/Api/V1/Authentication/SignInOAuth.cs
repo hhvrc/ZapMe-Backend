@@ -27,7 +27,7 @@ public partial class AuthenticationController
     {
         if (User.Identity?.IsAuthenticated ?? false)
         {
-            return CreateHttpError.AnonymousOnly();
+            return CreateHttpError.AnonymousOnly().ToActionResult();
         }
 
         if (!await HttpContext.IsProviderSupportedAsync(provider))

@@ -32,7 +32,7 @@ public partial class AccountController
 
         if (!PasswordUtils.CheckPassword(body.Password, identity.User.PasswordHash))
         {
-            return CreateHttpError.InvalidPassword();
+            return CreateHttpError.InvalidPassword().ToActionResult();
         }
 
         await dbContext.Users.Where(u => u.Id == identity.UserId).ExecuteUpdateAsync(spc => spc.SetProperty(u => u.Email, _ => null), cancellationToken);

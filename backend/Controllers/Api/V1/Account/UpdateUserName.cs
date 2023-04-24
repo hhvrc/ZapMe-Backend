@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.Models;
-using ZapMe.DTOs;
 using ZapMe.Helpers;
 using ZapMe.Utils;
 using static System.Net.Mime.MediaTypeNames;
@@ -31,7 +30,7 @@ public partial class AccountController
 
         if (identity.User.PasswordHash != PasswordUtils.HashPassword(body.Password))
         {
-            return CreateHttpError.InvalidPassword();
+            return CreateHttpError.InvalidPassword().ToActionResult();
         }
 
         bool success = await _dbContext.Users
@@ -41,6 +40,6 @@ public partial class AccountController
                 .SetProperty(u => u.UpdatedAt, _ => DateTime.UtcNow)
                 , cancellationToken) > 0;
 
-        return success ? Ok() : CreateHttpError.InternalServerError();
+        return success ? Ok() : CreateHttpError.InternalServerError().ToActionResult();
     }
 }

@@ -40,7 +40,7 @@ public partial class AuthenticationController
     {
         if (User.Identity?.IsAuthenticated ?? false)
         {
-            return CreateHttpError.AnonymousOnly();
+            return CreateHttpError.AnonymousOnly().ToActionResult();
         }
 
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);

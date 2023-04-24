@@ -37,13 +37,13 @@ public sealed partial class WebSocketController
             {
                 _logger.LogError("Failed to create websocket instance");
 
-                return CreateHttpError.InternalServerError();
+                return CreateHttpError.InternalServerError().ToActionResult();
             }
 
             // Register instance globally, the manager will have the ability to kill this connection
             if (!await _webSocketInstanceManager.RegisterInstanceAsync(identity.UserId, instanceId, instance, cancellationToken))
             {
-                return CreateHttpError.InternalServerError();
+                return CreateHttpError.InternalServerError().ToActionResult();
             }
 
             try
