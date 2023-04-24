@@ -187,7 +187,7 @@ paths:
               $ref: '#/components/schemas/RecoveryRequest'
       responses:
         '200':
-          description: Account
+          description: Ok
   /api/v1/Account/email:
     put:
       tags:
@@ -202,7 +202,7 @@ paths:
               $ref: '#/components/schemas/UpdateEmail'
       responses:
         '200':
-          description: New email
+          description: Ok
           content:
             application/json:
               schema:
@@ -324,7 +324,7 @@ paths:
               $ref: '#/components/schemas/UpdateUserName'
       responses:
         '200':
-          description: New username
+          description: Ok
         '400':
           description: Error details
           content:
@@ -819,27 +819,27 @@ components:
     AuthenticationConfig:
       type: object
       properties:
-        discord_client_id:
+        discordClientId:
           type: string
           description: 'Discord Client ID for OAuth, if null, Discord login will be disabled'
           nullable: true
-        github_client_id:
+        githubClientId:
           type: string
           description: 'Github Client ID for OAuth, if null, Github login will be disabled'
           nullable: true
-        twitter_client_id:
+        twitterClientId:
           type: string
           description: 'Twitter Client ID for OAuth, if null, Twitter login will be disabled'
           nullable: true
-        google_client_id:
+        googleClientId:
           type: string
           description: 'Google Client ID for OAuth, if null, Google login will be disabled'
           nullable: true
-        recaptcha_site_key:
+        recaptchaSiteKey:
           type: string
           description: 'ReCaptcha site key for bot detection, if null, ReCaptcha will be disabled'
           nullable: true
-        turnstile_site_key:
+        turnstileSiteKey:
           type: string
           description: 'Turnstile site key for bot detection, if null, Turnstile will be disabled'
           nullable: true

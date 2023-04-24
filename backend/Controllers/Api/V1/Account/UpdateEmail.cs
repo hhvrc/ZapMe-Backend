@@ -20,7 +20,7 @@ public partial class AccountController
     /// <param name="emailVerificationManager"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    /// <response code="200">New email</response>
+    /// <response code="200">Ok</response>
     /// <response code="400">Error details</response>
     [RequestSizeLimit(1024)]
     [HttpPut("email", Name = "UpdateEmail")]

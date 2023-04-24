@@ -17,7 +17,7 @@ public partial class AccountController
     /// <param name="body"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    /// <response code="200">New username</response>
+    /// <response code="200">Ok</response>
     /// <response code="400">Error details</response>
     [RequestSizeLimit(1024)]
     [HttpPut("username", Name = "UpdateUserName")]

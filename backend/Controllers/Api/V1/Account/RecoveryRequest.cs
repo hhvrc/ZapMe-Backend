@@ -18,7 +18,7 @@ public partial class AccountController
     /// <param name="passwordResetManager"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    /// <response code="200">Account</response>
+    /// <response code="200">Ok</response>
     [AllowAnonymous]
     [RequestSizeLimit(1024)]
     [HttpPost("recover", Name = "AccountRecoveryRequest")]
