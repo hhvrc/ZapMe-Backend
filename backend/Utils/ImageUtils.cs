@@ -11,7 +11,6 @@ public static class ImageUtils
     {
         try
         {
-            inputStream.Position = 0;
             using Image image = await Image.LoadAsync(inputStream, cancellationToken);
 
             int width = image.Width;

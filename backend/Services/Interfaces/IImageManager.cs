@@ -1,4 +1,5 @@
-﻿using OneOf;
+﻿using Amazon.S3;
+using OneOf;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data.Models;
 
@@ -14,6 +15,8 @@ public interface IImageManager
     /// <param name="imageHash">Sha-256 hash of image bytes</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="AmazonS3Exception"></exception>
     Task UploadToS3Async(Guid imageId, Stream imageStream, byte[] imageHash, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -22,6 +25,7 @@ public interface IImageManager
     /// <param name="imageId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
+    /// <exception cref="AmazonS3Exception"></exception>
     Task DeleteFromS3Async(Guid imageId, CancellationToken cancellationToken = default);
 
     /// <summary>

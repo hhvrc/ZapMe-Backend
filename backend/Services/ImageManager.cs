@@ -34,7 +34,6 @@ public class ImageManager : IImageManager
             Key = $"img_{imageId}",
             ChecksumSHA256 = Convert.ToBase64String(imageHash),
             InputStream = imageStream,
-            CannedACL = S3CannedACL.PublicRead
         }, cancellationToken);
     }
 
@@ -60,7 +59,13 @@ public class ImageManager : IImageManager
 
         // Create stream that can be read multiple times
         using MemoryStream memoryStream = new MemoryStream((int)imageSizeBytes);
-        await imageStream.CopyToAsync(memoryStream, cancellationToken);
+
+        // Parse image for metadata and rewrite to webp/gif
+        OneOf<ImageUtils.ParseResult, ErrorDetails> result = await ImageUtils.ParseAndRewriteFromStreamAsync(imageStream, memoryStream, cancellationToken);
+        if (result.TryPickT1(out ErrorDetails errorDetails, out ImageUtils.ParseResult imageInfo))
+        {
+            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Unsupported or invalid image", errorDetails.Detail);
+        }
 
         // Hash image data
         byte[] sha256 = HashingUtils.Sha256_Bytes(memoryStream);
@@ -71,13 +76,6 @@ public class ImageManager : IImageManager
         if (image != null)
         {
             return image;
-        }
-
-        // Parse image for metadata
-        OneOf<ImageUtils.ParseResult, ErrorDetails> result = await ImageUtils.ParseAndRewriteFromStreamAsync(imageStream, memoryStream, cancellationToken);
-        if (result.TryPickT0(out ImageUtils.ParseResult imageInfo, out ErrorDetails errorDetails))
-        {
-            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Unsupported or invalid image", errorDetails.Detail);
         }
 
         if (imageInfo.Width > 1024 || imageInfo.Height > 1024)
