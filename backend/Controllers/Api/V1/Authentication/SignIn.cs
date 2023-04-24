@@ -41,7 +41,7 @@ public partial class AuthenticationController
             return CreateHttpError.AnonymousOnly().ToActionResult();
         }
 
-        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
+        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);
 
         UserEntity? user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Name == body.UsernameOrEmail || u.Email == body.UsernameOrEmail, cancellationToken);
         if (user == null || !PasswordUtils.CheckPassword(body.Password, user.PasswordHash))
@@ -84,6 +84,8 @@ public partial class AuthenticationController
         }
 
         SessionEntity session = await _sessionManager.CreateAsync(user, body.SessionName, this.GetRemoteIP(), this.GetCloudflareIPCountry(), userAgent, body.RememberMe, cancellationToken);
+
+        session.User = user;
 
         return SignIn(new ZapMePrincipal(session));
     }

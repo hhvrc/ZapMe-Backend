@@ -92,7 +92,7 @@ public partial class AccountController
             return CreateHttpError.InvalidModelState((nameof(body.Email), "Disposable Emails are not allowed")).ToActionResult();
         }
 
-        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
+        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);
 
         if (await _dbContext.Users.AnyAsync(u => u.Email == body.Email, cancellationToken))
         {
