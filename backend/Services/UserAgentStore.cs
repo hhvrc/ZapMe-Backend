@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ZapMe.Constants;
+﻿using ZapMe.Constants;
 using ZapMe.Data;
 using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;

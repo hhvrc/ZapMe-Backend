@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace ZapMe.Controllers.Api.V1.Config.Models;
+﻿namespace ZapMe.Controllers.Api.V1.Config.Models;
 
 public readonly struct ApiDisabledFeatures
 {

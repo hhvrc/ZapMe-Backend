@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using ZapMe.Attributes;
+﻿using ZapMe.Attributes;
 
 namespace ZapMe.Controllers.Api.V1.Account.Models;
 

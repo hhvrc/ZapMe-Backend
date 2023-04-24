@@ -20,7 +20,8 @@ public partial class ConfigController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
     public Config.Models.Config GetConfig([FromServices] IConfiguration configuration)
     {
-        return new Config.Models.Config {
+        return new Config.Models.Config
+        {
             AppName = App.AppName,
             AppVersion = App.AppVersion.String,
             Api = new Config.Models.ApiConfig

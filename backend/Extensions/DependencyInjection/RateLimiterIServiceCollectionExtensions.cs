@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Threading.RateLimiting;
 using ZapMe.Authentication;
-using ZapMe.Constants;
 
 namespace Microsoft.Extensions.DependencyInjection;
 

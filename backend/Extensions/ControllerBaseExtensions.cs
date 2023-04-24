@@ -1,7 +1,4 @@
-﻿using ZapMe.Controllers;
-using ZapMe.Controllers.Api.V1.Models;
-
-namespace Microsoft.AspNetCore.Mvc;
+﻿namespace Microsoft.AspNetCore.Mvc;
 
 public static class ControllerBaseExtensions
 {

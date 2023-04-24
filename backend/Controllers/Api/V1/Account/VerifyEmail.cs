@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ZapMe.Controllers.Api.V1.Models;
-using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
-using ZapMe.Utils;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;

@@ -1,7 +1,4 @@
-﻿using AngleSharp.Io;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Primitives;
-using System.Xml.Linq;
+﻿using Microsoft.Extensions.Primitives;
 
 namespace Microsoft.AspNetCore.Http;
 

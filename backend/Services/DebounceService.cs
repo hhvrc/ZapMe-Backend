@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using ZapMe.Services.Interfaces;
+﻿using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
 
 namespace ZapMe.Services;

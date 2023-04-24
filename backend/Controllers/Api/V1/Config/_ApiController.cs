@@ -15,4 +15,4 @@ public sealed partial class ConfigController : Controller
     {
         _logger = logger;
     }
-} 
+}

@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using ZapMe.Data.Models;
+﻿using ZapMe.Data.Models;
 
 namespace ZapMe.Authentication.Models;
 

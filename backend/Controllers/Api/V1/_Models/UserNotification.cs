@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace ZapMe.Controllers.Api.V1.Models;
+﻿namespace ZapMe.Controllers.Api.V1.Models;
 
 /// <summary>
 /// System notification to be displayed to the user, do not confuse with user notifications

@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
-using System.Linq.Expressions;
-using ZapMe.Data;
+﻿using ZapMe.Data;
 using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
 

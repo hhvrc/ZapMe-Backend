@@ -24,7 +24,7 @@ public sealed class ImageEntity
     /// <summary>
     /// 
     /// </summary>
-    public uint Width { get; set; }  
+    public uint Width { get; set; }
 
     /// <summary>
     /// 

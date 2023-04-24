@@ -4,7 +4,6 @@ using ZapMe.Authentication;
 using ZapMe.Authentication.Models;
 using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
-using ZapMe.Data;
 using ZapMe.Data.Models;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;

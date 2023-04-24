@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace ZapMe.Controllers.Api.V1.User.FriendRequest.Models;
+﻿namespace ZapMe.Controllers.Api.V1.User.FriendRequest.Models;
 
 /// <summary>
 /// List of incoming and outgoing friendrequests

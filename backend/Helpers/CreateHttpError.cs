@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using ZapMe.Controllers.Api.V1.Models;
-using static System.Net.Mime.MediaTypeNames;
+﻿using ZapMe.Controllers.Api.V1.Models;
 
 namespace ZapMe.Helpers;
 

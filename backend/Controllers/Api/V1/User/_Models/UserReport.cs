@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace ZapMe.Controllers.Api.V1.User.Models;
+﻿namespace ZapMe.Controllers.Api.V1.User.Models;
 
 /// <summary>
 /// Message sent to server to report a user
