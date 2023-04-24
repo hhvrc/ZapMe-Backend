@@ -1,9 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 using Npgsql;
+using OneOf;
+using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data;
 using ZapMe.Data.Models;
-using ZapMe.DTOs;
 using ZapMe.Enums;
+using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
 
@@ -20,67 +23,62 @@ public sealed class UserManager : IUserManager
         _logger = logger;
     }
 
-    public async Task<AccountCreationResult> TryCreateAsync(string name, string? email, string password, CancellationToken cancellationToken)
+    public async Task<OneOf<UserEntity, ErrorDetails>> TryCreateAsync(string name, string email, string password, bool emailVerified, CancellationToken cancellationToken)
     {
-        string passwordHash = PasswordUtils.HashPassword(password);
+        if (_dbContext.Users.Any(u => u.Name == name || u.Email == email))
+        {
+            return CreateHttpError.Generic(StatusCodes.Status409Conflict, "Username/Email taken", "The given username or email is already associated with an account in the database", UserNotification.SeverityLevel.Warning, "Username/Email already taken", "Please choose a different Username or Email");
+        }
 
-        var user = new UserEntity
+        string passwordHash = PasswordUtils.HashPassword(password);
+        UserEntity user = new UserEntity
         {
             Name = name,
             Email = email,
+            EmailVerified = emailVerified,
             PasswordHash = passwordHash,
             AcceptedTosVersion = 0,
             ProfilePictureId = ImageEntity.DefaultImageId,
             OnlineStatus = UserStatus.Online,
-            OnlineStatusText = String.Empty,
-            UpdatedAt = DateTime.UtcNow
+            OnlineStatusText = String.Empty
         };
 
         int retryCount = 0;
-        while (retryCount < 3)
+    retry:
+        try
         {
-            try
+            using IDbContextTransaction? transaction = await _dbContext.Database.BeginTransactionIfNotExistsAsync(cancellationToken);
+
+            await _dbContext.Users.AddAsync(user, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            if (transaction != null)
             {
-                await _dbContext.Users.AddAsync(user, cancellationToken);
-                await _dbContext.SaveChangesAsync(cancellationToken);
-
-                return new AccountCreationResult(AccountCreationResult.ResultE.Success, user);
+                await transaction.CommitAsync(cancellationToken);
             }
-            catch (DbUpdateException exception)
+
+            return user;
+        }
+        catch (PostgresException exception)
+        {
+            if (exception.IsTransient && retryCount++ < 3)
             {
-                if (exception.InnerException is not PostgresException postgresException)
-                {
-                    return new AccountCreationResult(AccountCreationResult.ResultE.UnknownError, null!, exception.Message);
-                }
-
-                if (postgresException.IsTransient)
-                {
-                    retryCount++;
-                    continue;
-                }
-
-                if (postgresException.SqlState == PostgresErrorCodes.UniqueViolation)
-                {
-                    if (postgresException.ConstraintName == UserEntity.TableAccountEmailIndex)
-                    {
-                        return new AccountCreationResult(AccountCreationResult.ResultE.EmailAlreadyTaken, null!, exception.Message);
-                    }
-                    else if (postgresException.ConstraintName == UserEntity.TableAccountNameIndex)
-                    {
-                        return new AccountCreationResult(AccountCreationResult.ResultE.NameAlreadyTaken, null!, exception.Message);
-                    }
-                }
-
-                var errorCode = postgresException.SqlState switch
-                {
-                    "23514" => AccountCreationResult.ResultE.NameOrEmailInvalid,
-                    _ => AccountCreationResult.ResultE.UnknownError
-                };
-
-                return new AccountCreationResult(errorCode, null!, postgresException.MessageText);
+                goto retry;
             }
+
+            _logger.LogError(exception, "Failed to create user account");
+
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Failed to create user account");
         }
 
-        return new AccountCreationResult(AccountCreationResult.ResultE.UnknownError, null!, "Unknown error, retry count exceeded");
+        if (retryCount >= 3)
+        {
+            _logger.LogError("Ran out of retries while creating account!");
+        }
+
+        return CreateHttpError.InternalServerError();
     }
 }

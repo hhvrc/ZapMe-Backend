@@ -26,7 +26,7 @@ public sealed class ImageManager : IImageManager
         _bucketName = configuration.GetOrThrow("AmazonAWS:S3:PublicBucketName");
     }
 
-    public async Task UploadToS3Async(Guid imageId, Stream imageStream, byte[] imageHash, CancellationToken cancellationToken = default)
+    public async Task UploadToS3Async(Guid imageId, Stream imageStream, byte[] imageHash, CancellationToken cancellationToken)
     {
         await _s3Client.PutObjectAsync(new()
         {
@@ -37,7 +37,7 @@ public sealed class ImageManager : IImageManager
         }, cancellationToken);
     }
 
-    public async Task DeleteFromS3Async(Guid imageId, CancellationToken cancellationToken = default)
+    public async Task DeleteFromS3Async(Guid imageId, CancellationToken cancellationToken)
     {
         await _s3Client.DeleteObjectAsync(new()
         {

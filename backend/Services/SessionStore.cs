@@ -35,19 +35,4 @@ public sealed class SessionStore : ISessionStore
 
         return session;
     }
-
-    public async Task<bool> SetExipresAtAsync(Guid sessionId, DateTime expiresAt, CancellationToken cancellationToken = default)
-    {
-        return await _dbContext.Sessions.Where(s => s.Id == sessionId).ExecuteUpdateAsync(s => s.SetProperty(s => s.ExpiresAt, _ => expiresAt), cancellationToken) > 0;
-    }
-
-    public async Task<bool> DeleteSessionAsync(Guid sessionId, CancellationToken cancellationToken)
-    {
-        return await _dbContext.Sessions.Where(s => s.Id == sessionId).ExecuteDeleteAsync(cancellationToken) > 0;
-    }
-
-    public Task<int> DeleteUserSessionsAsync(Guid userId, CancellationToken cancellationToken)
-    {
-        return _dbContext.Sessions.Where(s => s.UserId == userId).ExecuteDeleteAsync(cancellationToken);
-    }
 }

@@ -39,8 +39,8 @@ public partial class ConfigController
             },
             Contact = new Config.Models.ContactConfig
             {
-                EmailSupport = App.SupportMailAddress.ToString(),
-                EmailContact = App.ContactMailAddress.ToString(),
+                EmailSupport = App.SupportEmailAddress.ToString(),
+                EmailContact = App.ContactEmailAddress.ToString(),
                 DiscordInviteUrl = new Uri("https://discord.gg/ez6HE5vxe8")
             },
             FounderSocials = new Config.Models.SocialsConfig

@@ -37,7 +37,9 @@ public partial class AccountController
             return CreateHttpError.InvalidPassword().ToActionResult();
         }
 
-        await _dbContext.Users.Where(u => u.Id == identity.User.Id).ExecuteDeleteAsync(cancellationToken);
+        await _dbContext.Users
+            .Where(u => u.Id == identity.User.Id)
+            .ExecuteDeleteAsync(cancellationToken);
 
         // TODO: register reason if supplied
 

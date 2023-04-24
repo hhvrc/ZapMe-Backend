@@ -21,17 +21,17 @@ public sealed class DebounceService : IDebounceService
         public string Disposable { get; set; }
     }
 
-    public async Task<bool> IsDisposableEmailAsync(string mailAddress, CancellationToken cancellationToken)
+    public async Task<bool> IsDisposableEmailAsync(string emailAddress, CancellationToken cancellationToken)
     {
-        EmailUtils.ParsedResult parsed = EmailUtils.Parse(mailAddress);
+        EmailUtils.ParsedResult parsed = EmailUtils.Parse(emailAddress);
         if (!parsed.Success)
         {
-            _logger.LogError("Failed to parse email: {}", mailAddress);
+            _logger.LogError("Failed to parse email: {}", emailAddress);
             return false;
         }
 
         // We want to forward aliases, but not the user part
-        // Aliases might help identify if the mail address is disposable or not
+        // Aliases might help identify if the email address is disposable or not
         // But if we forward the user part and the external service sells the data, user might get spammed, we don't want that
         string query = parsed.HasAlias ? $"?email={parsed.UserAlias}+user@{parsed.Host}" : $"?email=user@{parsed.Host}";
 
@@ -55,13 +55,13 @@ public sealed class DebounceService : IDebounceService
         }
         catch (Exception)
         {
-            _logger.LogError("disposable.io sent back invalid return for {}", mailAddress);
+            _logger.LogError("disposable.io sent back invalid return for {}", emailAddress);
             return false;
         }
 
         if (!Boolean.TryParse(isDisposableStr, out bool isDisposable))
         {
-            _logger.LogError("disposable.io sent back invalid return for {}", mailAddress);
+            _logger.LogError("disposable.io sent back invalid return for {}", emailAddress);
             return false;
         }
 

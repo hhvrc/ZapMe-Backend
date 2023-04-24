@@ -19,7 +19,6 @@ public partial class AuthenticationController
     /// 
     /// </summary>
     /// <param name="body"></param>
-    /// <param name="dbContext"></param>
     /// <param name="lockOutStore"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>The user account</returns>
@@ -35,7 +34,7 @@ public partial class AuthenticationController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status413RequestEntityTooLarge)]
-    public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] ZapMeContext dbContext, [FromServices] ILockOutStore lockOutStore, CancellationToken cancellationToken)
+    public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] ILockOutStore lockOutStore, CancellationToken cancellationToken)
     {
         if (User.Identity?.IsAuthenticated ?? false)
         {
@@ -44,13 +43,15 @@ public partial class AuthenticationController
 
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
 
-        UserEntity? user = await dbContext.Users.Where(u => u.Name == body.UsernameOrEmail || u.Email == body.UsernameOrEmail).SingleOrDefaultAsync(cancellationToken);
+        UserEntity? user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Name == body.UsernameOrEmail || u.Email == body.UsernameOrEmail, cancellationToken);
         if (user == null || !PasswordUtils.CheckPassword(body.Password, user.PasswordHash))
         {
             return CreateHttpError.InvalidCredentials("Invalid username/email/password", "Please check that your entered username/email and password are correct", "username", "password").ToActionResult();
         }
 
-        LockOutEntity[] lockouts = await lockOutStore.ListByUserIdAsync(user.Id).ToArrayAsync(cancellationToken);
+        LockOutEntity[] lockouts = await _dbContext.LockOuts
+            .Where(u => u.UserId == user.Id)
+            .ToArrayAsync(cancellationToken);
         if (lockouts.Any())
         {
             string reason = "Please contact support for more information";

@@ -1,4 +1,4 @@
-﻿namespace ZapMe.Websocket._Models.ServerPayloads;
+﻿namespace ZapMe.Websocket.Models.ServerPayloads;
 
 public readonly struct HelloMessage
 {

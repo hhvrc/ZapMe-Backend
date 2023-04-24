@@ -4,9 +4,9 @@ using ZapMe.Constants;
 
 namespace ZapMe.Data.Models;
 
-public sealed class MailAddressChangeRequestEntity
+public sealed class EmailVerificationRequestEntity
 {
-    public const string TableName = "mailAddressVerificationRequest";
+    public const string TableName = "emailVerificationRequest";
     public const string TableNewEmailIndex = TableName + "_newEmail_idx";
     public const string TableTokenIndex = TableName + "_tokenHash_idx";
 
@@ -38,11 +38,11 @@ public sealed class MailAddressChangeRequestEntity
     public DateTime CreatedAt { get; set; }
 }
 
-public sealed class MailAddressChangeRequestEntityConfiguration : IEntityTypeConfiguration<MailAddressChangeRequestEntity>
+public sealed class EmailAddressChangeRequestEntityConfiguration : IEntityTypeConfiguration<EmailVerificationRequestEntity>
 {
-    public void Configure(EntityTypeBuilder<MailAddressChangeRequestEntity> builder)
+    public void Configure(EntityTypeBuilder<EmailVerificationRequestEntity> builder)
     {
-        builder.ToTable(MailAddressChangeRequestEntity.TableName);
+        builder.ToTable(EmailVerificationRequestEntity.TableName);
 
         builder.HasKey(macr => macr.UserId);
 
@@ -62,16 +62,16 @@ public sealed class MailAddressChangeRequestEntityConfiguration : IEntityTypeCon
             .HasDefaultValueSql("now()");
 
         builder.HasOne(macr => macr.User)
-            .WithOne(u => u.MailAddressChangeRequestEntity)
-            .HasForeignKey<MailAddressChangeRequestEntity>(macr => macr.UserId)
+            .WithOne(u => u.EmailVerificationRequest)
+            .HasForeignKey<EmailVerificationRequestEntity>(macr => macr.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(macr => macr.NewEmail)
             .IsUnique()
-            .HasDatabaseName(MailAddressChangeRequestEntity.TableNewEmailIndex);
+            .HasDatabaseName(EmailVerificationRequestEntity.TableNewEmailIndex);
 
         builder.HasIndex(macr => macr.TokenHash)
-            .HasDatabaseName(MailAddressChangeRequestEntity.TableTokenIndex)
+            .HasDatabaseName(EmailVerificationRequestEntity.TableTokenIndex)
             .IsUnique();
     }
 }

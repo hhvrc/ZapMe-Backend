@@ -16,7 +16,7 @@ public sealed class GoogleReCaptchaService : IGoogleReCaptchaService
         _reCaptchaSecret = configuration["Authorization:ReCaptcha:SecretKey"] ?? throw new KeyNotFoundException("Config entry \"Authorization:ReCaptcha:SecretKey\" is missing!");
     }
 
-    public async Task<GoogleReCaptchaVerifyResponse> VerifyUserResponseTokenAsync(string reCaptchaToken, string? remoteIpAddress, CancellationToken cancellationToken = default)
+    public async Task<GoogleReCaptchaVerifyResponse> VerifyUserResponseTokenAsync(string reCaptchaToken, string? remoteIpAddress, CancellationToken cancellationToken)
     {
 #if DEBUG
         if (reCaptchaToken == "skip") return new GoogleReCaptchaVerifyResponse { Success = true };

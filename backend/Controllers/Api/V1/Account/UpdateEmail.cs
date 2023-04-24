@@ -5,6 +5,7 @@ using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data;
 using ZapMe.Helpers;
+using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -16,7 +17,7 @@ public partial class AccountController
     /// Updates the account email
     /// </summary>
     /// <param name="body"></param>
-    /// <param name="dbContext"></param>
+    /// <param name="emailVerificationManager"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <response code="200">New email</response>
@@ -25,10 +26,10 @@ public partial class AccountController
     [HttpPut("email", Name = "UpdateEmail")]
     [Consumes(Application.Json)]
     [Produces(Application.Json)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UpdateEmailOk), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> UpdateEmail([FromBody] UpdateEmail body, [FromServices] ZapMeContext dbContext, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateEmail([FromBody] UpdateEmail body, [FromServices] IEmailVerificationManager emailVerificationManager, CancellationToken cancellationToken)
     {
         ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 
@@ -37,8 +38,12 @@ public partial class AccountController
             return CreateHttpError.InvalidPassword().ToActionResult();
         }
 
-        await dbContext.Users.Where(u => u.Id == identity.UserId).ExecuteUpdateAsync(spc => spc.SetProperty(u => u.Email, _ => null), cancellationToken);
+        ErrorDetails? errorDetails = await emailVerificationManager.InitiateEmailVerificationAsync(identity.User.Name, body.NewEmail, cancellationToken);
+        if (errorDetails.HasValue)
+        {
+            return errorDetails.Value.ToActionResult();
+        }
 
-        return Ok();
+        return Ok(new UpdateEmailOk { Message = "Please check your email to verify your new address." });
     }
 }

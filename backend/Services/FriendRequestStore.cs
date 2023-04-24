@@ -15,7 +15,7 @@ public sealed class FriendRequestStore : IFriendRequestStore
         _logger = logger;
     }
 
-    public async Task<FriendRequestEntity> CreateAsync(Guid senderId, Guid receiverId, CancellationToken cancellationToken = default)
+    public async Task<FriendRequestEntity> CreateAsync(Guid senderId, Guid receiverId, CancellationToken cancellationToken)
     {
         FriendRequestEntity friendRequest = new FriendRequestEntity
         {
@@ -29,20 +29,5 @@ public sealed class FriendRequestStore : IFriendRequestStore
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return friendRequest;
-    }
-
-    public IAsyncEnumerable<FriendRequestEntity> ListByUserAsync(Guid userId)
-    {
-        return _dbContext.FriendRequests.Where(fr => fr.SenderId == userId || fr.ReceiverId == userId).ToAsyncEnumerable();
-    }
-
-    public IAsyncEnumerable<FriendRequestEntity> ListBySenderAsync(Guid senderId)
-    {
-        return _dbContext.FriendRequests.Where(fr => fr.SenderId == senderId).ToAsyncEnumerable();
-    }
-
-    public IAsyncEnumerable<FriendRequestEntity> ListByReceiverAsync(Guid receiverId)
-    {
-        return _dbContext.FriendRequests.Where(fr => fr.ReceiverId == receiverId).ToAsyncEnumerable();
     }
 }

@@ -25,7 +25,11 @@ public sealed class ActivityTracker
         // Add activity to the database
         if (context.User?.Identity is ZapMeIdentity identity)
         {
-            await dbContext.Users.Where(s => s.Id == identity.UserId).ExecuteUpdateAsync(spc => spc.SetProperty(u => u.LastOnline, _ => DateTime.UtcNow));
+            await dbContext.Users
+                .Where(s => s.Id == identity.UserId)
+                .ExecuteUpdateAsync(spc => spc
+                    .SetProperty(u => u.LastOnline, _ => DateTime.UtcNow)
+                    );
         }
 
         // Call the next delegate/middleware in the pipeline

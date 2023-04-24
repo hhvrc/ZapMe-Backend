@@ -1,5 +1,7 @@
-﻿using UAParser;
+﻿using Microsoft.EntityFrameworkCore;
+using UAParser;
 using ZapMe.Constants;
+using ZapMe.Data;
 using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
@@ -8,22 +10,27 @@ namespace ZapMe.Services;
 
 public sealed class UserAgentManager : IUserAgentManager
 {
-    public IUserAgentStore Store { get; }
+    private readonly ZapMeContext _dbContext;
+    private readonly IUserAgentStore _userAgentStore;
     private readonly ILogger<UserAgentManager> _logger;
 
-    public UserAgentManager(IUserAgentStore store, ILogger<UserAgentManager> logger)
+    public UserAgentManager(ZapMeContext dbContext, IUserAgentStore userAgentStore, ILogger<UserAgentManager> logger)
     {
-        Store = store;
+        _dbContext = dbContext;
+        _userAgentStore = userAgentStore;
         _logger = logger;
     }
 
-    public async Task<UserAgentEntity> EnsureCreatedAsync(string userAgent, CancellationToken cancellationToken = default)
+    public async Task<UserAgentEntity> EnsureCreatedAsync(string userAgent, CancellationToken cancellationToken)
     {
         uint length = (uint)userAgent.Length;
         string sha256 = HashingUtils.Sha256_Hex(userAgent);
 
-        UserAgentEntity? entry = await Store.GetByHashAsync(sha256, cancellationToken);
-        if (entry != null) return entry;
+        UserAgentEntity? entry = await _dbContext.UserAgents.FirstOrDefaultAsync(u => u.Sha256 == sha256, cancellationToken);
+        if (entry != null)
+        {
+            return entry;
+        }
 
         string os;
         string device;
@@ -37,7 +44,7 @@ public sealed class UserAgentManager : IUserAgentManager
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Failed to parse user agent {UserAgent}", userAgent);
+            _logger.LogError(ex, "Failed to parse user agent {UserAgent}", userAgent);
             os = "Unknown";
             device = "Unknown";
             browser = "Unknown";
@@ -48,6 +55,6 @@ public sealed class UserAgentManager : IUserAgentManager
             userAgent = userAgent[..UserAgentLimits.StoredValueLength];
         }
 
-        return await Store.CreateAsync(sha256, length, userAgent, os, device, browser, cancellationToken);
+        return await _userAgentStore.CreateAsync(sha256, length, userAgent, os, device, browser, cancellationToken);
     }
 }

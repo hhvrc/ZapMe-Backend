@@ -46,10 +46,4 @@ public sealed class PasswordResetRequestStore : IPasswordResetRequestStore
 
         return request;
     }
-
-    public Task<int> DeleteExpiredAsync(TimeSpan maxAge, CancellationToken cancellationToken)
-    {
-        DateTime expiresAt = DateTime.UtcNow - maxAge;
-        return _dbContext.PasswordResetRequests.Where(s => s.CreatedAt < expiresAt).ExecuteDeleteAsync(cancellationToken);
-    }
 }

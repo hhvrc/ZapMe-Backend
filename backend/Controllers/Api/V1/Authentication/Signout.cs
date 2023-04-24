@@ -20,7 +20,9 @@ public partial class AuthenticationController
     {
         ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 
-        int nDeleted = await _dbContext.Sessions.Where(s => s.Id == identity.SessionId).ExecuteDeleteAsync(cancellationToken);
+        int nDeleted = await _dbContext.Sessions
+            .Where(s => s.Id == identity.SessionId)
+            .ExecuteDeleteAsync(cancellationToken);
         if (nDeleted < 0)
         {
             _logger.LogWarning("User {UserId} signed out but session {SessionId} was not found/deleted", identity.UserId, identity.SessionId);

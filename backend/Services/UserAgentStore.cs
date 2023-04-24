@@ -34,9 +34,4 @@ public sealed class UserAgentStore : IUserAgentStore
 
         return userAgent;
     }
-
-    public Task<UserAgentEntity?> GetByHashAsync(string sha256, CancellationToken cancellationToken = default)
-    {
-        return _dbContext.UserAgents.FirstOrDefaultAsync(s => s.Sha256 == sha256, cancellationToken);
-    }
 }

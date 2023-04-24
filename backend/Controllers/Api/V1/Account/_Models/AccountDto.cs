@@ -17,7 +17,7 @@ public readonly struct AccountDto
         if (String.IsNullOrEmpty(email))
         {
             emailVerified = false;
-            email = user.MailAddressChangeRequestEntity?.NewEmail;
+            email = user.EmailVerificationRequest?.NewEmail;
         }
 
         Id = user.Id;

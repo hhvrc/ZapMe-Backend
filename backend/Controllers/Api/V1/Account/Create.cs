@@ -1,10 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using OneOf;
 using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.Data.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
+using ZapMe.Services;
 using ZapMe.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -18,8 +23,7 @@ public partial class AccountController
     /// <param name="body"></param>
     /// <param name="cfTurnstileService"></param>
     /// <param name="debounceService"></param>
-    /// <param name="emailTemplateStore"></param>
-    /// <param name="mailGunService"></param>
+    /// <param name="emailVerificationManager"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <response code="201">Created account</response>
@@ -30,15 +34,14 @@ public partial class AccountController
     [HttpPost(Name = "CreateAccount")]
     [Consumes(Application.Json)]
     [Produces(Application.Json)]
-    [ProducesResponseType(typeof(AccountDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(CreateOk), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status409Conflict)] // Username/email already taken
     public async Task<IActionResult> Create(
         [FromBody] CreateAccount body,
         [FromServices] ICloudFlareTurnstileService cfTurnstileService,
         [FromServices] IDebounceService debounceService,
-        [FromServices] IMailTemplateStore emailTemplateStore,
-        [FromServices] IMailGunService mailGunService,
+        [FromServices] IEmailVerificationManager emailVerificationManager,
         CancellationToken cancellationToken)
     {
         if (User.Identity?.IsAuthenticated ?? false)
@@ -91,52 +94,30 @@ public partial class AccountController
 
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(4, cancellationToken);
 
+        if (await _dbContext.Users.AnyAsync(u => u.Email == body.Email, cancellationToken))
+        {
+            return CreateHttpError.Generic(StatusCodes.Status409Conflict, "One or multiple idenitifiers in use", "Fields \"UserName\" or \"Email\" are not available", UserNotification.SeverityLevel.Warning, "Username/Email already taken", "Please choose a different Username or Email").ToActionResult();
+        }
+
+        using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
         // Create account
-        AccountCreationResult result = await _userManager.TryCreateAsync(body.UserName, body.Email, body.Password, cancellationToken);
-        if (!result.IsSuccess)
+        OneOf<UserEntity, ErrorDetails> tryCreateAccountResult = await _userManager.TryCreateAsync(body.UserName, body.Email, body.Password, emailVerified: false, cancellationToken);
+        if (tryCreateAccountResult.TryPickT1(out ErrorDetails errorDetails, out UserEntity user))
         {
-            switch (result.Result)
-            {
-                case AccountCreationResult.ResultE.Success:
-                    break;
-                case AccountCreationResult.ResultE.NameAlreadyTaken:
-                case AccountCreationResult.ResultE.EmailAlreadyTaken:
-                    return CreateHttpError.Generic(StatusCodes.Status409Conflict, "One or multiple idenitifiers in use", "Fields \"UserName\" or \"Email\" are not available", UserNotification.SeverityLevel.Warning, "Username/Email already taken", "Please choose a different Username or Email").ToActionResult();
-                case AccountCreationResult.ResultE.NameOrEmailInvalid:
-                    break;
-                case AccountCreationResult.ResultE.UnknownError:
-                    break;
-                default:
-                    break;
-            }
-
-            return StatusCode(StatusCodes.Status500InternalServerError);
+            return errorDetails.ToActionResult();
         }
 
-        string? emailTemplate = await emailTemplateStore.GetTemplateAsync("AccountCreated", cancellationToken);
-        if (emailTemplate != null)
+        // Send email verification
+        ErrorDetails? test = await emailVerificationManager.InitiateEmailVerificationAsync(body.UserName, body.Email, cancellationToken);
+        if (test.HasValue)
         {
-            string emailBody = new QuickStringReplacer(emailTemplate)
-                    .Replace("{{UserName}}", body.UserName)
-                    .Replace("{{ConfirmEmailLink}}", App.BackendUrl + "/Account/ConfirmEmail?token=")// + result.ConfirmationToken)
-                    .Replace("{{ContactLink}}", App.ContactUrl)
-                    .Replace("{{PrivacyPolicyLink}}", App.PrivacyPolicyUrl)
-                    .Replace("{{TermsOfServiceLink}}", App.TermsOfServiceUrl)
-                    .Replace("{{CompanyName}}", App.AppCreator)
-                    .Replace("{{CompanyAddress}}", App.MadeInText)
-                    .Replace("{{PoweredBy}}", App.AppName)
-                    .Replace("{{PoweredByLink}}", App.WebsiteUrl)
-                    .ToString();
-
-            await mailGunService.SendEmailAsync("System", body.UserName, body.Email, "Account Created", emailTemplate, cancellationToken);
-            throw new NotImplementedException();
-        }
-        else
-        {
-            _logger.LogError("Failed to load email template \"AccountCreated\"");
+            return test.Value.ToActionResult();
         }
 
-        // TODO: Send email verification
-        return CreatedAtAction(nameof(Get), new Account.Models.AccountDto(result.Entity)); // TODO: use a mapper FFS
+        // Commit transaction
+        await transaction.CommitAsync(cancellationToken);
+
+        return CreatedAtAction(nameof(Get), new CreateOk { Id = user.Id, Message = "Account created, please check your email for a verification link" });
     }
 }

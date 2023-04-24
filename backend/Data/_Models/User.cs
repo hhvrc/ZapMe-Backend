@@ -22,10 +22,14 @@ public sealed class UserEntity
     public required string Name { get; set; }
 
     /// <summary>
-    /// Email address of the user, if this is null, the user has not verified their email address yet.
-    /// <para>The email pending verification is stored in the <see cref="MailAddressChangeRequestEntity"/> table.</para>
+    /// 
     /// </summary>
-    public string? Email { get; set; }
+    public required string Email { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public bool EmailVerified { get; set; }
 
     /// <summary>
     /// Secure hash of the user's password, hashed with <see cref="Utils.PasswordUtils"/>.
@@ -70,7 +74,7 @@ public sealed class UserEntity
     /// </summary>
     public DateTime LastOnline { get; set; }
 
-    public MailAddressChangeRequestEntity? MailAddressChangeRequestEntity { get; set; }
+    public EmailVerificationRequestEntity? EmailVerificationRequest { get; set; }
 
     public ICollection<SessionEntity>? Sessions { get; set; }
     public ICollection<LockOutEntity>? LockOuts { get; set; }
@@ -100,6 +104,9 @@ public sealed class AccountEntityConfiguration : IEntityTypeConfiguration<UserEn
         builder.Property(u => u.Email)
             .HasColumnName("email")
             .HasMaxLength(GeneralHardLimits.EmailAddressMaxLength);
+
+        builder.Property(u => u.EmailVerified)
+            .HasColumnName("emailVerified");
 
         builder.Property(u => u.PasswordHash)
             .HasColumnName("passwordHash")

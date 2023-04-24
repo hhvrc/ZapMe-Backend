@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
@@ -25,7 +26,7 @@ public partial class AccountController
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> RecoveryRequest([FromBody] Account.Models.RecoveryRequest body, [FromServices] ICloudFlareTurnstileService cfTurnstileService, [FromServices] IPasswordResetManager passwordResetManager, CancellationToken cancellationToken)
     {
-        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(1, cancellationToken);
+        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);
 
         CloudflareTurnstileVerifyResponse reCaptchaResponse = await cfTurnstileService.VerifyUserResponseTokenAsync(body.TurnstileResponse, this.GetRemoteIP(), cancellationToken);
         if (!reCaptchaResponse.Success)
@@ -51,6 +52,7 @@ public partial class AccountController
 
         await passwordResetManager.InitiatePasswordReset(body.Email, cancellationToken);
 
-        return Ok(); // Return 200 OK no matter what happens, this is to prevent email enumeration
+        // Return 200 OK no matter what happens, this is to prevent email enumeration
+        return Ok(new RecoveryRequestOk { Message = "If the email you provided is registered, a recovery email has been sent to it. Please check your inbox." });
     }
 }

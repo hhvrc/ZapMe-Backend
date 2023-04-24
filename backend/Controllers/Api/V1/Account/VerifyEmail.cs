@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
@@ -13,7 +14,7 @@ public partial class AccountController
     /// Verify the users email address
     /// </summary>
     /// <param name="token"></param> 
-    /// <param name="mailAddressVerificationRequestStore"></param>
+    /// <param name="emailVerificationManager"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <response code="200">Ok</response>
@@ -24,18 +25,15 @@ public partial class AccountController
     [Consumes(Application.Json)]
     [Produces(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> ConfirmEmail([FromQuery] string token, [FromServices] IMailAddressVerificationRequestStore mailAddressVerificationRequestStore, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)] // Token invalid, expired, or already used
+    public async Task<IActionResult> ConfirmEmail([FromQuery] string token, [FromServices] IEmailVerificationManager emailVerificationManager, CancellationToken cancellationToken)
     {
-        string tokenHash = HashingUtils.Sha256_Hex(token);
-
-        MailAddressChangeRequestEntity? mailAddressVerificationRequest = await mailAddressVerificationRequestStore.GetByTokenHashAsync(tokenHash, cancellationToken);
-        /*if (mailAddressVerificationRequest == null)
+        ErrorDetails? errorDetails = await emailVerificationManager.CompleteEmailVerificationAsync(token, cancellationToken);
+        if (errorDetails.HasValue)
         {
-            return this.Error();
+            return errorDetails.Value.ToActionResult();
         }
 
-        bool success = await _userManager.Store.SetEmailVerifiedAsync(mailAddressVerificationRequest.UserId, true, cancellationToken);
-        */
         return Ok();
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using OneOf;
 using ZapMe.Constants;
+using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data;
 using ZapMe.Data.Models;
 using ZapMe.Helpers;
@@ -13,32 +15,34 @@ public sealed class PasswordResetManager : IPasswordResetManager
 {
     private readonly ZapMeContext _dbContext;
     private readonly IUserManager _userManager;
-    private readonly IMailTemplateStore _mailTemplateStore;
+    private readonly IEmailTemplateStore _mailTemplateStore;
     private readonly IMailGunService _mailGunService;
     private readonly IPasswordResetRequestStore _passwordResetRequestStore;
     private readonly ILogger<PasswordResetManager> _logger;
 
-    public PasswordResetManager(ZapMeContext dbContext, IUserManager userManager, IMailTemplateStore mailTemplateStore, IMailGunService mailGunService, IPasswordResetRequestStore passwordResetRequestStore, ILogger<PasswordResetManager> logger)
+    public PasswordResetManager(ZapMeContext dbContext, IUserManager userManager, IEmailTemplateStore emailTemplateStore, IMailGunService emailGunService, IPasswordResetRequestStore passwordResetRequestStore, ILogger<PasswordResetManager> logger)
     {
         _dbContext = dbContext;
         _userManager = userManager;
-        _mailTemplateStore = mailTemplateStore;
-        _mailGunService = mailGunService;
+        _mailTemplateStore = emailTemplateStore;
+        _mailGunService = emailGunService;
         _passwordResetRequestStore = passwordResetRequestStore;
         _logger = logger;
     }
 
     // TODO: Make this method return a Any<> type, bool if success, string/IActionResult if not
-    public async Task<bool> InitiatePasswordReset(UserEntity user, CancellationToken cancellationToken)
+    public async Task<ErrorDetails?> InitiatePasswordReset(UserEntity user, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(user.Email);
 
         string token = StringUtils.GenerateUrlSafeRandomString(16);
         string tokenHash = HashingUtils.Sha256_Hex(token);
 
-        string? emailTemplate = await _mailTemplateStore.GetTemplateAsync(EmailTemplateNames.PasswordReset, cancellationToken);
-        if (emailTemplate == null)
-            return false;
+        OneOf<string, ErrorDetails> getTemplateResponse = await _mailTemplateStore.GetTemplateAsync(EmailTemplateNames.PasswordReset, cancellationToken);
+        if (getTemplateResponse.TryPickT1(out ErrorDetails errorDetails, out string emailTemplate))
+        {
+            return errorDetails;
+        }
 
         string formattedEmail = new QuickStringReplacer(emailTemplate)
             .Replace("{{UserName}}", user.Name)
@@ -61,21 +65,27 @@ public sealed class PasswordResetManager : IPasswordResetManager
         // Commit transaction
         await transaction.CommitAsync(cancellationToken);
 
-        return success;
+        return null;
     }
 
-    public async Task<bool> InitiatePasswordReset(Guid accountId, CancellationToken cancellationToken)
+    public async Task<ErrorDetails?> InitiatePasswordReset(Guid accountId, CancellationToken cancellationToken)
     {
         UserEntity? userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == accountId && u.Email != null, cancellationToken);
-        if (userEntity == null) return false;
+        if (userEntity == null)
+        {
+            return CreateHttpError.Generic(StatusCodes.Status404NotFound, "Account not found", "The account was not found");
+        }
 
         return await InitiatePasswordReset(userEntity, cancellationToken);
     }
 
-    public async Task<bool> InitiatePasswordReset(string accountEmail, CancellationToken cancellationToken)
+    public async Task<ErrorDetails?> InitiatePasswordReset(string accountEmail, CancellationToken cancellationToken)
     {
         UserEntity? userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == accountEmail && u.Email != null, cancellationToken);
-        if (userEntity == null) return false;
+        if (userEntity == null)
+        {
+            return CreateHttpError.Generic(StatusCodes.Status404NotFound, "Account not found", "The account associated with that email was not found");
+        }
 
         return await InitiatePasswordReset(userEntity, cancellationToken);
     }
@@ -96,11 +106,17 @@ public sealed class PasswordResetManager : IPasswordResetManager
         using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         // Important to delete by token hash, and not account id as if the token has changed, someone else has issued a password reset
-        bool deleted = await _dbContext.PasswordResetRequests.Where(p => p.TokenHash == tokenHash).ExecuteDeleteAsync(cancellationToken) > 0;
+        bool deleted = await _dbContext.PasswordResetRequests
+            .Where(p => p.TokenHash == tokenHash)
+            .ExecuteDeleteAsync(cancellationToken) > 0;
         if (!deleted) return false; // Another caller made it before we did
 
         // Finally set the new password
-        bool success = await _dbContext.Users.Where(u => u.Id == passwordResetRequest.UserId).ExecuteUpdateAsync(spc => spc.SetProperty(u => u.PasswordHash, _ => newPasswordHash), cancellationToken) > 0;
+        bool success = await _dbContext.Users
+            .Where(u => u.Id == passwordResetRequest.UserId)
+            .ExecuteUpdateAsync(spc => spc
+            .SetProperty(u => u.PasswordHash, _ => newPasswordHash)
+            , cancellationToken) > 0;
         if (!success) return false; // Uhh, race condition?
 
         // Commit transaction
@@ -112,6 +128,8 @@ public sealed class PasswordResetManager : IPasswordResetManager
     public Task<int> RemoveExpiredRequests(CancellationToken cancellationToken)
     {
         DateTime minCreatedAt = DateTime.UtcNow - TimeSpan.FromMinutes(30);
-        return _dbContext.PasswordResetRequests.Where(x => x.CreatedAt < minCreatedAt).ExecuteDeleteAsync(cancellationToken);
+        return _dbContext.PasswordResetRequests
+            .Where(x => x.CreatedAt < minCreatedAt)
+            .ExecuteDeleteAsync(cancellationToken);
     }
 }
