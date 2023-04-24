@@ -22,8 +22,8 @@ public class ImageManager : IImageManager
     {
         _dbContext = dbContext;
         _s3Client = s3Client;
-        _regionName = configuration.GetOrThrow("AWS:Region");
-        _bucketName = configuration.GetOrThrow("AWS:S3:BucketName");
+        _regionName = configuration.GetOrThrow("AmazonAWS:Region");
+        _bucketName = configuration.GetOrThrow("AmazonAWS:S3:PublicBucketName");
     }
 
     public async Task UploadToS3Async(Guid imageId, Stream imageStream, byte[] imageHash, CancellationToken cancellationToken = default)
@@ -53,7 +53,7 @@ public class ImageManager : IImageManager
         {
             return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Invalid Content-Length", "Invalid Content-Length header");
         }
-        if (imageSizeBytes > 1_112_000)
+        if (imageSizeBytes > 1_112_000) // TODO: remove magic number
         {
             return CreateHttpError.Generic(StatusCodes.Status413PayloadTooLarge, "Payload too large", "Image too large, max 1MB");
         }

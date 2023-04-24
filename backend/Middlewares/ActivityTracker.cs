@@ -15,21 +15,20 @@ public sealed class ActivityTracker
 
     public async Task InvokeAsync(HttpContext context, ZapMeContext dbContext)
     {
-        try
+        // Add TraceIdentifier to the response headers
+        context.Response.OnStarting(() =>
         {
-            context.Response.OnStarting(() =>
-            {
-                context.Response.Headers["Trace-Id"] = context.TraceIdentifier;
-                return Task.CompletedTask;
-            });
-            await _next(context);
-        }
-        finally
+            context.Response.Headers["Trace-Id"] = context.TraceIdentifier;
+            return Task.CompletedTask;
+        });
+
+        // Add activity to the database
+        if (context.User?.Identity is ZapMeIdentity identity)
         {
-            if (context.User?.Identity is ZapMeIdentity identity)
-            {
-                await dbContext.Users.Where(s => s.Id == identity.UserId).ExecuteUpdateAsync(spc => spc.SetProperty(u => u.LastOnline, _ => DateTime.UtcNow));
-            }
+            await dbContext.Users.Where(s => s.Id == identity.UserId).ExecuteUpdateAsync(spc => spc.SetProperty(u => u.LastOnline, _ => DateTime.UtcNow));
         }
+
+        // Call the next delegate/middleware in the pipeline
+        await _next(context);
     }
 }
