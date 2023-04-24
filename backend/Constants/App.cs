@@ -34,11 +34,11 @@ public static class App
 
     public const string PrivacyPolicyUrl = WebsiteUrl + "/privacy";
 
-    public static readonly MailAddress HelloMailAddress = new MailAddress("hello@" + Domain, "Hello");
-    public static readonly MailAddress SystemMailAddress = new MailAddress("system@" + Domain, "System");
-    public static readonly MailAddress SupportMailAddress = new MailAddress("support@" + Domain, "Support");
-    public static readonly MailAddress ContactMailAddress = new MailAddress("contact@" + Domain, "Contact");
-    public static readonly MailAddress PrivacyMailAddress = new MailAddress("privacy@" + Domain, "Privacy");
+    public static readonly MailAddress HelloEmailAddress = new MailAddress("hello@" + Domain, "Hello");
+    public static readonly MailAddress SystemEmailAddress = new MailAddress("system@" + Domain, "System");
+    public static readonly MailAddress SupportEmailAddress = new MailAddress("support@" + Domain, "Support");
+    public static readonly MailAddress ContactEmailAddress = new MailAddress("contact@" + Domain, "Contact");
+    public static readonly MailAddress PrivacyEmailAddress = new MailAddress("privacy@" + Domain, "Privacy");
 
     public static readonly string AssemblyXmlPath = Path.Combine(AppContext.BaseDirectory, Assembly.GetExecutingAssembly().GetName().Name + ".xml");
 }

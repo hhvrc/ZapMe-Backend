@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ZapMe.Data;
+﻿using ZapMe.Data;
 using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
 
@@ -34,33 +33,5 @@ public sealed class SessionStore : ISessionStore
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return session;
-    }
-
-    public Task<SessionEntity?> GetByIdAsync(Guid sessionId, CancellationToken cancellationToken)
-    {
-        return _dbContext.Sessions
-            .Include(static s => s.User)
-            .ThenInclude(static a => a!.UserRoles)
-            .FirstOrDefaultAsync(s => s.Id == sessionId, cancellationToken);
-    }
-
-    public IAsyncEnumerable<SessionEntity> ListByUserAsync(Guid userId)
-    {
-        return _dbContext.Sessions.Where(s => s.UserId == userId).ToAsyncEnumerable();
-    }
-
-    public async Task<bool> SetExipresAtAsync(Guid sessionId, DateTime expiresAt, CancellationToken cancellationToken = default)
-    {
-        return await _dbContext.Sessions.Where(s => s.Id == sessionId).ExecuteUpdateAsync(s => s.SetProperty(static s => s.ExpiresAt, _ => expiresAt), cancellationToken) > 0;
-    }
-
-    public async Task<bool> DeleteSessionAsync(Guid sessionId, CancellationToken cancellationToken)
-    {
-        return await _dbContext.Sessions.Where(s => s.Id == sessionId).ExecuteDeleteAsync(cancellationToken) > 0;
-    }
-
-    public Task<int> DeleteUserSessionsAsync(Guid userId, CancellationToken cancellationToken)
-    {
-        return _dbContext.Sessions.Where(s => s.UserId == userId).ExecuteDeleteAsync(cancellationToken);
     }
 }

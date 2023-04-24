@@ -1,4 +1,5 @@
-﻿using ZapMe.Data.Models;
+﻿using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.Data.Models;
 
 namespace ZapMe.Services.Interfaces;
 
@@ -9,12 +10,12 @@ public interface IPasswordResetManager
     /// <para>1. Generates a password reset token</para>
     /// <para>2. Hashes the generated reset token</para>
     /// <para>3. Inserts or Updates the database with the token hash</para>
-    /// <para>4. Sends a mail to the accounts mail address containing a link to reset the password</para>
+    /// <para>4. Sends a email to the accounts mail address containing a link to reset the password</para>
     /// </summary>
-    /// <param name="user"></param>
+    /// <param name="user">User to reset the password for. User must have a verified email address, otherwise an exception will be thrown.</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<bool> InitiatePasswordReset(UserEntity user, CancellationToken cancellationToken = default);
+    public Task<ErrorDetails?> InitiatePasswordReset(UserEntity user, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Helper method for <see cref="InitiatePasswordReset(UserEntity, CancellationToken)"/>
@@ -22,7 +23,7 @@ public interface IPasswordResetManager
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<bool> InitiatePasswordReset(Guid userId, CancellationToken cancellationToken = default);
+    public Task<ErrorDetails?> InitiatePasswordReset(Guid userId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Helper method for <see cref="InitiatePasswordReset(UserEntity, CancellationToken)"/>
@@ -30,7 +31,7 @@ public interface IPasswordResetManager
     /// <param name="userEmail"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<bool> InitiatePasswordReset(string userEmail, CancellationToken cancellationToken = default);
+    public Task<ErrorDetails?> InitiatePasswordReset(string userEmail, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 

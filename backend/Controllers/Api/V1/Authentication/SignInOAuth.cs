@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ZapMe.Authentication.Models;
 using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.Helpers;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
@@ -18,7 +19,7 @@ public partial class AuthenticationController
     /// <response code="403">Error details</response>
     [RequestSizeLimit(1024)]
     [HttpPost("oauth-signin", Name = "AuthSignInOAuth")]
-    [Produces(Application.Json, Application.Xml)]
+    [Produces(Application.Json)]
     [ProducesResponseType(typeof(SignInOk), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
@@ -26,12 +27,12 @@ public partial class AuthenticationController
     {
         if (User.Identity?.IsAuthenticated ?? false)
         {
-            return this.Error_AnonymousOnly();
+            return CreateHttpError.AnonymousOnly().ToActionResult();
         }
 
         if (!await HttpContext.IsProviderSupportedAsync(provider))
         {
-            return this.Error(StatusCodes.Status406NotAcceptable, "Provider not supported", $"The OAuth provider \"{provider}\" is not supported", "Get the list of supported providers from the /api/v1/auth/oauth-providers endpoint");
+            return CreateHttpError.Generic(StatusCodes.Status406NotAcceptable, "Provider not supported", $"The OAuth provider \"{provider}\" is not supported", "Get the list of supported providers from the /api/v1/auth/oauth-providers endpoint").ToActionResult();
         }
 
         return Challenge(provider);

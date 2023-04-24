@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
@@ -17,15 +18,15 @@ public partial class AccountController
     /// <param name="passwordResetManager"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    /// <response code="200">Account</response>
+    /// <response code="200">Ok</response>
     [AllowAnonymous]
     [RequestSizeLimit(1024)]
     [HttpPost("recover", Name = "AccountRecoveryRequest")]
-    [Consumes(Application.Json, Application.Xml)]
+    [Consumes(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> RecoveryRequest([FromBody] Account.Models.RecoveryRequest body, [FromServices] ICloudFlareTurnstileService cfTurnstileService, [FromServices] IPasswordResetManager passwordResetManager, CancellationToken cancellationToken)
     {
-        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(1, cancellationToken);
+        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);
 
         CloudflareTurnstileVerifyResponse reCaptchaResponse = await cfTurnstileService.VerifyUserResponseTokenAsync(body.TurnstileResponse, this.GetRemoteIP(), cancellationToken);
         if (!reCaptchaResponse.Success)
@@ -37,9 +38,9 @@ public partial class AccountController
                     switch (errorCode)
                     {
                         case "invalid-input-response":
-                            return this.Error_InvalidModelState((nameof(body.TurnstileResponse), "Invalid ReCaptcha Response"));
+                            return CreateHttpError.InvalidModelState((nameof(body.TurnstileResponse), "Invalid ReCaptcha Response")).ToActionResult();
                         case "timeout-or-duplicate":
-                            return this.Error_InvalidModelState((nameof(body.TurnstileResponse), "ReCaptcha Response Expired or Already Used"));
+                            return CreateHttpError.InvalidModelState((nameof(body.TurnstileResponse), "ReCaptcha Response Expired or Already Used")).ToActionResult();
                         default:
                             break;
                     };
@@ -51,6 +52,7 @@ public partial class AccountController
 
         await passwordResetManager.InitiatePasswordReset(body.Email, cancellationToken);
 
-        return Ok(); // Return 200 OK no matter what happens, this is to prevent email enumeration
+        // Return 200 OK no matter what happens, this is to prevent email enumeration
+        return Ok(new RecoveryRequestOk { Message = "If the email you provided is registered, a recovery email has been sent to it. Please check your inbox." });
     }
 }

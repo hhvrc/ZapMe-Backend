@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ZapMe.Authentication;
 using ZapMe.Authentication.Models;
 using ZapMe.Constants;
@@ -17,7 +18,6 @@ public partial class AuthenticationController
     /// 
     /// </summary>
     /// <param name="body"></param>
-    /// <param name="userStore"></param>
     /// <param name="lockOutStore"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>The user account</returns>
@@ -26,35 +26,31 @@ public partial class AuthenticationController
     /// <response code="500">Error details</response>
     [RequestSizeLimit(1024)]
     [HttpPost("signin", Name = "AuthSignIn")]
-    [Consumes(Application.Json, Application.Xml)]
-    [Produces(Application.Json, Application.Xml)]
+    [Consumes(Application.Json)]
+    [Produces(Application.Json)]
     [ProducesResponseType(typeof(SignInOk), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status413RequestEntityTooLarge)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] IUserStore userStore, [FromServices] ILockOutStore lockOutStore, CancellationToken cancellationToken)
+    public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] ILockOutStore lockOutStore, CancellationToken cancellationToken)
     {
         if (User.Identity?.IsAuthenticated ?? false)
         {
-            return this.Error_AnonymousOnly();
+            return CreateHttpError.AnonymousOnly().ToActionResult();
         }
 
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);
 
-        UserEntity? user = await userStore.GetByNameAsync(body.Username, cancellationToken) ?? await userStore.GetByEmailAsync(body.Username, cancellationToken);
-        if (user == null)
+        UserEntity? user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Name == body.UsernameOrEmail || u.Email == body.UsernameOrEmail, cancellationToken);
+        if (user == null || !PasswordUtils.CheckPassword(body.Password, user.PasswordHash))
         {
-            return this.Error_InvalidCredentials("Invalid username/password", "Please check that your entered username and password are correct", "username", "password");
+            return CreateHttpError.InvalidCredentials("Invalid username/email/password", "Please check that your entered username/email and password are correct", "username", "password").ToActionResult();
         }
 
-        if (!PasswordUtils.CheckPassword(body.Password, user.PasswordHash))
-        {
-            return this.Error_InvalidCredentials("Invalid username/password", "Please check that your entered username and password are correct", "username", "password");
-        }
-
-        LockOutEntity[] lockouts = await lockOutStore.ListByUserIdAsync(user.Id).ToArrayAsync(cancellationToken);
+        LockOutEntity[] lockouts = await _dbContext.LockOuts
+            .Where(u => u.UserId == user.Id)
+            .ToArrayAsync(cancellationToken);
         if (lockouts.Any())
         {
             string reason = "Please contact support for more information";
@@ -65,17 +61,17 @@ public partial class AuthenticationController
                 reason = "Reason(s):\n" + String.Join("\n", publicList.Select(static x => x.Reason));
             }
 
-            return this.Error(StatusCodes.Status400BadRequest, "Account disabled", "Account has been disabled either by moderative or administrative reasons", UserNotification.SeverityLevel.Error, "Account disabled", reason);
+            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Account disabled", "Account has been disabled either by moderative or administrative reasons", UserNotification.SeverityLevel.Error, "Account disabled", reason).ToActionResult();
         }
 
-        if (!user.EmailVerified)
+        if (String.IsNullOrEmpty(user.Email))
         {
-            return this.Error(StatusCodes.Status400BadRequest, "Unverified Email", "Email has not been verified", UserNotification.SeverityLevel.Error, "Email not verified", "Please verify your email address before signing in");
+            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Unverified Email", "Email has not been verified", UserNotification.SeverityLevel.Error, "Email not verified", "Please verify your email address before signing in").ToActionResult();
         }
 
         if (user.AcceptedTosVersion < 0) // TODO: have a currentTosVerion value
         {
-            return this.Error(StatusCodes.Status400BadRequest, "TOS Review Required", "User needs to accept new TOS", UserNotification.SeverityLevel.Error, "Terms of Service not accepted", "Please accept the Terms of Service before signing in");
+            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "TOS Review Required", "User needs to accept new TOS", UserNotification.SeverityLevel.Error, "Terms of Service not accepted", "Please accept the Terms of Service before signing in").ToActionResult();
         }
 
         string userAgent = this.GetRemoteUserAgent();
@@ -83,7 +79,7 @@ public partial class AuthenticationController
         if (userAgent.Length > UserAgentLimits.MaxUploadLength)
         {
             // Request body too large
-            return this.Error(StatusCodes.Status413RequestEntityTooLarge, "User-Agent too long", $"User-Agent header has a hard limit on {UserAgentLimits.MaxUploadLength} characters", UserNotification.SeverityLevel.Error, "Bad client behaviour", "Your client has unexpected behaviour, please contact it's developers");
+            return CreateHttpError.Generic(StatusCodes.Status413RequestEntityTooLarge, "User-Agent too long", $"User-Agent header has a hard limit on {UserAgentLimits.MaxUploadLength} characters", UserNotification.SeverityLevel.Error, "Bad client behaviour", "Your client has unexpected behaviour, please contact it's developers").ToActionResult();
         }
 
         SessionEntity session = await _sessionManager.CreateAsync(user, body.SessionName, this.GetRemoteIP(), this.GetCloudflareIPCountry(), userAgent, body.RememberMe, cancellationToken);

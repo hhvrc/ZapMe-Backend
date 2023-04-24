@@ -1,12 +1,14 @@
-﻿using System.Text.Json.Serialization;
-
-namespace ZapMe.Websocket.Models.ServerPayloads;
+﻿namespace ZapMe.Websocket.Models.ServerPayloads;
 
 public sealed class GlobalMessage
 {
-    [JsonPropertyName("title")]
+    /// <summary>
+    /// 
+    /// </summary>
     public required string Title { get; set; }
 
-    [JsonPropertyName("message")]
+    /// <summary>
+    /// 
+    /// </summary>
     public required string Message { get; set; }
 }

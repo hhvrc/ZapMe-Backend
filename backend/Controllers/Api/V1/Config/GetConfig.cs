@@ -15,13 +15,13 @@ public partial class ConfigController
     /// <response code="200">Returns the service config</response>
     /// <returns></returns>
     [HttpGet(Name = "GetConfig")]
-    [Produces(Application.Json, Application.Xml)]
+    [Produces(Application.Json)]
     [ProducesResponseType(typeof(Config.Models.Config), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status500InternalServerError)]
     public Config.Models.Config GetConfig([FromServices] IConfiguration configuration)
     {
-        return new Config.Models.Config {
+        return new Config.Models.Config
+        {
             AppName = App.AppName,
             AppVersion = App.AppVersion.String,
             Api = new Config.Models.ApiConfig
@@ -40,8 +40,8 @@ public partial class ConfigController
             },
             Contact = new Config.Models.ContactConfig
             {
-                EmailSupport = App.SupportMailAddress.ToString(),
-                EmailContact = App.ContactMailAddress.ToString(),
+                EmailSupport = App.SupportEmailAddress.ToString(),
+                EmailContact = App.ContactEmailAddress.ToString(),
                 DiscordInviteUrl = new Uri("https://discord.gg/ez6HE5vxe8")
             },
             FounderSocials = new Config.Models.SocialsConfig

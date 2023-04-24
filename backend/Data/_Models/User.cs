@@ -17,7 +17,7 @@ public sealed class UserEntity
     public Guid Id { get; set; }
 
     /// <summary>
-    /// 
+    /// Username, also referred to as display name.
     /// </summary>
     public required string Name { get; set; }
 
@@ -32,7 +32,7 @@ public sealed class UserEntity
     public bool EmailVerified { get; set; }
 
     /// <summary>
-    /// 
+    /// Secure hash of the user's password, hashed with <see cref="Utils.PasswordUtils"/>.
     /// </summary>
     public required string PasswordHash { get; set; }
 
@@ -52,7 +52,7 @@ public sealed class UserEntity
     /// <summary>
     /// 
     /// </summary>
-    public UserOnlineStatus OnlineStatus { get; set; }
+    public UserStatus OnlineStatus { get; set; }
 
     /// <summary>
     /// 
@@ -73,6 +73,8 @@ public sealed class UserEntity
     /// Last time this user was online
     /// </summary>
     public DateTime LastOnline { get; set; }
+
+    public EmailVerificationRequestEntity? EmailVerificationRequest { get; set; }
 
     public ICollection<SessionEntity>? Sessions { get; set; }
     public ICollection<LockOutEntity>? LockOuts { get; set; }

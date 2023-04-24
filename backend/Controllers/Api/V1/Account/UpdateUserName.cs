@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ZapMe.Authentication;
+using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.Controllers.Api.V1.Models;
-using ZapMe.DTOs;
+using ZapMe.Helpers;
+using ZapMe.Utils;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
@@ -14,26 +17,31 @@ public partial class AccountController
     /// <param name="body"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    /// <response code="200">New username</response>
+    /// <response code="200">Ok</response>
     /// <response code="400">Error details</response>
     [RequestSizeLimit(1024)]
     [HttpPut("username", Name = "UpdateUserName")]
-    [Consumes(Application.Json, Application.Xml)]
-    [Produces(Application.Json, Application.Xml)]
-    [ProducesResponseType(typeof(Account.Models.AccountDto), StatusCodes.Status200OK)]
+    [Consumes(Application.Json)]
+    [Produces(Application.Json)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Update([FromBody] Account.Models.UpdateUserName body, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> UpdateUsername([FromBody] UpdateUserName body, CancellationToken cancellationToken)
     {
         ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 
-        PasswordCheckResult result = await _userManager.CheckPasswordAsync(identity.UserId, body.Password, cancellationToken);
-        if (result != PasswordCheckResult.Success)
+        if (identity.User.PasswordHash != PasswordUtils.HashPassword(body.Password))
         {
-            return this.Error_InvalidPassword();
+            return CreateHttpError.InvalidPassword().ToActionResult();
         }
 
-        await _userManager.Store.SetUserNameAsync(identity.UserId, body.NewUserName, cancellationToken);
+        bool success = await _dbContext.Users
+            .Where(u => u.Id == identity.UserId)
+            .ExecuteUpdateAsync(spc => spc
+                .SetProperty(u => u.Name, _ => body.NewUsername)
+                .SetProperty(u => u.UpdatedAt, _ => DateTime.UtcNow)
+                , cancellationToken) > 0;
 
-        return Ok();
+        return success ? Ok() : CreateHttpError.InternalServerError().ToActionResult();
     }
 }

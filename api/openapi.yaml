@@ -22,27 +22,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Create'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/Create'
+              $ref: '#/components/schemas/CreateAccount'
       responses:
         '201':
-          description: Created
+          description: Created account
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AccountDto'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/AccountDto'
+                $ref: '#/components/schemas/CreateOk'
         '400':
           description: Error details
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
         '409':
@@ -51,11 +42,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-        '200':
-          description: Created account
     delete:
       tags:
         - Account
@@ -84,19 +70,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-        '500':
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
         '400':
+          description: ''
+        '500':
           description: ''
     get:
       tags:
@@ -110,16 +86,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccountDto'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/AccountDto'
         '401':
           description: Unauthorized
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
         '404':
@@ -141,9 +111,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AccountOAuthAdd'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/AccountOAuthAdd'
       responses:
         '200':
           description: Success
@@ -153,16 +120,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
         '404':
           description: Not Found
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
     delete:
@@ -203,9 +164,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RecoveryConfirm'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/RecoveryConfirm'
       responses:
         '200':
           description: Ok
@@ -213,9 +171,6 @@ paths:
           description: Error details
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
   /api/v1/Account/recover:
@@ -230,12 +185,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RecoveryRequest'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/RecoveryRequest'
       responses:
         '200':
-          description: Account
+          description: Ok
   /api/v1/Account/email:
     put:
       tags:
@@ -248,26 +200,23 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateEmail'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/UpdateEmail'
       responses:
         '200':
-          description: New email
+          description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AccountDto'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/AccountDto'
+                $ref: '#/components/schemas/UpdateEmailOk'
         '400':
           description: Error details
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
   /api/v1/Account/password:
@@ -282,17 +231,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdatePassword'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/UpdatePassword'
       responses:
         '200':
           description: Ok
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/AccountDto'
-            application/xml:
               schema:
                 $ref: '#/components/schemas/AccountDto'
         '400':
@@ -301,15 +244,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
   /api/v1/Account/pfp:
     put:
       tags:
         - Account
-      summary: Updates the account username
+      summary: Updates the account profile picture
       operationId: UpdateProfilePicture
+      parameters:
+        - name: Hash-Sha256
+          in: header
+          description: '[Optional] Sha-256 hash of the image bytes to verify the integrity of the image server-side'
+          schema:
+            type: string
       requestBody:
         content:
           image/png:
@@ -335,25 +287,29 @@ paths:
         required: true
       responses:
         '201':
-          description: Created
+          description: Info about uploaded image
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AccountDto'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/AccountDto'
+                $ref: '#/components/schemas/UpdateProfilePictureOk'
         '400':
-          description: Error details
+          description: Payload is unsupported/corrupted or the hash (if provided) does not match the payload
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
+        '411':
+          description: Length is required
+          content:
+            application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-        '200':
-          description: New username
+        '413':
+          description: Image dimensions or byte size is too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
   /api/v1/Account/username:
     put:
       tags:
@@ -366,26 +322,40 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateUserName'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/UpdateUserName'
       responses:
         '200':
-          description: New username
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AccountDto'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/AccountDto'
+          description: Ok
         '400':
           description: Error details
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/Account/email/verify:
+    post:
+      tags:
+        - Account
+      summary: Verify the users email address
+      operationId: Verify Email Address
+      parameters:
+        - name: token
+          in: query
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+        '404':
+          description: Error details
+          content:
+            application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
   /api/v1/auth/oauth-providers:
@@ -401,9 +371,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OAuthProviderList'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/OAuthProviderList'
   /api/v1/auth/signin:
     post:
       tags:
@@ -416,17 +383,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AuthSignIn'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/AuthSignIn'
       responses:
         '200':
           description: Returns SignInOk along with a Cookie with similar data
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/SignInOk'
-            application/xml:
               schema:
                 $ref: '#/components/schemas/SignInOk'
         '400':
@@ -435,16 +396,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
         '401':
           description: Unauthorized
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
         '403':
@@ -453,27 +408,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
         '413':
           description: Client Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
         '500':
           description: Error details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
   /api/v1/auth/oauth-signin:
     post:
       tags:
@@ -493,25 +435,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SignInOk'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/SignInOk'
         '403':
           description: Error details
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
         '401':
           description: Error details
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
   /api/v1/auth/signout:
@@ -536,25 +469,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Config'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Config'
         '400':
           description: Bad Request
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-        '500':
-          description: Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
   /api/v1/health:
@@ -587,25 +505,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserDto'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/UserDto'
         '304':
           description: ''
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
         '404':
           description: ''
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
     delete:
@@ -628,16 +537,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserDto'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/UserDto'
         '404':
           description: ''
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
     post:
@@ -681,9 +584,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FriendRequestList'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/FriendRequestList'
   '/api/v1/user/i/{userId}':
     get:
       tags:
@@ -705,16 +605,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserDto'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/UserDto'
         '404':
           description: ''
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
   '/api/v1/user/u/{userName}':
@@ -737,16 +631,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserDto'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/UserDto'
         '404':
           description: ''
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-            application/xml:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
   /api/v1/user/report:
@@ -759,9 +647,6 @@ paths:
         description: ''
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/UserReport'
-          application/xml:
             schema:
               $ref: '#/components/schemas/UserReport'
       responses:
@@ -798,93 +683,109 @@ components:
           type: string
           description: ''
           format: uuid
+          readOnly: true
         username:
           type: string
           description: ''
+          readOnly: true
           example: MyUsername
-        profile_picture_id:
-          type: string
-          description: ''
-          format: uuid
-        status:
-          $ref: '#/components/schemas/UserOnlineStatus'
-        status_text:
-          type: string
-          description: ''
-        created_at:
-          type: string
-          description: Date this user was created at
-          format: date-time
-        last_online:
-          type: string
-          description: Last time this user was online
-          format: date-time
-        email:
+        obscuredEmail:
           maxLength: 320
           minLength: 5
           type: string
           description: Obfuscated email of your account
           format: email
+          readOnly: true
           example: user.name@example.com
-        email_verified:
+        emailVerified:
           type: boolean
-          description: True if email address has been verified
-        accepted_tos_version:
+          description: ''
+          readOnly: true
+        acceptedTosVersion:
           type: integer
           description: ''
           format: int32
+          readOnly: true
+        profilePictureUrl:
+          type: string
+          description: ''
+          format: uri
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/UserStatus'
+        statusText:
+          type: string
+          description: ''
+          readOnly: true
         friends:
           type: array
           items:
             type: string
             format: uuid
           description: Id of friends this account has
-        connected_accounts:
+          readOnly: true
+        oauthConnections:
           type: array
           items:
             type: string
           description: OAuth2 providers this account is connected to
+          readOnly: true
+        createdAt:
+          type: string
+          description: Date this user was created at
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          description: Last time this user was updated
+          format: date-time
+          readOnly: true
+        lastOnline:
+          type: string
+          description: Last time this user was online
+          format: date-time
+          readOnly: true
       additionalProperties: false
       description: 'Account object, this can only retrieved for the user you are logged in as'
     AccountOAuthAdd:
       type: object
       properties:
-        oauth_code:
+        oauthCode:
           type: string
       additionalProperties: false
       description: Request sent to server to add a oauth connection to a account
     ApiConfig:
       type: object
       properties:
-        tos_version:
+        tosVersion:
           type: integer
           description: 'The current Terms of Service version, if the user has not accepted this version, they will be prompted to accept it'
           format: int32
-        privacy_version:
+        privacyVersion:
           type: integer
           description: 'The current Privacy Policy version, if the user has not accepted this version, they will be prompted to accept it'
           format: int32
-        sentry_dsn:
+        sentryDsn:
           type: string
           description: "The DSN for Sentry, used for error reporting\r\nIf this is null, Sentry reporting is disabled"
           format: uri
           nullable: true
-        sentry_trace_sample_rate:
+        sentryTraceSampleRate:
           type: number
           description: 'Trace sample rate for Sentry, used for performance monitoring'
           format: double
         authentication:
           $ref: '#/components/schemas/AuthenticationConfig'
-        disabled_features:
+        disabledFeatures:
           $ref: '#/components/schemas/ApiDisabledFeatures'
       additionalProperties: false
     ApiDisabledFeatures:
       type: object
       properties:
-        webrtc:
+        webRTC:
           type: boolean
           description: 'If true, WebRTC is disabled'
-        websockets:
+        webSockets:
           type: boolean
           description: 'If true, WebSockets are disabled'
         endpoints:
@@ -896,7 +797,7 @@ components:
     AuthSignIn:
       type: object
       properties:
-        username:
+        usernameOrEmail:
           type: string
           description: Username or email address
           example: MyUsername
@@ -918,27 +819,27 @@ components:
     AuthenticationConfig:
       type: object
       properties:
-        discord_client_id:
+        discordClientId:
           type: string
           description: 'Discord Client ID for OAuth, if null, Discord login will be disabled'
           nullable: true
-        github_client_id:
+        githubClientId:
           type: string
           description: 'Github Client ID for OAuth, if null, Github login will be disabled'
           nullable: true
-        twitter_client_id:
+        twitterClientId:
           type: string
           description: 'Twitter Client ID for OAuth, if null, Twitter login will be disabled'
           nullable: true
-        google_client_id:
+        googleClientId:
           type: string
           description: 'Google Client ID for OAuth, if null, Google login will be disabled'
           nullable: true
-        recaptcha_site_key:
+        recaptchaSiteKey:
           type: string
           description: 'ReCaptcha site key for bot detection, if null, ReCaptcha will be disabled'
           nullable: true
-        turnstile_site_key:
+        turnstileSiteKey:
           type: string
           description: 'Turnstile site key for bot detection, if null, Turnstile will be disabled'
           nullable: true
@@ -962,26 +863,26 @@ components:
     ContactConfig:
       type: object
       properties:
-        support:
+        emailSupport:
           maxLength: 320
           minLength: 5
           type: string
           description: Email address to contact the support of the service
           format: email
           example: user.name@example.com
-        contact:
+        emailContact:
           maxLength: 320
           minLength: 5
           type: string
           description: Email address to contact the owner of the service
           format: email
           example: user.name@example.com
-        discord:
+        discordInviteUrl:
           type: string
           description: Invite URL to the Discord server where users can get support
           format: uri
       additionalProperties: false
-    Create:
+    CreateAccount:
       type: object
       properties:
         username:
@@ -1008,11 +909,22 @@ components:
           type: integer
           description: ''
           format: int32
-        turnstile_response:
+        turnstileResponse:
           type: string
           description: Response from cloudflare turnstile request
       additionalProperties: false
       description: Message sent to server to create a new account
+    CreateOk:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ''
+          format: uuid
+        message:
+          type: string
+          description: ''
+      additionalProperties: false
     ErrorDetails:
       type: object
       properties:
@@ -1022,9 +934,6 @@ components:
         detail:
           type: string
           description: More detailed description of what this error is about (not user friendly)
-        traceId:
-          type: string
-          description: ''
         suggestion:
           type: string
           description: Suggestion to developer on how they might be able to midegate this error
@@ -1092,7 +1001,7 @@ components:
     RecoveryConfirm:
       type: object
       properties:
-        new_password:
+        newPassword:
           maxLength: 256
           minLength: 10
           type: string
@@ -1113,7 +1022,7 @@ components:
           description: Email of your account you want to recover
           format: email
           example: user.name@example.com
-        turnstile_response:
+        turnstileResponse:
           type: string
           description: Response from cloudflare turnstile request
       additionalProperties: false
@@ -1176,7 +1085,7 @@ components:
     UpdateEmail:
       type: object
       properties:
-        new_email:
+        newEmail:
           maxLength: 320
           minLength: 5
           type: string
@@ -1189,25 +1098,48 @@ components:
           example: Hq2yP1B^Fho&zRHxHkEu
       additionalProperties: false
       description: Request sent to server to update account email address
+    UpdateEmailOk:
+      type: object
+      properties:
+        message:
+          type: string
+          description: 'Example: "Please check your email to verify your new address."'
+      additionalProperties: false
+      description: Request sent to server to update account email address
     UpdatePassword:
       type: object
       properties:
-        new:
+        password_new:
           maxLength: 256
           minLength: 10
           type: string
           description: ''
           example: Hq2yP1B^Fho&zRHxHkEu
-        old:
+        password_current:
           type: string
           description: ''
           example: Hq2yP1B^Fho&zRHxHkEu
       additionalProperties: false
       description: Request sent to server to update account password
+    UpdateProfilePictureOk:
+      type: object
+      properties:
+        imageId:
+          type: string
+          description: ''
+          format: uuid
+        imageUrl:
+          type: string
+          description: ''
+          format: uri
+        imageHash:
+          type: string
+          description: ''
+      additionalProperties: false
     UpdateUserName:
       type: object
       properties:
-        new_username:
+        newUsername:
           maxLength: 32
           minLength: 3
           pattern: '^[^\s].*[^\s]$'
@@ -1231,20 +1163,20 @@ components:
           type: string
           description: ''
           example: MyUsername
-        profile_picture_id:
+        profilePictureId:
           type: string
           description: ''
           format: uuid
         status:
-          $ref: '#/components/schemas/UserOnlineStatus'
-        status_text:
+          $ref: '#/components/schemas/UserStatus'
+        statusText:
           type: string
           description: ''
-        created_at:
+        createdAt:
           type: string
           description: Date this user was created at
           format: date-time
-        last_online:
+        lastOnline:
           type: string
           description: Last time this user was online
           format: date-time
@@ -1263,18 +1195,10 @@ components:
           nullable: true
       additionalProperties: false
       description: "System notification to be displayed to the user, do not confuse with user notifications\r\nThis is a hint and clients can choose to ignore it or implement notifications to be independent of this"
-    UserOnlineStatus:
-      enum:
-        - offline
-        - doNotDisturb
-        - inactive
-        - online
-        - downBad
-      type: string
     UserReport:
       type: object
       properties:
-        user_id:
+        userId:
           type: string
           format: uuid
         title:
@@ -1285,3 +1209,11 @@ components:
           description: ''
       additionalProperties: false
       description: Message sent to server to report a user
+    UserStatus:
+      enum:
+        - offline
+        - doNotDisturb
+        - inactive
+        - online
+        - downBad
+      type: string

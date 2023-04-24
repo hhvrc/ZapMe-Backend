@@ -15,7 +15,7 @@ public partial class UserController
     /// <response code="200"></response>
     /// <response code="404"></response>
     [HttpPost("report", Name = "ReportUser")]
-    [Consumes(Application.Json, Application.Xml)]
+    [Consumes(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)] // Report sent
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)] // User not found
     public IActionResult Report([FromBody] UserReport body)

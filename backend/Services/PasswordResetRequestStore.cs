@@ -46,34 +46,4 @@ public sealed class PasswordResetRequestStore : IPasswordResetRequestStore
 
         return request;
     }
-
-    public Task<PasswordResetRequestEntity?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken)
-    {
-        return _dbContext.PasswordResetRequests
-            .Include(static s => s.User)
-            .FirstOrDefaultAsync(s => s.UserId == userId, cancellationToken);
-    }
-
-    public Task<PasswordResetRequestEntity?> GetByTokenHashAsync(string tokenHash, CancellationToken cancellationToken = default)
-    {
-        return _dbContext.PasswordResetRequests
-            .Include(static s => s.User)
-            .FirstOrDefaultAsync(s => s.TokenHash == tokenHash, cancellationToken);
-    }
-
-    public async Task<bool> DeleteByUserIdAsync(Guid userId, CancellationToken cancellationToken)
-    {
-        return await _dbContext.PasswordResetRequests.Where(s => s.UserId == userId).ExecuteDeleteAsync(cancellationToken) > 0;
-    }
-
-    public async Task<bool> DeleteByTokenHashAsync(string tokenHash, CancellationToken cancellationToken)
-    {
-        return await _dbContext.PasswordResetRequests.Where(s => s.TokenHash == tokenHash).ExecuteDeleteAsync(cancellationToken) > 0;
-    }
-
-    public Task<int> DeleteExpiredAsync(TimeSpan maxAge, CancellationToken cancellationToken)
-    {
-        DateTime expiresAt = DateTime.UtcNow - maxAge;
-        return _dbContext.PasswordResetRequests.Where(s => s.CreatedAt < expiresAt).ExecuteDeleteAsync(cancellationToken);
-    }
 }

@@ -5,15 +5,15 @@ using ZapMe.Enums;
 
 namespace ZapMe.Controllers.Api.V1.User.Models;
 
-public class UserDto
+public readonly struct UserDto
 {
     public UserDto()
     {
         Id = Guid.Empty;
         Username = String.Empty;
         ProfilePictureId = Guid.Empty;
-        OnlineStatus = UserOnlineStatus.Offline;
-        OnlineStatusText = String.Empty;
+        Status = UserStatus.Offline;
+        StatusText = String.Empty;
         CreatedAt = DateTime.MinValue;
         LastOnline = DateTime.MinValue;
     }
@@ -22,8 +22,8 @@ public class UserDto
         Id = user.Id;
         Username = user.Name;
         ProfilePictureId = user.ProfilePictureId;
-        OnlineStatus = user.OnlineStatus;
-        OnlineStatusText = user.OnlineStatusText;
+        Status = user.OnlineStatus;
+        StatusText = user.OnlineStatusText;
         CreatedAt = user.CreatedAt;
         LastOnline = user.LastOnline;
     }
@@ -32,49 +32,42 @@ public class UserDto
     /// 
     /// </summary>
     [JsonPropertyOrder(0)]
-    [JsonPropertyName("id")]
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
     /// <summary>
     /// 
     /// </summary>
     [Username(false)]
     [JsonPropertyOrder(1)]
-    [JsonPropertyName("username")]
-    public string Username { get; set; }
+    public string Username { get; init; }
 
     /// <summary>
     /// 
     /// </summary>
     [JsonPropertyOrder(5)]
-    [JsonPropertyName("profile_picture_id")]
-    public Guid ProfilePictureId { get; set; }
+    public Guid ProfilePictureId { get; init; }
 
     /// <summary>
     /// 
     /// </summary>
     [JsonPropertyOrder(8)]
-    [JsonPropertyName("status")]
-    public UserOnlineStatus OnlineStatus { get; set; }
+    public UserStatus Status { get; init; }
 
     /// <summary>
     /// 
     /// </summary>
     [JsonPropertyOrder(9)]
-    [JsonPropertyName("status_text")]
-    public string OnlineStatusText { get; set; }
+    public string StatusText { get; init; }
 
     /// <summary>
     /// Date this user was created at
     /// </summary>
     [JsonPropertyOrder(15)]
-    [JsonPropertyName("created_at")]
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; init; }
 
     /// <summary>
     /// Last time this user was online
     /// </summary>
     [JsonPropertyOrder(16)]
-    [JsonPropertyName("last_online")]
-    public DateTime LastOnline { get; set; }
+    public DateTime LastOnline { get; init; }
 }

@@ -1,5 +1,12 @@
-﻿using ZapMe.Data.Models;
-using ZapMe.DTOs;
+﻿using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
+using Npgsql;
+using OneOf;
+using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.Data;
+using ZapMe.Data.Models;
+using ZapMe.Enums;
+using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
 
@@ -7,41 +14,71 @@ namespace ZapMe.Services;
 
 public sealed class UserManager : IUserManager
 {
-    public IUserStore Store { get; }
+    private readonly ZapMeContext _dbContext;
     private readonly ILogger<UserManager> _logger;
 
-    public UserManager(IUserStore userStore, ILogger<UserManager> logger)
+    public UserManager(ZapMeContext dbContext, ILogger<UserManager> logger)
     {
-        Store = userStore;
+        _dbContext = dbContext;
         _logger = logger;
     }
 
-    public Task<AccountCreationResult> TryCreateAsync(string userName, string email, string password, CancellationToken cancellationToken)
+    public async Task<OneOf<UserEntity, ErrorDetails>> TryCreateAsync(string name, string email, string password, bool emailVerified, CancellationToken cancellationToken)
     {
-        string passwordHash = PasswordUtils.HashPassword(password);
-
-        return Store.TryCreateAsync(userName.TrimAndMinifyWhiteSpaces(), email, passwordHash, cancellationToken);
-    }
-
-    public Task<bool> SetPasswordAsync(Guid userId, string password, CancellationToken cancellationToken)
-    {
-        string passwordHash = PasswordUtils.HashPassword(password);
-        return Store.SetPasswordHashAsync(userId, passwordHash, cancellationToken);
-    }
-
-    public async Task<PasswordCheckResult> CheckPasswordAsync(Guid userId, string password, CancellationToken cancellationToken)
-    {
-        UserEntity? user = await Store.GetByIdAsync(userId, cancellationToken);
-        if (user == null)
+        if (_dbContext.Users.Any(u => u.Name == name || u.Email == email))
         {
-            return PasswordCheckResult.UserNotFound;
+            return CreateHttpError.Generic(StatusCodes.Status409Conflict, "Username/Email taken", "The given username or email is already associated with an account in the database", UserNotification.SeverityLevel.Warning, "Username/Email already taken", "Please choose a different Username or Email");
         }
 
-        if (!PasswordUtils.CheckPassword(password, user.PasswordHash))
+        string passwordHash = PasswordUtils.HashPassword(password);
+        UserEntity user = new UserEntity
         {
-            return PasswordCheckResult.PasswordInvalid;
+            Name = name,
+            Email = email,
+            EmailVerified = emailVerified,
+            PasswordHash = passwordHash,
+            AcceptedTosVersion = 0,
+            ProfilePictureId = ImageEntity.DefaultImageId,
+            OnlineStatus = UserStatus.Online,
+            OnlineStatusText = String.Empty
+        };
+
+        int retryCount = 0;
+    retry:
+        try
+        {
+            using IDbContextTransaction? transaction = await _dbContext.Database.BeginTransactionIfNotExistsAsync(cancellationToken);
+
+            await _dbContext.Users.AddAsync(user, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            if (transaction != null)
+            {
+                await transaction.CommitAsync(cancellationToken);
+            }
+
+            return user;
+        }
+        catch (PostgresException exception)
+        {
+            if (exception.IsTransient && retryCount++ < 3)
+            {
+                goto retry;
+            }
+
+            _logger.LogError(exception, "Failed to create user account");
+
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Failed to create user account");
         }
 
-        return PasswordCheckResult.Success;
+        if (retryCount >= 3)
+        {
+            _logger.LogError("Ran out of retries while creating account!");
+        }
+
+        return CreateHttpError.InternalServerError();
     }
 }

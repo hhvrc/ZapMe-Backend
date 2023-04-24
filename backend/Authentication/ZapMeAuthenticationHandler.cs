@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Text.Json;
 using ZapMe.Authentication.Models;
+using ZapMe.Data;
 using ZapMe.Data.Models;
-using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Authentication;
 
@@ -15,14 +16,14 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
     private HttpContext _context = default!;
     private ZapMeAuthenticationOptions _options = default!;
     private Task<AuthenticateResult>? _authenticateTask = null;
-    private readonly ISessionStore _sessionStore;
+    private readonly ZapMeContext _dbContext;
     private readonly JsonSerializerOptions _jsonSerializerOptions;
     private readonly IOptionsMonitor<ZapMeAuthenticationOptions> _optionsMonitor;
     private readonly ILogger<ZapMeAuthenticationHandler> _logger;
 
-    public ZapMeAuthenticationHandler(ISessionStore sessionStore, IOptions<JsonOptions> options, IOptionsMonitor<ZapMeAuthenticationOptions> optionsMonitor, ILogger<ZapMeAuthenticationHandler> logger)
+    public ZapMeAuthenticationHandler(ZapMeContext dbContext, IOptions<JsonOptions> options, IOptionsMonitor<ZapMeAuthenticationOptions> optionsMonitor, ILogger<ZapMeAuthenticationHandler> logger)
     {
-        _sessionStore = sessionStore;
+        _dbContext = dbContext;
         _jsonSerializerOptions = options.Value.JsonSerializerOptions;
         _optionsMonitor = optionsMonitor;
         _logger = logger;
@@ -77,6 +78,8 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
 
     private async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
+        var requestTime = DateTime.UtcNow;
+
         string? sessionIdString = Request.Headers["Authorization"];
         if (sessionIdString is not null)
         {
@@ -102,19 +105,30 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
 
         CancellationToken cancellationToken = _context.RequestAborted;
 
-        SessionEntity? session = await _sessionStore.GetByIdAsync(sessionId, cancellationToken);
+        // TODO: Consider doing JWTs instead, and then fetching the user from controllers and check for session expiration there
+        SessionEntity? session = await _dbContext.Sessions.AsTracking()
+            .Include(s => s.User).ThenInclude(u => u!.ProfilePicture)
+            .Include(s => s.User).ThenInclude(u => u!.Sessions)
+            .Include(s => s.User).ThenInclude(u => u!.LockOuts)
+            .Include(s => s.User).ThenInclude(u => u!.UserRoles)
+            .Include(s => s.User).ThenInclude(u => u!.Relations)
+            .Include(s => s.User).ThenInclude(u => u!.FriendRequestsOutgoing)
+            .Include(s => s.User).ThenInclude(u => u!.FriendRequestsIncoming)
+            .Include(s => s.User).ThenInclude(u => u!.OauthConnections)
+            .FirstOrDefaultAsync(s => s.Id == sessionId && s.ExpiresAt > requestTime, cancellationToken);
         if (session == null)
-            return AuthenticateResult.Fail("Invalid Login Cookie");
+            return AuthenticateResult.Fail("Invalid or Expired Login Cookie");
 
-        if (session.IsExpired)
-            return AuthenticateResult.Fail("Expired Login Cookie");
+        TimeSpan lifeTime = session.ExpiresAt - session.CreatedAt;
+        DateTime halfLife = session.CreatedAt + (lifeTime / 2);
 
         // TODO: is this good or bad?
         // Sliding window refresh
-        if (session.IsHalfwayExpired)
+        if (requestTime > halfLife)
         {
             // refresh session
-            _ = _sessionStore.SetExipresAtAsync(session.Id, DateTime.UtcNow.Add(session.TimeToLive), cancellationToken);
+            session.ExpiresAt = requestTime.Add(lifeTime);
+            await _dbContext.SaveChangesAsync();
         }
 
         ZapMePrincipal principal = new ZapMePrincipal(session);

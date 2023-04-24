@@ -16,12 +16,4 @@ public interface IUserAgentStore
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     public Task<UserAgentEntity> CreateAsync(string hash, uint length, string value, string operatingSystem, string device, string browser, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="hash"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public Task<UserAgentEntity?> GetByHashAsync(string hash, CancellationToken cancellationToken = default);
 }

@@ -1,20 +1,17 @@
-﻿using System.Text.Json.Serialization;
-using ZapMe.Attributes;
+﻿using ZapMe.Attributes;
 
 namespace ZapMe.Controllers.Api.V1.Account.Models;
 
 /// <summary>
 /// Request sent to server to update account email address
 /// </summary>
-public struct UpdateEmail
+public readonly struct UpdateEmail
 {
     /// <summary/>
     [EmailAddress]
-    [JsonPropertyName("new_email")]
-    public string NewEmail { get; set; }
+    public string NewEmail { get; init; }
 
     /// <summary/>
     [Password(false)]
-    [JsonPropertyName("password")]
-    public string Password { get; set; }
+    public string Password { get; init; }
 }

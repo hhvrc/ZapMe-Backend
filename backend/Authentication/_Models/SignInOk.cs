@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using ZapMe.Controllers.Api.V1.Account.Models;
+﻿using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.Data.Models;
 
 namespace ZapMe.Authentication.Models;
@@ -20,12 +19,10 @@ public sealed class SignInOk
     /// <summary>
     /// 
     /// </summary>
-    [JsonPropertyName("session")]
     public SessionDto Session { get; set; }
 
     /// <summary>
     /// 
     /// </summary>
-    [JsonPropertyName("account")]
     public AccountDto Account { get; set; }
 }

@@ -48,10 +48,10 @@ public static class ZapMeIServiceCollectionExtensions
 
     public static void ZMAddUsers([NotNull] this IServiceCollection services)
     {
-        services.AddTransient<IUserStore, UserStore>();
         services.AddTransient<IUserManager, UserManager>();
         services.AddTransient<IPasswordResetRequestStore, PasswordResetRequestStore>();
         services.AddTransient<IPasswordResetManager, PasswordResetManager>();
+        services.AddTransient<IImageManager, ImageManager>();
     }
 
     public static void ZMAddSessions([NotNull] this IServiceCollection services)
@@ -82,7 +82,7 @@ public static class ZapMeIServiceCollectionExtensions
     {
         //services.AddTransient<EmailTemplateStore>();
         //services.AddTransient<IEmailTemplateStore, CachedEmailTemplateStore>();
-        services.AddTransient<IMailTemplateStore, MailTemplateStore>();
+        services.AddTransient<IEmailTemplateStore, EmailTemplateStore>();
     }
 
     public static void ZMAddWebSockets([NotNull] this IServiceCollection services)

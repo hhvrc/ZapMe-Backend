@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ZapMe.Authentication;
+using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.Controllers.Api.V1.Models;
-using ZapMe.DTOs;
+using ZapMe.Helpers;
+using ZapMe.Services.Interfaces;
+using ZapMe.Utils;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
@@ -12,28 +15,33 @@ public partial class AccountController
     /// Updates the account email
     /// </summary>
     /// <param name="body"></param>
+    /// <param name="emailVerificationManager"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    /// <response code="200">New email</response>
+    /// <response code="200">Ok</response>
     /// <response code="400">Error details</response>
     [RequestSizeLimit(1024)]
     [HttpPut("email", Name = "UpdateEmail")]
-    [Consumes(Application.Json, Application.Xml)]
-    [Produces(Application.Json, Application.Xml)]
-    [ProducesResponseType(typeof(Account.Models.AccountDto), StatusCodes.Status200OK)]
+    [Consumes(Application.Json)]
+    [Produces(Application.Json)]
+    [ProducesResponseType(typeof(UpdateEmailOk), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UpdateEmail([FromBody] Account.Models.UpdateEmail body, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> UpdateEmail([FromBody] UpdateEmail body, [FromServices] IEmailVerificationManager emailVerificationManager, CancellationToken cancellationToken)
     {
         ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 
-        PasswordCheckResult result = await _userManager.CheckPasswordAsync(identity.UserId, body.Password, cancellationToken);
-        if (result != PasswordCheckResult.Success)
+        if (!PasswordUtils.CheckPassword(body.Password, identity.User.PasswordHash))
         {
-            return this.Error_InvalidPassword();
+            return CreateHttpError.InvalidPassword().ToActionResult();
         }
 
-        await _userManager.Store.SetEmailAsync(identity.UserId, body.NewEmail, cancellationToken);
+        ErrorDetails? errorDetails = await emailVerificationManager.InitiateEmailVerificationAsync(identity.User.Name, body.NewEmail, cancellationToken);
+        if (errorDetails.HasValue)
+        {
+            return errorDetails.Value.ToActionResult();
+        }
 
-        return Ok();
+        return Ok(new UpdateEmailOk { Message = "Please check your email to verify your new address." });
     }
 }

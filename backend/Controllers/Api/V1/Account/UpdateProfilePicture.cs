@@ -1,9 +1,12 @@
-﻿using Amazon.S3;
-using Amazon.S3.Model;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using OneOf;
 using ZapMe.Attributes;
+using ZapMe.Authentication;
+using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.Data.Models;
+using ZapMe.Helpers;
+using ZapMe.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
@@ -11,56 +14,43 @@ namespace ZapMe.Controllers.Api.V1;
 public partial class AccountController
 {
     /// <summary>
-    /// Updates the account username
+    /// Updates the account profile picture
     /// </summary>
-    /// <param name="s3Client"></param>
+    /// <param name="sha256Hash">[Optional] Sha-256 hash of the image bytes to verify the integrity of the image server-side</param>
+    /// <param name="imageManager"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    /// <response code="200">New username</response>
-    /// <response code="400">Error details</response>
-    [AllowAnonymous]
+    /// <response code="201">Info about uploaded image</response>
+    /// <response code="400">Payload is unsupported/corrupted or the hash (if provided) does not match the payload</response>
+    /// <response code="411">Length is required</response>
+    /// <response code="413">Image dimensions or byte size is too large</response>
     [HttpPut("pfp", Name = "UpdateProfilePicture")]
-    [Produces(Application.Json, Application.Xml)]
+    [Produces(Application.Json)]
     [BinaryPayload(true, "image/png", "image/jpeg", "image/webp", "image/gif")]
-    [ProducesResponseType(typeof(Account.Models.AccountDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(UpdateProfilePictureOk), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Update([FromServices] IAmazonS3 s3Client, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status411LengthRequired)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status413PayloadTooLarge)]
+    public async Task<IActionResult> UpdateProfilePicture([FromHeader(Name = "Hash-Sha256")] string? sha256Hash, [FromServices] IImageManager imageManager, CancellationToken cancellationToken)
     {
+        ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
+
         long? length = Request.ContentLength;
         if (length == null)
         {
-            return BadRequest();
+            return CreateHttpError.Generic(StatusCodes.Status411LengthRequired, "Length is required", "Missing Content-Length header").ToActionResult();
         }
-        if (length > 1_112_000)
+        OneOf<ImageEntity, ErrorDetails> res = await imageManager.GetOrCreateRecordAsync(Request.Body, (ulong)length, sha256Hash, identity.UserId, cancellationToken);
+        if (res.TryPickT1(out ErrorDetails error, out ImageEntity image))
         {
-            return BadRequest();
-        }
-
-        string? contentType = Request.ContentType;
-        if (contentType == null)
-        {
-            return BadRequest();
-        }
-        if (contentType is not ("image/png" or "image/jpeg" or "image/webp" or "image/gif"))
-        {
-            return BadRequest();
+            return error.ToActionResult();
         }
 
-        byte[] data = new byte[(int)length!];
-        using MemoryStream ms = new(data);
-
-        await Request.Body.CopyToAsync(ms, cancellationToken);
-
-        PutObjectRequest request = new()
+        return Created(image.PublicUrl, new UpdateProfilePictureOk
         {
-            BucketName = "zapme-public",
-            Key = Guid.NewGuid().ToString(),
-            InputStream = ms,
-            ContentType = contentType,
-            CannedACL = S3CannedACL.PublicRead
-        };
-
-        await s3Client.PutObjectAsync(request, cancellationToken);
-        return Ok($"File uploaded to S3 successfully!");
+            ImageId = image.Id,
+            ImageUrl = image.PublicUrl,
+            ImageHash = image.Sha256
+        });
     }
 }

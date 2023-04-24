@@ -16,7 +16,7 @@ public sealed class CloudFlareTurnstileService : ICloudFlareTurnstileService
         _siteSecret = configuration["Authorization:Turnstile:SecretKey"] ?? throw new KeyNotFoundException("Config entry \"Authorization:Turnstile:SecretKey\" is missing!");
     }
 
-    public async Task<CloudflareTurnstileVerifyResponse> VerifyUserResponseTokenAsync(string token, string remoteIpAddress, CancellationToken cancellationToken = default)
+    public async Task<CloudflareTurnstileVerifyResponse> VerifyUserResponseTokenAsync(string token, string remoteIpAddress, CancellationToken cancellationToken)
     {
         if (String.IsNullOrEmpty(token))
         {

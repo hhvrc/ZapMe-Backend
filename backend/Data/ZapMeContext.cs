@@ -9,7 +9,7 @@ public sealed class ZapMeContext : DbContext
     {
     }
 
-    public required DbSet<UserEntity> Accounts { get; set; }
+    public required DbSet<UserEntity> Users { get; set; }
     public required DbSet<ImageEntity> Images { get; set; }
     public required DbSet<SessionEntity> Sessions { get; set; }
     public required DbSet<LockOutEntity> LockOuts { get; set; }
@@ -19,6 +19,7 @@ public sealed class ZapMeContext : DbContext
     public required DbSet<FriendRequestEntity> FriendRequests { get; set; }
     public required DbSet<OAuthConnectionEntity> OAuthConnections { get; set; }
     public required DbSet<PasswordResetRequestEntity> PasswordResetRequests { get; set; }
+    public required DbSet<EmailVerificationRequestEntity> EmailVerificationRequests { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -34,5 +35,6 @@ public sealed class ZapMeContext : DbContext
         modelBuilder.ApplyConfiguration(new FriendRequestEntityConfiguration());
         modelBuilder.ApplyConfiguration(new OAuthConnectionEntityConfiguration());
         modelBuilder.ApplyConfiguration(new PasswordResetRequestEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new EmailAddressChangeRequestEntityConfiguration());
     }
 }

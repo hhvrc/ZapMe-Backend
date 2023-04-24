@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ZapMe.Constants;
+﻿using ZapMe.Constants;
 using ZapMe.Data;
 using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
@@ -33,10 +32,5 @@ public sealed class UserAgentStore : IUserAgentStore
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return userAgent;
-    }
-
-    public Task<UserAgentEntity?> GetByHashAsync(string sha256, CancellationToken cancellationToken = default)
-    {
-        return _dbContext.UserAgents.FirstOrDefaultAsync(s => s.Sha256 == sha256, cancellationToken);
     }
 }

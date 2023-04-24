@@ -17,6 +17,7 @@ public sealed class UsernameAttribute : ValidationAttribute, IParameterAttribute
     private static readonly string _ErrMsgTooLong = $"Username must be at most {GeneralHardLimits.UsernameMaxLength} characters long";
     private const string _ErrMsgNoWhiteSpaceAtEnds = "Username cannot start or end with whitespace";
     private const string _ErrMsgNoObnoxiousChars = "Username must not contain obnoxious characters";
+    private const string _ErrMsgCannotBeEmailAddress = "Username cannot be an email address";
 
     public bool ShouldValidate { get; }
 
@@ -57,6 +58,11 @@ public sealed class UsernameAttribute : ValidationAttribute, IParameterAttribute
         if (Verifiers.IsBadUiString(username))
         {
             return new ValidationResult(_ErrMsgNoObnoxiousChars);
+        }
+
+        if (EmailUtils.Parse(username).Success)
+        {
+            return new ValidationResult(_ErrMsgCannotBeEmailAddress);
         }
 
         return ValidationResult.Success;

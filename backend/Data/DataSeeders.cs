@@ -17,7 +17,7 @@ public static class DataSeeders
         if (!context.Images.Any())
             await SeedImagesAsync(context, cancellationToken);
 
-        if (!context.Accounts.Any())
+        if (!context.Users.Any())
             await SeedAccountsAsync(context, cancellationToken);
 
         if (File.Exists("passwords.json"))
@@ -36,9 +36,12 @@ public static class DataSeeders
             Id = ImageEntity.DefaultImageId,
             Height = 0,
             Width = 0,
+            FrameCount = 0,
             SizeBytes = 0,
+            Extension = String.Empty,
             Sha256 = "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
-            HashPerceptual = 0,
+            S3BucketName = String.Empty,
+            S3RegionName = String.Empty,
             UploaderId = null,
             Uploader = null
         }, cancellationToken);
@@ -84,16 +87,15 @@ public static class DataSeeders
 
             accountPasswords.Add(name, new { email, password });
 
-            await context.Accounts.AddAsync(new UserEntity
+            await context.Users.AddAsync(new UserEntity
             {
                 Id = id,
                 Name = name,
                 Email = email,
-                EmailVerified = true,
                 PasswordHash = passwordHash,
                 AcceptedTosVersion = Int32.MaxValue,
                 ProfilePictureId = ImageEntity.DefaultImageId,
-                OnlineStatus = UserOnlineStatus.Online,
+                OnlineStatus = UserStatus.Online,
                 OnlineStatusText = "I'm online!",
                 CreatedAt = _CreationTime,
                 UpdatedAt = _CreationTime,

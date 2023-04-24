@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.User.FriendRequest.Models;
 using ZapMe.Data.Models;
@@ -16,13 +17,15 @@ public partial class UserController
     /// <response code="200"></response>
     [RequestSizeLimit(1024)]
     [HttpGet("friendrequests", Name = "ListFriendRequests")]
-    [Produces(Application.Json, Application.Xml)]
+    [Produces(Application.Json)]
     [ProducesResponseType(typeof(FriendRequestList), StatusCodes.Status200OK)]
     public async Task<FriendRequestList> ListFriendRequests([FromServices] IFriendRequestStore friendRequestStore, CancellationToken cancellationToken)
     {
         ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 
-        FriendRequestEntity[] friendRequests = await friendRequestStore.ListByUserAsync(identity.UserId).ToArrayAsync(cancellationToken); // TODO: improve performance
+        FriendRequestEntity[] friendRequests = await _dbContext.FriendRequests
+            .Where(fr => fr.ReceiverId == identity.UserId || fr.SenderId == identity.UserId)
+            .ToArrayAsync(cancellationToken);
 
         return new FriendRequestList
         {

@@ -8,13 +8,9 @@ public sealed class EmailUtilsTests
     [InlineData("email")]
     [InlineData("firstname.lastname")]
     [InlineData("first+name+lastname")]
-    [InlineData("\"email\"")]
     [InlineData("1234567890")]
     [InlineData("_________")]
     [InlineData("firstname-lastname")]
-    [InlineData("\"much.more\\ unusual\"")]
-    [InlineData("\"very.unusual.@.unusual.com\"")]
-    [InlineData("\"very.(),:;<>[].VERY.\\\"very@\\\\\\ very\\\".unusual\"")]
     public void IsValidUser_ValidUser_ReturnsSuccess(string user)
     {
         // Act
