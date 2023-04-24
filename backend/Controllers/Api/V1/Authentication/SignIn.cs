@@ -48,6 +48,11 @@ public partial class AuthenticationController
             return CreateHttpError.InvalidCredentials("Invalid username/email/password", "Please check that your entered username/email and password are correct", "username", "password").ToActionResult();
         }
 
+        if (!user.EmailVerified)
+        {
+            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Unverified Email", "Email has not been verified", UserNotification.SeverityLevel.Warning, "Email not verified", "Please verify your email address before signing in").ToActionResult();
+        }
+
         LockOutEntity[] lockouts = await _dbContext.LockOuts
             .Where(u => u.UserId == user.Id)
             .ToArrayAsync(cancellationToken);
