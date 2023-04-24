@@ -117,7 +117,14 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             .Include(s => s.User).ThenInclude(u => u!.OauthConnections)
             .FirstOrDefaultAsync(s => s.Id == sessionId && s.ExpiresAt > requestTime, cancellationToken);
         if (session == null)
+        {
             return AuthenticateResult.Fail("Invalid or Expired Login Cookie");
+        }
+
+        if (!session.User!.EmailVerified)
+        {
+            return AuthenticateResult.Fail("Email is not verified");
+        }
 
         TimeSpan lifeTime = session.ExpiresAt - session.CreatedAt;
         DateTime halfLife = session.CreatedAt + (lifeTime / 2);
