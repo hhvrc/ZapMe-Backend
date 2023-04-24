@@ -70,7 +70,7 @@ public sealed class ImageEntity
     /// 
     /// </summary>
     [NotMapped]
-    public string PublicUrl => $"https://{S3BucketName}.s3.{S3RegionName}.amazonaws.com/{Id}";
+    public string PublicUrl => $"https://{S3BucketName}.s3.{S3RegionName}.amazonaws.com/img_{Id}";
 }
 
 public sealed class ImageEntityConfiguration : IEntityTypeConfiguration<ImageEntity>
