@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -30,6 +31,20 @@ namespace ZapMe.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_userAgents", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "emailVerificationRequest",
+                columns: table => new
+                {
+                    userId = table.Column<Guid>(type: "uuid", nullable: false),
+                    newEmail = table.Column<string>(type: "character varying(320)", maxLength: 320, nullable: false),
+                    tokenHash = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    createdAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_emailVerificationRequest", x => x.userId);
                 });
 
             migrationBuilder.CreateTable(
@@ -71,7 +86,8 @@ namespace ZapMe.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     name = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    email = table.Column<string>(type: "character varying(320)", maxLength: 320, nullable: true),
+                    email = table.Column<string>(type: "character varying(320)", maxLength: 320, nullable: false),
+                    emailVerified = table.Column<bool>(type: "boolean", nullable: false),
                     passwordHash = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
                     acceptedTosVersion = table.Column<int>(type: "integer", nullable: false),
                     profilePictureId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -108,26 +124,6 @@ namespace ZapMe.Migrations
                     table.PrimaryKey("PK_lockOuts", x => x.id);
                     table.ForeignKey(
                         name: "FK_lockOuts_users_userId",
-                        column: x => x.userId,
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "mailAddressVerificationRequest",
-                columns: table => new
-                {
-                    userId = table.Column<Guid>(type: "uuid", nullable: false),
-                    newEmail = table.Column<string>(type: "character varying(320)", maxLength: 320, nullable: false),
-                    tokenHash = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    createdAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_mailAddressVerificationRequest", x => x.userId);
-                    table.ForeignKey(
-                        name: "FK_mailAddressVerificationRequest_users_userId",
                         column: x => x.userId,
                         principalTable: "users",
                         principalColumn: "id",
@@ -251,6 +247,18 @@ namespace ZapMe.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "emailVerificationRequest_newEmail_idx",
+                table: "emailVerificationRequest",
+                column: "newEmail",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "emailVerificationRequest_tokenHash_idx",
+                table: "emailVerificationRequest",
+                column: "tokenHash",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_friendRequests_receiverId",
                 table: "friendRequests",
                 column: "receiverId");
@@ -270,18 +278,6 @@ namespace ZapMe.Migrations
                 name: "IX_lockOuts_userId",
                 table: "lockOuts",
                 column: "userId");
-
-            migrationBuilder.CreateIndex(
-                name: "mailAddressVerificationRequest_newEmail_idx",
-                table: "mailAddressVerificationRequest",
-                column: "newEmail",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "mailAddressVerificationRequest_tokenHash_idx",
-                table: "mailAddressVerificationRequest",
-                column: "tokenHash",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "passwordResetRequests_tokenHash_idx",
@@ -338,6 +334,14 @@ namespace ZapMe.Migrations
                 unique: true);
 
             migrationBuilder.AddForeignKey(
+                name: "FK_emailVerificationRequest_users_userId",
+                table: "emailVerificationRequest",
+                column: "userId",
+                principalTable: "users",
+                principalColumn: "id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
                 name: "FK_friendRequests_users_receiverId",
                 table: "friendRequests",
                 column: "receiverId",
@@ -370,13 +374,13 @@ namespace ZapMe.Migrations
                 table: "images");
 
             migrationBuilder.DropTable(
+                name: "emailVerificationRequest");
+
+            migrationBuilder.DropTable(
                 name: "friendRequests");
 
             migrationBuilder.DropTable(
                 name: "lockOuts");
-
-            migrationBuilder.DropTable(
-                name: "mailAddressVerificationRequest");
 
             migrationBuilder.DropTable(
                 name: "oauthConnections");

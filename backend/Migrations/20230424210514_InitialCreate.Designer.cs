@@ -12,7 +12,7 @@ using ZapMe.Data;
 namespace ZapMe.Migrations
 {
     [DbContext(typeof(ZapMeContext))]
-    [Migration("20230424105008_InitialCreate")]
+    [Migration("20230424210514_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -27,6 +27,43 @@ namespace ZapMe.Migrations
 
             modelBuilder.HasSequence("EntityFrameworkHiLoSequence")
                 .IncrementsBy(10);
+
+            modelBuilder.Entity("ZapMe.Data.Models.EmailVerificationRequestEntity", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("userId");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("createdAt")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<string>("NewEmail")
+                        .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("character varying(320)")
+                        .HasColumnName("newEmail");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("tokenHash");
+
+                    b.HasKey("UserId");
+
+                    b.HasIndex("NewEmail")
+                        .IsUnique()
+                        .HasDatabaseName("emailVerificationRequest_newEmail_idx");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique()
+                        .HasDatabaseName("emailVerificationRequest_tokenHash_idx");
+
+                    b.ToTable("emailVerificationRequest", (string)null);
+                });
 
             modelBuilder.Entity("ZapMe.Data.Models.FriendRequestEntity", b =>
                 {
@@ -148,43 +185,6 @@ namespace ZapMe.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("lockOuts", (string)null);
-                });
-
-            modelBuilder.Entity("ZapMe.Data.Models.MailAddressChangeRequestEntity", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("userId");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("createdAt")
-                        .HasDefaultValueSql("now()");
-
-                    b.Property<string>("NewEmail")
-                        .IsRequired()
-                        .HasMaxLength(320)
-                        .HasColumnType("character varying(320)")
-                        .HasColumnName("newEmail");
-
-                    b.Property<string>("TokenHash")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("tokenHash");
-
-                    b.HasKey("UserId");
-
-                    b.HasIndex("NewEmail")
-                        .IsUnique()
-                        .HasDatabaseName("mailAddressVerificationRequest_newEmail_idx");
-
-                    b.HasIndex("TokenHash")
-                        .IsUnique()
-                        .HasDatabaseName("mailAddressVerificationRequest_tokenHash_idx");
-
-                    b.ToTable("mailAddressVerificationRequest", (string)null);
                 });
 
             modelBuilder.Entity("ZapMe.Data.Models.OAuthConnectionEntity", b =>
@@ -369,9 +369,14 @@ namespace ZapMe.Migrations
                         .HasDefaultValueSql("now()");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(320)
                         .HasColumnType("character varying(320)")
                         .HasColumnName("email");
+
+                    b.Property<bool>("EmailVerified")
+                        .HasColumnType("boolean")
+                        .HasColumnName("emailVerified");
 
                     b.Property<DateTime>("LastOnline")
                         .ValueGeneratedOnAdd()
@@ -491,6 +496,17 @@ namespace ZapMe.Migrations
                     b.ToTable("userRoles", (string)null);
                 });
 
+            modelBuilder.Entity("ZapMe.Data.Models.EmailVerificationRequestEntity", b =>
+                {
+                    b.HasOne("ZapMe.Data.Models.UserEntity", "User")
+                        .WithOne("EmailVerificationRequest")
+                        .HasForeignKey("ZapMe.Data.Models.EmailVerificationRequestEntity", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ZapMe.Data.Models.FriendRequestEntity", b =>
                 {
                     b.HasOne("ZapMe.Data.Models.UserEntity", "Receiver")
@@ -525,17 +541,6 @@ namespace ZapMe.Migrations
                     b.HasOne("ZapMe.Data.Models.UserEntity", "User")
                         .WithMany("LockOuts")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ZapMe.Data.Models.MailAddressChangeRequestEntity", b =>
-                {
-                    b.HasOne("ZapMe.Data.Models.UserEntity", "User")
-                        .WithOne("MailAddressChangeRequestEntity")
-                        .HasForeignKey("ZapMe.Data.Models.MailAddressChangeRequestEntity", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -631,13 +636,13 @@ namespace ZapMe.Migrations
 
             modelBuilder.Entity("ZapMe.Data.Models.UserEntity", b =>
                 {
+                    b.Navigation("EmailVerificationRequest");
+
                     b.Navigation("FriendRequestsIncoming");
 
                     b.Navigation("FriendRequestsOutgoing");
 
                     b.Navigation("LockOuts");
-
-                    b.Navigation("MailAddressChangeRequestEntity");
 
                     b.Navigation("OauthConnections");
 
