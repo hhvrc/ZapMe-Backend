@@ -115,6 +115,7 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             .Include(s => s.User).ThenInclude(u => u!.FriendRequestsOutgoing)
             .Include(s => s.User).ThenInclude(u => u!.FriendRequestsIncoming)
             .Include(s => s.User).ThenInclude(u => u!.OauthConnections)
+            .AsSplitQuery() // Performance improvement suggested by EF Core
             .FirstOrDefaultAsync(s => s.Id == sessionId && s.ExpiresAt > requestTime, cancellationToken);
         if (session == null)
         {
