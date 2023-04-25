@@ -12,9 +12,9 @@ namespace ZapMe.Jobs;
 public sealed class CleanupPasswordResets : IJob
 {
     private readonly IPasswordResetManager _passwordResetManager;
-    private readonly ILogger<WeeklyJob> _logger;
+    private readonly ILogger<CleanupPasswordResets> _logger;
 
-    public CleanupPasswordResets(IPasswordResetManager passwordResetManager, ILogger<WeeklyJob> logger)
+    public CleanupPasswordResets(IPasswordResetManager passwordResetManager, ILogger<CleanupPasswordResets> logger)
     {
         _passwordResetManager = passwordResetManager;
         _logger = logger;

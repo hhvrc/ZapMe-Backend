@@ -21,4 +21,10 @@ public interface IEmailVerificationManager
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<ErrorDetails?> CompleteEmailVerificationAsync(string token, CancellationToken cancellationToken = default);
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    Task<int> RemoveExpiredRequestsAsync(CancellationToken cancellationToken = default);
 }
