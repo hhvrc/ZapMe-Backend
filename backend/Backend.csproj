@@ -18,11 +18,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.0" />
+    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.2" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.5" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.103.47" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.101.46" />
-    <PackageReference Include="AWSSDK.SQS" Version="3.7.100.110" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.104.2" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.101.53" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.7.100.117" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="7.0.5" />
@@ -33,10 +33,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.IdentityModel.Logging" Version="6.28.1" />
+    <PackageReference Include="Microsoft.IdentityModel.Logging" Version="6.29.0" />
     <PackageReference Include="MimeTypesMap" Version="1.0.8" />
     <PackageReference Include="NetMQ" Version="4.0.1.11" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.3" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
     <PackageReference Include="OneOf" Version="3.0.243" />
     <PackageReference Include="PreMailer.Net" Version="2.4.0" />
     <PackageReference Include="Quartz.AspNetCore" Version="3.6.2" />
