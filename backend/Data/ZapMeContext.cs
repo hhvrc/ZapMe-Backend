@@ -23,9 +23,7 @@ public sealed class ZapMeContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.UseHiLo();
-
-        modelBuilder.ApplyConfiguration(new AccountEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new UserEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ImageEntityConfiguration());
         modelBuilder.ApplyConfiguration(new SessionEntityConfiguration());
         modelBuilder.ApplyConfiguration(new LockOutEntityConfiguration());

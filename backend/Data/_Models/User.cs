@@ -85,7 +85,7 @@ public sealed class UserEntity
     public ICollection<OAuthConnectionEntity>? OauthConnections { get; set; }
 }
 
-public sealed class AccountEntityConfiguration : IEntityTypeConfiguration<UserEntity>
+public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
 {
     public void Configure(EntityTypeBuilder<UserEntity> builder)
     {

@@ -11,10 +11,6 @@ namespace ZapMe.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateSequence(
-                name: "EntityFrameworkHiLoSequence",
-                incrementBy: 10);
-
             migrationBuilder.CreateTable(
                 name: "userAgents",
                 columns: table => new
@@ -405,9 +401,6 @@ namespace ZapMe.Migrations
 
             migrationBuilder.DropTable(
                 name: "images");
-
-            migrationBuilder.DropSequence(
-                name: "EntityFrameworkHiLoSequence");
         }
     }
 }
