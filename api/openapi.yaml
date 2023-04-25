@@ -645,13 +645,7 @@ paths:
         '404':
           description: ''
           content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-            text/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
   /ws:
@@ -659,6 +653,7 @@ paths:
       tags:
         - WebSocket
       summary: "Websocket endpoint for pub/sub communication (e.g. chat, notifications, events)\r\n\r\nDocumentation:\r\nYes"
+      operationId: WebSocket
       responses:
         '200':
           description: Connection closed

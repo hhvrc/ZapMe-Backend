@@ -20,7 +20,7 @@ public sealed partial class WebSocketController
     /// <returns></returns>
     /// <response code="200">Connection closed</response>
     /// <response code="400">This endpoint is purely just a websocket endpoint</response>
-    [HttpGet]
+    [HttpGet(Name = "WebSocket")]
     [Consumes(Application.Json)]
     [Produces(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
