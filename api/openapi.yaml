@@ -10,6 +10,8 @@ info:
     name: 'The Apache License, Version 2.0'
     url: https://zapme.app/license
   version: v1
+servers:
+  - url: https://api.zapme.app
 paths:
   /api/v1/Account:
     post:

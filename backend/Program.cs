@@ -81,7 +81,7 @@ services.ZMAddEmailTemplates();
 
 services.ZMAddWebSockets();
 services.ZMAddRateLimiter();
-services.ZMAddSwagger();
+services.ZMAddSwagger(isDevelopment);
 services.ZMAddAuthentication(configuration);
 services.ZMAddAuthorization();
 services.ZMAddDatabase(configuration);

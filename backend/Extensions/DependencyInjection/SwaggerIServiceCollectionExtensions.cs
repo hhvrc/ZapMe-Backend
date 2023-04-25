@@ -7,7 +7,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class SwaggerIServiceCollectionExtensions
 {
-    public static void ZMAddSwagger([NotNull] this IServiceCollection services)
+    public static void ZMAddSwagger([NotNull] this IServiceCollection services, bool isDev)
     {
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(opt =>
@@ -31,8 +31,17 @@ public static class SwaggerIServiceCollectionExtensions
                 {
                     Name = App.LicenseText,
                     Url = new Uri(App.LicenseUrl)
-                }
+                },
             });
+            if (isDev)
+            {
+                opt.AddServer(new OpenApiServer { Url = "http://localhost:5296" });
+                opt.AddServer(new OpenApiServer { Url = "https://localhost:7296" });
+            }
+            else
+            {
+                opt.AddServer(new OpenApiServer { Url = App.BackendUrl });
+            }
 
             opt.SupportNonNullableReferenceTypes();
 
