@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ZapMe.Authentication;
+using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Helpers;
 using ZapMe.Websocket;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Ws;
 
@@ -19,7 +21,11 @@ public sealed partial class WebSocketController
     /// <response code="200">Connection closed</response>
     /// <response code="400">This endpoint is purely just a websocket endpoint</response>
     [HttpGet]
-    public async Task<IActionResult> EntryPointAsync(ILogger<WebSocketInstance> logger, CancellationToken cancellationToken)
+    [Consumes(Application.Json)]
+    [Produces(Application.Json)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> EntryPointAsync([FromServices] ILogger<WebSocketInstance> logger, CancellationToken cancellationToken)
     {
         WebSocketManager wsManager = HttpContext.WebSockets;
 

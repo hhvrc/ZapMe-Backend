@@ -145,13 +145,7 @@ paths:
         '404':
           description: Not Found
           content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
             application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-            text/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
   /api/v1/Account/recover-confirm:
@@ -564,13 +558,7 @@ paths:
         '404':
           description: ''
           content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
             application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-            text/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
   /api/v1/user/friendrequests:
@@ -676,6 +664,10 @@ paths:
           description: Connection closed
         '400':
           description: This endpoint is purely just a websocket endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
 components:
   schemas:
     AccountDto:
