@@ -22,29 +22,29 @@
       },
       "AWSSDK.S3": {
         "type": "Direct",
-        "requested": "[3.7.104.2, )",
-        "resolved": "3.7.104.2",
-        "contentHash": "BxwfsmOi7bneSjUKokyDO6A/YRM36Qn9saThz/QqQKtPm+NF4qrkpdIJunkEMcp30U6i3TCZEUncRhonNYAAOg==",
+        "requested": "[3.7.104.5, )",
+        "resolved": "3.7.104.5",
+        "contentHash": "P2pjdOk/WXOf16AyK2YT1IXAzWQln/ouO60O6dB29y2nDo6KF0k3aUb1xN6G+W5lAzYGP1sT2Y6HEsnuQaLSHQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.106.24, 4.0.0)"
+          "AWSSDK.Core": "[3.7.106.27, 4.0.0)"
         }
       },
       "AWSSDK.SimpleNotificationService": {
         "type": "Direct",
-        "requested": "[3.7.101.53, )",
-        "resolved": "3.7.101.53",
-        "contentHash": "ueYE1n9Ln31mpXO8KU7QR5opXhKof+OtIc2Lcj3vDFOUB9KJebk2ZoH4XZEIv6maS2H3aqJ5PT/WKdd+La+pUQ==",
+        "requested": "[3.7.101.56, )",
+        "resolved": "3.7.101.56",
+        "contentHash": "6cCTTfo4jumxEEoA+Z8RD+6GorSmmnH42xyC579+/lf4/+4xWQ7WuOa4MkDXDMXQT0sZQjmpGSYuVYAQZY5Cjg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.106.24, 4.0.0)"
+          "AWSSDK.Core": "[3.7.106.27, 4.0.0)"
         }
       },
       "AWSSDK.SQS": {
         "type": "Direct",
-        "requested": "[3.7.100.117, )",
-        "resolved": "3.7.100.117",
-        "contentHash": "lG4JC1HWnwZNod89ZcfZnp4V5MrEFXv+IZ7g6TVXFQoFasE8hM1mbFuNDJOJdKT+G8NUlB4b/gowTy7B7K4pdg==",
+        "requested": "[3.7.100.120, )",
+        "resolved": "3.7.100.120",
+        "contentHash": "qElUNeOnP4rtZydL26+uLycBo8RTuBA15GGljsd4eN77Af2k08fiMtIMNB80ITpzsv96PzByEEdY5HinOqpwcQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.106.24, 4.0.0)"
+          "AWSSDK.Core": "[3.7.106.27, 4.0.0)"
         }
       },
       "BCrypt.Net-Next": {
@@ -108,11 +108,11 @@
       },
       "Microsoft.IdentityModel.Logging": {
         "type": "Direct",
-        "requested": "[6.29.0, )",
-        "resolved": "6.29.0",
-        "contentHash": "71GkXXyBNnIzs2Ybgi7FamQSrieVNPo+FLKECnFQOOgfIZdJ4jz5O3kBY7wIj4l8GbD+nKZkWYvcl6/Yk5up5g==",
+        "requested": "[6.30.0, )",
+        "resolved": "6.30.0",
+        "contentHash": "QoMnSniPTXLLds1lCGMokaYiCaLZu31LTnWzcITWTjMZX6fHRUNNkQYHEJH+d8AxyAH52tR3DotfkJzZe2gkEA==",
         "dependencies": {
-          "Microsoft.IdentityModel.Abstractions": "6.29.0"
+          "Microsoft.IdentityModel.Abstractions": "6.30.0"
         }
       },
       "MimeTypesMap": {
@@ -229,8 +229,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.106.24",
-        "contentHash": "Je4DemiO6Cl6LnIsCvHXH2uCgP3TldVR026mKZto4+n43v+M0u7ouQBJy2oSdNxJ4yXmhdXYEyOBEdHa+Rsi4g=="
+        "resolved": "3.7.106.27",
+        "contentHash": "OhWPKkQ9a5E1O+981F0X8qQBCLTVh4hQhV3B8dQ+r94f3PAD72uEVYfuqzgqwBFWUtb5JfPCTp4SAOhFgvgJMQ=="
       },
       "Humanizer.Core": {
         "type": "Transitive",
@@ -404,8 +404,8 @@
       },
       "Microsoft.IdentityModel.Abstractions": {
         "type": "Transitive",
-        "resolved": "6.29.0",
-        "contentHash": "qBEGruUGU5YkqV58ykpbtT5oUWzChe+xVy/siPFPzB4KydqDv6r91ElbiifIn9ncAceFtuEkIUQWav76lg7e0A=="
+        "resolved": "6.30.0",
+        "contentHash": "vC19oUKs6bycdBqdA5fJAElrgsJ14enyQCONWd5SOmIj1GNomdfZe9sawtFBVjU9XGTUkpGTwIVMMkxcyKlN9w=="
       },
       "Microsoft.NETCore.Platforms": {
         "type": "Transitive",
