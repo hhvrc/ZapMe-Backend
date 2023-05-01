@@ -15,38 +15,34 @@ public sealed class ImageManager : IImageManager
 {
     readonly ZapMeContext _dbContext;
     readonly IAmazonS3 _s3Client;
-    readonly string _regionName;
-    readonly string _bucketName;
 
     public ImageManager(ZapMeContext dbContext, IAmazonS3 s3Client, IConfiguration configuration)
     {
         _dbContext = dbContext;
         _s3Client = s3Client;
-        _regionName = configuration.GetOrThrow("AmazonAWS:Region");
-        _bucketName = configuration.GetOrThrow("AmazonAWS:S3:PublicBucketName");
     }
 
-    public async Task UploadToS3Async(Guid imageId, Stream imageStream, byte[] imageHash, CancellationToken cancellationToken)
+    public async Task UploadToS3Async(Guid imageId, Stream imageStream, byte[] imageHash, string regionName, CancellationToken cancellationToken)
     {
         await _s3Client.PutObjectAsync(new()
         {
-            BucketName = _bucketName,
+            BucketName = $"zapme-public-{regionName}",
             Key = $"img_{imageId}",
             ChecksumSHA256 = Convert.ToBase64String(imageHash),
             InputStream = imageStream,
         }, cancellationToken);
     }
 
-    public async Task DeleteFromS3Async(Guid imageId, CancellationToken cancellationToken)
+    public async Task DeleteFromS3Async(Guid imageId, string regionName, CancellationToken cancellationToken)
     {
         await _s3Client.DeleteObjectAsync(new()
         {
-            BucketName = _bucketName,
+            BucketName = $"zapme-public-{regionName}",
             Key = $"img_{imageId}",
         }, cancellationToken);
     }
 
-    public async Task<OneOf<ImageEntity, ErrorDetails>> GetOrCreateRecordAsync(Stream imageStream, ulong imageSizeBytes, string? sha256Hash, Guid? uploaderId, CancellationToken cancellationToken)
+    public async Task<OneOf<ImageEntity, ErrorDetails>> GetOrCreateRecordAsync(Stream imageStream, ulong imageSizeBytes, string regionName, string? sha256Hash, Guid? uploaderId, CancellationToken cancellationToken)
     {
         if (imageSizeBytes < 0)
         {
@@ -98,8 +94,7 @@ public sealed class ImageManager : IImageManager
             SizeBytes = (uint)imageSizeBytes,
             Extension = imageInfo.Extension,
             Sha256 = sha256_hex,
-            S3BucketName = _bucketName,
-            S3RegionName = _regionName,
+            R2RegionName = regionName,
             UploaderId = uploaderId
         };
 
@@ -110,7 +105,7 @@ public sealed class ImageManager : IImageManager
             using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 
             // Upload to S3 bucket
-            await UploadToS3Async(id, memoryStream, sha256, cancellationToken);
+            await UploadToS3Async(id, memoryStream, sha256, regionName, cancellationToken);
             uploaded = true;
 
             // Create DB record
@@ -126,7 +121,7 @@ public sealed class ImageManager : IImageManager
             // Attempt to clean up if partially successful
             if (uploaded && !transactionOk)
             {
-                await DeleteFromS3Async(image.Id, cancellationToken);
+                await DeleteFromS3Async(image.Id, regionName, cancellationToken);
             }
         }
 

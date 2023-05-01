@@ -1,12 +1,11 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Threading.RateLimiting;
+﻿using System.Threading.RateLimiting;
 using ZapMe.Authentication;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class RateLimiterIServiceCollectionExtensions
 {
-    public static void ZMAddRateLimiter([NotNull] this IServiceCollection services)
+    public static void ZMAddRateLimiter(this IServiceCollection services)
     {
         services.AddRateLimiter(opt =>
         {

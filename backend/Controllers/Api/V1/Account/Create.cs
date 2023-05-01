@@ -37,7 +37,7 @@ public partial class AccountController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status409Conflict)] // Username/email already taken
     public async Task<IActionResult> Create(
         [FromBody] CreateAccount body,
-        [FromServices] ICloudFlareTurnstileService cfTurnstileService,
+        [FromServices] ICloudflareTurnstileService cfTurnstileService,
         [FromServices] IDebounceService debounceService,
         [FromServices] IEmailVerificationManager emailVerificationManager,
         CancellationToken cancellationToken)

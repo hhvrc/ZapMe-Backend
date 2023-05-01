@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using RichardSzalay.MockHttp;
 using System.Text.Json;
+using ZapMe.Options;
 using ZapMe.Services;
 using ZapMe.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;
@@ -11,38 +13,37 @@ namespace ZapMe.Tests.Services;
 public sealed class CloudflareTurnstileServiceTests
 {
     private readonly string _reCaptchaSecret;
-    private readonly ICloudFlareTurnstileService _sut;
-    private readonly IConfiguration _configuration;
+    private readonly ICloudflareTurnstileService _sut;
+    private readonly IOptions<CloudflareTurnstileOptions> _options;
     private readonly Mock<IHttpClientFactory> _httpClientFactoryMock;
-    private readonly Mock<ILogger<CloudFlareTurnstileService>> _loggerMock = new();
+    private readonly Mock<ILogger<CloudflareTurnstileService>> _loggerMock = new();
     private readonly MockHttpMessageHandler _httpMessageHandlerMock;
     private readonly Bogus.Faker _faker;
 
     public CloudflareTurnstileServiceTests()
     {
         _faker = new Bogus.Faker();
-        _loggerMock = new Mock<ILogger<CloudFlareTurnstileService>>();
+        _loggerMock = new Mock<ILogger<CloudflareTurnstileService>>();
         _httpMessageHandlerMock = new MockHttpMessageHandler();
         _httpClientFactoryMock = new Mock<IHttpClientFactory>();
         _reCaptchaSecret = _faker.Random.AlphaNumeric(32);
 
-        _configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(new KeyValuePair<string, string?>[] {
-                new("Authorization:Turnstile:SecretKey", _reCaptchaSecret)
-            })
-            .Build();
+        _options = Microsoft.Extensions.Options.Options.Create(new CloudflareTurnstileOptions {
+            SiteKey = "",
+            SecretKey = _reCaptchaSecret
+        });
 
         _httpClientFactoryMock
             .Setup(_ => _.CreateClient(It.IsAny<string>()))
-            .Returns(() => new HttpClient(_httpMessageHandlerMock) { BaseAddress = new Uri("https://www.google.com/recaptcha/api/", UriKind.Absolute) });
+            .Returns(() => new HttpClient(_httpMessageHandlerMock) { BaseAddress = new Uri(CloudflareTurnstileService.BaseUrl, UriKind.Absolute) });
 
-        _sut = new CloudFlareTurnstileService(_httpClientFactoryMock.Object, _configuration, _loggerMock.Object);
+        _sut = new CloudflareTurnstileService(_httpClientFactoryMock.Object, _options, _loggerMock.Object);
     }
 
     void ArrangeMock(string userResponseToken, string remoteIp, string responseBody)
     {
         _httpMessageHandlerMock
-            .When(HttpMethod.Post, "https://www.google.com/recaptcha/api/siteverify")
+            .When(HttpMethod.Post, CloudflareTurnstileService.BaseUrl + CloudflareTurnstileService.SiteVerifyEndpoint)
             .With(req => req.Content?.Headers?.ContentType?.MediaType == "application/x-www-form-urlencoded")
             .WithExactFormData(new KeyValuePair<string, string?>[] {
                 new("secret", _reCaptchaSecret),

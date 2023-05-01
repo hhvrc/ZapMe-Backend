@@ -1,12 +1,40 @@
-﻿using System.Net.Mail;
+﻿using Microsoft.Extensions.Configuration;
+using System.Net.Http.Headers;
+using System.Net.Mail;
+using System.Text;
 using ZapMe.Constants;
+using ZapMe.Controllers.Api.V1.Config.Models;
+using ZapMe.Options;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Services;
 
+public static class MailGunServiceExtensions
+{
+    public static IServiceCollection AddMailGunService(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddHttpClient(MailGunService.HttpClientKey, cli =>
+        {
+            MailGunOptions options = configuration.GetRequiredSection(MailGunOptions.SectionName).Get<MailGunOptions>()!;
+
+            cli.BaseAddress = new Uri(MailGunService.BaseUrl, UriKind.Absolute);
+            cli.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
+            cli.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(App.AppName, App.AppVersion.String));
+            cli.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"api:{options.ApiKey}")));
+        });
+        services.AddSingleton<IMailGunService, MailGunService>();
+        return services;
+    }
+}
+
 public sealed class MailGunService : IMailGunService
 {
+    public const string HttpClientKey = "MailGun";
+    public const string BaseUrl = "https://api.eu.mailgun.net/v3/";
+    public const string SendMailEndpoint = "messages";
+
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<LockOutStore> _logger;
 
@@ -39,9 +67,9 @@ public sealed class MailGunService : IMailGunService
             { new StringContent(htmlbody), "html" }
         };
 
-        HttpClient httpClient = _httpClientFactory.CreateClient("MailGun");
+        HttpClient httpClient = _httpClientFactory.CreateClient(HttpClientKey);
 
-        using HttpResponseMessage result = await httpClient.PostAsync(Uri.EscapeDataString(App.Domain) + "/messages", content, cancellationToken);
+        using HttpResponseMessage result = await httpClient.PostAsync(Uri.EscapeDataString(App.Domain) + "/" + SendMailEndpoint, content, cancellationToken);
 
         if (!result.IsSuccessStatusCode)
         {

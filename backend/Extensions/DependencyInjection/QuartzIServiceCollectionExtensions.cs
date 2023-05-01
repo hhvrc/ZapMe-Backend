@@ -1,5 +1,4 @@
 ﻿using Quartz;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using ZapMe.Attributes;
 
@@ -65,10 +64,9 @@ public static class QuartzIServiceCollectionExtensions
         opt.WaitForJobsToComplete = true;
     }
 
-    public static void ZMAddQuartz([NotNull] this IServiceCollection services)
+    public static void ZMAddQuartz(this IServiceCollection services)
     {
         Quartz.Logging.LogProvider.IsDisabled = true;
-
         services.AddQuartz(ConfigureQuartz);
         services.AddQuartzServer(ConfigureQuartzServer);
     }

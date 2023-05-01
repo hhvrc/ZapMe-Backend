@@ -7,6 +7,7 @@ using System.Text.Json;
 using ZapMe.Authentication.Models;
 using ZapMe.Data;
 using ZapMe.Data.Models;
+using ZapMe.Options;
 
 namespace ZapMe.Authentication;
 
