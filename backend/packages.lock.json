@@ -10,9 +10,9 @@
       },
       "AWSSDK.Extensions.NETCore.Setup": {
         "type": "Direct",
-        "requested": "[3.7.5, )",
-        "resolved": "3.7.5",
-        "contentHash": "T+JpP2dFbyAFgm5htiwx9oaGZ9+IVGz5xpBCzCbLWW4lwmVWn3o1Wzi4xUpAo+TULWlzf4CBhuJ9chO0YtAGVw==",
+        "requested": "[3.7.6, )",
+        "resolved": "3.7.6",
+        "contentHash": "2R3HvO3wsbIlsPYG4l116CF6NJ5XwMwjXoiFRCw07GgJONH5p2YR8pvtlqnmzowfUnveVYhQVFDB+OiLisWw7w==",
         "dependencies": {
           "AWSSDK.Core": "3.7.6",
           "Microsoft.Extensions.Configuration.Abstractions": "2.0.0",
@@ -22,29 +22,29 @@
       },
       "AWSSDK.S3": {
         "type": "Direct",
-        "requested": "[3.7.104.5, )",
-        "resolved": "3.7.104.5",
-        "contentHash": "P2pjdOk/WXOf16AyK2YT1IXAzWQln/ouO60O6dB29y2nDo6KF0k3aUb1xN6G+W5lAzYGP1sT2Y6HEsnuQaLSHQ==",
+        "requested": "[3.7.104.7, )",
+        "resolved": "3.7.104.7",
+        "contentHash": "rA/IQNnub0c3Ega7MvkdHwHUH9/65tv2/Y2Y7xDNHOKj0Lo5w5az9wNSD7dte9p00C9xh/00iiv7GDpVAlCkZQ==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.106.27, 4.0.0)"
+          "AWSSDK.Core": "[3.7.106.29, 4.0.0)"
         }
       },
       "AWSSDK.SimpleNotificationService": {
         "type": "Direct",
-        "requested": "[3.7.101.56, )",
-        "resolved": "3.7.101.56",
-        "contentHash": "6cCTTfo4jumxEEoA+Z8RD+6GorSmmnH42xyC579+/lf4/+4xWQ7WuOa4MkDXDMXQT0sZQjmpGSYuVYAQZY5Cjg==",
+        "requested": "[3.7.101.58, )",
+        "resolved": "3.7.101.58",
+        "contentHash": "L5x7yzNafzE1WO8vkIUzh74wNaa2CR+aNpRwJqKy66GiulCAs3uR5JwlFTwceCLiYmn1naboaSlcOYDduuxuXg==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.106.27, 4.0.0)"
+          "AWSSDK.Core": "[3.7.106.29, 4.0.0)"
         }
       },
       "AWSSDK.SQS": {
         "type": "Direct",
-        "requested": "[3.7.100.120, )",
-        "resolved": "3.7.100.120",
-        "contentHash": "qElUNeOnP4rtZydL26+uLycBo8RTuBA15GGljsd4eN77Af2k08fiMtIMNB80ITpzsv96PzByEEdY5HinOqpwcQ==",
+        "requested": "[3.7.100.122, )",
+        "resolved": "3.7.100.122",
+        "contentHash": "QBnGoYkolzTHOob8sqy4/lQ4Az5yvVeGTzzFWgDkLRhyKhZe2OvkeH/1xqP/iQ6VkdWed5aximrf1qufP7o9fw==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.106.27, 4.0.0)"
+          "AWSSDK.Core": "[3.7.106.29, 4.0.0)"
         }
       },
       "BCrypt.Net-Next": {
@@ -123,9 +123,9 @@
       },
       "NetMQ": {
         "type": "Direct",
-        "requested": "[4.0.1.11, )",
-        "resolved": "4.0.1.11",
-        "contentHash": "IWzqZYKdujgir+OfEA1Ut1MQJy6lyeRYBSa0/QE4rDXNAxWtt7T+x6ewbbi2vT8uB+nTfsSa58KhPa1KFdWS5Q==",
+        "requested": "[4.0.1.12, )",
+        "resolved": "4.0.1.12",
+        "contentHash": "TeeHKqhJ5rCuzqYfF9gfU7aPeQjO8Wkw0FJznPYIVMJTFyw1Kz/y8pY0MmZnfNJNJ/7YU6TA80o1ru/EVM/aQQ==",
         "dependencies": {
           "AsyncIO": "0.1.69",
           "NaCl.Net": "0.1.13",
@@ -229,8 +229,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.106.27",
-        "contentHash": "OhWPKkQ9a5E1O+981F0X8qQBCLTVh4hQhV3B8dQ+r94f3PAD72uEVYfuqzgqwBFWUtb5JfPCTp4SAOhFgvgJMQ=="
+        "resolved": "3.7.106.29",
+        "contentHash": "qKEZxZUaLNw4c1OmPcYknP1ZrM6sQ8oBJNa02gp/9roCd2AYxu1QUPS4O8sNvaV9p0yuLGFFe0sR0FB5ElPMsw=="
       },
       "Humanizer.Core": {
         "type": "Transitive",

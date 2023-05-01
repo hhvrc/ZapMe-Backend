@@ -19,10 +19,10 @@
 
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.2" />
-    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.5" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.104.5" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.101.56" />
-    <PackageReference Include="AWSSDK.SQS" Version="3.7.100.120" />
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.6" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.104.7" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.101.58" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.7.100.122" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="7.0.5" />
@@ -35,7 +35,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.IdentityModel.Logging" Version="6.30.0" />
     <PackageReference Include="MimeTypesMap" Version="1.0.8" />
-    <PackageReference Include="NetMQ" Version="4.0.1.11" />
+    <PackageReference Include="NetMQ" Version="4.0.1.12" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
     <PackageReference Include="OneOf" Version="3.0.243" />
     <PackageReference Include="PreMailer.Net" Version="2.4.0" />
