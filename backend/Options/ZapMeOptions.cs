@@ -1,25 +1,27 @@
-﻿using Microsoft.AspNetCore.Authentication;
-
-namespace ZapMe.Options;
+﻿namespace ZapMe.Options;
 
 public sealed class ZapMeOptions
 {
-    public const string SectionName = "ZapMe";
-
     public required ZapMeAuthenticationOptions Authentication { get; set; }
-}
+    public required DatabaseOptions Database { get; set; }
+    public required CloudflareOptions Cloudflare { get; set; }
+    public required DiscordOptions Discord { get; set; }
+    public required GithubOptions Github { get; set; }
+    public required GoogleOptions Google { get; set; }
+    public required MailGunOptions MailGun { get; set; }
+    public required TwitterOptions Twitter { get; set; }
 
-public sealed class ZapMeAuthenticationOptions
-{
-    public const string SectionName = ZapMeOptions.SectionName + ":Authentication";
+    public static void Register(IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOptions<ZapMeOptions>().ValidateOnStart();
 
-    /// <summary>
-    /// Name of the cookie which will be sent to client
-    /// </summary>
-    public required string CookieName { get; set; }
-
-    /// <summary>
-    /// Sets if the cookie should be renewed if its half way through the expiration time.
-    /// </summary>
-    public required bool SlidingExpiration { get; set; }
+        ZapMeAuthenticationOptions.Register(services, configuration);
+        CloudflareOptions.Register(services, configuration);
+        DatabaseOptions.Register(services, configuration);
+        DiscordOptions.Register(services, configuration);
+        GithubOptions.Register(services, configuration);
+        GoogleOptions.Register(services, configuration);
+        MailGunOptions.Register(services, configuration);
+        TwitterOptions.Register(services, configuration);
+    }
 }

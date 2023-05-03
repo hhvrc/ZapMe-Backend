@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using System.Diagnostics.CodeAnalysis;
 using ZapMe.Authentication;
-using ZapMe.Options;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -18,7 +16,6 @@ public static class ZapMeAuthenticationBuilderExtensions
             });
         });
 
-        builder.Services.AddOptions<ZapMeAuthenticationOptions>().Bind(configuration.GetRequiredSection(ZapMeAuthenticationOptions.SectionName)).ValidateOnStart();
         builder.Services.AddTransient<IAuthenticationSignInHandler, ZapMeAuthenticationHandler>();
         return builder;
     }

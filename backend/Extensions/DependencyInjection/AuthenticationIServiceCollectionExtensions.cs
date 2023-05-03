@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using System.Diagnostics.CodeAnalysis;
-using ZapMe.Authentication;
-using ZapMe.Options;
+﻿using ZapMe.Authentication;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -14,9 +10,9 @@ public static class AuthenticationIServiceCollectionExtensions
             .AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
             .AddZapMe(configuration)
             //.AddDiscord()
-            .AddGitHub()
-            .AddTwitter()
-            .AddGoogle()
+            //.AddGitHub()
+            //.AddTwitter()
+            //.AddGoogle()
             ;
     }
 }

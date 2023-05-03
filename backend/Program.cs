@@ -1,16 +1,13 @@
-using Amazon.Extensions.NETCore.Setup;
 using Amazon.S3;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.IdentityModel.Logging;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using ZapMe.Constants;
-using ZapMe.Controllers.Api.V1.Config.Models;
 using ZapMe.Data;
 using ZapMe.Middlewares;
+using ZapMe.Options;
 using ZapMe.Services;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
@@ -76,6 +73,8 @@ services.Configure<ApiBehaviorOptions>(opt =>
 // ######## ZAPME SERVICES ################
 // ########################################
 
+ZapMeOptions.Register(services, configuration);
+
 services.AddAWSService<IAmazonS3>(configuration.GetAWSOptions("Cloudflare:R2"));
 services.AddTransient<IImageManager, ImageManager>();
 services.AddCloudflareTurnstileService(configuration);
@@ -115,7 +114,7 @@ services.AddCors(opt =>
     {
         if (isDevelopment)
         {
-            builder.WithOrigins("http://localhost:5173");
+            builder.WithOrigins("http://localhost:5173", "https://localhost:7296");
         }
         else
         {
