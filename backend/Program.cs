@@ -142,7 +142,6 @@ if (!isBuild)
 
     if (context.Database.EnsureCreated())
     {
-        await context.Database.MigrateAsync();
         await DataSeeders.SeedAsync(context);
     }
 }

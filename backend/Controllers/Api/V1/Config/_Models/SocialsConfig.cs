@@ -21,4 +21,9 @@ public readonly struct SocialsConfig
     /// Uri pointing to a personal website
     /// </summary>
     public Uri? WebsiteUri { get; init; }
+
+    /// <summary>
+    /// Discord username, e.g. "username#1234"
+    /// </summary>
+    public string? DiscordUsername { get; init; }
 }

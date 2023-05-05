@@ -12,18 +12,5 @@ public readonly struct ApiConfig
     /// </summary>
     public int PrivacyVersion { get; init; }
 
-    /// <summary>
-    /// The DSN for Sentry, used for error reporting
-    /// If this is null, Sentry reporting is disabled
-    /// </summary>
-    public Uri? SentryDsn { get; init; }
-
-    /// <summary>
-    /// Trace sample rate for Sentry, used for performance monitoring
-    /// </summary>
-    public double SentryTraceSampleRate { get; init; }
-
-    public AuthenticationConfig Authentication { get; init; }
-
     public ApiDisabledFeatures DisabledFeatures { get; init; }
 }

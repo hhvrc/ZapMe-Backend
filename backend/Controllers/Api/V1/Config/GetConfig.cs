@@ -12,9 +12,6 @@ public partial class ConfigController
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="discordOAuth2Options"></param>
-    /// <param name="githubOAuth2Options"></param>
-    /// <param name="twitterOAuth2Options"></param>
     /// <param name="googleOptions"></param>
     /// <param name="turnstileOptions"></param>
     /// <returns>The config for the service</returns>
@@ -25,9 +22,6 @@ public partial class ConfigController
     [ProducesResponseType(typeof(Config.Models.Config), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
     public Config.Models.Config GetConfig(
-        [FromServices] IOptions<DiscordOAuth2Options> discordOAuth2Options,
-        [FromServices] IOptions<GithubOAuth2Options> githubOAuth2Options,
-        [FromServices] IOptions<TwitterOAuth2Options> twitterOAuth2Options,
         [FromServices] IOptions<GoogleOptions> googleOptions,
         [FromServices] IOptions<CloudflareTurnstileOptions> turnstileOptions
         )
@@ -39,16 +33,7 @@ public partial class ConfigController
             Api = new Config.Models.ApiConfig
             {
                 TosVersion = 1,
-                PrivacyVersion = 1,
-                Authentication = new Config.Models.AuthenticationConfig
-                {
-                    DiscordClientId = discordOAuth2Options.Value.ClientID,
-                    GithubClientId = githubOAuth2Options.Value.ClientID,
-                    TwitterClientId = twitterOAuth2Options.Value.ClientID,
-                    GoogleClientId = googleOptions.Value.OAuth2.ClientID,
-                    RecaptchaSiteKey = googleOptions.Value.ReCaptcha.SiteKey,
-                    TurnstileSiteKey = turnstileOptions.Value.SiteKey
-                },
+                PrivacyVersion = 1
             },
             Contact = new Config.Models.ContactConfig
             {
@@ -61,7 +46,8 @@ public partial class ConfigController
                 GithubUri = new Uri("https://github.com/hhvrc"),
                 TwitterUri = new Uri("https://twitter.com/hhvrc"),
                 RedditUri = new Uri("https://reddit.com/u/hhvrc"),
-                WebsiteUri = new Uri("https://heavenvr.tech")
+                WebsiteUri = new Uri("https://heavenvr.tech"),
+                DiscordUsername = "HentaiHeaven#0001"
             }
         };
     }
