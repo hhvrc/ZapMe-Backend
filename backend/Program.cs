@@ -1,12 +1,15 @@
+using Amazon.S3;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.IdentityModel.Logging;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using ZapMe.Constants;
 using ZapMe.Data;
 using ZapMe.Middlewares;
+using ZapMe.Options;
+using ZapMe.Services;
+using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
 
 // The services are ordered by dependency requirements.
@@ -70,22 +73,35 @@ services.Configure<ApiBehaviorOptions>(opt =>
 // ######## ZAPME SERVICES ################
 // ########################################
 
-services.ZMAddHttpClients(configuration);
+ZapMeOptions.Register(services, configuration);
 
-services.ZMAddUsers();
-services.ZMAddSessions();
-services.ZMAddLockOuts();
-services.ZMAddUserRelations();
-services.ZMAddFriendRequests();
-services.ZMAddEmailTemplates();
+services.AddAWSService<IAmazonS3>(configuration.GetAWSOptions("Cloudflare:R2"));
+services.AddTransient<IImageManager, ImageManager>();
+services.AddCloudflareTurnstileService(configuration);
+services.AddDebounceService(configuration);
+//services.AddGoogleReCaptchaService(configuration);
+services.AddMailGunService(configuration);
 
-services.ZMAddWebSockets();
+services.AddTransient<IUserManager, UserManager>();
+services.AddTransient<IPasswordResetRequestStore, PasswordResetRequestStore>();
+services.AddTransient<IPasswordResetManager, PasswordResetManager>();
+services.AddTransient<IUserAgentStore, UserAgentStore>();
+services.AddTransient<IUserAgentManager, UserAgentManager>();
+services.AddTransient<ISessionStore, SessionStore>();
+services.AddTransient<ISessionManager, SessionManager>();
+services.AddTransient<ILockOutStore, LockOutStore>();
+services.AddTransient<IUserRelationStore, UserRelationStore>();
+services.AddTransient<IFriendRequestStore, FriendRequestStore>();
+//services.AddTransient<IFriendRequestManager, FriendRequestManager>();
+services.AddTransient<IEmailTemplateStore, EmailTemplateStore>();
+services.AddTransient<IEmailVerificationManager, EmailVerificationManager>();
+services.AddTransient<IWebSocketInstanceManager, WebSocketInstanceManager>();
+
 services.ZMAddRateLimiter();
 services.ZMAddSwagger(isDevelopment);
 services.ZMAddAuthentication(configuration);
 services.ZMAddAuthorization();
 services.ZMAddDatabase(configuration);
-services.ZMAddAmazonAWS(configuration);
 services.ZMAddQuartz();
 
 // ########################################
@@ -98,7 +114,7 @@ services.AddCors(opt =>
     {
         if (isDevelopment)
         {
-            builder.WithOrigins("http://localhost:5173");
+            builder.WithOrigins("http://localhost:5173", "https://localhost:7296");
         }
         else
         {
@@ -120,16 +136,13 @@ WebApplication app = builder.Build();
 
 if (!isBuild)
 {
-    using (IServiceScope scope = app.Services.CreateScope())
-    {
-        IServiceProvider serviceProvider = scope.ServiceProvider;
+    using IServiceScope scope = app.Services.CreateScope();
 
-        if (!((serviceProvider.GetService<IDatabaseCreator>() as RelationalDatabaseCreator)?.Exists() ?? false))
-        {
-            ZapMeContext context = serviceProvider.GetRequiredService<ZapMeContext>();
-            await context.Database.MigrateAsync();
-            await DataSeeders.SeedAsync(context);
-        }
+    ZapMeContext context = scope.ServiceProvider.GetRequiredService<ZapMeContext>();
+
+    if (context.Database.EnsureCreated())
+    {
+        await DataSeeders.SeedAsync(context);
     }
 }
 else

@@ -1,34 +1,63 @@
-﻿using ZapMe.DTOs;
+﻿using Microsoft.Extensions.Options;
+using System.Net.Http.Headers;
+using ZapMe.Constants;
+using ZapMe.DTOs;
+using ZapMe.Options;
 using ZapMe.Services.Interfaces;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Services;
 
-public sealed class CloudFlareTurnstileService : ICloudFlareTurnstileService
+public static class CloudflareTurnstileServiceExtensions
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<CloudFlareTurnstileService> _logger;
-    private readonly string _siteSecret;
+    public static IServiceCollection AddCloudflareTurnstileService(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOptions<CloudflareTurnstileOptions>().Bind(configuration.GetRequiredSection(CloudflareTurnstileOptions.SectionName)).ValidateOnStart();
+        services.AddHttpClient(CloudflareTurnstileService.HttpClientKey, client =>
+        {
+            client.BaseAddress = new Uri(CloudflareTurnstileService.BaseUrl, UriKind.Absolute);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
+            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(App.AppName, App.AppVersion.String));
+        });
+        services.AddTransient<ICloudflareTurnstileService, CloudflareTurnstileService>();
+        return services;
+    }
+}
 
-    public CloudFlareTurnstileService(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<CloudFlareTurnstileService> logger)
+public sealed class CloudflareTurnstileService : ICloudflareTurnstileService
+{
+    public const string HttpClientKey = "CloudflareTurnstile";
+    public const string BaseUrl = "https://challenges.cloudflare.com/turnstile/v0/";
+    public const string SiteVerifyEndpoint = "siteverify";
+
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly CloudflareTurnstileOptions _options;
+    private readonly ILogger<CloudflareTurnstileService> _logger;
+
+    public CloudflareTurnstileService(IHttpClientFactory httpClientFactory, IOptions<CloudflareTurnstileOptions> options, ILogger<CloudflareTurnstileService> logger)
     {
         _httpClientFactory = httpClientFactory;
+        _options = options.Value;
         _logger = logger;
-        _siteSecret = configuration["Authorization:Turnstile:SecretKey"] ?? throw new KeyNotFoundException("Config entry \"Authorization:Turnstile:SecretKey\" is missing!");
     }
 
-    public async Task<CloudflareTurnstileVerifyResponse> VerifyUserResponseTokenAsync(string token, string remoteIpAddress, CancellationToken cancellationToken)
+    public async Task<CloudflareTurnstileVerifyResponse> VerifyUserResponseTokenAsync(string responseToken, string? remoteIpAddress, CancellationToken cancellationToken)
     {
-        if (String.IsNullOrEmpty(token))
+        if (String.IsNullOrEmpty(responseToken))
         {
             return new CloudflareTurnstileVerifyResponse { ErrorCodes = new[] { "missing-input-response" } };
         }
 
         Dictionary<string, string> formUrlValues = new Dictionary<string, string>
         {
-            { "secret", _siteSecret },
-            { "response", token },
-            { "remoteip", remoteIpAddress }
+            { "secret", _options.SecretKey },
+            { "response", responseToken }
         };
+
+        if (!String.IsNullOrEmpty(remoteIpAddress))
+        {
+            formUrlValues.Add("remoteip", remoteIpAddress);
+        }
 
         int retryCount = 0;
         CloudflareTurnstileVerifyResponse response;
@@ -36,9 +65,9 @@ public sealed class CloudFlareTurnstileService : ICloudFlareTurnstileService
         {
             FormUrlEncodedContent httpContent = new FormUrlEncodedContent(formUrlValues);
 
-            HttpClient httpClient = _httpClientFactory.CreateClient("CloudflareTurnstile");
+            HttpClient httpClient = _httpClientFactory.CreateClient(HttpClientKey);
 
-            using HttpResponseMessage httpResponse = await httpClient.PostAsync("siteverify", httpContent, cancellationToken);
+            using HttpResponseMessage httpResponse = await httpClient.PostAsync(SiteVerifyEndpoint, httpContent, cancellationToken);
 
             response = await httpResponse.Content.ReadFromJsonAsync<CloudflareTurnstileVerifyResponse>(cancellationToken: cancellationToken);
         }

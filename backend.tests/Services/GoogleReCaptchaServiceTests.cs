@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using RichardSzalay.MockHttp;
 using System.Text.Json;
+using ZapMe.Options;
 using ZapMe.Services;
 using ZapMe.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;
@@ -12,7 +14,7 @@ public sealed class GoogleReCaptchaServiceTests
 {
     private readonly string _reCaptchaSecret;
     private readonly IGoogleReCaptchaService _sut;
-    private readonly IConfiguration _configuration;
+    private readonly IOptions<GoogleReCaptchaOptions> _options;
     private readonly Mock<IHttpClientFactory> _httpClientFactoryMock;
     private readonly Mock<ILogger<GoogleReCaptchaService>> _loggerMock = new();
     private readonly MockHttpMessageHandler _httpMessageHandlerMock;
@@ -26,17 +28,16 @@ public sealed class GoogleReCaptchaServiceTests
         _httpClientFactoryMock = new Mock<IHttpClientFactory>();
         _reCaptchaSecret = _faker.Random.AlphaNumeric(32);
 
-        _configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(new KeyValuePair<string, string?>[] {
-                new("Authorization:ReCaptcha:SecretKey", _reCaptchaSecret)
-            })
-            .Build();
+        _options = Microsoft.Extensions.Options.Options.Create(new GoogleReCaptchaOptions { 
+            SiteKey = "", 
+            SecretKey = _reCaptchaSecret
+        });
 
         _httpClientFactoryMock
             .Setup(_ => _.CreateClient(It.IsAny<string>()))
             .Returns(() => new HttpClient(_httpMessageHandlerMock) { BaseAddress = new Uri("https://www.google.com/recaptcha/api/", UriKind.Absolute) });
 
-        _sut = new GoogleReCaptchaService(_httpClientFactoryMock.Object, _configuration, _loggerMock.Object);
+        _sut = new GoogleReCaptchaService(_httpClientFactoryMock.Object, _options, _loggerMock.Object);
     }
 
     void ArrangeMock(string userResponseToken, string remoteIp, string responseBody)

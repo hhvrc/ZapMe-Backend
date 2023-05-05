@@ -1,10 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace Microsoft.Extensions.DependencyInjection;
+﻿namespace Microsoft.Extensions.DependencyInjection;
 
 public static class AuthorizationIServiceCollectionExtensions
 {
-    public static void ZMAddAuthorization([NotNull] this IServiceCollection services)
+    public static void ZMAddAuthorization(this IServiceCollection services)
     {
         services.AddAuthorization(opt =>
         {

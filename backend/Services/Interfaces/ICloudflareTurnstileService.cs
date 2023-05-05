@@ -5,14 +5,14 @@ namespace ZapMe.Services.Interfaces;
 /// <summary>
 /// 
 /// </summary>
-public interface ICloudFlareTurnstileService
+public interface ICloudflareTurnstileService
 {
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="token"></param>
+    /// <param name="responseToken"></param>
     /// <param name="remoteIpAddress"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<CloudflareTurnstileVerifyResponse> VerifyUserResponseTokenAsync(string token, string remoteIpAddress, CancellationToken cancellationToken = default);
+    Task<CloudflareTurnstileVerifyResponse> VerifyUserResponseTokenAsync(string responseToken, string? remoteIpAddress, CancellationToken cancellationToken = default);
 }

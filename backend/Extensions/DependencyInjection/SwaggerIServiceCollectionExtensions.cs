@@ -1,5 +1,4 @@
 ﻿using Microsoft.OpenApi.Models;
-using System.Diagnostics.CodeAnalysis;
 using ZapMe.Attributes;
 using ZapMe.Constants;
 
@@ -7,7 +6,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class SwaggerIServiceCollectionExtensions
 {
-    public static void ZMAddSwagger([NotNull] this IServiceCollection services, bool isDev)
+    public static void ZMAddSwagger(this IServiceCollection services, bool isDev)
     {
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(opt =>

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.Options;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
@@ -10,7 +12,8 @@ public partial class ConfigController
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="configuration"></param>
+    /// <param name="googleOptions"></param>
+    /// <param name="turnstileOptions"></param>
     /// <returns>The config for the service</returns>
     /// <response code="200">Returns the service config</response>
     /// <returns></returns>
@@ -18,7 +21,10 @@ public partial class ConfigController
     [Produces(Application.Json)]
     [ProducesResponseType(typeof(Config.Models.Config), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
-    public Config.Models.Config GetConfig([FromServices] IConfiguration configuration)
+    public Config.Models.Config GetConfig(
+        [FromServices] IOptions<GoogleOptions> googleOptions,
+        [FromServices] IOptions<CloudflareTurnstileOptions> turnstileOptions
+        )
     {
         return new Config.Models.Config
         {
@@ -27,16 +33,7 @@ public partial class ConfigController
             Api = new Config.Models.ApiConfig
             {
                 TosVersion = 1,
-                PrivacyVersion = 1,
-                Authentication = new Config.Models.AuthenticationConfig
-                {
-                    DiscordClientId = configuration["Authorization:Discord:ClientId"],
-                    GithubClientId = configuration["Authorization:Github:ClientId"],
-                    TwitterClientId = configuration["Authorization:Twitter:ClientId"],
-                    GoogleClientId = configuration["Authorization:Google:ClientId"],
-                    RecaptchaSiteKey = configuration["Authorization:ReCaptcha:SiteKey"],
-                    TurnstileSiteKey = configuration["Authorization:Turnstile:SiteKey"]
-                },
+                PrivacyVersion = 1
             },
             Contact = new Config.Models.ContactConfig
             {
@@ -49,7 +46,8 @@ public partial class ConfigController
                 GithubUri = new Uri("https://github.com/hhvrc"),
                 TwitterUri = new Uri("https://twitter.com/hhvrc"),
                 RedditUri = new Uri("https://reddit.com/u/hhvrc"),
-                WebsiteUri = new Uri("https://heavenvr.tech")
+                WebsiteUri = new Uri("https://heavenvr.tech"),
+                DiscordUsername = "HentaiHeaven#0001"
             }
         };
     }

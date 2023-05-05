@@ -49,12 +49,7 @@ public sealed class ImageEntity
     /// <summary>
     /// 
     /// </summary>
-    public required string S3BucketName { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public required string S3RegionName { get; set; }
+    public required string R2RegionName { get; set; }
 
     /// <summary>
     /// 
@@ -70,7 +65,7 @@ public sealed class ImageEntity
     /// 
     /// </summary>
     [NotMapped]
-    public Uri PublicUrl => new Uri($"https://{S3BucketName}.s3.{S3RegionName}.amazonaws.com/img_{Id}");
+    public Uri PublicUrl => new Uri($"https://zapme-public-{R2RegionName}.{App.Domain}/img_{Id}");
 }
 
 public sealed class ImageEntityConfiguration : IEntityTypeConfiguration<ImageEntity>
@@ -105,12 +100,8 @@ public sealed class ImageEntityConfiguration : IEntityTypeConfiguration<ImageEnt
             .HasColumnName("sha256")
             .HasMaxLength(HashConstants.Sha256LengthHex);
 
-        builder.Property(i => i.S3BucketName)
-            .HasColumnName("s3BucketName")
-            .HasMaxLength(32);
-
-        builder.Property(i => i.S3RegionName)
-            .HasColumnName("s3RegionName")
+        builder.Property(i => i.R2RegionName)
+            .HasColumnName("r2RegionName")
             .HasMaxLength(32);
 
         builder.Property(i => i.UploaderId)

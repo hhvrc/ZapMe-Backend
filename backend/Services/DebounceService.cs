@@ -1,10 +1,31 @@
-﻿using ZapMe.Services.Interfaces;
+﻿using System.Net.Http.Headers;
+using ZapMe.Constants;
+using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Services;
 
+public static class DebounceServiceExtensions
+{
+    public static IServiceCollection AddDebounceService(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddHttpClient(DebounceService.HttpClientKey, client =>
+        {
+            client.BaseAddress = new Uri(DebounceService.BaseUrl, UriKind.Absolute);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
+            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(App.AppName, App.AppVersion.String));
+        });
+        services.AddTransient<IDebounceService, DebounceService>();
+        return services;
+    }
+}
+
 public sealed class DebounceService : IDebounceService
 {
+    public const string HttpClientKey = "Debounce";
+    public const string BaseUrl = "https://disposable.debounce.io/";
+
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<DebounceService> _logger;
 
@@ -37,7 +58,7 @@ public sealed class DebounceService : IDebounceService
         string query = parsed.HasAlias ? $"?email={parsed.UserAlias}+user@{parsed.Host}" : $"?email=user@{parsed.Host}";
 
 
-        HttpClient httpClient = _httpClientFactory.CreateClient("Debounce");
+        HttpClient httpClient = _httpClientFactory.CreateClient(HttpClientKey);
 
         using HttpResponseMessage response = await httpClient.GetAsync(query, cancellationToken);
 

@@ -1,35 +1,61 @@
-﻿using ZapMe.DTOs;
+﻿using Microsoft.Extensions.Options;
+using System.Net.Http.Headers;
+using ZapMe.Constants;
+using ZapMe.DTOs;
+using ZapMe.Options;
 using ZapMe.Services.Interfaces;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Services;
 
+public static class GoogleReCaptchaServiceExtensions
+{
+    public static IServiceCollection AddGoogleReCaptchaService(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOptions<GoogleReCaptchaOptions>().Bind(configuration.GetRequiredSection(GoogleReCaptchaOptions.SectionName)).ValidateOnStart();
+        services.Configure<GoogleReCaptchaOptions>(configuration.GetSection(GoogleReCaptchaOptions.SectionName));
+        services.AddHttpClient(GoogleReCaptchaService.HttpClientKey, cli =>
+        {
+            cli.BaseAddress = new Uri(GoogleReCaptchaService.BaseUrl, UriKind.Absolute);
+            cli.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Application.Json));
+            cli.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(App.AppName, App.AppVersion.String));
+        });
+        services.AddTransient<IGoogleReCaptchaService, GoogleReCaptchaService>();
+        return services;
+    }
+}
+
 public sealed class GoogleReCaptchaService : IGoogleReCaptchaService
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<GoogleReCaptchaService> _logger;
-    private readonly string _reCaptchaSecret;
+    public const string HttpClientKey = "GoogleReCaptcha";
+    public const string BaseUrl = "https://www.google.com/recaptcha/api/";
+    public const string SiteVerifyEndpoint = "siteverify";
 
-    public GoogleReCaptchaService(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<GoogleReCaptchaService> logger)
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly GoogleReCaptchaOptions _options;
+    private readonly ILogger<GoogleReCaptchaService> _logger;
+
+    public GoogleReCaptchaService(IHttpClientFactory httpClientFactory, IOptions<GoogleReCaptchaOptions> options, ILogger<GoogleReCaptchaService> logger)
     {
         _httpClientFactory = httpClientFactory;
+        _options = options.Value;
         _logger = logger;
-        _reCaptchaSecret = configuration["Authorization:ReCaptcha:SecretKey"] ?? throw new KeyNotFoundException("Config entry \"Authorization:ReCaptcha:SecretKey\" is missing!");
     }
 
-    public async Task<GoogleReCaptchaVerifyResponse> VerifyUserResponseTokenAsync(string reCaptchaToken, string? remoteIpAddress, CancellationToken cancellationToken)
+    public async Task<GoogleReCaptchaVerifyResponse> VerifyUserResponseTokenAsync(string responseToken, string? remoteIpAddress, CancellationToken cancellationToken)
     {
 #if DEBUG
-        if (reCaptchaToken == "skip") return new GoogleReCaptchaVerifyResponse { Success = true };
+        if (responseToken == "skip") return new GoogleReCaptchaVerifyResponse { Success = true };
 #endif
-        if (String.IsNullOrEmpty(reCaptchaToken))
+        if (String.IsNullOrEmpty(responseToken))
         {
             return new GoogleReCaptchaVerifyResponse { ErrorCodes = new[] { "invalid-input-response" } };
         }
 
         Dictionary<string, string> formUrlValues = new Dictionary<string, string>
         {
-            { "secret", _reCaptchaSecret },
-            { "response", reCaptchaToken }
+            { "secret", _options.SecretKey },
+            { "response", responseToken }
         };
 
         if (!String.IsNullOrEmpty(remoteIpAddress))
@@ -39,9 +65,9 @@ public sealed class GoogleReCaptchaService : IGoogleReCaptchaService
 
         var httpContent = new FormUrlEncodedContent(formUrlValues);
 
-        HttpClient httpClient = _httpClientFactory.CreateClient("GoogleReCaptcha");
+        HttpClient httpClient = _httpClientFactory.CreateClient(HttpClientKey);
 
-        using HttpResponseMessage response = await httpClient.PostAsync("siteverify", httpContent, cancellationToken);
+        using HttpResponseMessage response = await httpClient.PostAsync(SiteVerifyEndpoint, httpContent, cancellationToken);
 
         return await response.Content.ReadFromJsonAsync<GoogleReCaptchaVerifyResponse>(cancellationToken: cancellationToken);
     }

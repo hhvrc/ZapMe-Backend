@@ -7,6 +7,7 @@ using System.Text.Json;
 using ZapMe.Authentication.Models;
 using ZapMe.Data;
 using ZapMe.Data.Models;
+using ZapMe.Options;
 
 namespace ZapMe.Authentication;
 
@@ -36,7 +37,7 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
     {
         _scheme = scheme ?? throw new ArgumentNullException(nameof(scheme));
         _context = context ?? throw new ArgumentNullException(nameof(context));
-        _options = _optionsMonitor.Get(_scheme.Name);
+        _options = _optionsMonitor.CurrentValue;
 
         return Task.CompletedTask;
     }
@@ -78,7 +79,7 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
 
     private async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        var requestTime = DateTime.UtcNow;
+        DateTime requestTime = DateTime.UtcNow;
 
         string? sessionIdString = Request.Headers["Authorization"];
         if (sessionIdString is not null)
@@ -146,11 +147,8 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
         return AuthenticateResult.Success(new AuthenticationTicket(principal, ZapMeAuthenticationDefaults.AuthenticationScheme));
     }
 
-    public Task<AuthenticateResult> AuthenticateAsync()
-    {
-        // Calling Authenticate more than once should always return the original value.
-        return _authenticateTask ??= HandleAuthenticateAsync();
-    }
+    // Calling Authenticate more than once should always return the original value.
+    public Task<AuthenticateResult> AuthenticateAsync() => _authenticateTask ??= HandleAuthenticateAsync();
 
     public Task ChallengeAsync(AuthenticationProperties? properties)
     {
