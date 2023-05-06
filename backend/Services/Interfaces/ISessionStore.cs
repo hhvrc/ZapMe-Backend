@@ -11,12 +11,11 @@ public interface ISessionStore
     /// 
     /// </summary>
     /// <param name="user"></param>
-    /// <param name="sessionName"></param>
     /// <param name="ipAddress"></param>
     /// <param name="countryCode"></param>
     /// <param name="userAgent"></param>
     /// <param name="expiresAt"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<SessionEntity> CreateAsync(UserEntity user, string? sessionName, string ipAddress, string countryCode, UserAgentEntity userAgent, DateTime expiresAt, CancellationToken cancellationToken = default);
+    Task<SessionEntity> CreateAsync(UserEntity user, string ipAddress, string countryCode, UserAgentEntity userAgent, DateTime expiresAt, CancellationToken cancellationToken = default);
 }

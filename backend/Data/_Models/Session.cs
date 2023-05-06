@@ -26,7 +26,7 @@ public sealed class SessionEntity
     /// <summary>
     /// User provided name for this session
     /// </summary>
-    public string? Name { get; set; }
+    public string? NickName { get; set; }
 
     /// <summary>
     /// The visitor's IP address (IPv4 or IPv6)
@@ -78,8 +78,8 @@ public sealed class SessionEntityConfiguration : IEntityTypeConfiguration<Sessio
         builder.Property(si => si.UserId)
             .HasColumnName("userId");
 
-        builder.Property(si => si.Name)
-            .HasColumnName("name")
+        builder.Property(si => si.NickName)
+            .HasColumnName("nickName")
             .HasMaxLength(32);
 
         builder.Property(si => si.IpAddress)
