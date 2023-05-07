@@ -1,13 +1,18 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Amazon.Auth.AccessControlPolicy;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using OneOf;
+using System.Numerics;
+using ZapMe.Authentication.Models;
 using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
+using ZapMe.Options;
 using ZapMe.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -22,6 +27,7 @@ public partial class AccountController
     /// <param name="cfTurnstileService"></param>
     /// <param name="debounceService"></param>
     /// <param name="emailVerificationManager"></param>
+    /// <param name="options"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <response code="201">Created account</response>
@@ -40,6 +46,7 @@ public partial class AccountController
         [FromServices] ICloudflareTurnstileService cfTurnstileService,
         [FromServices] IDebounceService debounceService,
         [FromServices] IEmailVerificationManager emailVerificationManager,
+        [FromServices] ZapMeOptions options,
         CancellationToken cancellationToken)
     {
         if (User.Identity?.IsAuthenticated ?? false)
@@ -90,8 +97,17 @@ public partial class AccountController
             return CreateHttpError.InvalidModelState((nameof(body.Email), "Disposable Emails are not allowed")).ToActionResult();
         }
 
-        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);
+        if (body.AcceptedPrivacyPolicyVersion < options.PrivacyPolicyVersion)
+        {
+            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Privacy Policy Review Required", "User needs to accept new Privacy Policy", UserNotification.SeverityLevel.Error, "Outdated Privacy Policy", "Please read and accept the new Privacy Policy before creating an account").ToActionResult();
+        }
 
+        if (body.AcceptedTermsOfServiceVersion < options.TermsOfServiceVersion)
+        {
+            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Terms of Service Review Required", "User needs to accept new Terms of Service", UserNotification.SeverityLevel.Error, "Outdated Terms of Service", "Please read and accept the new Terms of Service before creating an account").ToActionResult();
+        }
+
+        await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);
         if (await _dbContext.Users.AnyAsync(u => u.Email == body.Email, cancellationToken))
         {
             return CreateHttpError.Generic(StatusCodes.Status409Conflict, "taken", "Fields \"UserName\" or \"Email\" are not available", UserNotification.SeverityLevel.Warning, "Username/Email already taken", "Please choose a different Username or Email").ToActionResult();

@@ -20,7 +20,10 @@ public readonly struct CreateAccount
     public string Email { get; init; }
 
     /// <summary/>
-    public int AcceptedTosVersion { get; init; }
+    public uint AcceptedPrivacyPolicyVersion { get; init; }
+
+    /// <summary/>
+    public uint AcceptedTermsOfServiceVersion { get; init; }
 
     /// <summary>
     /// Response from cloudflare turnstile request

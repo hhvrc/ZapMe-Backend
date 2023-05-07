@@ -854,7 +854,11 @@ components:
           description: ''
           format: email
           example: user.name@example.com
-        acceptedTosVersion:
+        acceptedPrivacyPolicyVersion:
+          type: integer
+          description: ''
+          format: int32
+        acceptedTermsOfServiceVersion:
           type: integer
           description: ''
           format: int32
