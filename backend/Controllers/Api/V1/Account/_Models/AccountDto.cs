@@ -24,7 +24,8 @@ public readonly struct AccountDto
         Username = user.Name;
         ObscuredEmail = Transformers.ObscureEmail(email!);
         EmailVerified = emailVerified;
-        AcceptedTosVersion = user.AcceptedTosVersion;
+        AcceptedPrivacyPolicyVersion = user.AcceptedPrivacyPolicyVersion;
+        AcceptedTermsOfServiceVersion = user.AcceptedTermsOfServiceVersion;
         ProfilePictureUrl = user.ProfilePicture?.PublicUrl!;
         Status = user.OnlineStatus;
         StatusText = user.OnlineStatusText;
@@ -57,7 +58,12 @@ public readonly struct AccountDto
     /// <summary>
     /// 
     /// </summary>
-    public int AcceptedTosVersion { get; }
+    public uint AcceptedPrivacyPolicyVersion { get; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public uint AcceptedTermsOfServiceVersion { get; }
 
     /// <summary>
     /// 

@@ -690,7 +690,12 @@ components:
           type: boolean
           description: ''
           readOnly: true
-        acceptedTosVersion:
+        acceptedPrivacyPolicyVersion:
+          type: integer
+          description: ''
+          format: int32
+          readOnly: true
+        acceptedTermsOfServiceVersion:
           type: integer
           description: ''
           format: int32
@@ -872,15 +877,15 @@ components:
     ErrorDetails:
       type: object
       properties:
-        title:
+        code:
           type: string
-          description: Title for developer to understand what went wrong (not user friendly)
+          description: 'Error code, this is a short string that can be used to identify the error (meant for developers)'
         detail:
           type: string
-          description: More detailed description of what this error is about (not user friendly)
+          description: Detailed description of what this error is about (meant for developers)
         suggestion:
           type: string
-          description: Suggestion to developer on how they might be able to midegate this error
+          description: Suggestion on how to midegate this error (meant for developers)
           nullable: true
         fields:
           type: object

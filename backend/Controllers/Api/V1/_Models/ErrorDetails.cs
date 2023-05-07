@@ -9,10 +9,10 @@ namespace ZapMe.Controllers.Api.V1.Models;
 /// </summary>
 public readonly struct ErrorDetails
 {
-    public ErrorDetails(int httpStatusCode, string title, string detail, string? suggestion = null, Dictionary<string, string[]>? fields = null, UserNotification? notification = null)
+    public ErrorDetails(int httpStatusCode, string code, string detail, string? suggestion = null, Dictionary<string, string[]>? fields = null, UserNotification? notification = null)
     {
         HttpStatusCode = httpStatusCode;
-        Title = title;
+        Code = code;
         Detail = detail;
         Suggestion = suggestion;
         Fields = fields;
@@ -26,17 +26,17 @@ public readonly struct ErrorDetails
     public int HttpStatusCode { get; }
 
     /// <summary>
-    /// Title for developer to understand what went wrong (not user friendly)
+    /// Error code, this is a short string that can be used to identify the error (meant for developers)
     /// </summary>
-    public string Title { get; }
+    public string Code { get; }
 
     /// <summary>
-    /// More detailed description of what this error is about (not user friendly)
+    /// Detailed description of what this error is about (meant for developers)
     /// </summary>
     public string Detail { get; }
 
     /// <summary>
-    /// Suggestion to developer on how they might be able to midegate this error
+    /// Suggestion on how to midegate this error (meant for developers)
     /// </summary>
     public string? Suggestion { get; }
 

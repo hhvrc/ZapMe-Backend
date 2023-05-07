@@ -37,7 +37,8 @@ public sealed class UserManager : IUserManager
             Email = email,
             EmailVerified = emailVerified,
             PasswordHash = passwordHash,
-            AcceptedTosVersion = 0,
+            AcceptedPrivacyPolicyVersion = 0,
+            AcceptedTermsOfServiceVersion = 0,
             ProfilePictureId = ImageEntity.DefaultImageId,
             OnlineStatus = UserStatus.Online,
             OnlineStatusText = String.Empty

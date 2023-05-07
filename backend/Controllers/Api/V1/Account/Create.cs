@@ -94,7 +94,7 @@ public partial class AccountController
 
         if (await _dbContext.Users.AnyAsync(u => u.Email == body.Email, cancellationToken))
         {
-            return CreateHttpError.Generic(StatusCodes.Status409Conflict, "One or multiple idenitifiers in use", "Fields \"UserName\" or \"Email\" are not available", UserNotification.SeverityLevel.Warning, "Username/Email already taken", "Please choose a different Username or Email").ToActionResult();
+            return CreateHttpError.Generic(StatusCodes.Status409Conflict, "taken", "Fields \"UserName\" or \"Email\" are not available", UserNotification.SeverityLevel.Warning, "Username/Email already taken", "Please choose a different Username or Email").ToActionResult();
         }
 
         using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);

@@ -2,6 +2,8 @@
 
 public sealed class ZapMeOptions
 {
+    public required uint PrivacyPolicyVersion { get; set; }
+    public required uint TermsOfServiceVersion { get; set; }
     public required ZapMeAuthenticationOptions Authentication { get; set; }
     public required DatabaseOptions Database { get; set; }
     public required CloudflareOptions Cloudflare { get; set; }

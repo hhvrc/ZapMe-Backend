@@ -39,7 +39,12 @@ public sealed class UserEntity
     /// <summary>
     /// 
     /// </summary>
-    public int AcceptedTosVersion { get; set; }
+    public uint AcceptedPrivacyPolicyVersion { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public uint AcceptedTermsOfServiceVersion { get; set; }
 
     /// <inheritdoc/>
     public Guid ProfilePictureId { get; set; }
@@ -112,8 +117,11 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntit
             .HasColumnName("passwordHash")
             .HasMaxLength(120);
 
-        builder.Property(u => u.AcceptedTosVersion)
-            .HasColumnName("acceptedTosVersion");
+        builder.Property(u => u.AcceptedPrivacyPolicyVersion)
+            .HasColumnName("acceptedPrivacyPolicyVersion");
+
+        builder.Property(u => u.AcceptedTermsOfServiceVersion)
+            .HasColumnName("acceptedTermsOfServiceVersion");
 
         builder.Property(u => u.ProfilePictureId)
             .HasColumnName("profilePictureId");

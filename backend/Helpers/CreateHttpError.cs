@@ -8,26 +8,26 @@ public static class CreateHttpError
     private static Dictionary<string, string[]>? ToDict(IEnumerable<(string Key, string Value)> items) => items.ToDictionary(static x => x.Key, static x => new string[] { x.Value });
     private static Dictionary<string, string[]>? ToDict(IEnumerable<string> keys, string value) => keys.ToDictionary(static x => x, x => new string[] { value });
 
-    private static ErrorDetails Generic(int httpCode, string title, string detail, string? suggestion, Dictionary<string, string[]>? fields, UserNotification? notification) =>
-        new ErrorDetails(httpCode, title, detail, suggestion, fields, notification);
-    public static ErrorDetails Generic(int httpCode, string title, string detail, string? suggestion = null) =>
-        Generic(httpCode, title, detail, suggestion, null, null);
-    public static ErrorDetails Generic(int httpCode, string title, string detail, UserNotification.SeverityLevel notificationSeverity, string notificationTitle, string notificationDetail) =>
-        Generic(httpCode, title, detail, null, null, new UserNotification(notificationSeverity, notificationTitle, notificationDetail));
-    public static ErrorDetails Generic(int httpCode, string title, string detail, string? suggestion, UserNotification.SeverityLevel notificationSeverity, string notificationTitle, string notificationDetail) =>
-        Generic(httpCode, title, detail, suggestion, null, new UserNotification(notificationSeverity, notificationTitle, notificationDetail));
-    public static ErrorDetails Generic(int httpCode, string title, string detail, string? suggestion = null, params (string field, string error)[] fields) =>
-        Generic(httpCode, title, detail, suggestion, ToDict(fields), null);
-    public static ErrorDetails Generic(int httpCode, string title, string detail, string? suggestion = null, params (string field, string[] errors)[] fields) =>
-        Generic(httpCode, title, detail, suggestion, ToDict(fields), null);
-    public static ErrorDetails Generic(int httpCode, string title, string detail, UserNotification.SeverityLevel notificationSeverity, string notificationTitle, string notificationDetail, params (string field, string error)[] fields) =>
-        Generic(httpCode, title, detail, null, ToDict(fields), new UserNotification(notificationSeverity, notificationTitle, notificationDetail));
-    public static ErrorDetails Generic(int httpCode, string title, string detail, UserNotification.SeverityLevel notificationSeverity, string notificationTitle, string notificationDetail, params (string field, string[] errors)[] fields) =>
-        Generic(httpCode, title, detail, null, ToDict(fields), new UserNotification(notificationSeverity, notificationTitle, notificationDetail));
-    public static ErrorDetails Generic(int httpCode, string title, string detail, string? suggestion, UserNotification.SeverityLevel notificationSeverity, string notificationTitle, string notificationDetail, params (string field, string error)[] fields) =>
-        Generic(httpCode, title, detail, suggestion, ToDict(fields), new UserNotification(notificationSeverity, notificationTitle, notificationDetail));
-    public static ErrorDetails Generic(int httpCode, string title, string detail, string? suggestion, UserNotification.SeverityLevel notificationSeverity, string notificationTitle, string notificationDetail, params (string field, string[] errors)[] fields) =>
-        Generic(httpCode, title, detail, suggestion, ToDict(fields), new UserNotification(notificationSeverity, notificationTitle, notificationDetail));
+    private static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion, Dictionary<string, string[]>? fields, UserNotification? notification) =>
+        new ErrorDetails(httpCode, code, detail, suggestion, fields, notification);
+    public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion = null) =>
+        Generic(httpCode, code, detail, suggestion, null, null);
+    public static ErrorDetails Generic(int httpCode, string code, string detail, UserNotification.SeverityLevel notificationSeverity, string notificationTitle, string notificationDetail) =>
+        Generic(httpCode, code, detail, null, null, new UserNotification(notificationSeverity, notificationTitle, notificationDetail));
+    public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion, UserNotification.SeverityLevel notificationSeverity, string notificationTitle, string notificationDetail) =>
+        Generic(httpCode, code, detail, suggestion, null, new UserNotification(notificationSeverity, notificationTitle, notificationDetail));
+    public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion = null, params (string field, string error)[] fields) =>
+        Generic(httpCode, code, detail, suggestion, ToDict(fields), null);
+    public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion = null, params (string field, string[] errors)[] fields) =>
+        Generic(httpCode, code, detail, suggestion, ToDict(fields), null);
+    public static ErrorDetails Generic(int httpCode, string code, string detail, UserNotification.SeverityLevel notificationSeverity, string notificationTitle, string notificationDetail, params (string field, string error)[] fields) =>
+        Generic(httpCode, code, detail, null, ToDict(fields), new UserNotification(notificationSeverity, notificationTitle, notificationDetail));
+    public static ErrorDetails Generic(int httpCode, string code, string detail, UserNotification.SeverityLevel notificationSeverity, string notificationTitle, string notificationDetail, params (string field, string[] errors)[] fields) =>
+        Generic(httpCode, code, detail, null, ToDict(fields), new UserNotification(notificationSeverity, notificationTitle, notificationDetail));
+    public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion, UserNotification.SeverityLevel notificationSeverity, string notificationTitle, string notificationDetail, params (string field, string error)[] fields) =>
+        Generic(httpCode, code, detail, suggestion, ToDict(fields), new UserNotification(notificationSeverity, notificationTitle, notificationDetail));
+    public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion, UserNotification.SeverityLevel notificationSeverity, string notificationTitle, string notificationDetail, params (string field, string[] errors)[] fields) =>
+        Generic(httpCode, code, detail, suggestion, ToDict(fields), new UserNotification(notificationSeverity, notificationTitle, notificationDetail));
 
     /// <summary>
     /// 400 Bad Request
