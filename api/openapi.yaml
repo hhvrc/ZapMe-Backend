@@ -666,6 +666,21 @@ paths:
 components:
   schemas:
     AccountDto:
+      required:
+        - acceptedPrivacyPolicyVersion
+        - acceptedTermsOfServiceVersion
+        - createdAt
+        - emailVerified
+        - friends
+        - id
+        - lastOnline
+        - oauthConnections
+        - obscuredEmail
+        - profilePictureUrl
+        - status
+        - statusText
+        - updatedAt
+        - username
       type: object
       properties:
         id:
@@ -742,6 +757,8 @@ components:
       additionalProperties: false
       description: 'Account object, this can only retrieved for the user you are logged in as'
     AccountOAuthAdd:
+      required:
+        - oauthCode
       type: object
       properties:
         oauthCode:
@@ -749,6 +766,10 @@ components:
       additionalProperties: false
       description: Request sent to server to add a oauth connection to a account
     ApiConfig:
+      required:
+        - disabledFeatures
+        - privacyVersion
+        - tosVersion
       type: object
       properties:
         tosVersion:
@@ -763,6 +784,10 @@ components:
           $ref: '#/components/schemas/ApiDisabledFeatures'
       additionalProperties: false
     ApiDisabledFeatures:
+      required:
+        - endpoints
+        - webRTC
+        - webSockets
       type: object
       properties:
         webRTC:
@@ -778,6 +803,10 @@ components:
           description: 'List of disabled endpoints, if an endpoint is in this list, it will return a "503 Service Unavailable"'
       additionalProperties: false
     AuthSignIn:
+      required:
+        - password
+        - rememberMe
+        - usernameOrEmail
       type: object
       properties:
         usernameOrEmail:
@@ -794,6 +823,12 @@ components:
       additionalProperties: false
       description: Message sent to server to authenticate user using username and password
     Config:
+      required:
+        - api
+        - appName
+        - appVersion
+        - contact
+        - founderSocials
       type: object
       properties:
         appName:
@@ -810,6 +845,10 @@ components:
           $ref: '#/components/schemas/SocialsConfig'
       additionalProperties: false
     ContactConfig:
+      required:
+        - discordInviteUrl
+        - emailContact
+        - emailSupport
       type: object
       properties:
         emailSupport:
@@ -832,6 +871,13 @@ components:
           format: uri
       additionalProperties: false
     CreateAccount:
+      required:
+        - acceptedPrivacyPolicyVersion
+        - acceptedTermsOfServiceVersion
+        - email
+        - password
+        - turnstileResponse
+        - username
       type: object
       properties:
         username:
@@ -868,6 +914,9 @@ components:
       additionalProperties: false
       description: Message sent to server to create a new account
     CreateOk:
+      required:
+        - id
+        - message
       type: object
       properties:
         id:
@@ -879,6 +928,10 @@ components:
           description: ''
       additionalProperties: false
     ErrorDetails:
+      required:
+        - code
+        - detail
+        - notification
       type: object
       properties:
         code:
@@ -905,6 +958,9 @@ components:
       additionalProperties: false
       description: Details about the error
     FriendRequestList:
+      required:
+        - incoming
+        - outgoing
       type: object
       properties:
         incoming:
@@ -922,6 +978,8 @@ components:
       additionalProperties: false
       description: List of incoming and outgoing friendrequests
     OAuthProviderList:
+      required:
+        - providers
       type: object
       properties:
         providers:
@@ -952,6 +1010,9 @@ components:
           nullable: true
       additionalProperties: { }
     RecoveryConfirm:
+      required:
+        - newPassword
+        - token
       type: object
       properties:
         newPassword:
@@ -966,6 +1027,9 @@ components:
       additionalProperties: false
       description: Request sent to server to commit a password reset
     RecoveryRequest:
+      required:
+        - email
+        - turnstileResponse
       type: object
       properties:
         email:
@@ -981,6 +1045,10 @@ components:
       additionalProperties: false
       description: Request sent to server to request a password reset token
     SessionDto:
+      required:
+        - expiresAtUtc
+        - id
+        - issuedAtUtc
       type: object
       properties:
         id:
@@ -1003,6 +1071,9 @@ components:
         - error
       type: string
     SignInOk:
+      required:
+        - account
+        - session
       type: object
       properties:
         session:
@@ -1040,6 +1111,9 @@ components:
           nullable: true
       additionalProperties: false
     UpdateEmail:
+      required:
+        - newEmail
+        - password
       type: object
       properties:
         newEmail:
@@ -1056,6 +1130,8 @@ components:
       additionalProperties: false
       description: Request sent to server to update account email address
     UpdateEmailOk:
+      required:
+        - message
       type: object
       properties:
         message:
@@ -1064,6 +1140,9 @@ components:
       additionalProperties: false
       description: Request sent to server to update account email address
     UpdatePassword:
+      required:
+        - password_current
+        - password_new
       type: object
       properties:
         password_new:
@@ -1079,6 +1158,10 @@ components:
       additionalProperties: false
       description: Request sent to server to update account password
     UpdateProfilePictureOk:
+      required:
+        - imageHash
+        - imageId
+        - imageUrl
       type: object
       properties:
         imageId:
@@ -1094,6 +1177,9 @@ components:
           description: ''
       additionalProperties: false
     UpdateUserName:
+      required:
+        - newUsername
+        - password
       type: object
       properties:
         newUsername:
@@ -1110,6 +1196,14 @@ components:
       additionalProperties: false
       description: Request sent to server to update account username
     UserDto:
+      required:
+        - createdAt
+        - id
+        - lastOnline
+        - profilePictureId
+        - status
+        - statusText
+        - username
       type: object
       properties:
         id:
@@ -1139,6 +1233,9 @@ components:
           format: date-time
       additionalProperties: false
     UserNotification:
+      required:
+        - severity
+        - title
       type: object
       properties:
         severity:
@@ -1153,6 +1250,10 @@ components:
       additionalProperties: false
       description: "System notification to be displayed to the user, do not confuse with user notifications\r\nThis is a hint and clients can choose to ignore it or implement notifications to be independent of this"
     UserReport:
+      required:
+        - explenation
+        - title
+        - userId
       type: object
       properties:
         userId:

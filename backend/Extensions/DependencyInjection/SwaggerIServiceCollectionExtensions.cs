@@ -1,6 +1,7 @@
 ﻿using Microsoft.OpenApi.Models;
 using ZapMe.Attributes;
 using ZapMe.Constants;
+using ZapMe.Swagger;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +15,10 @@ public static class SwaggerIServiceCollectionExtensions
             opt.SchemaFilter<ZapMeAttributeSwaggerFilter>();
             opt.ParameterFilter<ZapMeAttributeSwaggerFilter>();
             opt.OperationFilter<ZapMeAttributeSwaggerFilter>();
+            opt.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
+            opt.SupportNonNullableReferenceTypes(); // Sets Nullable flags appropriately.
+            //opt.UseAllOfToExtendReferenceSchemas(); // Allows $ref enums to be nullable
+            //opt.UseAllOfForInheritance(); // Allows $ref objects to be nullable
 
             opt.SwaggerDoc("v1", new OpenApiInfo
             {
