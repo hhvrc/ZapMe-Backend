@@ -92,7 +92,6 @@ services.AddTransient<ILockOutStore, LockOutStore>();
 services.AddTransient<IUserRelationStore, UserRelationStore>();
 services.AddTransient<IFriendRequestStore, FriendRequestStore>();
 //services.AddTransient<IFriendRequestManager, FriendRequestManager>();
-services.AddTransient<IEmailTemplateStore, EmailTemplateStore>();
 services.AddTransient<IEmailVerificationManager, EmailVerificationManager>();
 services.AddTransient<IWebSocketInstanceManager, WebSocketInstanceManager>();
 

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using OneOf;
 using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data;
@@ -15,16 +14,14 @@ public sealed class PasswordResetManager : IPasswordResetManager
 {
     private readonly ZapMeContext _dbContext;
     private readonly IUserManager _userManager;
-    private readonly IEmailTemplateStore _mailTemplateStore;
     private readonly IMailGunService _mailGunService;
     private readonly IPasswordResetRequestStore _passwordResetRequestStore;
     private readonly ILogger<PasswordResetManager> _logger;
 
-    public PasswordResetManager(ZapMeContext dbContext, IUserManager userManager, IEmailTemplateStore emailTemplateStore, IMailGunService emailGunService, IPasswordResetRequestStore passwordResetRequestStore, ILogger<PasswordResetManager> logger)
+    public PasswordResetManager(ZapMeContext dbContext, IUserManager userManager, IMailGunService emailGunService, IPasswordResetRequestStore passwordResetRequestStore, ILogger<PasswordResetManager> logger)
     {
         _dbContext = dbContext;
         _userManager = userManager;
-        _mailTemplateStore = emailTemplateStore;
         _mailGunService = emailGunService;
         _passwordResetRequestStore = passwordResetRequestStore;
         _logger = logger;
@@ -38,20 +35,18 @@ public sealed class PasswordResetManager : IPasswordResetManager
         string token = StringUtils.GenerateUrlSafeRandomString(16);
         string tokenHash = HashingUtils.Sha256_Hex(token);
 
-        OneOf<string, ErrorDetails> getTemplateResponse = await _mailTemplateStore.GetTemplateAsync(EmailTemplateNames.PasswordReset, cancellationToken);
-        if (getTemplateResponse.TryPickT1(out ErrorDetails errorDetails, out string emailTemplate))
+        Dictionary<string, string> mailgunValues = new Dictionary<string, string>
         {
-            return errorDetails;
-        }
-
-        string formattedEmail = new QuickStringReplacer(emailTemplate)
-            .Replace("{{UserName}}", user.Name)
-            .Replace("{{ResetPasswordUrl}}", App.WebsiteUrl + "/reset-password?token=" + token)
-            .Replace("{{CompanyName}}", App.AppCreator)
-            .Replace("{{CompanyAddress}}", App.MadeInText)
-            .Replace("{{PoweredBy}}", App.AppName)
-            .Replace("{{PoweredByLink}}", App.WebsiteUrl)
-            .ToString();
+            { "UserName", user.Name },
+            { "ResetPasswordUrl", App.WebsiteUrl + "/reset-password?token=" + token },
+            { "ContactLink", App.ContactUrl },
+            { "PrivacyPolicyLink", App.PrivacyPolicyUrl },
+            { "TermsOfServiceLink", App.TermsOfServiceUrl },
+            { "CompanyName", App.AppCreator },
+            { "CompanyAddress", App.MadeInText },
+            { "PoweredBy", App.AppName },
+            { "PoweredByLink", App.WebsiteUrl }
+        };
 
         // Start transaction
         using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
@@ -60,7 +55,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
         await _passwordResetRequestStore.UpsertAsync(user.Id, tokenHash, cancellationToken);
 
         // Send recovery secret to email
-        bool success = await _mailGunService.SendEmailAsync("Hello", user.Name, user.Email, "Password recovery", formattedEmail, cancellationToken);
+        bool success = await _mailGunService.SendEmailAsync("Hello", user.Name, user.Email, "Password recovery", "password-reset", mailgunValues, cancellationToken);
 
         // Commit transaction
         await transaction.CommitAsync(cancellationToken);

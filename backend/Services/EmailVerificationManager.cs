@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
-using OneOf;
 using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data;
@@ -15,13 +14,11 @@ namespace ZapMe.Services;
 public sealed class EmailVerificationManager : IEmailVerificationManager
 {
     private readonly ZapMeContext _dbContext;
-    private readonly IEmailTemplateStore _emailTemplateStore;
     private readonly IMailGunService _mailGunService;
 
-    public EmailVerificationManager(ZapMeContext dbContext, IEmailTemplateStore emailTemplateStore, IMailGunService mailGunService)
+    public EmailVerificationManager(ZapMeContext dbContext, IMailGunService mailGunService)
     {
         _dbContext = dbContext;
-        _emailTemplateStore = emailTemplateStore;
         _mailGunService = mailGunService;
     }
 
@@ -36,25 +33,18 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
             TokenHash = HashingUtils.Sha256_Hex(emailVerificationToken)
         };
 
-        // Fetch email template
-        OneOf<string, ErrorDetails> geEmailtTemplateResult = await _emailTemplateStore.GetTemplateAsync("AccountCreated", cancellationToken);
-        if (geEmailtTemplateResult.TryPickT1(out ErrorDetails errorDetails, out string emailTemplate))
+        Dictionary<string, string> mailgunValues = new Dictionary<string, string>
         {
-            return errorDetails;
-        }
-
-        // Fill in email template
-        string formattedEmail = new QuickStringReplacer(emailTemplate)
-                .Replace("{{UserName}}", user.Name)
-                .Replace("{{ConfirmEmailLink}}", App.WebsiteUrl + "/verify-email?token=" + emailVerificationToken)
-                .Replace("{{ContactLink}}", App.ContactUrl)
-                .Replace("{{PrivacyPolicyLink}}", App.PrivacyPolicyUrl)
-                .Replace("{{TermsOfServiceLink}}", App.TermsOfServiceUrl)
-                .Replace("{{CompanyName}}", App.AppCreator)
-                .Replace("{{CompanyAddress}}", App.MadeInText)
-                .Replace("{{PoweredBy}}", App.AppName)
-                .Replace("{{PoweredByLink}}", App.WebsiteUrl)
-                .ToString();
+            { "UserName", user.Name },
+            { "ConfirmEmailLink", App.WebsiteUrl + "/verify-email?token=" + emailVerificationToken },
+            { "ContactLink", App.ContactUrl },
+            { "PrivacyPolicyLink", App.PrivacyPolicyUrl },
+            { "TermsOfServiceLink", App.TermsOfServiceUrl },
+            { "CompanyName", App.AppCreator },
+            { "CompanyAddress", App.MadeInText },
+            { "PoweredBy", App.AppName },
+            { "PoweredByLink", App.WebsiteUrl }
+        };
 
         // Start transaction
         using IDbContextTransaction? transaction = await _dbContext.Database.BeginTransactionIfNotExistsAsync(cancellationToken);
@@ -64,7 +54,7 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         // Send email
-        bool success = await _mailGunService.SendEmailAsync("System", user.Name, newEmail, "Account Created", formattedEmail, cancellationToken);
+        bool success = await _mailGunService.SendEmailAsync("System", user.Name, newEmail, "Account Created", "account-created", mailgunValues, cancellationToken);
         if (!success)
         {
             return CreateHttpError.InternalServerError();
