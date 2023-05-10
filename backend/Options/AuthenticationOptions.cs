@@ -14,8 +14,6 @@ public sealed class ZapMeAuthenticationOptions
     /// </summary>
     public required bool SlidingExpiration { get; set; }
 
-    public static void Register(IServiceCollection services, IConfiguration configuration)
-    {
+    public static void Register(IServiceCollection services, IConfiguration configuration) =>
         services.AddOptions<ZapMeAuthenticationOptions>().Bind(configuration.GetRequiredSection(SectionName)).ValidateOnStart();
-    }
 }

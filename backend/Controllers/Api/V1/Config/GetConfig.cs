@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
-using ZapMe.Options;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
@@ -12,8 +10,6 @@ public partial class ConfigController
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="googleOptions"></param>
-    /// <param name="turnstileOptions"></param>
     /// <returns>The config for the service</returns>
     /// <response code="200">Returns the service config</response>
     /// <returns></returns>
@@ -21,10 +17,7 @@ public partial class ConfigController
     [Produces(Application.Json)]
     [ProducesResponseType(typeof(Config.Models.Config), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
-    public Config.Models.Config GetConfig(
-        [FromServices] IOptions<GoogleOptions> googleOptions,
-        [FromServices] IOptions<CloudflareTurnstileOptions> turnstileOptions
-        )
+    public Config.Models.Config GetConfig()
     {
         return new Config.Models.Config
         {
