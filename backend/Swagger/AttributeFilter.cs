@@ -1,9 +1,10 @@
 ﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using ZapMe.Attributes;
 
-namespace ZapMe.Attributes;
+namespace ZapMe.Swagger;
 
-public sealed class ZapMeAttributeSwaggerFilter : ISchemaFilter, IParameterFilter, IOperationFilter
+public sealed class AttributeFilter : ISchemaFilter, IParameterFilter, IOperationFilter
 {
     public void Apply(OpenApiParameter parameter, ParameterFilterContext context)
     {

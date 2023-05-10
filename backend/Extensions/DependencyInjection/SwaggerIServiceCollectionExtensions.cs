@@ -1,5 +1,4 @@
 ﻿using Microsoft.OpenApi.Models;
-using ZapMe.Attributes;
 using ZapMe.Constants;
 using ZapMe.Swagger;
 
@@ -12,9 +11,9 @@ public static class SwaggerIServiceCollectionExtensions
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(opt =>
         {
-            opt.SchemaFilter<ZapMeAttributeSwaggerFilter>();
-            opt.ParameterFilter<ZapMeAttributeSwaggerFilter>();
-            opt.OperationFilter<ZapMeAttributeSwaggerFilter>();
+            opt.SchemaFilter<AttributeFilter>();
+            opt.ParameterFilter<AttributeFilter>();
+            opt.OperationFilter<AttributeFilter>();
             opt.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
             opt.SupportNonNullableReferenceTypes(); // Sets Nullable flags appropriately.
             //opt.UseAllOfToExtendReferenceSchemas(); // Allows $ref enums to be nullable
