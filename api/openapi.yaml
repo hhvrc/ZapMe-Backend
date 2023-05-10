@@ -1249,7 +1249,6 @@ components:
         - createdAt
         - id
         - lastOnline
-        - profilePictureId
         - status
         - statusText
         - username
@@ -1267,6 +1266,7 @@ components:
           type: string
           description: ''
           format: uuid
+          nullable: true
         status:
           allOf:
             - $ref: '#/components/schemas/UserStatus'
