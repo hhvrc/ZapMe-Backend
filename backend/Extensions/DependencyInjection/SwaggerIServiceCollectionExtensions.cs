@@ -16,8 +16,8 @@ public static class SwaggerIServiceCollectionExtensions
             opt.OperationFilter<AttributeFilter>();
             opt.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
             opt.SupportNonNullableReferenceTypes(); // Sets Nullable flags appropriately.
-            //opt.UseAllOfToExtendReferenceSchemas(); // Allows $ref enums to be nullable
-            //opt.UseAllOfForInheritance(); // Allows $ref objects to be nullable
+            opt.UseAllOfToExtendReferenceSchemas(); // Allows $ref enums to be nullable
+            opt.UseAllOfForInheritance(); // Allows $ref objects to be nullable
 
             opt.SwaggerDoc("v1", new OpenApiInfo
             {

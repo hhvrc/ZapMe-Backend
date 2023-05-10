@@ -24,7 +24,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateAccount'
+              allOf:
+                - $ref: '#/components/schemas/CreateAccount'
+              description: Message sent to server to create a new account
       responses:
         '201':
           description: Created account
@@ -112,7 +114,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AccountOAuthAdd'
+              allOf:
+                - $ref: '#/components/schemas/AccountOAuthAdd'
+              description: Request sent to server to add a oauth connection to a account
       responses:
         '200':
           description: Success
@@ -159,7 +163,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RecoveryConfirm'
+              allOf:
+                - $ref: '#/components/schemas/RecoveryConfirm'
+              description: Request sent to server to commit a password reset
       responses:
         '200':
           description: Ok
@@ -180,7 +186,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RecoveryRequest'
+              allOf:
+                - $ref: '#/components/schemas/RecoveryRequest'
+              description: Request sent to server to request a password reset token
       responses:
         '200':
           description: Ok
@@ -195,7 +203,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateEmail'
+              allOf:
+                - $ref: '#/components/schemas/UpdateEmail'
+              description: Request sent to server to update account email address
       responses:
         '200':
           description: Ok
@@ -226,7 +236,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdatePassword'
+              allOf:
+                - $ref: '#/components/schemas/UpdatePassword'
+              description: Request sent to server to update account password
       responses:
         '200':
           description: Ok
@@ -317,7 +329,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateUserName'
+              allOf:
+                - $ref: '#/components/schemas/UpdateUserName'
+              description: Request sent to server to update account username
       responses:
         '200':
           description: Ok
@@ -378,7 +392,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AuthSignIn'
+              allOf:
+                - $ref: '#/components/schemas/AuthSignIn'
+              description: Message sent to server to authenticate user using username and password
       responses:
         '200':
           description: Returns SignInOk along with a Cookie with similar data
@@ -638,7 +654,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserReport'
+              allOf:
+                - $ref: '#/components/schemas/UserReport'
+              description: Message sent to server to report a user
       responses:
         '200':
           description: ''
@@ -721,7 +739,10 @@ components:
           format: uri
           readOnly: true
         status:
-          $ref: '#/components/schemas/UserStatus'
+          allOf:
+            - $ref: '#/components/schemas/UserStatus'
+          description: ''
+          readOnly: true
         statusText:
           type: string
           description: ''
@@ -781,7 +802,8 @@ components:
           description: 'The current Privacy Policy version, if the user has not accepted this version, they will be prompted to accept it'
           format: int32
         disabledFeatures:
-          $ref: '#/components/schemas/ApiDisabledFeatures'
+          allOf:
+            - $ref: '#/components/schemas/ApiDisabledFeatures'
       additionalProperties: false
     ApiDisabledFeatures:
       required:
@@ -838,11 +860,17 @@ components:
           type: string
           description: 'Version of the product, e.g. "1.0.0"'
         api:
-          $ref: '#/components/schemas/ApiConfig'
+          allOf:
+            - $ref: '#/components/schemas/ApiConfig'
+          description: 'Api configuration, e.g. version, etc.'
         contact:
-          $ref: '#/components/schemas/ContactConfig'
+          allOf:
+            - $ref: '#/components/schemas/ContactConfig'
+          description: 'Contact information for ZapMe, e.g. email address, discord server, etc.'
         founderSocials:
-          $ref: '#/components/schemas/SocialsConfig'
+          allOf:
+            - $ref: '#/components/schemas/SocialsConfig'
+          description: The social media accounts of the founder of ZapMe
       additionalProperties: false
     ContactConfig:
       required:
@@ -931,7 +959,6 @@ components:
       required:
         - code
         - detail
-        - notification
       type: object
       properties:
         code:
@@ -954,7 +981,10 @@ components:
           description: Errors for specific fields in the request
           nullable: true
         notification:
-          $ref: '#/components/schemas/UserNotification'
+          allOf:
+            - $ref: '#/components/schemas/UserNotification'
+          description: "This is a user friendly error message, might help the user understand what went wrong and how to fix it\r\nCompletely optional, might be null"
+          nullable: true
       additionalProperties: false
       description: Details about the error
     FriendRequestList:
@@ -977,6 +1007,21 @@ components:
           description: UserId's of users that this user has sent friend requests to
       additionalProperties: false
       description: List of incoming and outgoing friendrequests
+    HttpValidationProblemDetails:
+      required:
+        - errors
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ProblemDetails'
+      properties:
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          readOnly: true
+      additionalProperties: { }
     OAuthProviderList:
       required:
         - providers
@@ -1077,9 +1122,13 @@ components:
       type: object
       properties:
         session:
-          $ref: '#/components/schemas/SessionDto'
+          allOf:
+            - $ref: '#/components/schemas/SessionDto'
+          description: ''
         account:
-          $ref: '#/components/schemas/AccountDto'
+          allOf:
+            - $ref: '#/components/schemas/AccountDto'
+          description: ''
       additionalProperties: false
       description: ''
     SocialsConfig:
@@ -1219,7 +1268,9 @@ components:
           description: ''
           format: uuid
         status:
-          $ref: '#/components/schemas/UserStatus'
+          allOf:
+            - $ref: '#/components/schemas/UserStatus'
+          description: ''
         statusText:
           type: string
           description: ''
@@ -1239,7 +1290,9 @@ components:
       type: object
       properties:
         severity:
-          $ref: '#/components/schemas/SeverityLevel'
+          allOf:
+            - $ref: '#/components/schemas/SeverityLevel'
+          description: 'Severity of the notification, might be used in clients to determine how to display the notification'
         title:
           type: string
           description: Message title to display to the user
