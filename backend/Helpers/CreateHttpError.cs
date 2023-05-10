@@ -59,15 +59,6 @@ public static class CreateHttpError
     /// <summary>
     /// 401 Unauthorized
     /// </summary>
-    /// <param name="message"></param>
-    /// <param name="notificationMessage"></param>
-    /// <param name="fields"></param>
-    /// <returns></returns>
-    public static ErrorDetails InvalidCredentials(string message, string notificationMessage, params string[] fields) =>
-        Generic(StatusCodes.Status401Unauthorized, "Unauthorized", "Invalid credentials", null, ToDict(fields, message), new UserNotification(UserNotification.SeverityLevel.Error, "Invalid credentials", notificationMessage));
-    /// <summary>
-    /// 401 Unauthorized
-    /// </summary>
     /// <param name="fields"></param>
     /// <returns></returns>
     public static ErrorDetails InvalidPassword(params string[] fields) =>

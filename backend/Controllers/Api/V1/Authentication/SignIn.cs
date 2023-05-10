@@ -48,7 +48,14 @@ public partial class AuthenticationController
         UserEntity? user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Name == body.UsernameOrEmail || u.Email == body.UsernameOrEmail, cancellationToken);
         if (user == null || !PasswordUtils.CheckPassword(body.Password, user.PasswordHash))
         {
-            return CreateHttpError.InvalidCredentials("Invalid username/email/password", "Please check that your entered username/email and password are correct", "username", "password").ToActionResult();
+            return CreateHttpError.Generic(
+                    StatusCodes.Status401Unauthorized,
+                    "invalid_credentials",
+                    "Please check that your entered the correct username/email and password",
+                    UserNotification.SeverityLevel.Warning,
+                    "Oops!",
+                    "Please check that your entered the correct username/email and password"
+                ).ToActionResult();
         }
 
         if (!user.EmailVerified)
