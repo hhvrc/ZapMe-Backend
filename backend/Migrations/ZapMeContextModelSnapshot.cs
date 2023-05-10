@@ -398,7 +398,7 @@ namespace ZapMe.Migrations
                         .HasColumnType("character varying(120)")
                         .HasColumnName("passwordHash");
 
-                    b.Property<Guid>("ProfilePictureId")
+                    b.Property<Guid?>("ProfilePictureId")
                         .HasColumnType("uuid")
                         .HasColumnName("profilePictureId");
 
@@ -585,8 +585,7 @@ namespace ZapMe.Migrations
                     b.HasOne("ZapMe.Data.Models.ImageEntity", "ProfilePicture")
                         .WithMany()
                         .HasForeignKey("ProfilePictureId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("ProfilePicture");
                 });

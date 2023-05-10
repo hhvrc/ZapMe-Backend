@@ -45,7 +45,7 @@ public readonly struct UserDto
     /// 
     /// </summary>
     [JsonPropertyOrder(5)]
-    public Guid ProfilePictureId { get; init; }
+    public Guid? ProfilePictureId { get; init; }
 
     /// <summary>
     /// 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Options;
 using OneOf;
 using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.Controllers.Api.V1.Models;
@@ -41,7 +42,7 @@ public partial class AccountController
         [FromServices] ICloudflareTurnstileService cfTurnstileService,
         [FromServices] IDebounceService debounceService,
         [FromServices] IEmailVerificationManager emailVerificationManager,
-        [FromServices] ZapMeOptions options,
+        [FromServices] IOptions<ZapMeOptions> options,
         CancellationToken cancellationToken)
     {
         if (User.Identity?.IsAuthenticated ?? false)
@@ -92,12 +93,12 @@ public partial class AccountController
             return CreateHttpError.InvalidModelState((nameof(body.Email), "Disposable Emails are not allowed")).ToActionResult();
         }
 
-        if (body.AcceptedPrivacyPolicyVersion < options.PrivacyPolicyVersion)
+        if (body.AcceptedPrivacyPolicyVersion < options.Value.PrivacyPolicyVersion)
         {
             return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "review_privpol", "User needs to accept new Privacy Policy", UserNotification.SeverityLevel.Error, "Please read and accept the new Privacy Policy before creating an account").ToActionResult();
         }
 
-        if (body.AcceptedTermsOfServiceVersion < options.TermsOfServiceVersion)
+        if (body.AcceptedTermsOfServiceVersion < options.Value.TermsOfServiceVersion)
         {
             return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "review_tos", "User needs to accept new Terms of Service", UserNotification.SeverityLevel.Error, "Please read and accept the new Terms of Service before creating an account").ToActionResult();
         }

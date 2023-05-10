@@ -9,7 +9,6 @@ public sealed class ImageEntity
 {
     public const string TableName = "images";
     public const string TableSha256Index = TableName + "_sha256_idx";
-    public static readonly Guid DefaultImageId = Guid.Parse("00000000-0000-0000-0000-000000000001");
 
     /// <summary>
     /// 

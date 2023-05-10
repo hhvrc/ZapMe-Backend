@@ -12,7 +12,7 @@ using ZapMe.Data;
 namespace ZapMe.Migrations
 {
     [DbContext(typeof(ZapMeContext))]
-    [Migration("20230510095622_InitialCreate")]
+    [Migration("20230510120949_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -401,7 +401,7 @@ namespace ZapMe.Migrations
                         .HasColumnType("character varying(120)")
                         .HasColumnName("passwordHash");
 
-                    b.Property<Guid>("ProfilePictureId")
+                    b.Property<Guid?>("ProfilePictureId")
                         .HasColumnType("uuid")
                         .HasColumnName("profilePictureId");
 
@@ -588,8 +588,7 @@ namespace ZapMe.Migrations
                     b.HasOne("ZapMe.Data.Models.ImageEntity", "ProfilePicture")
                         .WithMany()
                         .HasForeignKey("ProfilePictureId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("ProfilePicture");
                 });

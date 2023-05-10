@@ -86,7 +86,7 @@ namespace ZapMe.Migrations
                     passwordHash = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
                     acceptedPrivacyPolicyVersion = table.Column<long>(type: "bigint", nullable: false),
                     acceptedTermsOfServiceVersion = table.Column<long>(type: "bigint", nullable: false),
-                    profilePictureId = table.Column<Guid>(type: "uuid", nullable: false),
+                    profilePictureId = table.Column<Guid>(type: "uuid", nullable: true),
                     statusOnline = table.Column<int>(type: "integer", nullable: false),
                     statusText = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     createdAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),

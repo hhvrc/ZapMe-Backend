@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
+﻿using System.Text.Json;
 using ZapMe.Constants;
 using ZapMe.Data.Models;
 using ZapMe.Enums;
@@ -14,9 +13,6 @@ public static class DataSeeders
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        if (!context.Images.Any())
-            await SeedImagesAsync(context, cancellationToken);
-
         if (!context.Users.Any())
             await SeedAccountsAsync(context, cancellationToken);
 
@@ -27,24 +23,6 @@ public static class DataSeeders
             Console.WriteLine("Server shutting down...", cancellationToken);
             Environment.Exit(0);
         }
-    }
-
-    private static async Task SeedImagesAsync(ZapMeContext context, CancellationToken cancellationToken)
-    {
-        await context.Images.AddAsync(new ImageEntity
-        {
-            Id = ImageEntity.DefaultImageId,
-            Height = 0,
-            Width = 0,
-            FrameCount = 0,
-            SizeBytes = 0,
-            Extension = String.Empty,
-            Sha256 = "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
-            R2RegionName = String.Empty,
-            UploaderId = null,
-            Uploader = null
-        }, cancellationToken);
-        await context.SaveChangesAsync(cancellationToken);
     }
 
     private static async Task SeedAccountsAsync(ZapMeContext context, CancellationToken cancellationToken)
@@ -94,7 +72,6 @@ public static class DataSeeders
                 PasswordHash = passwordHash,
                 AcceptedPrivacyPolicyVersion = Int32.MaxValue,
                 AcceptedTermsOfServiceVersion = Int32.MaxValue,
-                ProfilePictureId = ImageEntity.DefaultImageId,
                 OnlineStatus = UserStatus.Online,
                 OnlineStatusText = "I'm online!",
                 CreatedAt = _CreationTime,

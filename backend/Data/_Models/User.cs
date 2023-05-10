@@ -47,7 +47,7 @@ public sealed class UserEntity
     public uint AcceptedTermsOfServiceVersion { get; set; }
 
     /// <inheritdoc/>
-    public Guid ProfilePictureId { get; set; }
+    public Guid? ProfilePictureId { get; set; }
 
     /// <summary>
     /// 
