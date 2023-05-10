@@ -67,8 +67,7 @@ namespace ZapMe.Migrations
                     sizeBytes = table.Column<long>(type: "bigint", nullable: false),
                     extension = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
                     sha256 = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    s3BucketName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    s3RegionName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    r2RegionName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
                     uploaderId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -85,7 +84,8 @@ namespace ZapMe.Migrations
                     email = table.Column<string>(type: "character varying(320)", maxLength: 320, nullable: false),
                     emailVerified = table.Column<bool>(type: "boolean", nullable: false),
                     passwordHash = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
-                    acceptedTosVersion = table.Column<int>(type: "integer", nullable: false),
+                    acceptedPrivacyPolicyVersion = table.Column<long>(type: "bigint", nullable: false),
+                    acceptedTermsOfServiceVersion = table.Column<long>(type: "bigint", nullable: false),
                     profilePictureId = table.Column<Guid>(type: "uuid", nullable: false),
                     statusOnline = table.Column<int>(type: "integer", nullable: false),
                     statusText = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
@@ -171,7 +171,7 @@ namespace ZapMe.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     userId = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
+                    nickName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
                     ipAddress = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
                     country = table.Column<string>(type: "character varying(2)", maxLength: 2, nullable: false),
                     userAgentId = table.Column<Guid>(type: "uuid", nullable: false),

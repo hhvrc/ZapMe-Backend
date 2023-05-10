@@ -12,7 +12,7 @@ public sealed class ZapMeOptions
 
     public static void Register(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddOptions<ZapMeOptions>().ValidateOnStart();
+        services.AddOptions<ZapMeOptions>().Bind(configuration).ValidateOnStart();
 
         ZapMeAuthenticationOptions.Register(services, configuration);
         CloudflareOptions.Register(services, configuration);

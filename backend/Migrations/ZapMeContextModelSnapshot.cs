@@ -104,17 +104,11 @@ namespace ZapMe.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("height");
 
-                    b.Property<string>("S3BucketName")
+                    b.Property<string>("R2RegionName")
                         .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)")
-                        .HasColumnName("s3BucketName");
-
-                    b.Property<string>("S3RegionName")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
-                        .HasColumnName("s3RegionName");
+                        .HasColumnName("r2RegionName");
 
                     b.Property<string>("Sha256")
                         .IsRequired()
@@ -265,10 +259,10 @@ namespace ZapMe.Migrations
                         .HasColumnType("character varying(40)")
                         .HasColumnName("ipAddress");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("NickName")
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)")
-                        .HasColumnName("name");
+                        .HasColumnName("nickName");
 
                     b.Property<Guid>("UserAgentId")
                         .HasColumnType("uuid")
@@ -352,9 +346,13 @@ namespace ZapMe.Migrations
                         .HasColumnName("id")
                         .HasDefaultValueSql("gen_random_uuid()");
 
-                    b.Property<int>("AcceptedTosVersion")
-                        .HasColumnType("integer")
-                        .HasColumnName("acceptedTosVersion");
+                    b.Property<long>("AcceptedPrivacyPolicyVersion")
+                        .HasColumnType("bigint")
+                        .HasColumnName("acceptedPrivacyPolicyVersion");
+
+                    b.Property<long>("AcceptedTermsOfServiceVersion")
+                        .HasColumnType("bigint")
+                        .HasColumnName("acceptedTermsOfServiceVersion");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
