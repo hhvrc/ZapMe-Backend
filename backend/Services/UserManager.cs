@@ -27,7 +27,7 @@ public sealed class UserManager : IUserManager
     {
         if (_dbContext.Users.Any(u => u.Name == name || u.Email == email))
         {
-            return CreateHttpError.Generic(StatusCodes.Status409Conflict, "Username/Email taken", "The given username or email is already associated with an account in the database", UserNotification.SeverityLevel.Warning, "Username/Email already taken", "Please choose a different Username or Email");
+            return CreateHttpError.UserNameOrEmailTaken();
         }
 
         string passwordHash = PasswordUtils.HashPassword(password);

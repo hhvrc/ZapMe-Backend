@@ -29,7 +29,7 @@ public partial class AccountController
     {
         if (!await passwordResetManager.TryCompletePasswordReset(body.Token, body.NewPassword, cancellationToken))
         {
-            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Bad reset token", "The reset token is invalid, expired, or has already been used.", UserNotification.SeverityLevel.Error, "Bad reset token", "The reset token is invalid, expired, or has already been used.").ToActionResult();
+            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Bad reset token", "The reset token is invalid, expired, or has already been used.", UserNotification.SeverityLevel.Error, "Token invalid, expired, or has already been used.").ToActionResult();
         }
 
         return Ok();

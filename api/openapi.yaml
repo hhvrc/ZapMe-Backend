@@ -1285,21 +1285,17 @@ components:
       additionalProperties: false
     UserNotification:
       required:
+        - content
         - severity
-        - title
       type: object
       properties:
         severity:
           allOf:
             - $ref: '#/components/schemas/SeverityLevel'
           description: 'Severity of the notification, might be used in clients to determine how to display the notification'
-        title:
+        content:
           type: string
-          description: Message title to display to the user
-        message:
-          type: string
-          description: User friendly message about this notification
-          nullable: true
+          description: 'Content of the notification, might be HTML'
       additionalProperties: false
       description: "System notification to be displayed to the user, do not confuse with user notifications\r\nThis is a hint and clients can choose to ignore it or implement notifications to be independent of this"
     UserReport:

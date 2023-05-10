@@ -6,11 +6,10 @@
 /// </summary>
 public sealed class UserNotification
 {
-    public UserNotification(SeverityLevel severity, string title, string? detail = null)
+    public UserNotification(SeverityLevel severity, string message)
     {
         Severity = severity;
-        Title = title;
-        Message = detail;
+        Content = message;
     }
 
     public enum SeverityLevel
@@ -26,12 +25,7 @@ public sealed class UserNotification
     public SeverityLevel Severity { get; set; }
 
     /// <summary>
-    /// Message title to display to the user
+    /// Content of the notification, might be HTML
     /// </summary>
-    public string Title { get; set; }
-
-    /// <summary>
-    /// User friendly message about this notification
-    /// </summary>
-    public string? Message { get; set; }
+    public string Content { get; set; }
 }

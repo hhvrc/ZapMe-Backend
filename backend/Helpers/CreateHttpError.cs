@@ -12,22 +12,22 @@ public static class CreateHttpError
         new ErrorDetails(httpCode, code, detail, suggestion, fields, notification);
     public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion = null) =>
         Generic(httpCode, code, detail, suggestion, null, null);
-    public static ErrorDetails Generic(int httpCode, string code, string detail, UserNotification.SeverityLevel notificationSeverity, string notificationTitle, string notificationDetail) =>
-        Generic(httpCode, code, detail, null, null, new UserNotification(notificationSeverity, notificationTitle, notificationDetail));
-    public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion, UserNotification.SeverityLevel notificationSeverity, string notificationTitle, string notificationDetail) =>
-        Generic(httpCode, code, detail, suggestion, null, new UserNotification(notificationSeverity, notificationTitle, notificationDetail));
+    public static ErrorDetails Generic(int httpCode, string code, string detail, UserNotification.SeverityLevel notificationSeverity, string notificationContent) =>
+        Generic(httpCode, code, detail, null, null, new UserNotification(notificationSeverity, notificationContent));
+    public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion, UserNotification.SeverityLevel notificationSeverity, string notificationContent) =>
+        Generic(httpCode, code, detail, suggestion, null, new UserNotification(notificationSeverity, notificationContent));
     public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion = null, params (string field, string error)[] fields) =>
         Generic(httpCode, code, detail, suggestion, ToDict(fields), null);
     public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion = null, params (string field, string[] errors)[] fields) =>
         Generic(httpCode, code, detail, suggestion, ToDict(fields), null);
-    public static ErrorDetails Generic(int httpCode, string code, string detail, UserNotification.SeverityLevel notificationSeverity, string notificationTitle, string notificationDetail, params (string field, string error)[] fields) =>
-        Generic(httpCode, code, detail, null, ToDict(fields), new UserNotification(notificationSeverity, notificationTitle, notificationDetail));
-    public static ErrorDetails Generic(int httpCode, string code, string detail, UserNotification.SeverityLevel notificationSeverity, string notificationTitle, string notificationDetail, params (string field, string[] errors)[] fields) =>
-        Generic(httpCode, code, detail, null, ToDict(fields), new UserNotification(notificationSeverity, notificationTitle, notificationDetail));
-    public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion, UserNotification.SeverityLevel notificationSeverity, string notificationTitle, string notificationDetail, params (string field, string error)[] fields) =>
-        Generic(httpCode, code, detail, suggestion, ToDict(fields), new UserNotification(notificationSeverity, notificationTitle, notificationDetail));
-    public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion, UserNotification.SeverityLevel notificationSeverity, string notificationTitle, string notificationDetail, params (string field, string[] errors)[] fields) =>
-        Generic(httpCode, code, detail, suggestion, ToDict(fields), new UserNotification(notificationSeverity, notificationTitle, notificationDetail));
+    public static ErrorDetails Generic(int httpCode, string code, string detail, UserNotification.SeverityLevel notificationSeverity, string notificationContent, params (string field, string error)[] fields) =>
+        Generic(httpCode, code, detail, null, ToDict(fields), new UserNotification(notificationSeverity, notificationContent));
+    public static ErrorDetails Generic(int httpCode, string code, string detail, UserNotification.SeverityLevel notificationSeverity, string notificationContent, params (string field, string[] errors)[] fields) =>
+        Generic(httpCode, code, detail, null, ToDict(fields), new UserNotification(notificationSeverity, notificationContent));
+    public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion, UserNotification.SeverityLevel notificationSeverity, string notificationContent, params (string field, string error)[] fields) =>
+        Generic(httpCode, code, detail, suggestion, ToDict(fields), new UserNotification(notificationSeverity, notificationContent));
+    public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion, UserNotification.SeverityLevel notificationSeverity, string notificationContent, params (string field, string[] errors)[] fields) =>
+        Generic(httpCode, code, detail, suggestion, ToDict(fields), new UserNotification(notificationSeverity, notificationContent));
 
     /// <summary>
     /// 400 Bad Request
@@ -62,17 +62,19 @@ public static class CreateHttpError
     /// <param name="fields"></param>
     /// <returns></returns>
     public static ErrorDetails InvalidPassword(params string[] fields) =>
-        Generic(StatusCodes.Status401Unauthorized, "Unauthorized", "Invalid password", null, ToDict(fields, "Invalid password"), new UserNotification(UserNotification.SeverityLevel.Error, "Invalid password", "The password you entered is incorrect."));
+        Generic(StatusCodes.Status401Unauthorized, "Unauthorized", "Invalid password", null, ToDict(fields, "Invalid password"), new UserNotification(UserNotification.SeverityLevel.Error, "Invalid password"));
+    public static ErrorDetails UserNameOrEmailTaken() =>
+        Generic(StatusCodes.Status401Unauthorized, "Unauthorized", "Username or email already taken", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "Username or email already taken"));
     /// <summary>
     /// 429 Too Many Requests
     /// </summary>
     /// <returns></returns>
     public static ErrorDetails TooManyRequests() =>
-        Generic(StatusCodes.Status429TooManyRequests, "Too Many Requests", "You have exceeded the rate limit", null, null, new UserNotification(UserNotification.SeverityLevel.Warning, "Rate Limit Exceeded", "You have exceeded the rate limit. Please try again later."));
+        Generic(StatusCodes.Status429TooManyRequests, "Too Many Requests", "You have exceeded the rate limit", null, null, new UserNotification(UserNotification.SeverityLevel.Warning, "Rate limit exceeded, please try again later"));
     /// <summary>
     /// 500 Internal Server Error
     /// </summary>
     /// <returns></returns>
     public static ErrorDetails InternalServerError() =>
-        Generic(StatusCodes.Status500InternalServerError, "Internal Server Error", "An internal server error occurred.", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "Server error", "Please try again later"));
+        Generic(StatusCodes.Status500InternalServerError, "Internal Server Error", "An internal server error occurred.", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "Internal server error, please try again later"));
 }
