@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using ZapMe.Authentication;
 using ZapMe.Authentication.Models;
 using ZapMe.Constants;
@@ -35,7 +36,7 @@ public partial class AuthenticationController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status413RequestEntityTooLarge)]
-    public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] ILockOutStore lockOutStore, [FromServices] ZapMeOptions options, CancellationToken cancellationToken)
+    public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] ILockOutStore lockOutStore, [FromServices] IOptions<ZapMeOptions> options, CancellationToken cancellationToken)
     {
         if (User.Identity?.IsAuthenticated ?? false)
         {
@@ -76,17 +77,17 @@ public partial class AuthenticationController
             return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Unverified Email", "Email has not been verified", UserNotification.SeverityLevel.Error, "Email not verified", "Please verify your email address before signing in").ToActionResult();
         }
 
-        if (user.AcceptedPrivacyPolicyVersion < options.PrivacyPolicyVersion)
+        if (user.AcceptedPrivacyPolicyVersion < options.Value.PrivacyPolicyVersion)
         {
             return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Privacy Policy Review Required", "User needs to accept new Privacy Policy", UserNotification.SeverityLevel.Error, "Privacy Policy not accepted", "Please accept the Privacy Policy before signing in").ToActionResult();
         }
 
-        if (user.AcceptedTermsOfServiceVersion < options.TermsOfServiceVersion)
+        if (user.AcceptedTermsOfServiceVersion < options.Value.TermsOfServiceVersion)
         {
             return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Terms of Service Review Required", "User needs to accept new Terms of Service", UserNotification.SeverityLevel.Error, "Terms of Service not accepted", "Please accept the Terms of Service before signing in").ToActionResult();
         }
 
-        if (user.AcceptedPrivacyPolicyVersion > options.PrivacyPolicyVersion || user.AcceptedTermsOfServiceVersion > options.TermsOfServiceVersion)
+        if (user.AcceptedPrivacyPolicyVersion > options.Value.PrivacyPolicyVersion || user.AcceptedTermsOfServiceVersion > options.Value.TermsOfServiceVersion)
         {
             return CreateHttpError.InternalServerError().ToActionResult();
         }
