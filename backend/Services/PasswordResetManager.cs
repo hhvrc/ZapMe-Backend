@@ -122,9 +122,8 @@ public sealed class PasswordResetManager : IPasswordResetManager
 
     public Task<int> RemoveExpiredRequests(CancellationToken cancellationToken)
     {
-        DateTime minCreatedAt = DateTime.UtcNow - TimeSpan.FromMinutes(30);
         return _dbContext.PasswordResetRequests
-            .Where(x => x.CreatedAt < minCreatedAt)
+            .Where(x => x.CreatedAt < DateTime.UtcNow.AddHours(-24))
             .ExecuteDeleteAsync(cancellationToken);
     }
 }

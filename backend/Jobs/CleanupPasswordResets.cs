@@ -8,7 +8,7 @@ namespace ZapMe.Jobs;
 /// Cleans up expired password requests
 /// Runs once every 10 minutes
 /// </summary>
-[QuartzTimer("CleanupPasswordResets", 10, QuartzTimer.Interval.Minute)]
+[QuartzTimer("CleanupPasswordResets", QuartzTimer.Predefined.Hourly)]
 public sealed class CleanupPasswordResets : IJob
 {
     private readonly IPasswordResetManager _passwordResetManager;

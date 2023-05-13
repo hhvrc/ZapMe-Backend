@@ -99,7 +99,7 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
     public Task<int> RemoveExpiredRequestsAsync(CancellationToken cancellationToken = default)
     {
         return _dbContext.EmailVerificationRequests
-                .Where(x => x.CreatedAt < DateTime.UtcNow.AddHours(-24))
-                .ExecuteDeleteAsync(cancellationToken);
+            .Where(x => x.CreatedAt < DateTime.UtcNow.AddHours(-24))
+            .ExecuteDeleteAsync(cancellationToken);
     }
 }
