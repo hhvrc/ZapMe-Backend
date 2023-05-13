@@ -19,7 +19,6 @@ public sealed class LockOutStore : ILockOutStore
     {
         LockOutEntity lockout = new LockOutEntity
         {
-            User = null!, // TODO: wtf do i do now? ask on C# discord
             UserId = userId,
             Reason = reason,
             Flags = flags,
