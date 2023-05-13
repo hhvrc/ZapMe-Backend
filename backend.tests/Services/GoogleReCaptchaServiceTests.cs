@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RichardSzalay.MockHttp;
 using System.Text.Json;
@@ -28,8 +27,9 @@ public sealed class GoogleReCaptchaServiceTests
         _httpClientFactoryMock = new Mock<IHttpClientFactory>();
         _reCaptchaSecret = _faker.Random.AlphaNumeric(32);
 
-        _options = Microsoft.Extensions.Options.Options.Create(new GoogleReCaptchaOptions { 
-            SiteKey = "", 
+        _options = Microsoft.Extensions.Options.Options.Create(new GoogleReCaptchaOptions
+        {
+            SiteKey = "",
             SecretKey = _reCaptchaSecret
         });
 

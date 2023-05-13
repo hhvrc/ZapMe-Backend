@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RichardSzalay.MockHttp;
 using System.Text.Json;
@@ -28,7 +27,8 @@ public sealed class CloudflareTurnstileServiceTests
         _httpClientFactoryMock = new Mock<IHttpClientFactory>();
         _reCaptchaSecret = _faker.Random.AlphaNumeric(32);
 
-        _options = Microsoft.Extensions.Options.Options.Create(new CloudflareTurnstileOptions {
+        _options = Microsoft.Extensions.Options.Options.Create(new CloudflareTurnstileOptions
+        {
             SiteKey = "",
             SecretKey = _reCaptchaSecret
         });

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using ZapMe.Attributes;
+﻿using ZapMe.Attributes;
 
 namespace ZapMe.Controllers.Api.V1.Authentication.Models;
 
