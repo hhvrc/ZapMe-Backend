@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 using OneOf;
+using ZapMe.Attributes;
 using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data.Models;
@@ -29,7 +30,7 @@ public partial class AccountController
     /// <response code="201">Created account</response>
     /// <response code="400">Error details</response>
     /// <response code="409">Error details</response>
-    [AllowAnonymous]
+    [AnonymousOnly]
     [RequestSizeLimit(1024)]
     [HttpPost(Name = "CreateAccount")]
     [Consumes(Application.Json)]
@@ -45,11 +46,6 @@ public partial class AccountController
         [FromServices] IOptions<ZapMeOptions> options,
         CancellationToken cancellationToken)
     {
-        if (User.Identity?.IsAuthenticated ?? false)
-        {
-            return CreateHttpError.AnonymousOnly().ToActionResult();
-        }
-
         // Verify turnstile token
         CloudflareTurnstileVerifyResponse reCaptchaResponse = await cfTurnstileService.VerifyUserResponseTokenAsync(body.TurnstileResponse, this.GetRemoteIP(), cancellationToken);
         if (!reCaptchaResponse.Success)

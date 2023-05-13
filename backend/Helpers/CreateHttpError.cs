@@ -51,12 +51,6 @@ public static class CreateHttpError
     public static ErrorDetails InvalidModelState(params (string field, string[] errors)[] fields) =>
         InvalidModelState(ToDict(fields));
     /// <summary>
-    /// 403 Forbidden
-    /// </summary>
-    /// <returns></returns>
-    public static ErrorDetails AnonymousOnly() =>
-        Generic(StatusCodes.Status403Forbidden, "Anonymous Only", "This endpoint is only available to anonymous users", "Please sign out, or remove the Authorization header and try again", null, null);
-    /// <summary>
     /// 401 Unauthorized
     /// </summary>
     /// <param name="fields"></param>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ZapMe.Attributes;
 using ZapMe.Authentication.Models;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Helpers;
@@ -17,6 +18,7 @@ public partial class AuthenticationController
     /// <response code="200">Returns SignInOk along with a Cookie with similar data</response>
     /// <response code="401">Error details</response>
     /// <response code="403">Error details</response>
+    [AnonymousOnly]
     [RequestSizeLimit(1024)]
     [HttpPost("oauth-signin", Name = "AuthSignInOAuth")]
     [Produces(Application.Json)]
@@ -25,11 +27,6 @@ public partial class AuthenticationController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> SignInOAuth([FromQuery] string provider, CancellationToken cancellationToken)
     {
-        if (User.Identity?.IsAuthenticated ?? false)
-        {
-            return CreateHttpError.AnonymousOnly().ToActionResult();
-        }
-
         if (!await HttpContext.IsProviderSupportedAsync(provider))
         {
             return CreateHttpError.Generic(StatusCodes.Status406NotAcceptable, "Provider not supported", $"The OAuth provider \"{provider}\" is not supported", "Get the list of supported providers from the /api/v1/auth/oauth-providers endpoint").ToActionResult();

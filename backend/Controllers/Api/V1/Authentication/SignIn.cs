@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using ZapMe.Attributes;
 using ZapMe.Authentication;
 using ZapMe.Authentication.Models;
 using ZapMe.Constants;
@@ -27,6 +28,7 @@ public partial class AuthenticationController
     /// <response code="200">Returns SignInOk along with a Cookie with similar data</response>
     /// <response code="400">Error details</response>
     /// <response code="500">Error details</response>
+    [AnonymousOnly]
     [RequestSizeLimit(1024)]
     [HttpPost("signin", Name = "AuthSignIn")]
     [Consumes(Application.Json)]
@@ -38,11 +40,6 @@ public partial class AuthenticationController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status413RequestEntityTooLarge)]
     public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] ILockOutStore lockOutStore, [FromServices] IOptions<ZapMeOptions> options, CancellationToken cancellationToken)
     {
-        if (User.Identity?.IsAuthenticated ?? false)
-        {
-            return CreateHttpError.AnonymousOnly().ToActionResult();
-        }
-
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);
 
         UserEntity? user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Name == body.UsernameOrEmail || u.Email == body.UsernameOrEmail, cancellationToken);
