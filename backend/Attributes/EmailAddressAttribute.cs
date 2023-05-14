@@ -6,10 +6,20 @@ using ZapMe.Utils;
 
 namespace ZapMe.Attributes;
 
+/// <summary>
+/// Custom attribute used for validating email address properties or fields.
+/// </summary>
+/// <remarks>
+/// This attribute implements the <see cref="ValidationAttribute"/> and <see cref="IParameterAttribute"/> interfaces.
+/// </remarks>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
 public sealed class EmailAddressAttribute : ValidationAttribute, IParameterAttribute
 {
+    /// <summary>
+    /// The example email to use for the OpenApi schema.
+    /// </summary>
     public const string ExampleEmail = "user.name@example.com";
+
     private const string _ErrMsgMustBeString = "Email address must be a string";
     private static readonly string _ErrMsgTooShort = $"Email address must be at least {GeneralHardLimits.EmailAddressMinLength} characters long";
     private static readonly string _ErrMsgTooLong = $"Email address must be at most {GeneralHardLimits.EmailAddressMaxLength} characters long";
@@ -19,11 +29,16 @@ public sealed class EmailAddressAttribute : ValidationAttribute, IParameterAttri
 
     public bool AllowDisplayName { get; }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EmailAddressAttribute"/> class with the specified value indicating whether a display name is allowed in an email address.
+    /// </summary>
+    /// <param name="allowDisplayName">Indicates whether a display name is allowed in an email address.</param>
     public EmailAddressAttribute(bool allowDisplayName = false)
     {
         AllowDisplayName = allowDisplayName;
     }
 
+    /// <inheritdoc/>
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
         if (value == null)
@@ -65,6 +80,7 @@ public sealed class EmailAddressAttribute : ValidationAttribute, IParameterAttri
         return ValidationResult.Success;
     }
 
+    /// <inheritdoc/>
     public void Apply(OpenApiSchema schema)
     {
         schema.MinLength = GeneralHardLimits.EmailAddressMinLength;
@@ -72,6 +88,8 @@ public sealed class EmailAddressAttribute : ValidationAttribute, IParameterAttri
         schema.Format = "email";
         schema.Example = new OpenApiString(ExampleEmail);
     }
+
+    /// <inheritdoc/>
     public void Apply(OpenApiParameter parameter)
     {
         Apply(parameter.Schema);

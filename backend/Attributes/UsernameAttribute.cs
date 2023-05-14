@@ -7,11 +7,25 @@ using ZapMe.Utils;
 
 namespace ZapMe.Attributes;
 
+/// <summary>
+/// An attribute used to validate whether a username is valid.
+/// </summary>
+/// <remarks>
+/// Implements <see cref="IParameterAttribute"/> and inherits from <see cref="ValidationAttribute"/>.
+/// </remarks>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
 public sealed class UsernameAttribute : ValidationAttribute, IParameterAttribute
 {
+    /// <summary>
+    /// Regular expression for username validation.
+    /// </summary>
     public const string UsernameRegex = /* lang=regex */ @"^[^\s].*[^\s]$";
+
+    /// <summary>
+    /// Example username used to generate OpenApi documentation.
+    /// </summary>
     public const string ExampleUsername = "MyUsername";
+
     private const string _ErrMsgMustBeString = "Username must be a string";
     private static readonly string _ErrMsgTooShort = $"Username must be at least {GeneralHardLimits.UsernameMinLength} characters long";
     private static readonly string _ErrMsgTooLong = $"Username must be at most {GeneralHardLimits.UsernameMaxLength} characters long";
@@ -19,13 +33,21 @@ public sealed class UsernameAttribute : ValidationAttribute, IParameterAttribute
     private const string _ErrMsgNoObnoxiousChars = "Username must not contain obnoxious characters";
     private const string _ErrMsgCannotBeEmailAddress = "Username cannot be an email address";
 
+    /// <summary>
+    /// Indicates whether validation should be performed.
+    /// </summary>
     public bool ShouldValidate { get; }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UsernameAttribute"/> class with the specified validation behavior.
+    /// </summary>
+    /// <param name="shouldValidate">True if validation should be performed; otherwise, false.</param>
     public UsernameAttribute(bool shouldValidate)
     {
         ShouldValidate = shouldValidate;
     }
 
+    /// <inheritdoc/>
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
         if (!ShouldValidate) return ValidationResult.Success;
@@ -68,6 +90,7 @@ public sealed class UsernameAttribute : ValidationAttribute, IParameterAttribute
         return ValidationResult.Success;
     }
 
+    /// <inheritdoc/>
     public void Apply(OpenApiSchema schema)
     {
         if (ShouldValidate)
@@ -79,6 +102,8 @@ public sealed class UsernameAttribute : ValidationAttribute, IParameterAttribute
 
         schema.Example = new OpenApiString(ExampleUsername);
     }
+
+    /// <inheritdoc/>
     public void Apply(OpenApiParameter parameter)
     {
         Apply(parameter.Schema);
