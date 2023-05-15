@@ -81,7 +81,7 @@ services.AddDebounceService(configuration);
 //services.AddGoogleReCaptchaService(configuration);
 services.AddMailGunService(configuration);
 
-services.AddTransient<IUserManager, UserManager>();
+services.AddTransient<IUserStore, UserStore>();
 services.AddTransient<IPasswordResetRequestStore, PasswordResetRequestStore>();
 services.AddTransient<IPasswordResetManager, PasswordResetManager>();
 services.AddTransient<IUserAgentStore, UserAgentStore>();

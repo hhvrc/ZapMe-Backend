@@ -14,11 +14,11 @@ namespace ZapMe.Controllers.Api.V1;
 public sealed partial class UserController : ControllerBase
 {
     private readonly ZapMeContext _dbContext;
-    private readonly IUserManager _userManager;
+    private readonly IUserStore _userStore;
 
-    public UserController(ZapMeContext dbContext, IUserManager userManager)
+    public UserController(ZapMeContext dbContext, IUserStore userManager)
     {
         _dbContext = dbContext;
-        _userManager = userManager;
+        _userStore = userManager;
     }
 }

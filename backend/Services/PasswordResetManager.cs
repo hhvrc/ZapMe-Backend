@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
@@ -13,15 +14,13 @@ namespace ZapMe.Services;
 public sealed class PasswordResetManager : IPasswordResetManager
 {
     private readonly ZapMeContext _dbContext;
-    private readonly IUserManager _userManager;
     private readonly IMailGunService _mailGunService;
     private readonly IPasswordResetRequestStore _passwordResetRequestStore;
     private readonly ILogger<PasswordResetManager> _logger;
 
-    public PasswordResetManager(ZapMeContext dbContext, IUserManager userManager, IMailGunService emailGunService, IPasswordResetRequestStore passwordResetRequestStore, ILogger<PasswordResetManager> logger)
+    public PasswordResetManager(ZapMeContext dbContext, IMailGunService emailGunService, IPasswordResetRequestStore passwordResetRequestStore, ILogger<PasswordResetManager> logger)
     {
         _dbContext = dbContext;
-        _userManager = userManager;
         _mailGunService = emailGunService;
         _passwordResetRequestStore = passwordResetRequestStore;
         _logger = logger;
@@ -56,6 +55,11 @@ public sealed class PasswordResetManager : IPasswordResetManager
 
         // Send recovery secret to email
         bool success = await _mailGunService.SendEmailAsync("Hello", user.Name, user.Email, "Password recovery", "password-reset", mailgunValues, cancellationToken);
+        if (!success)
+        {
+            _logger.LogError("Failed to send password reset email to {Email}", user.Email);
+            return CreateHttpError.InternalServerError();
+        }
 
         // Commit transaction
         await transaction.CommitAsync(cancellationToken);

@@ -1,15 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
-using OneOf;
 using ZapMe.Attributes;
 using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data.Models;
 using ZapMe.DTOs;
+using ZapMe.Enums;
 using ZapMe.Helpers;
 using ZapMe.Options;
 using ZapMe.Services.Interfaces;
+using ZapMe.Utils;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
@@ -100,13 +101,30 @@ public partial class AccountController
 
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);
 
+        UserEntity user = new UserEntity
+        {
+            Name = body.Username,
+            Email = body.Email,
+            EmailVerified = false,
+            PasswordHash = PasswordUtils.HashPassword(body.Password),
+            AcceptedPrivacyPolicyVersion = body.AcceptedPrivacyPolicyVersion,
+            AcceptedTermsOfServiceVersion = body.AcceptedTermsOfServiceVersion,
+            OnlineStatus = UserStatus.Online,
+            OnlineStatusText = String.Empty
+        };
+
+        if (_dbContext.Users.Any(u => u.Name == user.Name || u.Email == user.Email))
+        {
+            return CreateHttpError.UserNameOrEmailTaken().ToActionResult();
+        }
+
         using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         // Create account
-        OneOf<UserEntity, ErrorDetails> tryCreateAccountResult = await _userManager.TryCreateAsync(body.Username, body.Email, body.Password, emailVerified: false, cancellationToken);
-        if (tryCreateAccountResult.TryPickT1(out ErrorDetails errorDetails, out UserEntity user))
+        bool success = await _userStore.TryCreateAsync(user, cancellationToken);
+        if (!success)
         {
-            return errorDetails.ToActionResult();
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
         // Send email verification
