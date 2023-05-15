@@ -15,7 +15,7 @@ public readonly struct UserDto
         Status = UserStatus.Offline;
         StatusText = String.Empty;
         CreatedAt = DateTime.MinValue;
-        LastOnline = DateTime.MinValue;
+        LastSeenAt = DateTime.MinValue;
     }
     public UserDto(UserEntity user)
     {
@@ -25,7 +25,7 @@ public readonly struct UserDto
         Status = user.OnlineStatus;
         StatusText = user.OnlineStatusText;
         CreatedAt = user.CreatedAt;
-        LastOnline = user.LastOnline;
+        LastSeenAt = user.LastOnline;
     }
 
     /// <summary>
@@ -66,8 +66,8 @@ public readonly struct UserDto
     public DateTime CreatedAt { get; init; }
 
     /// <summary>
-    /// Last time this user was online
+    /// Last time this user was seen online
     /// </summary>
     [JsonPropertyOrder(16)]
-    public DateTime LastOnline { get; init; }
+    public DateTime LastSeenAt { get; init; }
 }
