@@ -90,11 +90,6 @@ public partial class AuthenticationController
             return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "review_tos", "User needs to accept new Terms of Service", UserNotification.SeverityLevel.Error, "Please read and accept the new Terms of Service before creating an account").ToActionResult();
         }
 
-        if (user.AcceptedPrivacyPolicyVersion > options.Value.PrivacyPolicyVersion || user.AcceptedTermsOfServiceVersion > options.Value.TermsOfServiceVersion)
-        {
-            return CreateHttpError.InternalServerError().ToActionResult();
-        }
-
         string userAgent = this.GetRemoteUserAgent();
 
         if (userAgent.Length > UserAgentLimits.MaxUploadLength)
