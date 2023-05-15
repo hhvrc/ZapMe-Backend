@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.Controllers.Api.V1.User.Models;
 using ZapMe.Data.Models;
 using ZapMe.Helpers;
 using static System.Net.Mime.MediaTypeNames;
@@ -24,12 +26,15 @@ public partial class UserController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)] // User not found
     public async Task<IActionResult> Get([FromRoute] Guid userId, CancellationToken cancellationToken)
     {
-        UserEntity? user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
-        if (user == null)
+        UserEntity user = (User as ZapMePrincipal)!.Identity.User;
+
+        UserEntity? targetUser = await _dbContext.Users.SingleOrDefaultAsync(u => u.Id == userId && !u.Relations!.Any(r => r.TargetUserId == user.Id || r.SourceUserId == user.Id), cancellationToken);
+        if (targetUser == null)
         {
             return CreateHttpError.Generic(StatusCodes.Status404NotFound, "Not found", $"User with id {userId} not found").ToActionResult();
         }
 
-        return Ok(user);
+        // TODO: use a mapper
+        return Ok(new UserDto(targetUser));
     }
 }
