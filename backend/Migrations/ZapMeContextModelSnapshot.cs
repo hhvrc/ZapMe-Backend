@@ -22,6 +22,37 @@ namespace ZapMe.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("ZapMe.Data.Models.DeletedUserEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("DeletedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("deletedBy");
+
+                    b.Property<string>("DeletionReason")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("deletionReason");
+
+                    b.Property<DateTime>("UserCreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("userCreatedAt");
+
+                    b.Property<DateTime>("UserDeletedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("userDeletedAt")
+                        .HasDefaultValueSql("now()");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("deletedUsers", (string)null);
+                });
+
             modelBuilder.Entity("ZapMe.Data.Models.EmailVerificationRequestEntity", b =>
                 {
                     b.Property<Guid>("UserId")

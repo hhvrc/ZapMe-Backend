@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.ComponentModel.DataAnnotations;
 using ZapMe.Attributes;
 using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.Data.Models;
 using ZapMe.Helpers;
 using ZapMe.Utils;
 using static System.Net.Mime.MediaTypeNames;
@@ -30,18 +32,31 @@ public partial class AccountController
         CancellationToken cancellationToken
         )
     {
-        ZapMeIdentity identity = (User as ZapMePrincipal)!.Identity;
+        UserEntity user = (User as ZapMePrincipal)!.Identity.User;
 
-        if (!PasswordUtils.CheckPassword(password, identity.User.PasswordHash))
+        if (!PasswordUtils.CheckPassword(password, user.PasswordHash))
         {
             return CreateHttpError.InvalidPassword().ToActionResult();
         }
 
+        using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
         await _dbContext.Users
-            .Where(u => u.Id == identity.User.Id)
+            .Where(u => u.Id == user.Id)
             .ExecuteDeleteAsync(cancellationToken);
 
-        // TODO: register reason if supplied
+        await _dbContext.DeletedUsers.AddAsync(new DeletedUserEntity
+        {
+            Id = user.Id,
+            DeletedBy = user.Id,
+            DeletionReason = reason,
+            UserCreatedAt = user.CreatedAt,
+            UserDeletedAt = DateTime.UtcNow,
+        }, cancellationToken);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
 
         return Ok();
     }

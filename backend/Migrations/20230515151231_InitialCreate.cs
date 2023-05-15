@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -10,6 +11,21 @@ namespace ZapMe.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "deletedUsers",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    deletedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    deletionReason = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    userCreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    userDeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_deletedUsers", x => x.id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "userAgents",
                 columns: table => new
@@ -367,6 +383,9 @@ namespace ZapMe.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_images_users_uploaderId",
                 table: "images");
+
+            migrationBuilder.DropTable(
+                name: "deletedUsers");
 
             migrationBuilder.DropTable(
                 name: "emailVerificationRequest");
