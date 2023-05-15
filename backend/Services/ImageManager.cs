@@ -1,5 +1,6 @@
 ﻿using Amazon.S3;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using OneOf;
 using ZapMe.Controllers.Api.V1.Models;
@@ -102,7 +103,7 @@ public sealed class ImageManager : IImageManager
         try
         {
             // Start transaction
-            using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+            using IDbContextTransaction? transaction = await _dbContext.Database.BeginTransactionIfNotExistsAsync(cancellationToken);
 
             // Upload to S3 bucket
             await UploadToS3Async(id, memoryStream, sha256, regionName, cancellationToken);
@@ -113,7 +114,10 @@ public sealed class ImageManager : IImageManager
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             // Commit transaction
-            await transaction.CommitAsync(cancellationToken);
+            if (transaction != null)
+            {
+                await transaction.CommitAsync(cancellationToken);
+            }
             transactionOk = true;
         }
         finally

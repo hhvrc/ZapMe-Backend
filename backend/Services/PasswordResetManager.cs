@@ -48,7 +48,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
         };
 
         // Start transaction
-        using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+        using IDbContextTransaction? transaction = await _dbContext.Database.BeginTransactionIfNotExistsAsync(cancellationToken);
 
         // Insert token into database
         await _passwordResetRequestStore.UpsertAsync(user.Id, tokenHash, cancellationToken);
@@ -62,7 +62,10 @@ public sealed class PasswordResetManager : IPasswordResetManager
         }
 
         // Commit transaction
-        await transaction.CommitAsync(cancellationToken);
+        if (transaction != null)
+        {
+            await transaction.CommitAsync(cancellationToken);
+        }
 
         return null;
     }
@@ -102,7 +105,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
         string newPasswordHash = PasswordUtils.HashPassword(newPassword);
 
         // Start transaction
-        using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+        using IDbContextTransaction? transaction = await _dbContext.Database.BeginTransactionIfNotExistsAsync(cancellationToken);
 
         // Important to delete by token hash, and not account id as if the token has changed, someone else has issued a password reset
         bool deleted = await _dbContext.PasswordResetRequests
@@ -119,7 +122,10 @@ public sealed class PasswordResetManager : IPasswordResetManager
         if (!success) return false; // Uhh, race condition?
 
         // Commit transaction
-        await transaction.CommitAsync(cancellationToken);
+        if (transaction != null)
+        {
+            await transaction.CommitAsync(cancellationToken);
+        }
 
         return success;
     }
