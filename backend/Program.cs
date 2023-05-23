@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Logging;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using ZapMe.Authentication;
 using ZapMe.Constants;
 using ZapMe.Data;
 using ZapMe.Middlewares;
@@ -95,12 +96,53 @@ services.AddTransient<IFriendRequestStore, FriendRequestStore>();
 services.AddTransient<IEmailVerificationManager, EmailVerificationManager>();
 services.AddTransient<IWebSocketInstanceManager, WebSocketInstanceManager>();
 
-services.ZMAddRateLimiter();
-services.ZMAddSwagger(isDevelopment);
-services.ZMAddAuthentication(configuration);
-services.ZMAddAuthorization();
-services.ZMAddDatabase(configuration);
-services.ZMAddQuartz();
+services.AddRateLimiting();
+services.AddSwagger(isDevelopment);
+services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
+    .AddZapMe(configuration)
+    .AddDiscord(opt =>
+    {
+        opt.ClientId = configuration["Discord:ClientId"];
+        opt.ClientSecret = configuration["Discord:ClientSecret"];
+        opt.CallbackPath = "/api/v1/auth/o/cb/discord";
+        opt.AccessDeniedPath = "/api/v1/auth/o/denied";
+        opt.Scope.Add("identify");
+        opt.Scope.Add("email");
+        opt.Prompt = "none";
+    })
+    .AddGitHub(opt =>
+    {
+        opt.ClientId = configuration["GitHub:ClientId"];
+        opt.ClientSecret = configuration["GitHub:ClientSecret"];
+        opt.CallbackPath = "/api/v1/auth/o/cb/github";
+        opt.AccessDeniedPath = "/api/v1/auth/o/denied";
+        opt.Scope.Add("user:email");
+        opt.Scope.Add("read:user");
+    })
+    .AddTwitter(opt =>
+    {
+        opt.ConsumerKey = configuration["Twitter:ConsumerKey"];
+        opt.ConsumerSecret = configuration["Twitter:ConsumerSecret"];
+        opt.CallbackPath = "/api/v1/auth/o/cb/twitter";
+        opt.AccessDeniedPath = "/api/v1/auth/o/denied";
+    })
+    .AddGoogle(opt =>
+    {
+        opt.ClientId = configuration["Google:ClientId"];
+        opt.ClientSecret = configuration["Google:ClientSecret"];
+        opt.CallbackPath = "/api/v1/auth/o/cb/google";
+        opt.AccessDeniedPath = "/api/v1/auth/o/denied";
+        opt.Scope.Add("openid");
+        opt.Scope.Add("profile");
+        opt.Scope.Add("email");
+    });
+services.AddAuthorization(opt =>
+{
+    // Example:
+    // opt.AddPolicy("Admin", policy => policy.RequireClaim("Admin"));
+});
+services.AddDatabase(configuration);
+services.AddScheduledJobs();
 
 // ########################################
 // ######## CORS CONFIGURATION ############

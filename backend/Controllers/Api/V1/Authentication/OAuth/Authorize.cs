@@ -12,7 +12,7 @@ public partial class AuthenticationController
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="provider"></param>
+    /// <param name="providerName"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <response code="200">Returns SignInOk along with a Cookie with similar data</response>
@@ -20,18 +20,18 @@ public partial class AuthenticationController
     /// <response code="403">Error details</response>
     [AnonymousOnly]
     [RequestSizeLimit(1024)]
-    [HttpPost("oauth-signin", Name = "AuthSignInOAuth")]
+    [HttpGet("o/req/{providerName}", Name = "OAuth Authorize")]
     [Produces(Application.Json)]
     [ProducesResponseType(typeof(SignInOk), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> SignInOAuth([FromQuery] string provider, CancellationToken cancellationToken)
+    public async Task<IActionResult> OAuthAuthorize([FromRoute] string providerName, CancellationToken cancellationToken)
     {
-        if (!await HttpContext.IsProviderSupportedAsync(provider))
+        if (!await HttpContext.IsProviderSupportedAsync(providerName))
         {
-            return CreateHttpError.Generic(StatusCodes.Status406NotAcceptable, "Provider not supported", $"The OAuth provider \"{provider}\" is not supported", "Get the list of supported providers from the /api/v1/auth/oauth-providers endpoint").ToActionResult();
+            return CreateHttpError.Generic(StatusCodes.Status406NotAcceptable, "Provider not supported", $"The OAuth provider \"{providerName}\" is not supported", "Get the list of supported providers from the /api/v1/auth/o/list endpoint").ToActionResult();
         }
 
-        return Challenge(provider);
+        return Challenge(providerName);
     }
 }

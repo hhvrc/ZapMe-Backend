@@ -11,14 +11,14 @@ public partial class AuthenticationController
     /// </summary>
     /// <returns></returns>
     /// <response code="200">Returns supported OAuth providers</response>
-    [HttpGet("oauth-providers", Name = "AuthGetOAuthProviders")]
+    [HttpGet("o/list", Name = "OAuth List Providers")]
     [Produces(Application.Json)]
     [ProducesResponseType(typeof(OAuthProviderList), StatusCodes.Status200OK)]
-    public OAuthProviderList GetOAuthProviders()
+    public OAuthProviderList ListOAuthProviders()
     {
         return new OAuthProviderList
         {
-            Providers = HttpContext.GetExternalProvidersAsync().Select(static p => p.DisplayName ?? p.Name)
+            Providers = HttpContext.GetExternalProvidersAsync().Select(p => p.Name)
         };
     }
-}
+};

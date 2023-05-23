@@ -18,15 +18,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.Discord" Version="7.0.2" />
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.2" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.6" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.104.7" />
     <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.101.58" />
     <PackageReference Include="AWSSDK.SQS" Version="3.7.100.122" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="IdentityModel" Version="6.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="7.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="7.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.5">
