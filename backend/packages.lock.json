@@ -2,6 +2,12 @@
   "version": 1,
   "dependencies": {
     "net7.0": {
+      "AspNet.Security.OAuth.Discord": {
+        "type": "Direct",
+        "requested": "[7.0.2, )",
+        "resolved": "7.0.2",
+        "contentHash": "YDgj4G/sUG5xXHRTzdysWeP6/pusInxpRhmv7ZlGFJLrNotzjsbYR9tUxBwbcG8jVhedtSYAj/gjJH/3w/Q8BA=="
+      },
       "AspNet.Security.OAuth.GitHub": {
         "type": "Direct",
         "requested": "[7.0.2, )",
@@ -53,6 +59,12 @@
         "resolved": "4.0.3",
         "contentHash": "W+U9WvmZQgi5cX6FS5GDtDoPzUCV4LkBLkywq/kRZhuDwcbavOzcDAr3LXJFqHUi952Yj3LEYoWW0jbEUQChsA=="
       },
+      "IdentityModel": {
+        "type": "Direct",
+        "requested": "[6.1.0, )",
+        "resolved": "6.1.0",
+        "contentHash": "W9A6U26se5Jeo+QoczLfXW5LgBDXL0bBfnb2DWWZMivv9L52ls/85WtEGZQ8kSgOUecuBUlQZdpu02Uni8n1tg=="
+      },
       "Microsoft.AspNetCore.Authentication.Google": {
         "type": "Direct",
         "requested": "[7.0.5, )",
@@ -64,15 +76,6 @@
         "requested": "[7.0.5, )",
         "resolved": "7.0.5",
         "contentHash": "s0R/awVWIhEc8J8wuN40Zn2/Bxb5Cmh46US+RdhOoY2lXPVV6ZJflJVTgnwZc13+92AKOW8J+blWKvlA6I/1bA=="
-      },
-      "Microsoft.AspNetCore.SpaServices.Extensions": {
-        "type": "Direct",
-        "requested": "[7.0.5, )",
-        "resolved": "7.0.5",
-        "contentHash": "HzeAbRo4XwefVUscdFOdQEdPIP/uWMYBPxBgVg0J+HdYIjkc/8dR1OLMLi8XA6BhG8IkT1JJ+Ay0gsP7Ox5S3w==",
-        "dependencies": {
-          "Microsoft.Extensions.FileProviders.Physical": "7.0.0"
-        }
       },
       "Microsoft.EntityFrameworkCore": {
         "type": "Direct",
@@ -336,26 +339,11 @@
       },
       "Microsoft.Extensions.FileProviders.Abstractions": {
         "type": "Transitive",
-        "resolved": "7.0.0",
-        "contentHash": "NyawiW9ZT/liQb34k9YqBSNPLuuPkrjMgQZ24Y/xXX1RoiBkLUdPMaQTmxhZ5TYu8ZKZ9qayzil75JX95vGQUg==",
+        "resolved": "6.0.0",
+        "contentHash": "0pd4/fho0gC12rQswaGQxbU34jOS1TPS8lZPpkFCH68ppQjHNHYle9iRuHeev1LhrJ94YPvzcRd8UmIuFk23Qw==",
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "7.0.0"
+          "Microsoft.Extensions.Primitives": "6.0.0"
         }
-      },
-      "Microsoft.Extensions.FileProviders.Physical": {
-        "type": "Transitive",
-        "resolved": "7.0.0",
-        "contentHash": "K8D2MTR+EtzkbZ8z80LrG7Ur64R7ZZdRLt1J5cgpc/pUWl0C6IkAUapPuK28oionHueCPELUqq0oYEvZfalNdg==",
-        "dependencies": {
-          "Microsoft.Extensions.FileProviders.Abstractions": "7.0.0",
-          "Microsoft.Extensions.FileSystemGlobbing": "7.0.0",
-          "Microsoft.Extensions.Primitives": "7.0.0"
-        }
-      },
-      "Microsoft.Extensions.FileSystemGlobbing": {
-        "type": "Transitive",
-        "resolved": "7.0.0",
-        "contentHash": "2jONjKHiF+E92ynz2ZFcr9OvxIw+rTGMPEH+UZGeHTEComVav93jQUWGkso8yWwVBcEJGcNcZAaqY01FFJcj7w=="
       },
       "Microsoft.Extensions.Hosting.Abstractions": {
         "type": "Transitive",
