@@ -106,8 +106,17 @@ services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
         opt.Scope.Add("email");
         opt.Scope.Add("identify");
         opt.Prompt = "none";
-        //opt.CorrelationCookie.SameSite = SameSiteMode.None;
+        opt.SaveTokens = true;
         opt.StateDataFormat = new DistributedCacheSecureDataFormat<AuthenticationProperties>();
+        opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.ProfileImage, json =>
+        {
+            string? avatar = json.GetString("avatar");
+            if (avatar is null)
+            {
+                return null;
+            }
+            return $"https://cdn.discordapp.com/avatars/{json.GetString("id")}/{avatar}.png";
+        });
         opt.Validate();
     })
     .AddGitHub("github", opt =>
@@ -118,8 +127,18 @@ services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
         opt.AccessDeniedPath = "/api/v1/auth/o/denied";
         opt.Scope.Add("read:user");
         opt.Scope.Add("user:email");
-        //opt.CorrelationCookie.SameSite = SameSiteMode.None;
+        opt.SaveTokens = true;
         opt.StateDataFormat = new DistributedCacheSecureDataFormat<AuthenticationProperties>();
+        opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.ProfileImage, json =>
+        {
+            string? gravatarId = json.GetString("gravatar_id");
+            string? avatarUrl = json.GetString("avatar_url");
+
+            if (gravatarId is null) return avatarUrl;
+            if (avatarUrl is null) return $"https://www.gravatar.com/avatar/{gravatarId}?s=256";
+
+            return $"https://www.gravatar.com/avatar/{gravatarId}?s=256?d={avatarUrl}";
+        });
         opt.Validate();
     })
     .AddTwitter("twitter", opt =>
@@ -128,9 +147,15 @@ services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
         opt.ConsumerSecret = configuration.GetValue<string>("Twitter:OAuth1:ConsumerSecret")!;
         opt.CallbackPath = "/api/v1/auth/o/cb/twitter";
         opt.AccessDeniedPath = "/api/v1/auth/o/denied";
+        opt.SaveTokens = true;
         opt.RetrieveUserDetails = true;
-        //opt.StateCookie.SameSite = SameSiteMode.None;
         opt.StateDataFormat = new DistributedCacheSecureDataFormat<RequestToken>();
+        opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.ProfileImage, json =>
+        {
+            string? profileImageUrl = json.GetString("profile_image_url_https");
+            if (profileImageUrl is null) return null;
+            return profileImageUrl.Replace("_normal", "_400x400");
+        });
         opt.Validate();
     })
     .AddGoogle("google", opt =>
@@ -142,8 +167,14 @@ services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
         opt.Scope.Add("https://www.googleapis.com/auth/userinfo.email");
         opt.Scope.Add("https://www.googleapis.com/auth/userinfo.profile");
         opt.Scope.Add("openid");
-        //opt.CorrelationCookie.SameSite = SameSiteMode.None;
+        opt.SaveTokens = true;
         opt.StateDataFormat = new DistributedCacheSecureDataFormat<AuthenticationProperties>();
+        opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.ProfileImage, json =>
+        {
+            string? picture = json.GetString("picture");
+            if (picture is null) return null;
+            return picture.Replace("s96-c", "s400-c");
+        });
         opt.Validate();
     });
 services.AddAuthorization(opt =>

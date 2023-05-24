@@ -44,7 +44,18 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
 
     public async Task SignInAsync(ClaimsPrincipal claimsIdentity, AuthenticationProperties? properties)
     {
-        SessionEntity session = (claimsIdentity as ZapMePrincipal)!.Identity.Session;
+        string? authenticationType = claimsIdentity.Identity?.AuthenticationType;
+        if (String.IsNullOrEmpty(authenticationType)) throw new InvalidOperationException($"Cannot sign in with an empty {nameof(claimsIdentity.Identity.AuthenticationType)}.");
+
+        SessionEntity session;
+        if (authenticationType == _scheme.Name)
+        {
+            session = (claimsIdentity as ZapMePrincipal)!.Identity.Session;
+        }
+        else
+        {
+            session = await OAuthHandlers.HandleSignInAsync(authenticationType, claimsIdentity, properties, _dbContext, _logger);
+        }
 
         SignInOk result = new SignInOk(session);
 
