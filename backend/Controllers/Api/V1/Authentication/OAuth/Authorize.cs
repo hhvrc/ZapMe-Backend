@@ -19,8 +19,8 @@ public partial class AuthenticationController
     /// <response code="200">Returns SignInOk along with a Cookie with similar data</response>
     /// <response code="401">Error details</response>
     /// <response code="403">Error details</response>
-    [EnableCors]
     [AnonymousOnly]
+    [EnableCors("allow_oauth_providers")]
     [RequestSizeLimit(1024)]
     [HttpGet("o/req/{providerName}", Name = "OAuth Authorize")]
     [Produces(Application.Json)]

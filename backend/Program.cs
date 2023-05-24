@@ -1,4 +1,6 @@
 using Amazon.S3;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Twitter;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Logging;
 using System.Text.Json;
@@ -6,6 +8,7 @@ using System.Text.Json.Serialization;
 using ZapMe.Authentication;
 using ZapMe.Constants;
 using ZapMe.Data;
+using ZapMe.Helpers;
 using ZapMe.Middlewares;
 using ZapMe.Options;
 using ZapMe.Services;
@@ -94,7 +97,7 @@ services.AddRateLimiting();
 services.AddSwagger(isDevelopment);
 services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
     .AddZapMe(configuration)
-    .AddDiscord(opt =>
+    .AddDiscord("discord", opt =>
     {
         opt.ClientId = configuration.GetValue<string>("Discord:OAuth2:ClientId")!;
         opt.ClientSecret = configuration.GetValue<string>("Discord:OAuth2:ClientSecret")!;
@@ -103,8 +106,11 @@ services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
         opt.Scope.Add("email");
         opt.Scope.Add("identify");
         opt.Prompt = "none";
+        //opt.CorrelationCookie.SameSite = SameSiteMode.None;
+        opt.StateDataFormat = new DistributedCacheSecureDataFormat<AuthenticationProperties>();
+        opt.Validate();
     })
-    .AddGitHub(opt =>
+    .AddGitHub("github", opt =>
     {
         opt.ClientId = configuration.GetValue<string>("GitHub:OAuth2:ClientId")!;
         opt.ClientSecret = configuration.GetValue<string>("GitHub:OAuth2:ClientSecret")!;
@@ -112,15 +118,22 @@ services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
         opt.AccessDeniedPath = "/api/v1/auth/o/denied";
         opt.Scope.Add("read:user");
         opt.Scope.Add("user:email");
+        //opt.CorrelationCookie.SameSite = SameSiteMode.None;
+        opt.StateDataFormat = new DistributedCacheSecureDataFormat<AuthenticationProperties>();
+        opt.Validate();
     })
-    .AddTwitter(opt =>
+    .AddTwitter("twitter", opt =>
     {
         opt.ConsumerKey = configuration.GetValue<string>("Twitter:OAuth1:ConsumerKey")!;
         opt.ConsumerSecret = configuration.GetValue<string>("Twitter:OAuth1:ConsumerSecret")!;
         opt.CallbackPath = "/api/v1/auth/o/cb/twitter";
         opt.AccessDeniedPath = "/api/v1/auth/o/denied";
+        opt.RetrieveUserDetails = true;
+        //opt.StateCookie.SameSite = SameSiteMode.None;
+        opt.StateDataFormat = new DistributedCacheSecureDataFormat<RequestToken>();
+        opt.Validate();
     })
-    .AddGoogle(opt =>
+    .AddGoogle("google", opt =>
     {
         opt.ClientId = configuration.GetValue<string>("Google:OAuth2:ClientId")!;
         opt.ClientSecret = configuration.GetValue<string>("Google:OAuth2:ClientSecret")!;
@@ -129,6 +142,9 @@ services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
         opt.Scope.Add("https://www.googleapis.com/auth/userinfo.email");
         opt.Scope.Add("https://www.googleapis.com/auth/userinfo.profile");
         opt.Scope.Add("openid");
+        //opt.CorrelationCookie.SameSite = SameSiteMode.None;
+        opt.StateDataFormat = new DistributedCacheSecureDataFormat<AuthenticationProperties>();
+        opt.Validate();
     });
 services.AddAuthorization(opt =>
 {
@@ -144,35 +160,26 @@ services.AddScheduledJobs();
 
 services.AddCors(opt =>
 {
-    opt.AddDefaultPolicy(builder =>
-    {
-        if (isDevelopment)
-        {
-            builder.WithOrigins(
-                "http://localhost:5173",
-                "http://localhost:5296",
-                "https://localhost:7296"
-                );
-        }
-        else
-        {
-            builder.WithOrigins(
-                "https://zapme.app",
-                "https://www.zapme.app"
-                );
-        }
+    string[] defaultOrigins = configuration.GetSection("Cors:DefaultOrigins").Get<string[]>()!;
 
-        // OAuth2
-        builder.WithOrigins(
-                "https://accounts.google.com",
-                "https://oauth2.googleapis.com",
-                "https://discord.com",
-                "https://github.com",
-                "https://api.twitter.com"
-            );
-
-        builder.AllowAnyHeader().AllowAnyMethod().AllowCredentials();
-    });
+    opt.AddDefaultPolicy(builder => builder
+        .WithOrigins(defaultOrigins)
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials()
+    );
+    opt.AddPolicy("allow_oauth_providers", builder => builder
+        .WithOrigins(
+            "https://accounts.google.com",
+            "https://oauth2.googleapis.com",
+            "https://discord.com",
+            "https://github.com",
+            "https://api.twitter.com"
+        )
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials()
+    );
 });
 
 // ########################################
@@ -239,6 +246,7 @@ app.Map("/swagger", true, app =>
 });
 app.Map("/static", false, app =>
 {
+    app.UseCors();
     // Cloudflare caching: Asset is cached for 24 hours, and can be stale for 30 seconds while cloudflare revalidates it.
     app.UseHeaderValue("Cache-Control", "public, max-age=86400, stale-while-revalidate=30");
     app.UseStaticFiles();
