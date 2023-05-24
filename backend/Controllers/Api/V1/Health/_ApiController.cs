@@ -5,8 +5,7 @@ namespace ZapMe.Controllers.Api.V1;
 /// <summary>
 /// 
 /// </summary>
-[ApiController]
-[Route("api/v1/health/")]
+[ApiController, Route("api/v1/[Controller]/")]
 public sealed partial class HealthController : ControllerBase
 {
     private readonly ILogger<HealthController> _logger;

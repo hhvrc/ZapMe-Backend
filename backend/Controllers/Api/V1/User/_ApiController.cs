@@ -8,9 +8,7 @@ namespace ZapMe.Controllers.Api.V1;
 /// <summary>
 /// 
 /// </summary>
-[Authorize]
-[ApiController]
-[Route("api/v1/user/")]
+[ApiController, Authorize, Route("api/v1/[Controller]/")]
 public sealed partial class UserController : ControllerBase
 {
     private readonly ZapMeContext _dbContext;

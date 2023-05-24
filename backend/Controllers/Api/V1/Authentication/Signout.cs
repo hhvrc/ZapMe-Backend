@@ -5,7 +5,7 @@ using ZapMe.Authentication;
 
 namespace ZapMe.Controllers.Api.V1;
 
-public partial class AuthenticationController
+public partial class AuthController
 {
     /// <summary>
     /// 

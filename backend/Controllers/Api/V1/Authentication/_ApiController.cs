@@ -7,15 +7,14 @@ namespace ZapMe.Controllers.Api.V1;
 /// <summary>
 /// 
 /// </summary>
-[ApiController]
-[Route("/api/v1/auth/")]
-public sealed partial class AuthenticationController : ControllerBase
+[ApiController, Route("api/v1/[Controller]/")]
+public sealed partial class AuthController : ControllerBase
 {
     private readonly ZapMeContext _dbContext;
     private readonly ISessionManager _sessionManager;
-    private readonly ILogger<AuthenticationController> _logger;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthenticationController(ZapMeContext dbContext, ISessionManager sessionManager, ILogger<AuthenticationController> logger)
+    public AuthController(ZapMeContext dbContext, ISessionManager sessionManager, ILogger<AuthController> logger)
     {
         _dbContext = dbContext;
         _sessionManager = sessionManager;
