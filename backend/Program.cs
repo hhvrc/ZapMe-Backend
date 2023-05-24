@@ -44,13 +44,7 @@ bool isBuild = configuration.GetValue<bool>("IsBuild", false);
 // ########################################
 
 IdentityModelEventSource.ShowPII = isDevelopment;
-builder.Logging.AddSimpleConsole(opt =>
-{
-    opt.IncludeScopes = true;
-    opt.SingleLine = false;
-    opt.UseUtcTimestamp = true;
-    opt.TimestampFormat = "[yyyy-MM-dd HH:mm:ss.fff] ";
-});
+builder.Logging.AddSimpleConsole();
 
 // ########################################
 // ######## CORE SERVICES #################
@@ -102,39 +96,39 @@ services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
     .AddZapMe(configuration)
     .AddDiscord(opt =>
     {
-        opt.ClientId = configuration["Discord:ClientId"];
-        opt.ClientSecret = configuration["Discord:ClientSecret"];
+        opt.ClientId = configuration.GetValue<string>("Discord:OAuth2:ClientId")!;
+        opt.ClientSecret = configuration.GetValue<string>("Discord:OAuth2:ClientSecret")!;
         opt.CallbackPath = "/api/v1/auth/o/cb/discord";
         opt.AccessDeniedPath = "/api/v1/auth/o/denied";
-        opt.Scope.Add("identify");
         opt.Scope.Add("email");
+        opt.Scope.Add("identify");
         opt.Prompt = "none";
     })
     .AddGitHub(opt =>
     {
-        opt.ClientId = configuration["GitHub:ClientId"];
-        opt.ClientSecret = configuration["GitHub:ClientSecret"];
+        opt.ClientId = configuration.GetValue<string>("GitHub:OAuth2:ClientId")!;
+        opt.ClientSecret = configuration.GetValue<string>("GitHub:OAuth2:ClientSecret")!;
         opt.CallbackPath = "/api/v1/auth/o/cb/github";
         opt.AccessDeniedPath = "/api/v1/auth/o/denied";
-        opt.Scope.Add("user:email");
         opt.Scope.Add("read:user");
+        opt.Scope.Add("user:email");
     })
     .AddTwitter(opt =>
     {
-        opt.ConsumerKey = configuration["Twitter:ConsumerKey"];
-        opt.ConsumerSecret = configuration["Twitter:ConsumerSecret"];
+        opt.ConsumerKey = configuration.GetValue<string>("Twitter:OAuth1:ConsumerKey")!;
+        opt.ConsumerSecret = configuration.GetValue<string>("Twitter:OAuth1:ConsumerSecret")!;
         opt.CallbackPath = "/api/v1/auth/o/cb/twitter";
         opt.AccessDeniedPath = "/api/v1/auth/o/denied";
     })
     .AddGoogle(opt =>
     {
-        opt.ClientId = configuration["Google:ClientId"];
-        opt.ClientSecret = configuration["Google:ClientSecret"];
+        opt.ClientId = configuration.GetValue<string>("Google:OAuth2:ClientId")!;
+        opt.ClientSecret = configuration.GetValue<string>("Google:OAuth2:ClientSecret")!;
         opt.CallbackPath = "/api/v1/auth/o/cb/google";
         opt.AccessDeniedPath = "/api/v1/auth/o/denied";
+        opt.Scope.Add("https://www.googleapis.com/auth/userinfo.email");
+        opt.Scope.Add("https://www.googleapis.com/auth/userinfo.profile");
         opt.Scope.Add("openid");
-        opt.Scope.Add("profile");
-        opt.Scope.Add("email");
     });
 services.AddAuthorization(opt =>
 {
@@ -154,12 +148,29 @@ services.AddCors(opt =>
     {
         if (isDevelopment)
         {
-            builder.WithOrigins("http://localhost:5173", "https://localhost:7296");
+            builder.WithOrigins(
+                "http://localhost:5173",
+                "http://localhost:5296",
+                "https://localhost:7296"
+                );
         }
         else
         {
-            builder.WithOrigins("https://zapme.app", "https://www.zapme.app");
+            builder.WithOrigins(
+                "https://zapme.app",
+                "https://www.zapme.app"
+                );
         }
+
+        // OAuth2
+        builder.WithOrigins(
+                "https://accounts.google.com",
+                "https://oauth2.googleapis.com",
+                "https://discord.com",
+                "https://github.com",
+                "https://api.twitter.com"
+            );
+
         builder.AllowAnyHeader().AllowAnyMethod().AllowCredentials();
     });
 });
