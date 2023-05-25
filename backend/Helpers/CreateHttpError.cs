@@ -35,7 +35,7 @@ public static class CreateHttpError
     /// <param name="fields"></param>
     /// <returns></returns>
     public static ErrorDetails InvalidModelState(Dictionary<string, string[]>? fields) =>
-        Generic(StatusCodes.Status400BadRequest, "Bad Request", "Request body has invalid format/fields", null, fields, null);
+        Generic(StatusCodes.Status400BadRequest, "invalid_model", "Request body has invalid format/fields", null, fields, null);
     /// <summary>
     /// 400 Bad Request
     /// </summary>
@@ -56,9 +56,9 @@ public static class CreateHttpError
     /// <param name="fields"></param>
     /// <returns></returns>
     public static ErrorDetails InvalidPassword(params string[] fields) =>
-        Generic(StatusCodes.Status401Unauthorized, "Unauthorized", "Invalid password", null, ToDict(fields, "Invalid password"), new UserNotification(UserNotification.SeverityLevel.Error, "Invalid password"));
+        Generic(StatusCodes.Status401Unauthorized, "unauthorized", "Invalid password", null, ToDict(fields, "Invalid password"), new UserNotification(UserNotification.SeverityLevel.Error, "Invalid password"));
     public static ErrorDetails UserNameOrEmailTaken() =>
-        Generic(StatusCodes.Status401Unauthorized, "Unauthorized", "Username or email already taken", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "Username or email already taken"));
+        Generic(StatusCodes.Status401Unauthorized, "unauthorized", "Username or email already taken", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "Username or email already taken"));
     public static ErrorDetails UnsupportedOAuthProvider(string providerName) =>
         Generic(StatusCodes.Status406NotAcceptable, "oauth_provider_not_supported", $"The OAuth provider \"{providerName}\" is not supported", "Get the list of supported providers from the /api/v1/auth/o/list endpoint");
     /// <summary>
@@ -66,11 +66,11 @@ public static class CreateHttpError
     /// </summary>
     /// <returns></returns>
     public static ErrorDetails TooManyRequests() =>
-        Generic(StatusCodes.Status429TooManyRequests, "Too Many Requests", "You have exceeded the rate limit", null, null, new UserNotification(UserNotification.SeverityLevel.Warning, "Rate limit exceeded, please try again later"));
+        Generic(StatusCodes.Status429TooManyRequests, "ratelimited", "You have exceeded the rate limit", null, null, new UserNotification(UserNotification.SeverityLevel.Warning, "Rate limit exceeded, please try again later"));
     /// <summary>
     /// 500 Internal Server Error
     /// </summary>
     /// <returns></returns>
     public static ErrorDetails InternalServerError() =>
-        Generic(StatusCodes.Status500InternalServerError, "Internal Server Error", "An internal server error occurred.", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "Internal server error, please try again later"));
+        Generic(StatusCodes.Status500InternalServerError, "internal_error", "An internal server error occurred.", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "Internal server error, please try again later"));
 }
