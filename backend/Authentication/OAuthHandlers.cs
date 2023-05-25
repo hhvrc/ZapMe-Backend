@@ -18,7 +18,7 @@ public static class OAuthHandlers
         {
             "GitHub" => FetchGithubAuthParams(claimsIdentity, properties, logger),
             "Google" => FetchGoogleAuthParams(claimsIdentity, properties, logger),
-            "Twitter" => FetchTwitterAuthParams(claimsIdentity, properties, logger),
+            "twitter" => FetchTwitterAuthParams(claimsIdentity, properties, logger),
             "Discord" => FetchDiscordAuthParams(claimsIdentity, properties, logger),
             _ => OneOf<AuthParameters, ErrorDetails>.FromT1(CreateHttpError.UnsupportedOAuthProvider(authenticationType)),
         };
@@ -40,7 +40,6 @@ public static class OAuthHandlers
     }
     private static OneOf<AuthParameters, ErrorDetails> FetchDiscordAuthParams(ClaimsPrincipal claimsIdentity, AuthenticationProperties? properties, ILogger logger)
     {
-        // TODO: invalid claim names, fixme
         string? discordId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         string? discordName = claimsIdentity.FindFirst("urn:discord:name")?.Value ?? claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
         string? discordEmail = claimsIdentity.FindFirst(ClaimTypes.Email)?.Value;
@@ -59,7 +58,7 @@ public static class OAuthHandlers
         string? twitterId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         string? twitterName = claimsIdentity.FindFirst("urn:twitter:name")?.Value ?? claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
         string? twitterEmail = claimsIdentity.FindFirst(ClaimTypes.Email)?.Value;
-        string? twitterProfilePictureUrl = claimsIdentity.FindFirst(ZapMeClaimTypes.ProfileImage)?.Value;
+        string? twitterProfilePictureUrl = claimsIdentity.FindFirst(ZapMeClaimTypes.ProfileImage)?.Value?.Replace("_normal", "_400x400");
         if (String.IsNullOrEmpty(twitterId) || String.IsNullOrEmpty(twitterName) || String.IsNullOrEmpty(twitterEmail))
         {
             logger.LogError("Twitter OAuth claims are missing");
