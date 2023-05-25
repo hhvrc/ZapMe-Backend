@@ -53,7 +53,7 @@ builder.Logging.AddSimpleConsole();
 // ######## CORE SERVICES #################
 // ########################################
 
-services.AddRouting();
+services.AddRouting(opt => opt.LowercaseUrls = true);
 services.AddControllers().AddJsonOptions(opt =>
 {
     opt.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
