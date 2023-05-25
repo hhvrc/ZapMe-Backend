@@ -1,4 +1,6 @@
-﻿namespace ZapMe.Authentication;
+﻿using System.Security.Claims;
+
+namespace ZapMe.Authentication;
 
 public static class ZapMeClaimTypes
 {
