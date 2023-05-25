@@ -184,7 +184,7 @@ services.AddScheduledJobs();
 
 services.AddCors(opt =>
 {
-    string[] defaultOrigins = configuration.GetSection("Cors:DefaultOrigins").Get<string[]>()!;
+    string[] defaultOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()!;
 
     opt.AddDefaultPolicy(builder => builder
         .WithOrigins(defaultOrigins)
@@ -194,14 +194,23 @@ services.AddCors(opt =>
     );
     opt.AddPolicy("allow_oauth_providers", builder => builder
         .WithOrigins(
-            "https://accounts.google.com",
-            "https://oauth2.googleapis.com",
             "https://discord.com",
+            "https://*.discord.com",
             "https://github.com",
-            "https://api.twitter.com"
+            "https://*.github.com",
+            "https://twitter.com",
+            "https://*.twitter.com",
+            "https://google.com",
+            "https://*.google.com",
+            "https://googleapis.com",
+            "https://*.googleapis.com"
         )
         .AllowAnyHeader()
-        .AllowAnyMethod()
+        .WithMethods(
+            "GET",
+            "POST",
+            "OPTIONS"
+        )
         .AllowCredentials()
     );
 });
