@@ -54,7 +54,22 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
         }
         else
         {
-            session = await OAuthHandlers.HandleSignInAsync(authenticationType, claimsIdentity, properties, _dbContext, _logger);
+            var authParamsResult = OAuthHandlers.FetchAuthParams(authenticationType, claimsIdentity, properties, _logger);
+            if (authParamsResult.TryPickT1(out var errorDetails, out var authParams))
+            {
+                await errorDetails.Write(Response, _jsonSerializerOptions);
+                return;
+            }
+
+            throw new NotImplementedException();
+            /*
+            var authenticationResult = await OAuthHandlers.AuthenticateUser(authParams, _context.RequestServices, _dbContext, _logger);
+            if (authenticationResult.TryPickT1(out errorDetails, out var result))
+            {
+                await errorDetails.Write(Response, _jsonSerializerOptions);
+                return;
+            }
+            */
         }
 
         SignInOk result = new SignInOk(session);
