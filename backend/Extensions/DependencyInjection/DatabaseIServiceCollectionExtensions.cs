@@ -6,7 +6,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class DatabaseIServiceCollectionExtensions
 {
-    public static void ZMAddDatabase(this IServiceCollection services, IConfiguration configuration)
+    public static void AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         DatabaseOptions options = configuration.GetRequiredSection(DatabaseOptions.SectionName).Get<DatabaseOptions>()!;
 

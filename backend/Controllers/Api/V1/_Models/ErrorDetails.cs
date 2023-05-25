@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -53,4 +54,11 @@ public readonly struct ErrorDetails
 
     public ObjectResult ToActionResult() => new ObjectResult(this) { StatusCode = HttpStatusCode, ContentTypes = { Application.Json } };
     public static implicit operator ObjectResult(ErrorDetails errorDetails) => errorDetails.ToActionResult();
+
+    public Task Write(HttpResponse response, JsonSerializerOptions? options = null)
+    {
+        response.StatusCode = HttpStatusCode;
+        response.ContentType = Application.Json;
+        return response.WriteAsJsonAsync(this, options);
+    }
 }

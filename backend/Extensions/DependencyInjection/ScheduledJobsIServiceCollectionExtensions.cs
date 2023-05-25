@@ -4,7 +4,7 @@ using ZapMe.Attributes;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
-public static class QuartzIServiceCollectionExtensions
+public static class ScheduledJobsIServiceCollectionExtensions
 {
     readonly struct TimerTrigger
     {
@@ -64,7 +64,7 @@ public static class QuartzIServiceCollectionExtensions
         opt.WaitForJobsToComplete = true;
     }
 
-    public static void ZMAddQuartz(this IServiceCollection services)
+    public static void AddScheduledJobs(this IServiceCollection services)
     {
         Quartz.Logging.LogProvider.IsDisabled = true;
         services.AddQuartz(ConfigureQuartz);

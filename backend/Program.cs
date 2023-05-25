@@ -1,10 +1,14 @@
 using Amazon.S3;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Twitter;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Logging;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using ZapMe.Authentication;
 using ZapMe.Constants;
 using ZapMe.Data;
+using ZapMe.Helpers;
 using ZapMe.Middlewares;
 using ZapMe.Options;
 using ZapMe.Services;
@@ -43,19 +47,13 @@ bool isBuild = configuration.GetValue<bool>("IsBuild", false);
 // ########################################
 
 IdentityModelEventSource.ShowPII = isDevelopment;
-builder.Logging.AddSimpleConsole(opt =>
-{
-    opt.IncludeScopes = true;
-    opt.SingleLine = false;
-    opt.UseUtcTimestamp = true;
-    opt.TimestampFormat = "[yyyy-MM-dd HH:mm:ss.fff] ";
-});
+builder.Logging.AddSimpleConsole();
 
 // ########################################
 // ######## CORE SERVICES #################
 // ########################################
 
-services.AddRouting();
+services.AddRouting(opt => opt.LowercaseUrls = true);
 services.AddControllers().AddJsonOptions(opt =>
 {
     opt.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
@@ -95,12 +93,90 @@ services.AddTransient<IFriendRequestStore, FriendRequestStore>();
 services.AddTransient<IEmailVerificationManager, EmailVerificationManager>();
 services.AddTransient<IWebSocketInstanceManager, WebSocketInstanceManager>();
 
-services.ZMAddRateLimiter();
-services.ZMAddSwagger(isDevelopment);
-services.ZMAddAuthentication(configuration);
-services.ZMAddAuthorization();
-services.ZMAddDatabase(configuration);
-services.ZMAddQuartz();
+services.AddRateLimiting();
+services.AddSwagger(isDevelopment);
+services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
+    .AddZapMe()
+    .AddDiscord("discord", opt =>
+    {
+        opt.ClientId = configuration.GetValue<string>("Discord:OAuth2:ClientId")!;
+        opt.ClientSecret = configuration.GetValue<string>("Discord:OAuth2:ClientSecret")!;
+        opt.CallbackPath = "/api/v1/auth/o/cb/discord";
+        opt.AccessDeniedPath = "/api/v1/auth/o/denied";
+        opt.Scope.Add("email");
+        opt.Scope.Add("identify");
+        opt.Prompt = "none";
+        opt.SaveTokens = true;
+        opt.StateDataFormat = new DistributedCacheSecureDataFormat<AuthenticationProperties>();
+        opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.ProfileImage, json =>
+        {
+            string? userId = json.GetString("id");
+            string? avatar = json.GetString("avatar");
+            if (String.IsNullOrEmpty(userId) || String.IsNullOrEmpty(avatar))
+                return null;
+
+            return $"https://cdn.discordapp.com/avatars/{userId}/{avatar}.png";
+        });
+        opt.Validate();
+    })
+    .AddGitHub("github", opt =>
+    {
+        opt.ClientId = configuration.GetValue<string>("GitHub:OAuth2:ClientId")!;
+        opt.ClientSecret = configuration.GetValue<string>("GitHub:OAuth2:ClientSecret")!;
+        opt.CallbackPath = "/api/v1/auth/o/cb/github";
+        opt.AccessDeniedPath = "/api/v1/auth/o/denied";
+        opt.Scope.Add("read:user");
+        opt.Scope.Add("user:email");
+        opt.SaveTokens = true;
+        opt.StateDataFormat = new DistributedCacheSecureDataFormat<AuthenticationProperties>();
+        opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.ProfileImage, json =>
+        {
+            string? avatarUrl = json.GetString("avatar_url");
+            string? gravatarId = json.GetString("gravatar_id");
+
+            if (String.IsNullOrEmpty(gravatarId))
+                return avatarUrl;
+
+            if (String.IsNullOrEmpty(avatarUrl))
+                return $"https://www.gravatar.com/avatar/{gravatarId}?s=256";
+
+            return $"https://www.gravatar.com/avatar/{gravatarId}?s=256&d={Uri.EscapeDataString(avatarUrl)}";
+        });
+        opt.Validate();
+    })
+    .AddTwitter("twitter", opt =>
+    {
+        opt.ConsumerKey = configuration.GetValue<string>("Twitter:OAuth1:ConsumerKey")!;
+        opt.ConsumerSecret = configuration.GetValue<string>("Twitter:OAuth1:ConsumerSecret")!;
+        opt.CallbackPath = "/api/v1/auth/o/cb/twitter";
+        opt.AccessDeniedPath = "/api/v1/auth/o/denied";
+        opt.SaveTokens = true;
+        opt.RetrieveUserDetails = true;
+        opt.StateDataFormat = new DistributedCacheSecureDataFormat<RequestToken>();
+        opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.ProfileImage, "profile_image_url_https");
+        opt.Validate();
+    })
+    .AddGoogle("google", opt =>
+    {
+        opt.ClientId = configuration.GetValue<string>("Google:OAuth2:ClientId")!;
+        opt.ClientSecret = configuration.GetValue<string>("Google:OAuth2:ClientSecret")!;
+        opt.CallbackPath = "/api/v1/auth/o/cb/google";
+        opt.AccessDeniedPath = "/api/v1/auth/o/denied";
+        opt.Scope.Add("email");
+        opt.Scope.Add("profile");
+        opt.Scope.Add("openid");
+        opt.SaveTokens = true;
+        opt.StateDataFormat = new DistributedCacheSecureDataFormat<AuthenticationProperties>();
+        opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.ProfileImage, "picture");
+        opt.Validate();
+    });
+services.AddAuthorization(opt =>
+{
+    // Example:
+    // opt.AddPolicy("Admin", policy => policy.RequireClaim("Admin"));
+});
+services.AddDatabase(configuration);
+services.AddScheduledJobs();
 
 // ########################################
 // ######## CORS CONFIGURATION ############
@@ -108,18 +184,35 @@ services.ZMAddQuartz();
 
 services.AddCors(opt =>
 {
-    opt.AddDefaultPolicy(builder =>
-    {
-        if (isDevelopment)
-        {
-            builder.WithOrigins("http://localhost:5173", "https://localhost:7296");
-        }
-        else
-        {
-            builder.WithOrigins("https://zapme.app", "https://www.zapme.app");
-        }
-        builder.AllowAnyHeader().AllowAnyMethod().AllowCredentials();
-    });
+    string[] defaultOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()!;
+
+    opt.AddDefaultPolicy(builder => builder
+        .WithOrigins(defaultOrigins)
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials()
+    );
+    opt.AddPolicy("allow_oauth_providers", builder => builder
+        .WithOrigins(
+            "https://discord.com",
+            "https://*.discord.com",
+            "https://github.com",
+            "https://*.github.com",
+            "https://twitter.com",
+            "https://*.twitter.com",
+            "https://google.com",
+            "https://*.google.com",
+            "https://googleapis.com",
+            "https://*.googleapis.com"
+        )
+        .AllowAnyHeader()
+        .WithMethods(
+            "GET",
+            "POST",
+            "OPTIONS"
+        )
+        .AllowCredentials()
+    );
 });
 
 // ########################################
@@ -186,6 +279,7 @@ app.Map("/swagger", true, app =>
 });
 app.Map("/static", false, app =>
 {
+    app.UseCors();
     // Cloudflare caching: Asset is cached for 24 hours, and can be stale for 30 seconds while cloudflare revalidates it.
     app.UseHeaderValue("Cache-Control", "public, max-age=86400, stale-while-revalidate=30");
     app.UseStaticFiles();

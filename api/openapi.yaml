@@ -13,7 +13,7 @@ info:
 servers:
   - url: https://api.zapme.app
 paths:
-  /api/v1/Account:
+  /api/v1/account:
     post:
       tags:
         - Account
@@ -98,7 +98,7 @@ paths:
                 $ref: '#/components/schemas/ErrorDetails'
         '404':
           description: Error details
-  '/api/v1/Account/oauth/{providerName}':
+  '/api/v1/account/oauth/{providerName}':
     post:
       tags:
         - Account
@@ -152,7 +152,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-  /api/v1/Account/recover-confirm:
+  /api/v1/account/recover-confirm:
     post:
       tags:
         - Account
@@ -175,7 +175,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-  /api/v1/Account/recover:
+  /api/v1/account/recover:
     post:
       tags:
         - Account
@@ -192,7 +192,7 @@ paths:
       responses:
         '200':
           description: Ok
-  /api/v1/Account/email:
+  /api/v1/account/email:
     put:
       tags:
         - Account
@@ -225,7 +225,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-  /api/v1/Account/password:
+  /api/v1/account/password:
     put:
       tags:
         - Account
@@ -258,7 +258,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-  /api/v1/Account/pfp:
+  /api/v1/account/pfp:
     put:
       tags:
         - Account
@@ -318,7 +318,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-  /api/v1/Account/username:
+  /api/v1/account/username:
     put:
       tags:
         - Account
@@ -347,7 +347,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-  /api/v1/Account/email/verify:
+  /api/v1/account/email/verify:
     post:
       tags:
         - Account
@@ -368,12 +368,76 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-  /api/v1/auth/oauth-providers:
+  '/api/v1/auth/o/req/{providerName}':
     get:
       tags:
-        - Authentication
+        - Auth
       summary: ''
-      operationId: AuthGetOAuthProviders
+      operationId: OAuth Authorize
+      parameters:
+        - name: providerName
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns SignInOk along with a Cookie with similar data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignInOk'
+        '403':
+          description: Error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '401':
+          description: Error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  '/api/v1/auth/o/cb/{providerName}':
+    post:
+      tags:
+        - Auth
+      summary: ''
+      operationId: OAuth Callback
+      parameters:
+        - name: providerName
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns SignInOk along with a Cookie with similar data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignInOk'
+        '403':
+          description: Error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '401':
+          description: Error details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/auth/o/list:
+    get:
+      tags:
+        - Auth
+      summary: ''
+      operationId: OAuth List Providers
       responses:
         '200':
           description: Returns supported OAuth providers
@@ -384,7 +448,7 @@ paths:
   /api/v1/auth/signin:
     post:
       tags:
-        - Authentication
+        - Auth
       summary: ''
       operationId: AuthSignIn
       requestBody:
@@ -428,41 +492,10 @@ paths:
                 $ref: '#/components/schemas/ErrorDetails'
         '500':
           description: Error details
-  /api/v1/auth/oauth-signin:
-    post:
-      tags:
-        - Authentication
-      summary: ''
-      operationId: AuthSignInOAuth
-      parameters:
-        - name: provider
-          in: query
-          description: ''
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Returns SignInOk along with a Cookie with similar data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SignInOk'
-        '403':
-          description: Error details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-        '401':
-          description: Error details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
   /api/v1/auth/signout:
     post:
       tags:
-        - Authentication
+        - Auth
       summary: ''
       operationId: AuthSignOut
       responses:

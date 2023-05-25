@@ -3,9 +3,9 @@ using ZapMe.Authentication;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
-public static class RateLimiterIServiceCollectionExtensions
+public static class RateLimitingIServiceCollectionExtensions
 {
-    public static void ZMAddRateLimiter(this IServiceCollection services)
+    public static void AddRateLimiting(this IServiceCollection services)
     {
         services.AddRateLimiter(opt =>
         {

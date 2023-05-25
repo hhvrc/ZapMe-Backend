@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using ZapMe.Attributes;
 using ZapMe.Authentication.Models;
 using ZapMe.Controllers.Api.V1.Models;
@@ -7,31 +8,29 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
 
-public partial class AuthenticationController
+public partial class AuthController
 {
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="provider"></param>
+    /// <param name="providerName"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <response code="200">Returns SignInOk along with a Cookie with similar data</response>
     /// <response code="401">Error details</response>
     /// <response code="403">Error details</response>
     [AnonymousOnly]
+    [EnableCors("allow_oauth_providers")]
     [RequestSizeLimit(1024)]
-    [HttpPost("oauth-signin", Name = "AuthSignInOAuth")]
+    [HttpPost("o/cb/{providerName}", Name = "OAuth Callback")]
     [Produces(Application.Json)]
     [ProducesResponseType(typeof(SignInOk), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> SignInOAuth([FromQuery] string provider, CancellationToken cancellationToken)
+    public async Task<IActionResult> OAuthCallback([FromRoute] string providerName, CancellationToken cancellationToken)
     {
-        if (!await HttpContext.IsProviderSupportedAsync(provider))
-        {
-            return CreateHttpError.Generic(StatusCodes.Status406NotAcceptable, "Provider not supported", $"The OAuth provider \"{provider}\" is not supported", "Get the list of supported providers from the /api/v1/auth/oauth-providers endpoint").ToActionResult();
-        }
+        if (!await HttpContext.IsProviderSupportedAsync(providerName)) return CreateHttpError.UnsupportedOAuthProvider(providerName).ToActionResult();
 
-        return Challenge(provider);
+        return Challenge(providerName);
     }
 }

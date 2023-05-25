@@ -2,7 +2,7 @@
 
 public sealed class DatabaseOptions
 {
-    public const string SectionName = "Database";
+    public const string SectionName = "PgSQL";
 
     public required string ConnectionString { get; set; }
 
