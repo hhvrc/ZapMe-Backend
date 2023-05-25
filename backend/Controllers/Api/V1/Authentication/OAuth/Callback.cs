@@ -29,10 +29,7 @@ public partial class AuthController
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> OAuthCallback([FromRoute] string providerName, CancellationToken cancellationToken)
     {
-        if (!await HttpContext.IsProviderSupportedAsync(providerName))
-        {
-            return CreateHttpError.Generic(StatusCodes.Status406NotAcceptable, "Provider not supported", $"The OAuth provider \"{providerName}\" is not supported", "Get the list of supported providers from the /api/v1/auth/o/list endpoint").ToActionResult();
-        }
+        if (!await HttpContext.IsProviderSupportedAsync(providerName)) return CreateHttpError.UnsupportedOAuthProvider(providerName).ToActionResult();
 
         return Challenge(providerName);
     }

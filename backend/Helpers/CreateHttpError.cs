@@ -59,6 +59,8 @@ public static class CreateHttpError
         Generic(StatusCodes.Status401Unauthorized, "Unauthorized", "Invalid password", null, ToDict(fields, "Invalid password"), new UserNotification(UserNotification.SeverityLevel.Error, "Invalid password"));
     public static ErrorDetails UserNameOrEmailTaken() =>
         Generic(StatusCodes.Status401Unauthorized, "Unauthorized", "Username or email already taken", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "Username or email already taken"));
+    public static ErrorDetails UnsupportedOAuthProvider(string providerName) =>
+        Generic(StatusCodes.Status406NotAcceptable, "oauth_provider_not_supported", $"The OAuth provider \"{providerName}\" is not supported", "Get the list of supported providers from the /api/v1/auth/o/list endpoint");
     /// <summary>
     /// 429 Too Many Requests
     /// </summary>
