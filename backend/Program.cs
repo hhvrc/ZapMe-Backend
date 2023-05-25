@@ -96,7 +96,7 @@ services.AddTransient<IWebSocketInstanceManager, WebSocketInstanceManager>();
 services.AddRateLimiting();
 services.AddSwagger(isDevelopment);
 services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
-    .AddZapMe(configuration)
+    .AddZapMe()
     .AddDiscord("discord", opt =>
     {
         opt.ClientId = configuration.GetValue<string>("Discord:OAuth2:ClientId")!;

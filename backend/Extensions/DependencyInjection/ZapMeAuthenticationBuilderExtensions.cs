@@ -5,7 +5,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ZapMeAuthenticationBuilderExtensions
 {
-    public static AuthenticationBuilder AddZapMe(this AuthenticationBuilder builder, IConfiguration configuration)
+    public static AuthenticationBuilder AddZapMe(this AuthenticationBuilder builder)
     {
         builder.Services.Configure<AuthenticationOptions>(o =>
         {
