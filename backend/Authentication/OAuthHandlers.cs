@@ -16,10 +16,9 @@ public static class OAuthHandlers
     {
         return authenticationType switch
         {
-            "GitHub" => FetchGithubAuthParams(claimsIdentity, properties, logger),
-            "Google" => FetchGoogleAuthParams(claimsIdentity, properties, logger),
+            "github" => FetchGithubAuthParams(claimsIdentity, properties, logger),
             "twitter" => FetchTwitterAuthParams(claimsIdentity, properties, logger),
-            "Discord" => FetchDiscordAuthParams(claimsIdentity, properties, logger),
+            "discord" => FetchDiscordAuthParams(claimsIdentity, properties, logger),
             _ => OneOf<AuthParameters, ErrorDetails>.FromT1(CreateHttpError.UnsupportedOAuthProvider(authenticationType)),
         };
     }
@@ -66,21 +65,6 @@ public static class OAuthHandlers
         }
 
         return new AuthParameters(twitterName, twitterEmail, twitterProfilePictureUrl, "twitter", twitterId);
-    }
-    private static OneOf<AuthParameters, ErrorDetails> FetchGoogleAuthParams(ClaimsPrincipal claimsIdentity, AuthenticationProperties? properties, ILogger logger)
-    {
-        // TODO: invalid claim names, fixme
-        string? googleId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        string? googleName = claimsIdentity.FindFirst("urn:google:name")?.Value ?? claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
-        string? googleEmail = claimsIdentity.FindFirst(ClaimTypes.Email)?.Value;
-        string? googleProfilePictureUrl = claimsIdentity.FindFirst(ZapMeClaimTypes.ProfileImage)?.Value;
-        if (String.IsNullOrEmpty(googleId) || String.IsNullOrEmpty(googleName) || String.IsNullOrEmpty(googleEmail))
-        {
-            logger.LogError("Google OAuth claims are missing");
-            return OneOf<AuthParameters, ErrorDetails>.FromT1(CreateHttpError.InternalServerError());
-        }
-
-        return new AuthParameters(googleName, googleEmail, googleProfilePictureUrl, "google", googleId);
     }
     /*
     public static async Task<OneOf<AuthenticationEntities, ErrorDetails>> AuthenticateUser(AuthParameters authParams, IServiceProvider serviceProvider, ZapMeContext dbContext, ILogger logger, CancellationToken cancellationToken)

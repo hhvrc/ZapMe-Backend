@@ -194,23 +194,6 @@ services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
         opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
         opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.ProfileImage, "profile_image_url_https");
         opt.Validate();
-    })
-    .AddGoogle("google", opt =>
-    {
-        opt.ClientId = configuration.GetValue<string>("Google:OAuth2:ClientId")!;
-        opt.ClientSecret = configuration.GetValue<string>("Google:OAuth2:ClientSecret")!;
-        opt.CallbackPath = "/api/v1/auth/o/cb/google";
-        opt.AccessDeniedPath = "/api/v1/auth/o/denied";
-        opt.Scope.Add("email");
-        opt.Scope.Add("profile");
-        opt.Scope.Add("openid");
-        opt.SaveTokens = true;
-        opt.StateDataFormat = new DistributedCacheSecureDataFormat<AuthenticationProperties>();
-        opt.CorrelationCookie.HttpOnly = true;
-        opt.CorrelationCookie.SameSite = SameSiteMode.None;
-        opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
-        opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.ProfileImage, "picture");
-        opt.Validate();
     });
 services.AddAuthorization(opt =>
 {
@@ -241,11 +224,7 @@ services.AddCors(opt =>
             "https://github.com",
             "https://*.github.com",
             "https://twitter.com",
-            "https://*.twitter.com",
-            "https://google.com",
-            "https://*.google.com",
-            "https://googleapis.com",
-            "https://*.googleapis.com"
+            "https://*.twitter.com"
         )
         .AllowAnyHeader()
         .WithMethods(

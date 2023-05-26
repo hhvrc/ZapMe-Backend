@@ -11,5 +11,4 @@ public static class ZapMeClaimTypes
     public const string DiscordId = "zapme.discord_id";
     public const string GithubId = "zapme.github_id";
     public const string TwitterId = "zapme.twitter_id";
-    public const string GoogleId = "zapme.google_id";
 }
