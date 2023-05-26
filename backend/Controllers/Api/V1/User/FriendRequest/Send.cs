@@ -14,8 +14,6 @@ partial class UserController
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    /// <response code="200"></response>
-    /// <response code="404"></response>
     [RequestSizeLimit(1024)]
     [HttpPost("i/{userId}/friendrequest", Name = "SendFriendRequest")]
     [Consumes(Application.Json)]

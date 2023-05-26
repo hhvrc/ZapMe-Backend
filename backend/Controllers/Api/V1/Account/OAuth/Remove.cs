@@ -14,7 +14,7 @@ public partial class AccountController
     [Consumes(Application.Json)]
     [Produces(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult OAuthRemove([FromRoute] string providerName)
     {
         return Ok();

@@ -29,9 +29,9 @@ public partial class AccountController
     [Produces(Application.Json)]
     [BinaryPayload(true, "image/png", "image/jpeg", "image/webp", "image/gif")]
     [ProducesResponseType(typeof(UpdateProfilePictureOk), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status411LengthRequired)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status413PayloadTooLarge)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status411LengthRequired)]
+    [ProducesResponseType(StatusCodes.Status413PayloadTooLarge)]
     public async Task<IActionResult> UpdateProfilePicture([FromHeader(Name = "Hash-Sha256")] string? sha256Hash, [FromServices] IImageManager imageManager, CancellationToken cancellationToken)
     {
         ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;

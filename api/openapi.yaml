@@ -35,13 +35,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/CreateOk'
         '400':
-          description: Error details
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
         '409':
-          description: Error details
+          description: Conflict
           content:
             application/json:
               schema:
@@ -74,10 +74,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-        '400':
-          description: ''
-        '500':
-          description: ''
     get:
       tags:
         - Account
@@ -96,8 +92,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-        '404':
-          description: Error details
   '/api/v1/account/oauth/{providerName}':
     post:
       tags:
@@ -170,7 +164,7 @@ paths:
         '200':
           description: Ok
         '404':
-          description: Error details
+          description: Not Found
           content:
             application/json:
               schema:
@@ -214,7 +208,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UpdateEmailOk'
         '400':
-          description: Error details
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -247,7 +241,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccountDto'
         '400':
-          description: Error details
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -336,7 +330,7 @@ paths:
         '200':
           description: Ok
         '400':
-          description: Error details
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -363,7 +357,7 @@ paths:
         '200':
           description: Ok
         '404':
-          description: Error details
+          description: Not Found
           content:
             application/json:
               schema:
@@ -383,19 +377,9 @@ paths:
             type: string
       responses:
         '200':
-          description: Returns SignInOk along with a Cookie with similar data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SignInOk'
-        '403':
-          description: Error details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-        '401':
-          description: Error details
+          description: Success
+        '406':
+          description: Not Acceptable
           content:
             application/json:
               schema:
@@ -415,19 +399,9 @@ paths:
             type: string
       responses:
         '200':
-          description: Returns SignInOk along with a Cookie with similar data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SignInOk'
-        '403':
-          description: Error details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-        '401':
-          description: Error details
+          description: Success
+        '406':
+          description: Not Acceptable
           content:
             application/json:
               schema:
@@ -467,7 +441,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SignInOk'
         '400':
-          description: Error details
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -490,8 +464,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-        '500':
-          description: Error details
   /api/v1/auth/signout:
     post:
       tags:
@@ -545,19 +517,15 @@ paths:
             format: uuid
       responses:
         '200':
-          description: ''
+          description: Success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserDto'
         '304':
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
+          description: Not Modified
         '404':
-          description: ''
+          description: Not Found
           content:
             application/json:
               schema:
@@ -577,13 +545,13 @@ paths:
             format: uuid
       responses:
         '200':
-          description: ''
+          description: Success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserDto'
         '404':
-          description: ''
+          description: Not Found
           content:
             application/json:
               schema:
@@ -603,13 +571,13 @@ paths:
             format: uuid
       responses:
         '200':
-          description: ''
+          description: Success
         '404':
-          description: ''
+          description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProblemDetails'
+                $ref: '#/components/schemas/ErrorDetails'
   /api/v1/user/friendrequests:
     get:
       tags:
@@ -618,7 +586,7 @@ paths:
       operationId: ListFriendRequests
       responses:
         '200':
-          description: ''
+          description: Success
           content:
             application/json:
               schema:
@@ -639,13 +607,13 @@ paths:
             format: uuid
       responses:
         '200':
-          description: ''
+          description: Success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserDto'
         '404':
-          description: ''
+          description: Not Found
           content:
             application/json:
               schema:
@@ -665,13 +633,13 @@ paths:
             type: string
       responses:
         '200':
-          description: ''
+          description: Success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserDto'
         '404':
-          description: ''
+          description: Not Found
           content:
             application/json:
               schema:
@@ -692,9 +660,9 @@ paths:
               description: Message sent to server to report a user
       responses:
         '200':
-          description: ''
+          description: Success
         '404':
-          description: ''
+          description: Not Found
           content:
             application/json:
               schema:
@@ -713,7 +681,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetails'
+                $ref: '#/components/schemas/ProblemDetails'
 components:
   schemas:
     AccountDto:

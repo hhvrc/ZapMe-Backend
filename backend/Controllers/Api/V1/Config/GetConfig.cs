@@ -16,7 +16,7 @@ public partial class ConfigController
     [HttpGet(Name = "GetConfig")]
     [Produces(Application.Json)]
     [ProducesResponseType(typeof(Config.Models.Config), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public Config.Models.Config GetConfig()
     {
         return new Config.Models.Config

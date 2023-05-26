@@ -16,17 +16,13 @@ public partial class AuthController
     /// <param name="providerName"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    /// <response code="200">Returns SignInOk along with a Cookie with similar data</response>
-    /// <response code="401">Error details</response>
-    /// <response code="403">Error details</response>
     [AnonymousOnly]
     [EnableCors("allow_oauth_providers")]
     [RequestSizeLimit(1024)]
     [HttpGet("o/req/{providerName}", Name = "OAuth Authorize")]
     [Produces(Application.Json)]
-    [ProducesResponseType(typeof(SignInOk), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
     public async Task<IActionResult> OAuthAuthorize([FromRoute] string providerName, CancellationToken cancellationToken)
     {
         if (!await HttpContext.IsProviderSupportedAsync(providerName)) return CreateHttpError.UnsupportedOAuthProvider(providerName).ToActionResult();

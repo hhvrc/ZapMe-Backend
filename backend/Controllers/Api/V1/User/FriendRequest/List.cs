@@ -14,7 +14,6 @@ public partial class UserController
     /// List all incoming and outgoing friend requests
     /// </summary>
     /// <returns></returns>
-    /// <response code="200"></response>
     [RequestSizeLimit(1024)]
     [HttpGet("friendrequests", Name = "ListFriendRequests")]
     [Consumes(Application.Json)]

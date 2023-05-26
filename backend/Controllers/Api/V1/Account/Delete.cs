@@ -19,13 +19,11 @@ public partial class AccountController
     /// </summary>
     /// <returns></returns>
     /// <response code="200">Empty</response>
-    /// <response code="400"></response>
-    /// <response code="500"></response>
     [RequestSizeLimit(1024)]
     [HttpDelete(Name = "DeleteAccount")]
     [Produces(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Delete(
         [FromHeader][Password(true)] string password,
         [FromHeader][StringLength(1024)] string? reason,

@@ -17,14 +17,13 @@ public partial class AccountController
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <response code="200">Ok</response>
-    /// <response code="404">Error details</response>
     [AllowAnonymous]
     [RequestSizeLimit(1024)]
     [HttpPost("recover-confirm", Name = "AccountRecoveryConfirm")]
     [Consumes(Application.Json)]
     [Produces(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)] // Token invalid, expired, or already used
+    [ProducesResponseType(StatusCodes.Status404NotFound)] // Token invalid, expired, or already used
     public async Task<IActionResult> RecoveryConfirm([FromBody] Account.Models.RecoveryConfirm body, [FromServices] IPasswordResetManager passwordResetManager, CancellationToken cancellationToken)
     {
         if (!await passwordResetManager.TryCompletePasswordReset(body.Token, body.NewPassword, cancellationToken))

@@ -13,11 +13,10 @@ public partial class AccountController
     /// </summary>
     /// <returns></returns>
     /// <response code="200">Account</response>
-    /// <response code="404">Error details</response>
     [HttpGet(Name = "GetAccount")]
     [Produces(Application.Json)]
     [ProducesResponseType(typeof(AccountDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public AccountDto Get()
     {
         ZapMeIdentity identity = (User as ZapMePrincipal)!.Identity;

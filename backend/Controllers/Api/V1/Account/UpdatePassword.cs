@@ -18,14 +18,13 @@ public partial class AccountController
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <response code="200">Ok</response>
-    /// <response code="400">Error details</response>
     [RequestSizeLimit(1024)]
     [HttpPut("password", Name = "UpdatePassword")]
     [Consumes(Application.Json)]
     [Produces(Application.Json)]
     [ProducesResponseType(typeof(AccountDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Update([FromBody] UpdatePassword body, CancellationToken cancellationToken)
     {
         ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;

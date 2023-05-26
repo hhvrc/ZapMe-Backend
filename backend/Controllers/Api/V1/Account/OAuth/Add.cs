@@ -15,8 +15,8 @@ public partial class AccountController
     [Consumes(Application.Json)]
     [Produces(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status409Conflict)] // Provider already added
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)] // Provider not supported
+    [ProducesResponseType(StatusCodes.Status409Conflict)] // Provider already added
+    [ProducesResponseType(StatusCodes.Status404NotFound)] // Provider not supported
     public IActionResult OAuthAdd([FromRoute] string providerName, [FromBody] AccountOAuthAdd body)
     {
         return Ok(String.Empty);

@@ -26,18 +26,16 @@ public partial class AuthController
     /// <param name="cancellationToken"></param>
     /// <returns>The user account</returns>
     /// <response code="200">Returns SignInOk along with a Cookie with similar data</response>
-    /// <response code="400">Error details</response>
-    /// <response code="500">Error details</response>
     [AnonymousOnly]
     [RequestSizeLimit(1024)]
     [HttpPost("signin", Name = "AuthSignIn")]
     [Consumes(Application.Json)]
     [Produces(Application.Json)]
     [ProducesResponseType(typeof(SignInOk), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status413RequestEntityTooLarge)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status413RequestEntityTooLarge)]
     public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] ILockOutStore lockOutStore, [FromServices] IOptions<ZapMeOptions> options, CancellationToken cancellationToken)
     {
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);

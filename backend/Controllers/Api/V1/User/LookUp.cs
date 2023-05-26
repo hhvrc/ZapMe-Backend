@@ -17,13 +17,11 @@ public partial class UserController
     /// <param name="userName"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    /// <response code="200"></response>
-    /// <response code="404"></response>
     [RequestSizeLimit(1024)]
     [HttpGet("u/{userName}", Name = "LookUpUser")]
     [Produces(Application.Json)]
-    [ProducesResponseType(typeof(User.Models.UserDto), StatusCodes.Status200OK)]     // Accepted
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status404NotFound)] // User not found
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]     // Accepted
+    [ProducesResponseType(StatusCodes.Status404NotFound)] // User not found
     public async Task<IActionResult> LookUp([FromRoute] string userName, CancellationToken cancellationToken)
     {
         UserEntity user = (User as ZapMePrincipal)!.Identity.User;

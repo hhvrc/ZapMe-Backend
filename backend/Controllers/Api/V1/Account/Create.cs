@@ -28,16 +28,14 @@ public partial class AccountController
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <response code="201">Created account</response>
-    /// <response code="400">Error details</response>
-    /// <response code="409">Error details</response>
     [AnonymousOnly]
     [RequestSizeLimit(1024)]
     [HttpPost(Name = "CreateAccount")]
     [Consumes(Application.Json)]
     [Produces(Application.Json)]
     [ProducesResponseType(typeof(CreateOk), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status409Conflict)] // Username/email already taken
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)] // Username/email already taken
     public async Task<IActionResult> Create(
         [FromBody] CreateAccount body,
         [FromServices] ICloudflareTurnstileService cfTurnstileService,
