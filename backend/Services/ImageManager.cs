@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.DependencyInjection;
 using OneOf;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data;
@@ -43,19 +44,29 @@ public sealed class ImageManager : IImageManager
         }, cancellationToken);
     }
 
-    public async Task<OneOf<ImageEntity, ErrorDetails>> GetOrCreateRecordAsync(Stream imageStream, ulong imageSizeBytes, string regionName, string? sha256Hash, Guid? uploaderId, CancellationToken cancellationToken)
+    public async Task<OneOf<ImageEntity, ErrorDetails>> GetOrCreateRecordAsync(string imageUrl, string regionName, string? sha256Hash, Guid? uploaderId, CancellationToken cancellationToken)
     {
-        if (imageSizeBytes < 0)
+        using HttpClient client = new();
+        using HttpResponseMessage response = await client.GetAsync(imageUrl, cancellationToken);
+        long contentLength = response.Content.Headers.ContentLength ?? -1;
+        if (contentLength is <= 0 or > Int32.MaxValue)
         {
-            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Invalid Content-Length", "Invalid Content-Length header");
+            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Invalid image", "Image size is invalid");
         }
+
+        Stream imageStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        return await GetOrCreateRecordAsync(imageStream, regionName, (int)contentLength, null, null, cancellationToken);
+    }
+
+    public async Task<OneOf<ImageEntity, ErrorDetails>> GetOrCreateRecordAsync(Stream imageStream, string regionName, int imageSizeBytes, string? sha256Hash, Guid? uploaderId, CancellationToken cancellationToken)
+    {
         if (imageSizeBytes > 1_112_000) // TODO: remove magic number
         {
             return CreateHttpError.Generic(StatusCodes.Status413PayloadTooLarge, "Payload too large", "Image too large, max 1MB");
         }
 
-        // Create stream that can be read multiple times
-        using MemoryStream memoryStream = new MemoryStream((int)imageSizeBytes);
+        // Create stream that can be read multiple times, imageSizeBytes is initially just a hint
+        using MemoryStream memoryStream = imageSizeBytes > 0 ? new MemoryStream(imageSizeBytes) : new MemoryStream();
 
         // Parse image for metadata and rewrite to webp/gif
         OneOf<ImageUtils.ParseResult, ErrorDetails> result = await ImageUtils.ParseAndRewriteFromStreamAsync(imageStream, memoryStream, cancellationToken);
@@ -92,7 +103,7 @@ public sealed class ImageManager : IImageManager
             Height = imageInfo.Height,
             Width = imageInfo.Width,
             FrameCount = imageInfo.FrameCount,
-            SizeBytes = (uint)imageSizeBytes,
+            SizeBytes = (uint)memoryStream.Length, // TODO: maybe possible crash if image is too large (very unlikely though)
             Extension = imageInfo.Extension,
             Sha256 = sha256_hex,
             R2RegionName = regionName,

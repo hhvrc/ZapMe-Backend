@@ -1,9 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 using OneOf;
 using System.Security.Claims;
+using System.Threading;
 using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.Data;
 using ZapMe.Data.Models;
+using ZapMe.Enums;
 using ZapMe.Helpers;
+using ZapMe.Services;
+using ZapMe.Services.Interfaces;
+using ZapMe.Utils;
 
 namespace ZapMe.Authentication;
 
@@ -66,88 +73,37 @@ public static class OAuthHandlers
 
         return new AuthParameters(twitterName, twitterEmail, twitterProfilePictureUrl, "twitter", twitterId);
     }
-    /*
-    public static async Task<OneOf<AuthenticationEntities, ErrorDetails>> AuthenticateUser(AuthParameters authParams, IServiceProvider serviceProvider, ZapMeContext dbContext, ILogger logger, CancellationToken cancellationToken)
+    
+    public static async Task<OneOf<OAuthConnectionEntity, ErrorDetails>> GetOrCreateConnection(AuthParameters authParams, IServiceProvider serviceProvider, ZapMeContext dbContext, ILogger logger, CancellationToken cancellationToken)
     {
-        OAuthConnectionEntity? connection = await dbContext.OAuthConnections
-            .Include(oc => oc.User)
-            .ThenInclude(u => u.Sessions)
-            .FirstOrDefaultAsync(x => x.ProviderName == authParams.Provider && x.ProviderId == authParams.ProviderId, cancellationToken);
-        if (connection is null)
+        var connectionEntity = await dbContext.OAuthConnections
+            .Include(c => c.User)
+            .ThenInclude(u => u.ProfilePicture)
+            .FirstOrDefaultAsync(c => c.ProviderName == authParams.Provider && c.ProviderId == authParams.ProviderId, cancellationToken);
+        if (connectionEntity != null)
         {
-            return await CreateNewUser(authParams, serviceProvider, dbContext, logger);
+            return connectionEntity;
         }
 
-        return await CreateSession(connection, serviceProvider, dbContext, logger, cancellationToken);
+        ErrorDetails errorDetails;
+        ImageEntity? profilePicture = null;
+        if (!String.IsNullOrEmpty(authParams.ProfilePictureUrl))
+        {
+            IImageManager imageManager = serviceProvider.GetRequiredService<IImageManager>();
+            var createImageResult = await imageManager.GetOrCreateRecordAsync(authParams.ProfilePictureUrl, "regionThingy", null, null, cancellationToken); // TODO: URGENT: fixme
+            if (createImageResult.TryPickT1(out errorDetails, out profilePicture))
+            {
+                return errorDetails;
+            }
+        }
+
+        IOAuthConnectionManager connectionManager = serviceProvider.GetRequiredService<IOAuthConnectionManager>();
+        var getOrCreateConnectionResult = await connectionManager.GetOrCreateConnectionAsync(authParams.Name, authParams.Email, profilePicture, authParams.Provider, authParams.ProviderId, cancellationToken);
+        if (getOrCreateConnectionResult.TryPickT1(out errorDetails, out connectionEntity))
+        {
+            return errorDetails;
+        }
+
+        return connectionEntity;
     }
-
-    private static async Task<OneOf<AuthenticationEntities, ErrorDetails>> CreateNewUser(AuthParameters authParams, IServiceProvider serviceProvider, ZapMeContext dbContext, ILogger logger)
-    {
-        ImageManager imageManager = serviceProvider.GetRequiredService<ImageManager>();
-        UserStore userStore = serviceProvider.GetRequiredService<UserStore>();
-
-        UserEntity user = new()
-        {
-            Name = authParams.Name,
-            Email = authParams.Email,
-            ProfilePictureUrl = authParams.ProfilePictureUrl,
-            Sessions = new List<SessionEntity>(),
-        };
-        OAuthConnectionEntity connection = new()
-        {
-            ProviderName = authParams.Provider,
-            ProviderId = authParams.ProviderId,
-            User = user,
-        };
-        SessionEntity session = new()
-        {
-            User = user,
-            OAuthConnection = connection,
-            Token = Guid.NewGuid().ToString(),
-            ExpirationDate = DateTime.UtcNow.AddDays(7),
-        };
-
-        try
-        {
-            await dbContext.Users.AddAsync(user);
-            await dbContext.OAuthConnections.AddAsync(connection);
-            await dbContext.Sessions.AddAsync(session);
-            await dbContext.SaveChangesAsync();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to create new user");
-            return OneOf<AuthenticationEntities, ErrorDetails>.FromT1(CreateHttpError.InternalServerError());
-        }
-
-        return new AuthenticationEntities(user, connection, session);
-    }
-
-    private static async Task<OneOf<AuthenticationEntities, ErrorDetails>> CreateSession(OAuthConnectionEntity connection, IServiceProvider serviceProvider, ZapMeContext dbContext, ILogger logger, CancellationToken cancellationToken)
-    {
-        SessionManager sessionManager = serviceProvider.GetRequiredService<SessionManager>();
-
-        sessionManager.CreateAsync(connection.User, cancellationToken);
-        SessionEntity session = new()
-        {
-            User = connection.User,
-            OAuthConnection = connection,
-            Token = Guid.NewGuid().ToString(),
-            ExpirationDate = DateTime.UtcNow.AddDays(7),
-        };
-
-        try
-        {
-            await dbContext.Sessions.AddAsync(session);
-            await dbContext.SaveChangesAsync();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to create new session");
-            return OneOf<AuthenticationEntities, ErrorDetails>.FromT1(CreateHttpError.InternalServerError());
-        }
-
-        return new AuthenticationEntities(connection.User, connection, session);
-    }
-    */
 }

@@ -14,7 +14,7 @@ public static class ImageUtils
     /// <param name="outputStream"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>Parse result or ErrorDetails(400)</returns>
-    public static async Task<OneOf<ParseResult, ErrorDetails>> ParseAndRewriteFromStreamAsync(Stream inputStream, Stream outputStream, CancellationToken cancellationToken = default)
+    public static async Task<OneOf<ParseResult, ErrorDetails>> ParseAndRewriteFromStreamAsync(Stream inputStream, Stream? outputStream, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -38,12 +38,12 @@ public static class ImageUtils
             // Write
             if (frameCount == 1)
             {
-                await image.SaveAsWebpAsync(outputStream, cancellationToken);
+                if (outputStream != null) await image.SaveAsWebpAsync(outputStream, cancellationToken);
                 return new ParseResult((uint)width, (uint)height, (uint)frameCount, "webp");
             }
             else
             {
-                await image.SaveAsGifAsync(outputStream, cancellationToken);
+                if (outputStream != null) await image.SaveAsGifAsync(outputStream, cancellationToken);
                 return new ParseResult((uint)width, (uint)height, (uint)frameCount, "gif");
             }
         }

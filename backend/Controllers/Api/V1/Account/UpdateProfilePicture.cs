@@ -36,15 +36,15 @@ public partial class AccountController
     {
         ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
 
-        long? length = Request.ContentLength;
-        if (length == null)
+        long length = Request.ContentLength ?? -1;
+        if (length is <= 0 or > Int32.MaxValue)
         {
-            return CreateHttpError.Generic(StatusCodes.Status411LengthRequired, "Length is required", "Missing Content-Length header").ToActionResult();
+            return CreateHttpError.Generic(StatusCodes.Status411LengthRequired, "Length is required", "Missing or invalid Content-Length header").ToActionResult();
         }
 
         string cfRegion = CountryLookup.GetCloudflareRegion(this.GetCloudflareIPCountry());
 
-        OneOf<ImageEntity, ErrorDetails> res = await imageManager.GetOrCreateRecordAsync(Request.Body, (ulong)length, cfRegion, sha256Hash, identity.UserId, cancellationToken);
+        OneOf<ImageEntity, ErrorDetails> res = await imageManager.GetOrCreateRecordAsync(Request.Body, cfRegion, (int)length, sha256Hash, identity.UserId, cancellationToken);
         if (res.TryPickT1(out ErrorDetails error, out ImageEntity image))
         {
             return error.ToActionResult();

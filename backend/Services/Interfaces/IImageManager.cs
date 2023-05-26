@@ -33,12 +33,23 @@ public interface IImageManager
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="imageStream"></param>
-    /// <param name="imageSizeBytes"></param>
+    /// <param name="imageUrl"></param>
     /// <param name="regionName"></param>
     /// <param name="sha256Hash"></param>
     /// <param name="uploaderId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>ImageEntity or ErrorDetails(400/413)</returns>
-    Task<OneOf<ImageEntity, ErrorDetails>> GetOrCreateRecordAsync(Stream imageStream, ulong imageSizeBytes, string regionName, string? sha256Hash = null, Guid? uploaderId = null, CancellationToken cancellationToken = default);
+    Task<OneOf<ImageEntity, ErrorDetails>> GetOrCreateRecordAsync(string imageUrl, string regionName, string? sha256Hash = null, Guid? uploaderId = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="imageStream"></param>
+    /// <param name="imageSizeHint"></param>
+    /// <param name="regionName"></param>
+    /// <param name="sha256Hash"></param>
+    /// <param name="uploaderId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>ImageEntity or ErrorDetails(400/413)</returns>
+    Task<OneOf<ImageEntity, ErrorDetails>> GetOrCreateRecordAsync(Stream imageStream, string regionName, int imageSizeHint = -1, string? sha256Hash = null, Guid? uploaderId = null, CancellationToken cancellationToken = default);
 }

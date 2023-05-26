@@ -5,9 +5,11 @@ using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Text.Json;
 using ZapMe.Authentication.Models;
+using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data;
 using ZapMe.Data.Models;
 using ZapMe.Options;
+using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Authentication;
 
@@ -54,25 +56,34 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
         }
         else
         {
+            ErrorDetails errorDetails;
             var authParamsResult = OAuthHandlers.FetchAuthParams(authenticationType, claimsIdentity, properties, _logger);
-            if (authParamsResult.TryPickT1(out var errorDetails, out var authParams))
+            if (authParamsResult.TryPickT1(out errorDetails, out var authParams))
             {
                 await errorDetails.Write(Response, _jsonSerializerOptions);
                 return;
             }
 
-            throw new NotImplementedException();
-            /*
-            var authenticationResult = await OAuthHandlers.AuthenticateUser(authParams, _context.RequestServices, _dbContext, _logger);
-            if (authenticationResult.TryPickT1(out errorDetails, out var result))
+            IServiceProvider serviceProvider = _context.RequestServices;
+            CancellationToken cancellationToken = _context.RequestAborted;
+            var authenticationResult = await OAuthHandlers.GetOrCreateConnection(authParams, serviceProvider, _dbContext, _logger, cancellationToken);
+            if (authenticationResult.TryPickT1(out errorDetails, out var connectionEntity))
             {
                 await errorDetails.Write(Response, _jsonSerializerOptions);
                 return;
             }
-            */
+
+            session = await serviceProvider.GetRequiredService<ISessionManager>().CreateAsync(
+                connectionEntity.User,
+                _context.GetRemoteIP(),
+                _context.GetCloudflareIPCountry(),
+                _context.GetRemoteUserAgent(),
+                true, // TODO: should rememberMe be true?
+                cancellationToken
+            );
         }
 
-        SignInOk result = new SignInOk(session);
+        SignInOk signInOk = new SignInOk(session);
 
         Response.StatusCode = StatusCodes.Status200OK;
         Response.Cookies.Append(
@@ -93,7 +104,7 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             }
         );
 
-        await Response.WriteAsJsonAsync(result, _jsonSerializerOptions);
+        await Response.WriteAsJsonAsync(signInOk, _jsonSerializerOptions);
     }
 
     public Task SignOutAsync(AuthenticationProperties? properties)
