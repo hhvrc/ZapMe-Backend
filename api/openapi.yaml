@@ -681,7 +681,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProblemDetails'
+                $ref: '#/components/schemas/ErrorDetails'
 components:
   schemas:
     AccountDto:
@@ -1008,21 +1008,6 @@ components:
           description: UserId's of users that this user has sent friend requests to
       additionalProperties: false
       description: List of incoming and outgoing friendrequests
-    HttpValidationProblemDetails:
-      required:
-        - errors
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/ProblemDetails'
-      properties:
-        errors:
-          type: object
-          additionalProperties:
-            type: array
-            items:
-              type: string
-          readOnly: true
-      additionalProperties: { }
     OAuthProviderList:
       required:
         - providers
@@ -1035,26 +1020,6 @@ components:
           description: ''
       additionalProperties: false
       description: ''
-    ProblemDetails:
-      type: object
-      properties:
-        type:
-          type: string
-          nullable: true
-        title:
-          type: string
-          nullable: true
-        status:
-          type: integer
-          format: int32
-          nullable: true
-        detail:
-          type: string
-          nullable: true
-        instance:
-          type: string
-          nullable: true
-      additionalProperties: { }
     RecoveryConfirm:
       required:
         - newPassword
