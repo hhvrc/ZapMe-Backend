@@ -2,6 +2,7 @@ using Amazon.S3;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Twitter;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Logging;
 using System.Text.Json;
@@ -54,6 +55,10 @@ builder.Logging.AddSimpleConsole();
 // ######## CORE SERVICES #################
 // ########################################
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+});
 services.AddRouting(opt => opt.LowercaseUrls = true);
 services.AddControllers().AddJsonOptions(opt =>
 {
@@ -266,6 +271,8 @@ else
 {
     app.UseExceptionHandler("/error");
 }
+
+app.UseForwardedHeaders();
 
 app.Map("/api", true, app =>
 {
