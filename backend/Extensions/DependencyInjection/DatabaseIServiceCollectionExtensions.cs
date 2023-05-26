@@ -14,7 +14,7 @@ public static class DatabaseIServiceCollectionExtensions
             {
                 dbOpt.UseNpgsql(options.ConnectionString, npgSqlOpt =>
                 {
-                    npgSqlOpt.SetPostgresVersion(14, 5);
+                    npgSqlOpt.SetPostgresVersion(options.ServerVersionMajor, options.ServerVersionMinor);
                 });
                 dbOpt.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
