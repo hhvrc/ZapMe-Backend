@@ -1,5 +1,6 @@
 using Amazon.S3;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Twitter;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Logging;
@@ -108,6 +109,9 @@ services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
         opt.Prompt = "none";
         opt.SaveTokens = true;
         opt.StateDataFormat = new DistributedCacheSecureDataFormat<AuthenticationProperties>();
+        opt.CorrelationCookie.HttpOnly = true;
+        opt.CorrelationCookie.SameSite = SameSiteMode.None;
+        opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
         opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.ProfileImage, json =>
         {
             string? userId = json.GetString("id");
@@ -129,6 +133,9 @@ services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
         opt.Scope.Add("user:email");
         opt.SaveTokens = true;
         opt.StateDataFormat = new DistributedCacheSecureDataFormat<AuthenticationProperties>();
+        opt.CorrelationCookie.HttpOnly = true;
+        opt.CorrelationCookie.SameSite = SameSiteMode.None;
+        opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
         opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.ProfileImage, json =>
         {
             string? avatarUrl = json.GetString("avatar_url");
@@ -153,6 +160,9 @@ services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
         opt.SaveTokens = true;
         opt.RetrieveUserDetails = true;
         opt.StateDataFormat = new DistributedCacheSecureDataFormat<RequestToken>();
+        opt.CorrelationCookie.HttpOnly = true;
+        opt.CorrelationCookie.SameSite = SameSiteMode.None;
+        opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
         opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.ProfileImage, "profile_image_url_https");
         opt.Validate();
     })
@@ -167,6 +177,9 @@ services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
         opt.Scope.Add("openid");
         opt.SaveTokens = true;
         opt.StateDataFormat = new DistributedCacheSecureDataFormat<AuthenticationProperties>();
+        opt.CorrelationCookie.HttpOnly = true;
+        opt.CorrelationCookie.SameSite = SameSiteMode.None;
+        opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
         opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.ProfileImage, "picture");
         opt.Validate();
     });
