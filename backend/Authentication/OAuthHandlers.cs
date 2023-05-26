@@ -21,7 +21,7 @@ public static class OAuthHandlers
 
     public static OneOf<AuthParameters, ErrorDetails> FetchAuthParams(string authenticationType, ClaimsPrincipal claimsIdentity, AuthenticationProperties? properties, ILogger logger)
     {
-        return authenticationType switch
+        return authenticationType.ToLower() switch
         {
             "github" => FetchGithubAuthParams(claimsIdentity, properties, logger),
             "twitter" => FetchTwitterAuthParams(claimsIdentity, properties, logger),
