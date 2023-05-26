@@ -1,10 +1,10 @@
 using Amazon.S3;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Twitter;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Logging;
+using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using ZapMe.Authentication;
@@ -55,9 +55,33 @@ builder.Logging.AddSimpleConsole();
 // ######## CORE SERVICES #################
 // ########################################
 
-builder.Services.Configure<ForwardedHeadersOptions>(options =>
+builder.Services.Configure<ForwardedHeadersOptions>(opt =>
 {
-    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+    opt.ForwardedHeaders = ForwardedHeaders.All;
+
+    opt.KnownNetworks.Clear();
+    foreach (string ip in configuration.GetSection("Proxy:SubNetList").Get<string[]>() ?? Array.Empty<string>())
+    {
+        string[] parts = ip.Split('/');
+        if (parts.Length != 2 || !IPAddress.TryParse(parts[0], out IPAddress? address) || !Int32.TryParse(parts[1], out int mask) || mask < 0 || mask > 32)
+        {
+            Console.WriteLine($"Skipping invalid proxy subnet: {ip}");
+            continue;
+        }
+
+        opt.KnownNetworks.Add(new IPNetwork(address, mask));
+    }
+
+    opt.KnownProxies.Clear();
+    foreach (string ip in configuration.GetSection("Proxy:AllowedIPs").Get<string[]>() ?? Array.Empty<string>())
+    {
+        if (!IPAddress.TryParse(ip, out IPAddress? address))
+        {
+            Console.WriteLine($"Skipping invalid proxy ip: {ip}");
+            continue;
+        }
+        opt.KnownProxies.Add(address);
+    }
 });
 services.AddRouting(opt => opt.LowercaseUrls = true);
 services.AddControllers().AddJsonOptions(opt =>
