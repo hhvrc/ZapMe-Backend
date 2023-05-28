@@ -13,11 +13,10 @@ partial class HealthController
     /// <response code="200">Health status</response>
     [AllowAnonymous]
     [HttpGet(Name = "GetHealth")]
-    [Produces(Text.Plain)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult Get()
     {
-        return Ok("Hello World!");
+        return Ok("{\"msg\": \"Hello World!\"}");
     }
 }
 

@@ -96,7 +96,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
     {
         string tokenHash = HashingUtils.Sha256_Hex(token);
 
-        PasswordResetRequestEntity? passwordResetRequest = await _dbContext.PasswordResetRequests.FirstOrDefaultAsync(p => p.TokenHash == tokenHash, cancellationToken);
+        UserPasswordResetRequestEntity? passwordResetRequest = await _dbContext.UserPasswordResetRequests.FirstOrDefaultAsync(p => p.TokenHash == tokenHash, cancellationToken);
         if (passwordResetRequest == null) return false;
 
         // Check if token is valid
@@ -108,7 +108,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
         using IDbContextTransaction? transaction = await _dbContext.Database.BeginTransactionIfNotExistsAsync(cancellationToken);
 
         // Important to delete by token hash, and not account id as if the token has changed, someone else has issued a password reset
-        bool deleted = await _dbContext.PasswordResetRequests
+        bool deleted = await _dbContext.UserPasswordResetRequests
             .Where(p => p.TokenHash == tokenHash)
             .ExecuteDeleteAsync(cancellationToken) > 0;
         if (!deleted) return false; // Another caller made it before we did
@@ -132,7 +132,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
 
     public Task<int> RemoveExpiredRequests(CancellationToken cancellationToken)
     {
-        return _dbContext.PasswordResetRequests
+        return _dbContext.UserPasswordResetRequests
             .Where(x => x.CreatedAt < DateTime.UtcNow.AddHours(-24))
             .ExecuteDeleteAsync(cancellationToken);
     }

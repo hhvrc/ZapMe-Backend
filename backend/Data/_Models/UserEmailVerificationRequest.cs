@@ -4,7 +4,7 @@ using ZapMe.Constants;
 
 namespace ZapMe.Data.Models;
 
-public sealed class EmailVerificationRequestEntity
+public sealed class UserEmailVerificationRequestEntity
 {
     public const string TableName = "emailVerificationRequest";
     public const string TableNewEmailIndex = TableName + "_newEmail_idx";
@@ -38,11 +38,11 @@ public sealed class EmailVerificationRequestEntity
     public DateTime CreatedAt { get; set; }
 }
 
-public sealed class EmailAddressChangeRequestEntityConfiguration : IEntityTypeConfiguration<EmailVerificationRequestEntity>
+public sealed class UserEmailAddressChangeRequestEntityConfiguration : IEntityTypeConfiguration<UserEmailVerificationRequestEntity>
 {
-    public void Configure(EntityTypeBuilder<EmailVerificationRequestEntity> builder)
+    public void Configure(EntityTypeBuilder<UserEmailVerificationRequestEntity> builder)
     {
-        builder.ToTable(EmailVerificationRequestEntity.TableName);
+        builder.ToTable(UserEmailVerificationRequestEntity.TableName);
 
         builder.HasKey(macr => macr.UserId);
 
@@ -63,15 +63,15 @@ public sealed class EmailAddressChangeRequestEntityConfiguration : IEntityTypeCo
 
         builder.HasOne(macr => macr.User)
             .WithOne(u => u.EmailVerificationRequest)
-            .HasForeignKey<EmailVerificationRequestEntity>(macr => macr.UserId)
+            .HasForeignKey<UserEmailVerificationRequestEntity>(macr => macr.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(macr => macr.NewEmail)
             .IsUnique()
-            .HasDatabaseName(EmailVerificationRequestEntity.TableNewEmailIndex);
+            .HasDatabaseName(UserEmailVerificationRequestEntity.TableNewEmailIndex);
 
         builder.HasIndex(macr => macr.TokenHash)
-            .HasDatabaseName(EmailVerificationRequestEntity.TableTokenIndex)
+            .HasDatabaseName(UserEmailVerificationRequestEntity.TableTokenIndex)
             .IsUnique();
     }
 }

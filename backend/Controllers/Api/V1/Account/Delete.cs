@@ -21,7 +21,6 @@ public partial class AccountController
     /// <response code="200">Empty</response>
     [RequestSizeLimit(1024)]
     [HttpDelete(Name = "DeleteAccount")]
-    [Produces(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Delete(

@@ -11,5 +11,5 @@ public interface IPasswordResetRequestStore
     /// <param name="tokenHash"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public Task<PasswordResetRequestEntity> UpsertAsync(Guid accountId, string tokenHash, CancellationToken cancellationToken = default);
+    public Task<UserPasswordResetRequestEntity> UpsertAsync(Guid accountId, string tokenHash, CancellationToken cancellationToken = default);
 }

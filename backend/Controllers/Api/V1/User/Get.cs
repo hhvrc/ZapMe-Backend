@@ -19,7 +19,6 @@ public partial class UserController
     /// <returns></returns>
     [RequestSizeLimit(1024)]
     [HttpGet("i/{userId}", Name = "GetUser")]
-    [Produces(Application.Json)]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]     // Accepted
     [ProducesResponseType(StatusCodes.Status404NotFound)] // User not found
     public async Task<IActionResult> Get([FromRoute] Guid userId, CancellationToken cancellationToken)

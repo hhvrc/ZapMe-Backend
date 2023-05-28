@@ -5,15 +5,15 @@ using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Text.Json;
 using ZapMe.Authentication.Models;
-using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data;
 using ZapMe.Data.Models;
+using ZapMe.Helpers;
 using ZapMe.Options;
-using ZapMe.Services.Interfaces;
+using ZapMe.Utils;
 
 namespace ZapMe.Authentication;
 
-public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
+public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
 {
     private AuthenticationScheme _scheme = default!;
     private HttpContext _context = default!;
@@ -34,6 +34,11 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
 
     private HttpRequest Request => _context.Request;
     private HttpResponse Response => _context.Response;
+    private string RequestingIpAddress => _context.GetRemoteIP();
+    private string RequestingIpCountry => _context.GetCloudflareIPCountry();
+    private string RequestingIpRegion => CountryLookup.GetCloudflareRegion(RequestingIpCountry);
+    private string RequestingUserAgent => _context.GetRemoteUserAgent();
+    private CancellationToken CancellationToken => _context.RequestAborted;
 
     public Task InitializeAsync(AuthenticationScheme scheme, HttpContext context)
     {
@@ -44,48 +49,26 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
         return Task.CompletedTask;
     }
 
-    public async Task SignInAsync(ClaimsPrincipal claimsIdentity, AuthenticationProperties? properties)
+    public Task SignInAsync(ClaimsPrincipal claimsIdentity, AuthenticationProperties? properties)
     {
-        string? authenticationType = claimsIdentity.Identity?.AuthenticationType;
-        if (String.IsNullOrEmpty(authenticationType)) throw new InvalidOperationException($"Cannot sign in with an empty {nameof(claimsIdentity.Identity.AuthenticationType)}.");
-
-        SessionEntity session;
-        if (authenticationType == _scheme.Name)
+        string? authScheme = claimsIdentity.Identity?.AuthenticationType;
+        if (String.IsNullOrEmpty(authScheme))
         {
-            session = (claimsIdentity as ZapMePrincipal)!.Identity.Session;
-        }
-        else
-        {
-            ErrorDetails errorDetails;
-            var authParamsResult = OAuthHandlers.FetchAuthParams(authenticationType, claimsIdentity, properties, _logger);
-            if (authParamsResult.TryPickT1(out errorDetails, out var authParams))
-            {
-                await errorDetails.Write(Response, _jsonSerializerOptions);
-                return;
-            }
-
-            IServiceProvider serviceProvider = _context.RequestServices;
-            CancellationToken cancellationToken = _context.RequestAborted;
-            var authenticationResult = await OAuthHandlers.GetOrCreateConnection(authParams, serviceProvider, _dbContext, _logger, cancellationToken);
-            if (authenticationResult.TryPickT1(out errorDetails, out var connectionEntity))
-            {
-                await errorDetails.Write(Response, _jsonSerializerOptions);
-                return;
-            }
-
-            session = await serviceProvider.GetRequiredService<ISessionManager>().CreateAsync(
-                connectionEntity.User,
-                _context.GetRemoteIP(),
-                _context.GetCloudflareIPCountry(),
-                _context.GetRemoteUserAgent(),
-                true, // TODO: should rememberMe be true?
-                cancellationToken
-            );
+            _logger.LogError($"Cannot sign in with an empty AuthenticationScheme.");
+            return CreateHttpError.InternalServerError().Write(Response);
         }
 
+        if (authScheme == _scheme.Name)
+        {
+            return ZapMeSignInAsync(claimsIdentity, properties);
+        }
+
+        return SignInOAuthAsync(authScheme, claimsIdentity, properties);
+    }
+    private Task FinishSignInAsync(SessionEntity session)
+    {
         SignInOk signInOk = new SignInOk(session);
 
-        Response.StatusCode = StatusCodes.Status200OK;
         Response.Cookies.Append(
             _options.CookieName,
             session.Id.ToString(),
@@ -104,7 +87,12 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             }
         );
 
-        await Response.WriteAsJsonAsync(signInOk, _jsonSerializerOptions);
+        return WriteOkJsonResponse(new OAuthResult(OAuthResultType.SignedIn, signInOk, null));
+    }
+    private Task WriteOkJsonResponse(OAuthResult value)
+    {
+        Response.StatusCode = StatusCodes.Status200OK;
+        return Response.WriteAsJsonAsync(value, _jsonSerializerOptions);
     }
 
     public Task SignOutAsync(AuthenticationProperties? properties)
@@ -189,13 +177,11 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
 
     public Task ChallengeAsync(AuthenticationProperties? properties)
     {
-        Response.StatusCode = StatusCodes.Status401Unauthorized;
-        return Task.CompletedTask;
+        return CreateHttpError.Unauthorized().Write(Response);
     }
 
     public Task ForbidAsync(AuthenticationProperties? properties)
     {
-        Response.StatusCode = StatusCodes.Status403Forbidden;
-        return Task.CompletedTask;
+        return CreateHttpError.Forbidden().Write(Response);
     }
 }

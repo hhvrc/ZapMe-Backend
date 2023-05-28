@@ -4,9 +4,9 @@ using ZapMe.Constants;
 
 namespace ZapMe.Data.Models;
 
-public sealed class PasswordResetRequestEntity
+public sealed class UserPasswordResetRequestEntity
 {
-    public const string TableName = "passwordResetRequests";
+    public const string TableName = "userPasswordResetRequests";
     public const string TableTokenIndex = TableName + "_tokenHash_idx";
 
     /// <summary>
@@ -30,11 +30,11 @@ public sealed class PasswordResetRequestEntity
     public DateTime CreatedAt { get; set; }
 }
 
-public sealed class PasswordResetRequestEntityConfiguration : IEntityTypeConfiguration<PasswordResetRequestEntity>
+public sealed class UserPasswordResetRequestEntityConfiguration : IEntityTypeConfiguration<UserPasswordResetRequestEntity>
 {
-    public void Configure(EntityTypeBuilder<PasswordResetRequestEntity> builder)
+    public void Configure(EntityTypeBuilder<UserPasswordResetRequestEntity> builder)
     {
-        builder.ToTable(PasswordResetRequestEntity.TableName);
+        builder.ToTable(UserPasswordResetRequestEntity.TableName);
 
         builder.HasKey(pr => pr.UserId);
 
@@ -50,12 +50,12 @@ public sealed class PasswordResetRequestEntityConfiguration : IEntityTypeConfigu
             .HasDefaultValueSql("now()");
 
         builder.HasOne(pr => pr.User)
-            .WithOne()
-            .HasForeignKey<PasswordResetRequestEntity>(pr => pr.UserId)
+            .WithOne(u => u.PasswordResetRequest)
+            .HasForeignKey<UserPasswordResetRequestEntity>(pr => pr.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(pr => pr.TokenHash)
-            .HasDatabaseName(PasswordResetRequestEntity.TableTokenIndex)
+            .HasDatabaseName(UserPasswordResetRequestEntity.TableTokenIndex)
             .IsUnique();
     }
 }

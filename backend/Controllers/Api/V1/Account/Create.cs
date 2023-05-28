@@ -31,8 +31,6 @@ public partial class AccountController
     [AnonymousOnly]
     [RequestSizeLimit(1024)]
     [HttpPost(Name = "CreateAccount")]
-    [Consumes(Application.Json)]
-    [Produces(Application.Json)]
     [ProducesResponseType(typeof(CreateOk), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)] // Username/email already taken

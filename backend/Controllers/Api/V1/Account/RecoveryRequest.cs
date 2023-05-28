@@ -24,7 +24,7 @@ public partial class AccountController
     [HttpPost("recover", Name = "AccountRecoveryRequest")]
     [Consumes(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> RecoveryRequest([FromBody] Account.Models.RecoveryRequest body, [FromServices] ICloudflareTurnstileService cfTurnstileService, [FromServices] IPasswordResetManager passwordResetManager, CancellationToken cancellationToken)
+    public async Task<IActionResult> RecoveryRequest([FromBody] RecoveryRequest body, [FromServices] ICloudflareTurnstileService cfTurnstileService, [FromServices] IPasswordResetManager passwordResetManager, CancellationToken cancellationToken)
     {
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);
 

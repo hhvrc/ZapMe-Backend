@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
@@ -20,11 +21,9 @@ public partial class AccountController
     [AllowAnonymous]
     [RequestSizeLimit(1024)]
     [HttpPost("recover-confirm", Name = "AccountRecoveryConfirm")]
-    [Consumes(Application.Json)]
-    [Produces(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)] // Token invalid, expired, or already used
-    public async Task<IActionResult> RecoveryConfirm([FromBody] Account.Models.RecoveryConfirm body, [FromServices] IPasswordResetManager passwordResetManager, CancellationToken cancellationToken)
+    public async Task<IActionResult> RecoveryConfirm([FromBody] RecoveryConfirm body, [FromServices] IPasswordResetManager passwordResetManager, CancellationToken cancellationToken)
     {
         if (!await passwordResetManager.TryCompletePasswordReset(body.Token, body.NewPassword, cancellationToken))
         {

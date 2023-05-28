@@ -17,29 +17,29 @@ public sealed class PasswordResetRequestStore : IPasswordResetRequestStore
         _logger = logger;
     }
 
-    public async Task<PasswordResetRequestEntity> UpsertAsync(Guid userId, string tokenHash, CancellationToken cancellationToken)
+    public async Task<UserPasswordResetRequestEntity> UpsertAsync(Guid userId, string tokenHash, CancellationToken cancellationToken)
     {
         if (tokenHash.Length != HashConstants.Sha256LengthHex) throw new ArgumentException($"Tokenhash should be {HashConstants.Sha256LengthHex} characters", nameof(tokenHash));
 
-        PasswordResetRequestEntity? request = await _dbContext.PasswordResetRequests.AsTracking().FirstOrDefaultAsync(s => s.UserId == userId, cancellationToken);
+        UserPasswordResetRequestEntity? request = await _dbContext.UserPasswordResetRequests.AsTracking().FirstOrDefaultAsync(s => s.UserId == userId, cancellationToken);
 
         if (request == null)
         {
-            request = new PasswordResetRequestEntity
+            request = new UserPasswordResetRequestEntity
             {
                 UserId = userId,
                 User = null!,
                 TokenHash = tokenHash
             };
 
-            await _dbContext.PasswordResetRequests.AddAsync(request, cancellationToken);
+            await _dbContext.UserPasswordResetRequests.AddAsync(request, cancellationToken);
         }
         else
         {
             request.TokenHash = tokenHash;
             request.CreatedAt = DateTime.UtcNow;
 
-            _dbContext.PasswordResetRequests.Update(request);
+            _dbContext.UserPasswordResetRequests.Update(request);
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);

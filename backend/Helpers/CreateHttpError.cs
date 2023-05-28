@@ -73,4 +73,8 @@ public static class CreateHttpError
     /// <returns></returns>
     public static ErrorDetails InternalServerError() =>
         Generic(StatusCodes.Status500InternalServerError, "internal_error", "An internal server error occurred.", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "Internal server error, please try again later"));
+    public static ErrorDetails Unauthorized() =>
+        Generic(StatusCodes.Status401Unauthorized, "unauthorized", "You are not authorized to perform this action", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "You are not authorized to perform this action"));
+    public static ErrorDetails Forbidden() =>
+        Generic(StatusCodes.Status403Forbidden, "forbidden", "You are not allowed to perform this action", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "You are not allowed to perform this action"));
 }

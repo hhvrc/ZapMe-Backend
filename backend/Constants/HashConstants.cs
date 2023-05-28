@@ -8,4 +8,5 @@ public static class HashConstants
     public const int Sha256LengthHex = Sha256LengthBin * 2;
     public const int Sha512LengthBin = 64;
     public const int Sha512LengthHex = Sha512LengthBin * 2;
+    public const int BCryptHashLength = 60;
 }

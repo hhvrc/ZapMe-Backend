@@ -19,10 +19,10 @@ public sealed class SignInOk
     /// <summary>
     /// 
     /// </summary>
-    public SessionDto Session { get; set; }
+    public SessionDto Session { get; }
 
     /// <summary>
     /// 
     /// </summary>
-    public AccountDto Account { get; set; }
+    public AccountDto Account { get; }
 }

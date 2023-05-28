@@ -14,8 +14,6 @@ public partial class UserController
     /// <returns></returns>
     [RequestSizeLimit(1024)]
     [HttpPut("i/{userId}/friendrequest", Name = "AcceptFriendRequest")]
-    [Consumes(Application.Json)]
-    [Produces(Application.Json)]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]        // Accepted
     [ProducesResponseType(StatusCodes.Status304NotModified)] // Already friends
     [ProducesResponseType(StatusCodes.Status404NotFound)]    // No friendrequest incoming

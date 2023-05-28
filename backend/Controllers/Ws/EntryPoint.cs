@@ -20,8 +20,6 @@ public sealed partial class WebSocketController
     /// <response code="200">Connection closed</response>
     /// <response code="400">This endpoint is purely just a websocket endpoint</response>
     [HttpGet(Name = "WebSocket")]
-    [Consumes(Application.Json)]
-    [Produces(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> EntryPointAsync([FromServices] ILogger<WebSocketInstance> logger, CancellationToken cancellationToken)

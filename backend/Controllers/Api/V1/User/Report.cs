@@ -12,8 +12,6 @@ public partial class UserController
     /// <param name="body"></param>
     /// <returns></returns>
     [HttpPost("report", Name = "ReportUser")]
-    [Consumes(Application.Json)]
-    [Produces(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)] // Report sent
     [ProducesResponseType(StatusCodes.Status404NotFound)] // User not found
     public IActionResult Report([FromBody] UserReport body)

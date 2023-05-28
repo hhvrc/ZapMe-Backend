@@ -19,7 +19,6 @@ public partial class UserController
     /// <returns></returns>
     [RequestSizeLimit(1024)]
     [HttpGet("u/{userName}", Name = "LookUpUser")]
-    [Produces(Application.Json)]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]     // Accepted
     [ProducesResponseType(StatusCodes.Status404NotFound)] // User not found
     public async Task<IActionResult> LookUp([FromRoute] string userName, CancellationToken cancellationToken)

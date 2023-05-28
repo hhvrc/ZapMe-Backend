@@ -195,9 +195,7 @@ public sealed class WebSocketInstance : IDisposable
 
         var message = new ServerMessage<T>(type, data);
 
-        string str = JsonSerializer.Serialize(message);
-
-        var bytes = Encoding.UTF8.GetBytes(str);
+        var bytes = JsonSerializer.SerializeToUtf8Bytes(message);
 
         _webSocketBufferData = new ArraySegment<byte>(bytes);
 

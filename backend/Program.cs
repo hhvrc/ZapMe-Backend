@@ -3,7 +3,10 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Twitter;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Logging;
+using StackExchange.Redis;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -88,6 +91,7 @@ services.AddControllers().AddJsonOptions(opt =>
 {
     opt.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     opt.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    opt.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, false));
 });
 //services.AddHealthChecks().AddCheck("sql" ) //TODO: explore this
@@ -137,7 +141,7 @@ services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
         opt.Scope.Add("identify");
         opt.Prompt = "none";
         opt.SaveTokens = true;
-        opt.StateDataFormat = new DistributedCacheSecureDataFormat<AuthenticationProperties>();
+        opt.StateDataFormat = new DistributedCacheSecureDataFormat<AuthenticationProperties>(configuration.GetValue<string>("Redis:ConnectionString")!, TimeSpan.FromMinutes(1));
         opt.CorrelationCookie.HttpOnly = true;
         opt.CorrelationCookie.SameSite = SameSiteMode.None;
         opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
@@ -161,7 +165,7 @@ services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
         opt.Scope.Add("read:user");
         opt.Scope.Add("user:email");
         opt.SaveTokens = true;
-        opt.StateDataFormat = new DistributedCacheSecureDataFormat<AuthenticationProperties>();
+        opt.StateDataFormat = new DistributedCacheSecureDataFormat<AuthenticationProperties>(configuration.GetValue<string>("Redis:ConnectionString")!, TimeSpan.FromMinutes(1));
         opt.CorrelationCookie.HttpOnly = true;
         opt.CorrelationCookie.SameSite = SameSiteMode.None;
         opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
@@ -188,7 +192,7 @@ services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
         opt.AccessDeniedPath = "/api/v1/auth/o/denied";
         opt.SaveTokens = true;
         opt.RetrieveUserDetails = true;
-        opt.StateDataFormat = new DistributedCacheSecureDataFormat<RequestToken>();
+        opt.StateDataFormat = new DistributedCacheSecureDataFormat<RequestToken>(configuration.GetValue<string>("Redis:ConnectionString")!, TimeSpan.FromMinutes(1));
         opt.CorrelationCookie.HttpOnly = true;
         opt.CorrelationCookie.SameSite = SameSiteMode.None;
         opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
@@ -199,6 +203,11 @@ services.AddAuthorization(opt =>
 {
     // Example:
     // opt.AddPolicy("Admin", policy => policy.RequireClaim("Admin"));
+});
+services.AddStackExchangeRedisCache(opt =>
+{
+    opt.Configuration = configuration.GetValue<string>("Redis:ConnectionString")!;
+    opt.InstanceName = "ZapMe";
 });
 services.AddDatabase(configuration);
 services.AddScheduledJobs();

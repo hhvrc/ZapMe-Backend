@@ -16,8 +16,6 @@ partial class UserController
     /// <returns></returns>
     [RequestSizeLimit(1024)]
     [HttpPost("i/{userId}/friendrequest", Name = "SendFriendRequest")]
-    [Consumes(Application.Json)]
-    [Produces(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> FriendRequestSend([FromRoute] Guid userId, CancellationToken cancellationToken)

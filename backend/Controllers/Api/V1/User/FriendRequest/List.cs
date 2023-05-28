@@ -16,8 +16,6 @@ public partial class UserController
     /// <returns></returns>
     [RequestSizeLimit(1024)]
     [HttpGet("friendrequests", Name = "ListFriendRequests")]
-    [Consumes(Application.Json)]
-    [Produces(Application.Json)]
     [ProducesResponseType(typeof(FriendRequestList), StatusCodes.Status200OK)]
     public async Task<FriendRequestList> ListFriendRequests([FromServices] IFriendRequestStore friendRequestStore, CancellationToken cancellationToken)
     {

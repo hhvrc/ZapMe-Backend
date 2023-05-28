@@ -79,7 +79,8 @@ public sealed class UserEntity
     /// </summary>
     public DateTime LastOnline { get; set; }
 
-    public EmailVerificationRequestEntity? EmailVerificationRequest { get; set; }
+    public UserPasswordResetRequestEntity? PasswordResetRequest { get; set; }
+    public UserEmailVerificationRequestEntity? EmailVerificationRequest { get; set; }
 
     public ICollection<SessionEntity>? Sessions { get; set; }
     public ICollection<LockOutEntity>? LockOuts { get; set; }

@@ -1,28 +1,30 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using System.Collections.Concurrent;
-using System.Text;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 using System.Text.Json;
 
 namespace ZapMe.Helpers;
 
 public class DistributedCacheSecureDataFormat<T> : ISecureDataFormat<T>
 {
-    private static readonly ConcurrentDictionary<string, byte[]> _KeyValuePairs = new ConcurrentDictionary<string, byte[]>();
-    /*
-     * TODO: implement
-     * IMPLEMENTME
-    private readonly IDistributedCache _cache;
+    private readonly RedisCache _redisCache;
+    private readonly DistributedCacheEntryOptions _entryOptions;
 
-    public DistributedCacheSecureDataFormat(IDistributedCache cache)
+    public DistributedCacheSecureDataFormat(string connectionString, TimeSpan secretLifeSpan)
     {
-        _cache = cache;
+        _redisCache = new RedisCache(new RedisCacheOptions
+        {
+            Configuration = connectionString
+        });
+        _entryOptions = new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = secretLifeSpan
+        };
     }
-    */
     public string Protect(T data)
     {
-        byte[] bytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(data));
         string key = Utils.StringUtils.GenerateUrlSafeRandomString(32);
-        _KeyValuePairs.TryAdd(key, bytes);
+        _redisCache.Set(key, JsonSerializer.SerializeToUtf8Bytes(data), _entryOptions);
         return key;
     }
 
@@ -38,12 +40,13 @@ public class DistributedCacheSecureDataFormat<T> : ISecureDataFormat<T>
             return default;
         }
 
-        if (!_KeyValuePairs.TryGetValue(protectedText, out byte[]? bytes) || bytes == null)
+        byte[]? bytes = _redisCache.Get(protectedText);
+        if (bytes == null)
         {
             return default;
         }
 
-        return JsonSerializer.Deserialize<T>(Encoding.UTF8.GetString(bytes));
+        return JsonSerializer.Deserialize<T>(bytes);
     }
 
     public T? Unprotect(string? protectedText, string? purpose)

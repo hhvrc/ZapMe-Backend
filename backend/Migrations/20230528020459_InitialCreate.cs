@@ -162,25 +162,6 @@ namespace ZapMe.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "passwordResetRequests",
-                columns: table => new
-                {
-                    userId = table.Column<Guid>(type: "uuid", nullable: false),
-                    tokenHash = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    createdAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_passwordResetRequests", x => x.userId);
-                    table.ForeignKey(
-                        name: "FK_passwordResetRequests_users_userId",
-                        column: x => x.userId,
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "sessions",
                 columns: table => new
                 {
@@ -204,6 +185,25 @@ namespace ZapMe.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_sessions_users_userId",
+                        column: x => x.userId,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "userPasswordResetRequests",
+                columns: table => new
+                {
+                    userId = table.Column<Guid>(type: "uuid", nullable: false),
+                    tokenHash = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    createdAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_userPasswordResetRequests", x => x.userId);
+                    table.ForeignKey(
+                        name: "FK_userPasswordResetRequests_users_userId",
                         column: x => x.userId,
                         principalTable: "users",
                         principalColumn: "id",
@@ -291,12 +291,6 @@ namespace ZapMe.Migrations
                 column: "userId");
 
             migrationBuilder.CreateIndex(
-                name: "passwordResetRequests_tokenHash_idx",
-                table: "passwordResetRequests",
-                column: "tokenHash",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_sessions_userAgentId",
                 table: "sessions",
                 column: "userAgentId");
@@ -310,6 +304,12 @@ namespace ZapMe.Migrations
                 name: "userAgents_hash_idx",
                 table: "userAgents",
                 column: "sha256",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "userPasswordResetRequests_tokenHash_idx",
+                table: "userPasswordResetRequests",
+                column: "tokenHash",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -400,10 +400,10 @@ namespace ZapMe.Migrations
                 name: "oauthConnections");
 
             migrationBuilder.DropTable(
-                name: "passwordResetRequests");
+                name: "sessions");
 
             migrationBuilder.DropTable(
-                name: "sessions");
+                name: "userPasswordResetRequests");
 
             migrationBuilder.DropTable(
                 name: "userRelations");

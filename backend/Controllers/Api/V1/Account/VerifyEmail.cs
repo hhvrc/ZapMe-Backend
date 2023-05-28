@@ -19,8 +19,6 @@ public partial class AccountController
     [AllowAnonymous]
     [RequestSizeLimit(1024)]
     [HttpPost("email/verify", Name = "Verify Email Address")]
-    [Consumes(Application.Json)]
-    [Produces(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)] // Token invalid, expired, or already used
     public async Task<IActionResult> ConfirmEmail([FromQuery] string token, [FromServices] IEmailVerificationManager emailVerificationManager, CancellationToken cancellationToken)

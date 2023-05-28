@@ -11,7 +11,6 @@ using ZapMe.Helpers;
 using ZapMe.Options;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -29,8 +28,6 @@ public partial class AuthController
     [AnonymousOnly]
     [RequestSizeLimit(1024)]
     [HttpPost("signin", Name = "AuthSignIn")]
-    [Consumes(Application.Json)]
-    [Produces(Application.Json)]
     [ProducesResponseType(typeof(SignInOk), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

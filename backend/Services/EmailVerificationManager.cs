@@ -26,7 +26,7 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
     {
         // Create email verification entry
         string emailVerificationToken = StringUtils.GenerateUrlSafeRandomString(16);
-        EmailVerificationRequestEntity? emailVerificationRequest = new EmailVerificationRequestEntity
+        UserEmailVerificationRequestEntity? emailVerificationRequest = new UserEmailVerificationRequestEntity
         {
             UserId = user.Id,
             NewEmail = newEmail,
@@ -50,7 +50,7 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
         using IDbContextTransaction? transaction = await _dbContext.Database.BeginTransactionIfNotExistsAsync(cancellationToken);
 
         // Save email verification request
-        await _dbContext.EmailVerificationRequests.AddAsync(emailVerificationRequest, cancellationToken);
+        await _dbContext.UserEmailVerificationRequests.AddAsync(emailVerificationRequest, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         // Send email
@@ -74,7 +74,7 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
         string tokenHash = HashingUtils.Sha256_Hex(token);
 
         // Fetch email verification request
-        EmailVerificationRequestEntity? verificationRequest = await _dbContext.EmailVerificationRequests.SingleOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken);
+        UserEmailVerificationRequestEntity? verificationRequest = await _dbContext.UserEmailVerificationRequests.SingleOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken);
         if (verificationRequest == null)
         {
             return CreateHttpError.Generic(StatusCodes.Status404NotFound, "Invalid token", "Token invalid, expired, or already used");
@@ -86,7 +86,7 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
                                 .ExecuteUpdateAsync(spc => spc.SetProperty(x => x.EmailVerified, _ => true), cancellationToken);
 
         // Delete email verification request
-        await _dbContext.EmailVerificationRequests.Where(x => x.TokenHash == tokenHash).ExecuteDeleteAsync(cancellationToken);
+        await _dbContext.UserEmailVerificationRequests.Where(x => x.TokenHash == tokenHash).ExecuteDeleteAsync(cancellationToken);
 
         if (nUpdated == 0)
         {
@@ -98,7 +98,7 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
 
     public Task<int> RemoveExpiredRequestsAsync(CancellationToken cancellationToken = default)
     {
-        return _dbContext.EmailVerificationRequests
+        return _dbContext.UserEmailVerificationRequests
             .Where(x => x.CreatedAt < DateTime.UtcNow.AddHours(-24))
             .ExecuteDeleteAsync(cancellationToken);
     }

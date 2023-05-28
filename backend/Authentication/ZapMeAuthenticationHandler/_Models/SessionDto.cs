@@ -2,7 +2,7 @@
 
 namespace ZapMe.Authentication.Models;
 
-public sealed class SessionDto
+public readonly struct SessionDto
 {
     public SessionDto(SessionEntity session)
     {
@@ -14,15 +14,15 @@ public sealed class SessionDto
     /// <summary>
     /// 
     /// </summary>
-    public Guid Id { get; set; }
+    public Guid Id { get; }
 
     /// <summary>
     /// 
     /// </summary>
-    public DateTime IssuedAtUtc { get; set; }
+    public DateTime IssuedAtUtc { get; }
 
     /// <summary>
     /// 
     /// </summary>
-    public DateTime ExpiresAtUtc { get; set; }
+    public DateTime ExpiresAtUtc { get; }
 }

@@ -20,8 +20,6 @@ public partial class AccountController
     /// <response code="200">Ok</response>
     [RequestSizeLimit(1024)]
     [HttpPut("username", Name = "UpdateUserName")]
-    [Consumes(Application.Json)]
-    [Produces(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
