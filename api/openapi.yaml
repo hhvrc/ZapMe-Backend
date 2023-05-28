@@ -366,18 +366,18 @@ paths:
     get:
       tags:
         - Auth
-      summary: ''
+      summary: Start the OAuth authentication process
       operationId: OAuth Authorize
       parameters:
         - name: providerName
           in: path
-          description: ''
+          description: 'Name of the OAuth provider to use, supported providers can be fetched from M:ZapMe.Controllers.Api.V1.AuthController.ListOAuthProviders'
           required: true
           schema:
             type: string
       responses:
-        '200':
-          description: Success
+        '302':
+          description: Redirect
         '406':
           description: Not Acceptable
           content:
@@ -393,13 +393,43 @@ paths:
       parameters:
         - name: providerName
           in: path
-          description: ''
+          description: 'Name of the OAuth provider to use, supported providers can be fetched from M:ZapMe.Controllers.Api.V1.AuthController.ListOAuthProviders'
           required: true
           schema:
             type: string
       responses:
         '200':
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthResult'
+        '406':
+          description: Not Acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/auth/o/create:
+    post:
+      tags:
+        - Auth
+      summary: ''
+      operationId: OAuth Create Account
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/OAuthFinishAccountCreation'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignInOk'
         '406':
           description: Not Acceptable
           content:
@@ -1008,6 +1038,31 @@ components:
           description: UserId's of users that this user has sent friend requests to
       additionalProperties: false
       description: List of incoming and outgoing friendrequests
+    OAuthFinishAccountCreation:
+      required:
+        - acceptedPrivacyPolicyVersion
+        - acceptedTermsOfServiceVersion
+        - oAuthTicket
+        - password
+      type: object
+      properties:
+        oAuthTicket:
+          type: string
+          description: ''
+          readOnly: true
+        acceptedPrivacyPolicyVersion:
+          type: integer
+          description: ''
+          format: int32
+        acceptedTermsOfServiceVersion:
+          type: integer
+          description: ''
+          format: int32
+        password:
+          type: string
+          description: ''
+          readOnly: true
+      additionalProperties: false
     OAuthProviderList:
       required:
         - providers
@@ -1020,6 +1075,42 @@ components:
           description: ''
       additionalProperties: false
       description: ''
+    OAuthResult:
+      required:
+        - resultType
+      type: object
+      properties:
+        resultType:
+          allOf:
+            - $ref: '#/components/schemas/OAuthResultType'
+        signInOk:
+          allOf:
+            - $ref: '#/components/schemas/SignInOk'
+          description: ''
+          nullable: true
+        oAuthTicket:
+          allOf:
+            - $ref: '#/components/schemas/OAuthTicket'
+          nullable: true
+      additionalProperties: false
+    OAuthResultType:
+      enum:
+        - signedIn
+        - requireTwoFactor
+        - requireAccountCreation
+      type: string
+    OAuthTicket:
+      required:
+        - expiresAtUtc
+        - ticket
+      type: object
+      properties:
+        ticket:
+          type: string
+        expiresAtUtc:
+          type: string
+          format: date-time
+      additionalProperties: false
     RecoveryConfirm:
       required:
         - newPassword
@@ -1066,14 +1157,17 @@ components:
           type: string
           description: ''
           format: uuid
+          readOnly: true
         issuedAtUtc:
           type: string
           description: ''
           format: date-time
+          readOnly: true
         expiresAtUtc:
           type: string
           description: ''
           format: date-time
+          readOnly: true
       additionalProperties: false
     SeverityLevel:
       enum:
@@ -1095,6 +1189,7 @@ components:
           allOf:
             - $ref: '#/components/schemas/AccountDto'
           description: ''
+          readOnly: true
       additionalProperties: false
       description: ''
     SocialsConfig:
