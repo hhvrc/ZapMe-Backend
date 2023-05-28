@@ -64,7 +64,7 @@ public sealed class ImageEntity
     /// 
     /// </summary>
     [NotMapped]
-    public Uri PublicUrl => new Uri($"https://zapme-public-{R2RegionName}.{App.Domain}/img_{Id}");
+    public Uri PublicUrl => new Uri($"https://r2-{R2RegionName}.{App.Domain}/img_{Id}");
 }
 
 public sealed class ImageEntityConfiguration : IEntityTypeConfiguration<ImageEntity>
