@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
 

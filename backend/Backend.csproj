@@ -21,9 +21,9 @@
     <PackageReference Include="AspNet.Security.OAuth.Discord" Version="7.0.2" />
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.2" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.7" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.104.19" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.101.68" />
-    <PackageReference Include="AWSSDK.SQS" Version="3.7.102.7" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.104.23" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.101.72" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.7.102.11" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="IdentityModel" Version="6.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.5" />

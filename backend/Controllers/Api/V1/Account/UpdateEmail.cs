@@ -5,7 +5,6 @@ using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
 

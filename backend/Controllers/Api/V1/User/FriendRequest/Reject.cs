@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Controllers.Api.V1.User.Models;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
 

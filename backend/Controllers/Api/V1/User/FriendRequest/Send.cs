@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using ZapMe.Authentication;
 using ZapMe.Data.Models;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
 

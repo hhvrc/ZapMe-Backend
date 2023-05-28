@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.DependencyInjection;
 using OneOf;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data;

@@ -4,7 +4,6 @@ using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.User.FriendRequest.Models;
 using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
 

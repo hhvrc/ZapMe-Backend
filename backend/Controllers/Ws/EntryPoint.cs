@@ -2,7 +2,6 @@
 using ZapMe.Authentication;
 using ZapMe.Helpers;
 using ZapMe.Websocket;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Ws;
 

@@ -11,7 +11,6 @@ using ZapMe.Helpers;
 using ZapMe.Options;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
 

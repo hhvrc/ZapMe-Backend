@@ -28,29 +28,29 @@
       },
       "AWSSDK.S3": {
         "type": "Direct",
-        "requested": "[3.7.104.19, )",
-        "resolved": "3.7.104.19",
-        "contentHash": "lHzqZP7Z2SqIUV5IPlpGoZ6U8Ww6uP1An3cx9z9uIkzEKso8TBc8DoZMMPUDUknHOLVP7nKpTV6r4xH441/X+g==",
+        "requested": "[3.7.104.23, )",
+        "resolved": "3.7.104.23",
+        "contentHash": "7ybIjzPsz/51VDO4OOagxsoneAMirQhv2tHrOCX+6aee3RYptCO3j6SV7UuiHefeMeG3OBv5H3Hfx5PBsLhH6g==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.106.39, 4.0.0)"
+          "AWSSDK.Core": "[3.7.106.43, 4.0.0)"
         }
       },
       "AWSSDK.SimpleNotificationService": {
         "type": "Direct",
-        "requested": "[3.7.101.68, )",
-        "resolved": "3.7.101.68",
-        "contentHash": "MobKTlb+u8EFmNuZgczffAcH8X5Izg1QlGtLw1DGx8hht0Wsiy7AuWkpx69Qrim3xTv0YvpiWbnpeF6f8yt5iw==",
+        "requested": "[3.7.101.72, )",
+        "resolved": "3.7.101.72",
+        "contentHash": "OQjXOxZEDxihcExyiWbUsHSF/itOPtM76JW2JES1NZ7p0zDYdME/zE74f90+1amiPYVSNuIb2OAVlF3htVjh2A==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.106.39, 4.0.0)"
+          "AWSSDK.Core": "[3.7.106.43, 4.0.0)"
         }
       },
       "AWSSDK.SQS": {
         "type": "Direct",
-        "requested": "[3.7.102.7, )",
-        "resolved": "3.7.102.7",
-        "contentHash": "N1Y2dfC/QM4eX9ayr7iZCRfETopZBhpKQEuey8PqGvGCOKvybGGjKeEEo0li4fAiuJGu6o8cpHHROqxjtsJdNg==",
+        "requested": "[3.7.102.11, )",
+        "resolved": "3.7.102.11",
+        "contentHash": "XaKs7u6nmCH3E8kQfyQvFraWlxkZcN5xcCM7V1sdNYqs93wx+vETC90dkhaKJPvaLMKPPDUmOrd7DrI6WB2UkA==",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.106.39, 4.0.0)"
+          "AWSSDK.Core": "[3.7.106.43, 4.0.0)"
         }
       },
       "BCrypt.Net-Next": {
@@ -244,8 +244,8 @@
       },
       "AWSSDK.Core": {
         "type": "Transitive",
-        "resolved": "3.7.106.39",
-        "contentHash": "F8YJ6QV7+btBpqo+9DfDu2+IziCLA7yDo5sdBAiJpF4Wdd4pL4YLF3sy2if0c9XsC8b3XThdoDJJ88AboDMkyg=="
+        "resolved": "3.7.106.43",
+        "contentHash": "ryd0+7v6gSs315jo6LYxNfikFKE2tt14mEHGNIainkgrQ15DKTkAKJIbDMnYdylQoYBAhAV7OVe49NjNON6AGQ=="
       },
       "Humanizer.Core": {
         "type": "Transitive",
