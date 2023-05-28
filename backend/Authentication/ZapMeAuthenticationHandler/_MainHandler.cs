@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
 using ZapMe.Authentication.Models;
@@ -107,27 +109,21 @@ public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHa
     {
         DateTime requestTime = DateTime.UtcNow;
 
-        string? sessionIdString = Request.Headers["Authorization"];
-        if (sessionIdString is not null)
-        {
-            if (!sessionIdString.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-            {
-                return AuthenticateResult.Fail("Invalid Authorization header format.");
-            }
-
-            sessionIdString = sessionIdString["Bearer ".Length..].Trim();
-        }
-        else
-        {
-            sessionIdString = Request.Cookies[_options.CookieName];
-        }
-
-        if (sessionIdString == null)
+        StringValues authHeader = Request.Headers.Authorization;
+        if (!authHeader.Any())
         {
             return AuthenticateResult.NoResult();
         }
 
-        if (!Guid.TryParse(sessionIdString, out Guid sessionId))
+        if (
+            !AuthenticationHeaderValue.TryParse(Request.Headers.Authorization, out AuthenticationHeaderValue? authHeaderValue) ||
+            !String.Equals(authHeaderValue.Scheme, "Bearer", StringComparison.OrdinalIgnoreCase)
+           )
+        {
+            return AuthenticateResult.Fail("Invalid Authorization header.");
+        }
+
+        if (!Guid.TryParse(authHeaderValue.Parameter, out Guid sessionId))
             return AuthenticateResult.Fail("Malformed Login Cookie");
 
         CancellationToken cancellationToken = _context.RequestAborted;
