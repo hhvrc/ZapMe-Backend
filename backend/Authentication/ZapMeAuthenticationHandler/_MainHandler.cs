@@ -34,9 +34,10 @@ public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHa
 
     private HttpRequest Request => _context.Request;
     private HttpResponse Response => _context.Response;
+    private IServiceProvider ServiceProvider => _context.RequestServices;
     private string RequestingIpAddress => _context.GetRemoteIP();
     private string RequestingIpCountry => _context.GetCloudflareIPCountry();
-    private string RequestingIpRegion => CountryLookup.GetCloudflareRegion(RequestingIpCountry);
+    private string RequestingIpRegion => CountryRegionLookup.GetCloudflareRegion(RequestingIpCountry);
     private string RequestingUserAgent => _context.GetRemoteUserAgent();
     private CancellationToken CancellationToken => _context.RequestAborted;
 

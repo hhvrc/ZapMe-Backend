@@ -40,7 +40,7 @@ public partial class AccountController
             return CreateHttpError.Generic(StatusCodes.Status411LengthRequired, "Length is required", "Missing or invalid Content-Length header").ToActionResult();
         }
 
-        string cfRegion = CountryLookup.GetCloudflareRegion(this.GetCloudflareIPCountry());
+        string cfRegion = CountryRegionLookup.GetCloudflareRegion(this.GetCloudflareIPCountry());
 
         OneOf<ImageEntity, ErrorDetails> res = await imageManager.GetOrCreateRecordAsync(Request.Body, cfRegion, (int)length, sha256Hash, identity.UserId, cancellationToken);
         if (res.TryPickT1(out ErrorDetails error, out ImageEntity image))

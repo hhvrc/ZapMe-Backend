@@ -1049,7 +1049,6 @@ components:
         oAuthTicket:
           type: string
           description: ''
-          readOnly: true
         acceptedPrivacyPolicyVersion:
           type: integer
           description: ''
@@ -1059,9 +1058,11 @@ components:
           description: ''
           format: int32
         password:
+          maxLength: 256
+          minLength: 10
           type: string
           description: ''
-          readOnly: true
+          example: Hq2yP1B^Fho&zRHxHkEu
       additionalProperties: false
     OAuthProviderList:
       required:

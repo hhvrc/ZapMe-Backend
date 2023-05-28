@@ -1,9 +1,11 @@
-﻿namespace ZapMe.Controllers.Api.V1.Authentication.OAuth.Models;
+﻿using ZapMe.Attributes;
+
+namespace ZapMe.Controllers.Api.V1.Authentication.OAuth.Models;
 
 public readonly struct OAuthFinishAccountCreation
 {
     /// <summary/>
-    public string OAuthTicket { get; }
+    public string OAuthTicket { get; init; }
 
     /// <summary/>
     public uint AcceptedPrivacyPolicyVersion { get; init; }
@@ -12,5 +14,6 @@ public readonly struct OAuthFinishAccountCreation
     public uint AcceptedTermsOfServiceVersion { get; init; }
 
     /// <summary/>
-    public string Password { get; }
+    [Password(true)]
+    public string Password { get; init; }
 }

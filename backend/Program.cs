@@ -124,6 +124,7 @@ services.AddTransient<IFriendRequestStore, FriendRequestStore>();
 //services.AddTransient<IFriendRequestManager, FriendRequestManager>();
 services.AddTransient<IEmailVerificationManager, EmailVerificationManager>();
 services.AddTransient<IWebSocketInstanceManager, WebSocketInstanceManager>();
+services.AddTransient<ITemporaryDataStore, TemporaryDataStore>();
 
 services.AddRateLimiting();
 services.AddSwagger(isDevelopment);

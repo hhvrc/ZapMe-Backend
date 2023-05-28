@@ -248,6 +248,52 @@ namespace ZapMe.Migrations
                     b.ToTable("sessions", (string)null);
                 });
 
+            modelBuilder.Entity("ZapMe.Data.Models.TemporaryJsonDataEntity", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasColumnType("text")
+                        .HasColumnName("key");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expiresAt");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("value");
+
+                    b.HasKey("Key");
+
+                    b.HasIndex("ExpiresAt")
+                        .HasDatabaseName("tempJsonData_expiresAt_idx");
+
+                    b.ToTable("tempJsonData", (string)null);
+                });
+
+            modelBuilder.Entity("ZapMe.Data.Models.TemporaryStringDataEntity", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasColumnType("text")
+                        .HasColumnName("key");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expiresAt");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("value");
+
+                    b.HasKey("Key");
+
+                    b.HasIndex("ExpiresAt")
+                        .HasDatabaseName("tempStringData_expiresAt_idx");
+
+                    b.ToTable("tempStringData", (string)null);
+                });
+
             modelBuilder.Entity("ZapMe.Data.Models.UserAgentEntity", b =>
                 {
                     b.Property<Guid>("Id")

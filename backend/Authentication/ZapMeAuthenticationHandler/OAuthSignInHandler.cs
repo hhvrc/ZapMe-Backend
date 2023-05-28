@@ -33,16 +33,14 @@ public partial class ZapMeAuthenticationHandler
             .FirstOrDefaultAsync(c => c.ProviderName == oauthClaims.Provider && c.ProviderId == oauthClaims.ProviderId, CancellationToken);
         if (connectionEntity == null)
         {
-            var distributedCache = _context.RequestServices.GetRequiredService<IDistributedCache>();
+            var tempDataStore = _context.RequestServices.GetRequiredService<ITemporaryDataStore>();
 
-            var cacheKey = HashingUtils.Sha256_Base64(oauthClaims.Provider + oauthClaims.ProviderId);
-            await distributedCache.SetAsync(
+            var cacheKey = "oauthticket:" + HashingUtils.Sha256_Base64(oauthClaims.Provider + oauthClaims.ProviderId);
+            DateTime expiresAt = DateTime.UtcNow.AddMinutes(15);
+            await tempDataStore.SetAsync(
                 cacheKey,
-                JsonSerializer.SerializeToUtf8Bytes(oauthClaims),
-                new DistributedCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(15)
-                },
+                oauthClaims,
+                expiresAt,
                 CancellationToken
             );
 
@@ -50,7 +48,7 @@ public partial class ZapMeAuthenticationHandler
             await WriteOkJsonResponse(new OAuthResult
             {
                 ResultType = OAuthResultType.RequireAccountCreation,
-                OAuthTicket = new OAuthTicket(cacheKey, DateTime.UtcNow.AddMinutes(15))
+                OAuthTicket = new OAuthTicket(cacheKey, expiresAt)
             });
             return;
         }
@@ -67,31 +65,5 @@ public partial class ZapMeAuthenticationHandler
         );
 
         await FinishSignInAsync(session);
-    }
-
-    private readonly record struct AuthenticationEntities(UserEntity User, OAuthConnectionEntity Connection, SessionEntity Session);
-    private async Task<OneOf<OAuthConnectionEntity, ErrorDetails>> CreateConnection(OAuthProviderVariables authParams)
-    {
-        IServiceProvider serviceProvider = _context.RequestServices;
-        ErrorDetails errorDetails;
-        ImageEntity? profilePicture = null;
-        if (!String.IsNullOrEmpty(authParams.ProfilePictureUrl))
-        {
-            IImageManager imageManager = serviceProvider.GetRequiredService<IImageManager>();
-            var createImageResult = await imageManager.GetOrCreateRecordAsync(authParams.ProfilePictureUrl, RequestingIpRegion, null, null, CancellationToken); // TODO: URGENT: fixme
-            if (createImageResult.TryPickT1(out errorDetails, out profilePicture))
-            {
-                return errorDetails;
-            }
-        }
-
-        IOAuthConnectionManager connectionManager = serviceProvider.GetRequiredService<IOAuthConnectionManager>();
-        var getOrCreateConnectionResult = await connectionManager.GetOrCreateConnectionAsync(authParams.Name, authParams.Email, profilePicture, authParams.Provider, authParams.ProviderId, CancellationToken);
-        if (getOrCreateConnectionResult.TryPickT1(out errorDetails, out var connectionEntity))
-        {
-            return errorDetails;
-        }
-
-        return connectionEntity!;
     }
 }

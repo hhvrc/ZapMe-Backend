@@ -5,7 +5,7 @@ using ZapMe.Helpers;
 
 namespace ZapMe.Authentication;
 
-public readonly record struct OAuthProviderVariables(string Name, string Email, string? ProfilePictureUrl, string Provider, string ProviderId);
+public sealed record OAuthProviderVariables(string Name, string Email, string? ProfilePictureUrl, string Provider, string ProviderId);
 public static class OAuthClaimsFetchers
 {
     public static OneOf<OAuthProviderVariables, ErrorDetails> FetchClaims(string authScheme, ClaimsPrincipal claimsPrincipal, ILogger logger)

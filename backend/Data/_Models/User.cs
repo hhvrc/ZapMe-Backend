@@ -8,8 +8,8 @@ namespace ZapMe.Data.Models;
 public sealed class UserEntity
 {
     public const string TableName = "users";
-    public const string TableAccountNameIndex = TableName + "_name_idx";
-    public const string TableAccountEmailIndex = TableName + "_email_idx";
+    public const string TableUserNameIndex = TableName + "_name_idx";
+    public const string TableUserEmailIndex = TableName + "_email_idx";
 
     /// <summary>
     /// 
@@ -156,11 +156,11 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntit
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(u => u.Name)
-            .HasDatabaseName(UserEntity.TableAccountNameIndex)
+            .HasDatabaseName(UserEntity.TableUserNameIndex)
             .IsUnique();
 
         builder.HasIndex(u => u.Email)
-            .HasDatabaseName(UserEntity.TableAccountEmailIndex)
+            .HasDatabaseName(UserEntity.TableUserEmailIndex)
             .IsUnique();
     }
 }

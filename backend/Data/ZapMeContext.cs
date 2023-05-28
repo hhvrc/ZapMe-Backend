@@ -21,6 +21,8 @@ public sealed class ZapMeContext : DbContext
     public required DbSet<OAuthConnectionEntity> OAuthConnections { get; set; }
     public required DbSet<UserPasswordResetRequestEntity> UserPasswordResetRequests { get; set; }
     public required DbSet<UserEmailVerificationRequestEntity> UserEmailVerificationRequests { get; set; }
+    public required DbSet<TemporaryJsonDataEntity> TemporaryJsonData { get; set; }
+    public required DbSet<TemporaryStringDataEntity> TemporaryStringData { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -36,5 +38,7 @@ public sealed class ZapMeContext : DbContext
         modelBuilder.ApplyConfiguration(new OAuthConnectionEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserPasswordResetRequestEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserEmailAddressChangeRequestEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new TemporaryJsonDataEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new TemporaryStringDataEntityConfiguration());
     }
 }
