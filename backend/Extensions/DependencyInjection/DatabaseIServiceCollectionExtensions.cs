@@ -6,11 +6,11 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class DatabaseIServiceCollectionExtensions
 {
-    public static void AddDatabase(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         DatabaseOptions options = configuration.GetRequiredSection(DatabaseOptions.SectionName).Get<DatabaseOptions>()!;
 
-        services.AddDbContextPool<ZapMeContext>(dbOpt =>
+        return services.AddDbContextPool<ZapMeContext>(dbOpt =>
             {
                 dbOpt.UseNpgsql(options.ConnectionString, npgSqlOpt =>
                 {

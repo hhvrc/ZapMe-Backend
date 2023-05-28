@@ -1,3 +1,4 @@
+using Amazon.Extensions.NETCore.Setup;
 using Amazon.S3;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Twitter;
@@ -104,7 +105,7 @@ services.Configure<ApiBehaviorOptions>(opt =>
 
 ZapMeOptions.Register(services, configuration);
 
-services.AddAWSService<IAmazonS3>(configuration.GetAWSOptions("Cloudflare:R2"));
+services.AddCloudflareR2(configuration);
 services.AddTransient<IImageManager, ImageManager>();
 services.AddCloudflareTurnstileService(configuration);
 services.AddDebounceService(configuration);

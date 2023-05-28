@@ -35,7 +35,7 @@ public partial class ZapMeAuthenticationHandler
         {
             var tempDataStore = _context.RequestServices.GetRequiredService<ITemporaryDataStore>();
 
-            var cacheKey = "oauthticket:" + HashingUtils.Sha256_Base64(oauthClaims.Provider + oauthClaims.ProviderId);
+            var cacheKey = "oauthticket:" + StringUtils.GenerateUrlSafeRandomString(32);
             DateTime expiresAt = DateTime.UtcNow.AddMinutes(15);
             await tempDataStore.SetAsync(
                 cacheKey,

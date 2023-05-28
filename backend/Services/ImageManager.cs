@@ -15,28 +15,29 @@ namespace ZapMe.Services;
 public sealed class ImageManager : IImageManager
 {
     readonly ZapMeContext _dbContext;
-    readonly IAmazonS3 _s3Client;
+    readonly ICloudflareR2Service _cloudflareR2Service;
 
-    public ImageManager(ZapMeContext dbContext, IAmazonS3 s3Client, IConfiguration configuration)
+    public ImageManager(ZapMeContext dbContext, ICloudflareR2Service cloudflareR2Service, IConfiguration configuration)
     {
         _dbContext = dbContext;
-        _s3Client = s3Client;
+        _cloudflareR2Service = cloudflareR2Service;
     }
 
-    public async Task UploadToS3Async(Guid imageId, Stream imageStream, byte[] imageHash, string regionName, CancellationToken cancellationToken)
+    public Task UploadToS3Async(Guid imageId, Stream imageStream, byte[] imageHash, string regionName, CancellationToken cancellationToken)
     {
-        await _s3Client.PutObjectAsync(new()
+        return _cloudflareR2Service.UploadObjectAsync(new()
         {
             BucketName = $"zapme-public-{regionName}",
             Key = $"img_{imageId}",
             ChecksumSHA256 = Convert.ToBase64String(imageHash),
             InputStream = imageStream,
+            DisablePayloadSigning = true, // TODO: remove when Cloudflare fixes their S3 implementation
         }, cancellationToken);
     }
 
-    public async Task DeleteFromS3Async(Guid imageId, string regionName, CancellationToken cancellationToken)
+    public Task DeleteFromS3Async(Guid imageId, string regionName, CancellationToken cancellationToken)
     {
-        await _s3Client.DeleteObjectAsync(new()
+        return _cloudflareR2Service.DeleteObjectAsync(new()
         {
             BucketName = $"zapme-public-{regionName}",
             Key = $"img_{imageId}",
