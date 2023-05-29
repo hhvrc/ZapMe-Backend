@@ -84,12 +84,6 @@ namespace ZapMe.Migrations
                         .HasColumnName("id")
                         .HasDefaultValueSql("gen_random_uuid()");
 
-                    b.Property<string>("Extension")
-                        .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("character varying(8)")
-                        .HasColumnName("extension");
-
                     b.Property<long>("FrameCount")
                         .HasColumnType("bigint")
                         .HasColumnName("frameCount");
@@ -97,6 +91,12 @@ namespace ZapMe.Migrations
                     b.Property<long>("Height")
                         .HasColumnType("bigint")
                         .HasColumnName("height");
+
+                    b.Property<string>("MimeType")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("mimeType");
 
                     b.Property<string>("R2RegionName")
                         .IsRequired()

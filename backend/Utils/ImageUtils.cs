@@ -5,7 +5,7 @@ namespace ZapMe.Utils;
 
 public static class ImageUtils
 {
-    public readonly record struct ParseResult(uint Width, uint Height, uint FrameCount, string Extension);
+    public readonly record struct ParseResult(uint Width, uint Height, uint FrameCount, string MimeType);
 
     /// <summary>
     /// Parses and rewrites an image from a stream
@@ -39,12 +39,12 @@ public static class ImageUtils
             if (frameCount == 1)
             {
                 if (outputStream != null) await image.SaveAsWebpAsync(outputStream, cancellationToken);
-                return new ParseResult((uint)width, (uint)height, (uint)frameCount, "webp");
+                return new ParseResult((uint)width, (uint)height, (uint)frameCount, "image/webp");
             }
             else
             {
                 if (outputStream != null) await image.SaveAsGifAsync(outputStream, cancellationToken);
-                return new ParseResult((uint)width, (uint)height, (uint)frameCount, "gif");
+                return new ParseResult((uint)width, (uint)height, (uint)frameCount, "image/gif");
             }
         }
         catch (Exception)

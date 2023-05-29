@@ -12,13 +12,14 @@ public interface IImageManager
     /// </summary>
     /// <param name="imageId"></param>
     /// <param name="imageStream"></param>
+    /// <param name="imageMimeType"></param>
     /// <param name="imageHash">Sha-256 hash of image bytes</param>
     /// <param name="regionName"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="AmazonS3Exception"></exception>
-    Task UploadToS3Async(Guid imageId, Stream imageStream, byte[] imageHash, string regionName, CancellationToken cancellationToken = default);
+    Task UploadToS3Async(Guid imageId, Stream imageStream, string imageMimeType, byte[] imageHash, string regionName, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 

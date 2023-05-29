@@ -38,7 +38,7 @@ public sealed class ImageEntity
     /// <summary>
     /// 
     /// </summary>
-    public required string Extension { get; set; }
+    public required string MimeType { get; set; }
 
     /// <summary>
     /// 
@@ -91,9 +91,9 @@ public sealed class ImageEntityConfiguration : IEntityTypeConfiguration<ImageEnt
         builder.Property(i => i.SizeBytes)
             .HasColumnName("sizeBytes");
 
-        builder.Property(i => i.Extension)
-            .HasColumnName("extension")
-            .HasMaxLength(8);
+        builder.Property(i => i.MimeType)
+            .HasColumnName("mimeType")
+            .HasMaxLength(32);
 
         builder.Property(i => i.Sha256)
             .HasColumnName("sha256")

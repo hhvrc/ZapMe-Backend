@@ -1,5 +1,4 @@
-﻿using Amazon.S3;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using OneOf;
@@ -23,14 +22,15 @@ public sealed class ImageManager : IImageManager
         _cloudflareR2Service = cloudflareR2Service;
     }
 
-    public Task UploadToS3Async(Guid imageId, Stream imageStream, byte[] imageHash, string regionName, CancellationToken cancellationToken)
+    public Task UploadToS3Async(Guid imageId, Stream imageStream, string imageMimeType, byte[] imageHash, string regionName, CancellationToken cancellationToken)
     {
         return _cloudflareR2Service.UploadObjectAsync(new()
         {
             BucketName = $"zapme-public-{regionName}",
             Key = $"img_{imageId}",
-            ChecksumSHA256 = Convert.ToBase64String(imageHash),
             InputStream = imageStream,
+            ContentType = imageMimeType,
+            ChecksumSHA256 = Convert.ToBase64String(imageHash),
             DisablePayloadSigning = true, // TODO: remove when Cloudflare fixes their S3 implementation
         }, cancellationToken);
     }
@@ -104,7 +104,7 @@ public sealed class ImageManager : IImageManager
             Width = imageInfo.Width,
             FrameCount = imageInfo.FrameCount,
             SizeBytes = (uint)memoryStream.Length, // TODO: maybe possible crash if image is too large (very unlikely though)
-            Extension = imageInfo.Extension,
+            MimeType = imageInfo.MimeType,
             Sha256 = sha256_hex,
             R2RegionName = regionName,
             UploaderId = uploaderId
@@ -117,7 +117,7 @@ public sealed class ImageManager : IImageManager
             using IDbContextTransaction? transaction = await _dbContext.Database.BeginTransactionIfNotExistsAsync(cancellationToken);
 
             // Upload to S3 bucket
-            await UploadToS3Async(id, memoryStream, sha256, regionName, cancellationToken);
+            await UploadToS3Async(id, memoryStream, imageInfo.MimeType, sha256, regionName, cancellationToken);
             uploaded = true;
 
             // Create DB record

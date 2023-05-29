@@ -130,12 +130,6 @@
           "Microsoft.IdentityModel.Abstractions": "6.30.1"
         }
       },
-      "MimeTypesMap": {
-        "type": "Direct",
-        "requested": "[1.0.8, )",
-        "resolved": "1.0.8",
-        "contentHash": "iOm6Zar+yVROhlyrGGSJTfThvNoHLUeYeQQND9YD/ot/nA2qsWUp9kP2MHTdF9P7I8afW6eCf8vdELLZjDFdSQ=="
-      },
       "NetMQ": {
         "type": "Direct",
         "requested": "[4.0.1.12, )",

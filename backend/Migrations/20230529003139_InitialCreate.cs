@@ -106,7 +106,7 @@ namespace ZapMe.Migrations
                     width = table.Column<long>(type: "bigint", nullable: false),
                     frameCount = table.Column<long>(type: "bigint", nullable: false),
                     sizeBytes = table.Column<long>(type: "bigint", nullable: false),
-                    extension = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
+                    mimeType = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
                     sha256 = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     r2RegionName = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
                     uploaderId = table.Column<Guid>(type: "uuid", nullable: true)
