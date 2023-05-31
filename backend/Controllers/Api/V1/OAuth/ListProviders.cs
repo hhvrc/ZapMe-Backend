@@ -10,7 +10,7 @@ public partial class OAuthController
     /// </summary>
     /// <returns></returns>
     /// <response code="200">Returns supported OAuth providers</response>
-    [HttpGet("o/list", Name = "OAuth List Providers")]
+    [HttpGet("list", Name = "OAuth List Providers")]
     [ProducesResponseType(typeof(OAuthProviderList), StatusCodes.Status200OK)]
     public OAuthProviderList ListOAuthProviders()
     {

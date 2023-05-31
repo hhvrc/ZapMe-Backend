@@ -17,7 +17,7 @@ public partial class OAuthController
     [AnonymousOnly]
     [EnableCors("allow_oauth_providers")]
     [RequestSizeLimit(1024)]
-    [HttpPost("o/cb/{providerName}", Name = "OAuth Callback")]
+    [HttpPost("callback/{providerName}", Name = "OAuth Callback")]
     [ProducesResponseType(typeof(OAuthResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
     public async Task<IActionResult> OAuthCallback([FromRoute] string providerName)

@@ -28,7 +28,7 @@ public partial class OAuthController
     [AnonymousOnly]
     [RequestSizeLimit(1024)]
     [Consumes(Application.Json)]
-    [HttpPost("o/create", Name = "OAuth Create Account")]
+    [HttpPost("create", Name = "OAuth Create Account")]
     [ProducesResponseType(typeof(SignInOk), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
     public async Task<IActionResult> OAuthFinishAccountCreation(
