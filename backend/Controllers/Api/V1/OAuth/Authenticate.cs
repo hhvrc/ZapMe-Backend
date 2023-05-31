@@ -1,26 +1,25 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using ZapMe.Attributes;
-using ZapMe.Authentication.Models;
 using ZapMe.Helpers;
 
 namespace ZapMe.Controllers.Api.V1;
 
-public partial class AuthController
+public partial class OAuthController
 {
     /// <summary>
-    /// 
+    /// Start the OAuth authentication process
     /// </summary>
-    /// <param name="providerName">Name of the OAuth provider to use, supported providers can be fetched from <see cref="AuthController.ListOAuthProviders"/></param>
-    /// <status code="200">Success, session has been created</status>
+    /// <param name="providerName">Name of the OAuth provider to use, supported providers can be fetched from <see cref="OAuthController.ListOAuthProviders"/></param>
+    /// <status code="302">Success, redirects to OAuth provider's login page</status>
     /// <status code="406">Not Acceptable, the OAuth provider is not supported</status>
     [AnonymousOnly]
     [EnableCors("allow_oauth_providers")]
     [RequestSizeLimit(1024)]
-    [HttpPost("o/cb/{providerName}", Name = "OAuth Callback")]
-    [ProducesResponseType(typeof(OAuthResult), StatusCodes.Status200OK)]
+    [HttpGet("o/req/{providerName}", Name = "OAuth Authorize")]
+    [ProducesResponseType(StatusCodes.Status302Found)]
     [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
-    public async Task<IActionResult> OAuthCallback([FromRoute] string providerName)
+    public async Task<IActionResult> OAuthAuthorize([FromRoute] string providerName)
     {
         if (!await HttpContext.IsProviderSupportedAsync(providerName)) return CreateHttpError.UnsupportedOAuthProvider(providerName).ToActionResult();
 

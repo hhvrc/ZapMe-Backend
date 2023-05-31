@@ -5,7 +5,7 @@ namespace ZapMe.Utils;
 public static class StringUtils
 {
     /// <summary>
-    /// Generates a random string of <paramref name="length"/> length, consisting of these characters: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_
+    /// Generates a cryptographically secure random string of <paramref name="length"/> length, consisting of these characters: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_
     /// </summary>
     /// <param name="length">Length of the generated string</param>
     /// <returns></returns>

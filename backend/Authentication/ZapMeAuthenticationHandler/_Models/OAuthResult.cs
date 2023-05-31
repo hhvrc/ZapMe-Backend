@@ -16,8 +16,8 @@ public enum OAuthResultType
 
     /// <summary>
     /// User is not registered in the system, the OAuth provider has provided all the information needed to create a new account, but client must provide a password.
-    /// <para>Client must call the <see cref="AuthController.OAuthFinishAccountCreation"/> endpoint to create a new account.</para>
-    /// <para>OAuth Ticket will be provided in the response body, and must be sent back to the server in the <see cref="AuthController.OAuthFinishAccountCreation"/> endpoint.</para>
+    /// <para>Client must call the <see cref="OAuthController.OAuthFinishAccountCreation"/> endpoint to create a new account.</para>
+    /// <para>OAuth Ticket will be provided in the response body, and must be sent back to the server in the <see cref="OAuthController.OAuthFinishAccountCreation"/> endpoint.</para>
     /// </summary>
     RequireAccountCreation,
 }

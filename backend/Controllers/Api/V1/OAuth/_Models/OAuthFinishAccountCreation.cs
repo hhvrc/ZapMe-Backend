@@ -1,6 +1,6 @@
 ﻿using ZapMe.Attributes;
 
-namespace ZapMe.Controllers.Api.V1.Authentication.OAuth.Models;
+namespace ZapMe.Controllers.Api.V1.OAuth.Models;
 
 public readonly struct OAuthFinishAccountCreation
 {

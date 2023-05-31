@@ -1,22 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
-using Quartz.Impl.AdoJobStore.Common;
-using System.Text.Json;
 using ZapMe.Attributes;
 using ZapMe.Authentication;
 using ZapMe.Authentication.Models;
-using ZapMe.Controllers.Api.V1.Authentication.OAuth.Models;
 using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.Controllers.Api.V1.OAuth.Models;
 using ZapMe.Data.Models;
 using ZapMe.Helpers;
-using ZapMe.Services;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
 
-public partial class AuthController
+public partial class OAuthController
 {
     /// <summary>
     /// 
@@ -30,6 +27,7 @@ public partial class AuthController
     /// <status code="200"></status>
     [AnonymousOnly]
     [RequestSizeLimit(1024)]
+    [Consumes(Application.Json)]
     [HttpPost("o/create", Name = "OAuth Create Account")]
     [ProducesResponseType(typeof(SignInOk), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
@@ -45,7 +43,7 @@ public partial class AuthController
         string requestingIp = this.GetRemoteIP();
         string requestingCfIpCountry = this.GetCloudflareIPCountry();
         string requestingCfIpRegion = CountryRegionLookup.GetCloudflareRegion(requestingCfIpCountry);
-        string reqestingUserAgent  = this.GetRemoteUserAgent();
+        string reqestingUserAgent = this.GetRemoteUserAgent();
 
         var oauthVariables = await temporaryDataStore.GetAsync<OAuthProviderVariables>("oauthticket:" + body.OAuthTicket, cancellationToken);
         if (oauthVariables == null)
@@ -55,7 +53,7 @@ public partial class AuthController
                 "ticket_invalid",
                 "The provided OAuth ticket is invalid or expired",
                 "Please restart the OAuth flow by calling the /api/v1/auth/o/req endpoint"
-            ).ToActionResult(); 
+            ).ToActionResult();
         }
 
         using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);

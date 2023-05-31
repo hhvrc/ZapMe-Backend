@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ZapMe.Controllers.Api.V1.Authentication.Models;
+using ZapMe.Controllers.Api.V1.OAuth.Models;
 
 namespace ZapMe.Controllers.Api.V1;
 
-public partial class AuthController
+public partial class OAuthController
 {
     /// <summary>
     /// 

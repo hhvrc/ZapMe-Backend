@@ -1,4 +1,4 @@
-﻿namespace ZapMe.Controllers.Api.V1.Authentication.Models;
+﻿namespace ZapMe.Controllers.Api.V1.OAuth.Models;
 
 /// <summary>
 /// 
