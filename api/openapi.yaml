@@ -362,93 +362,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-  '/api/v1/auth/o/req/{providerName}':
-    get:
-      tags:
-        - Auth
-      summary: Start the OAuth authentication process
-      operationId: OAuth Authorize
-      parameters:
-        - name: providerName
-          in: path
-          description: 'Name of the OAuth provider to use, supported providers can be fetched from M:ZapMe.Controllers.Api.V1.AuthController.ListOAuthProviders'
-          required: true
-          schema:
-            type: string
-      responses:
-        '302':
-          description: Redirect
-        '406':
-          description: Not Acceptable
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-  '/api/v1/auth/o/cb/{providerName}':
-    post:
-      tags:
-        - Auth
-      summary: ''
-      operationId: OAuth Callback
-      parameters:
-        - name: providerName
-          in: path
-          description: 'Name of the OAuth provider to use, supported providers can be fetched from M:ZapMe.Controllers.Api.V1.AuthController.ListOAuthProviders'
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthResult'
-        '406':
-          description: Not Acceptable
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-  /api/v1/auth/o/create:
-    post:
-      tags:
-        - Auth
-      summary: ''
-      operationId: OAuth Create Account
-      requestBody:
-        description: ''
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/OAuthFinishAccountCreation'
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SignInOk'
-        '406':
-          description: Not Acceptable
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-  /api/v1/auth/o/list:
-    get:
-      tags:
-        - Auth
-      summary: ''
-      operationId: OAuth List Providers
-      responses:
-        '200':
-          description: Returns supported OAuth providers
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OAuthProviderList'
   /api/v1/auth/signin:
     post:
       tags:
@@ -531,6 +444,93 @@ paths:
       responses:
         '200':
           description: Health status
+  '/api/v1/oauth/authentiacte/{providerName}':
+    get:
+      tags:
+        - OAuth
+      summary: Start the OAuth authentication process
+      operationId: OAuth Authorize
+      parameters:
+        - name: providerName
+          in: path
+          description: 'Name of the OAuth provider to use, supported providers can be fetched from M:ZapMe.Controllers.Api.V1.OAuthController.ListOAuthProviders'
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect
+        '406':
+          description: Not Acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  '/api/v1/oauth/callback/{providerName}':
+    post:
+      tags:
+        - OAuth
+      summary: ''
+      operationId: OAuth Callback
+      parameters:
+        - name: providerName
+          in: path
+          description: 'Name of the OAuth provider to use, supported providers can be fetched from M:ZapMe.Controllers.Api.V1.OAuthController.ListOAuthProviders'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthResult'
+        '406':
+          description: Not Acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/oauth/create:
+    post:
+      tags:
+        - OAuth
+      summary: ''
+      operationId: OAuth Create Account
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/OAuthFinishAccountCreation'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignInOk'
+        '406':
+          description: Not Acceptable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/oauth/list:
+    get:
+      tags:
+        - OAuth
+      summary: ''
+      operationId: OAuth List Providers
+      responses:
+        '200':
+          description: Returns supported OAuth providers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthProviderList'
   '/api/v1/user/i/{userId}/friendrequest':
     put:
       tags:
