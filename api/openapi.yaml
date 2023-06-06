@@ -497,7 +497,7 @@ paths:
       tags:
         - OAuth
       summary: ''
-      operationId: OAuth Create Account
+      operationId: Complete OAuth Account Creation
       requestBody:
         description: ''
         content:

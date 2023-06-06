@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Net.Http.Headers;
 using OneOf;
+using System.Globalization;
 using System.Security.Claims;
 using System.Text.Json;
 using ZapMe.Authentication.Models;
@@ -36,21 +39,25 @@ public partial class ZapMeAuthenticationHandler
         {
             var stateStore = ServiceProvider.GetRequiredService<IOAuthStateStore>();
 
-            var stateKey = StringUtils.GenerateUrlSafeRandomString(32);
             var expiresAt = DateTime.UtcNow + OAuthConstants.StateLifetime;
-            await stateStore.CreateStateAsync(
-                stateKey,
-                authScheme,
+            var ticket = await stateStore.CreateRegistrationTicketAsync(
                 RequestingIpAddress,
+                oauthClaims,
                 CancellationToken
             );
 
-            // If the user doesn't exist or doesn't have an OAuth connection, inform the client to create a new account using the /api/v1/auth/o/create endpoint
-            await WriteOkJsonResponse(new OAuthResult
-            {
-                ResultType = OAuthResultType.RequireAccountCreation,
-                OAuthTicket = new OAuthTicket(stateKey, expiresAt)
-            });
+            Response.StatusCode = StatusCodes.Status302Found;
+            Response.Headers.Location = QueryHelpers.AddQueryString($"{App.WebsiteUrl}/oauth/create",
+                new Dictionary<string, string?>
+                {
+                    { "ticket", ticket },
+                    { "expiresAt", expiresAt.ToString("O", CultureInfo.InvariantCulture) },
+                    { "email", oauthClaims.Email },
+                    { "name", oauthClaims.Name },
+                    { "profilePictureUrl", oauthClaims.ProfilePictureUrl },
+                }
+            );
+            await Response.StartAsync(CancellationToken);
             return;
         }
 

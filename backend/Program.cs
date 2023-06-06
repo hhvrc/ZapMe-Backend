@@ -176,7 +176,11 @@ services.AddCors(opt =>
             "https://github.com",
             "https://*.github.com",
             "https://twitter.com",
-            "https://*.twitter.com"
+            "https://*.twitter.com",
+            "https://google.com",
+            "https://*.google.com",
+            "https://googleapis.com",
+            "https://*.googleapis.com"
         )
         .AllowAnyHeader()
         .WithMethods(
