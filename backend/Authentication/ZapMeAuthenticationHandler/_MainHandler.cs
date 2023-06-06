@@ -39,7 +39,6 @@ public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHa
     private IServiceProvider ServiceProvider => _context.RequestServices;
     private string RequestingIpAddress => _context.GetRemoteIP();
     private string RequestingIpCountry => _context.GetCloudflareIPCountry();
-    private string RequestingIpRegion => CountryRegionLookup.GetCloudflareRegion(RequestingIpCountry);
     private string RequestingUserAgent => _context.GetRemoteUserAgent();
     private CancellationToken CancellationToken => _context.RequestAborted;
 
@@ -72,24 +71,6 @@ public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHa
     {
         SignInOk signInOk = new SignInOk(session);
 
-        Response.Cookies.Append(
-            _options.CookieName,
-            session.Id.ToString(),
-            new CookieOptions
-            {
-                Path = "/",
-#if DEBUG
-                SameSite = SameSiteMode.None,
-#else
-                SameSite = SameSiteMode.Strict,
-#endif
-                HttpOnly = true,
-                MaxAge = session.ExpiresAt - DateTime.UtcNow,
-                IsEssential = true,
-                Secure = true
-            }
-        );
-
         return WriteOkJsonResponse(new OAuthResult(OAuthResultType.SignedIn, signInOk, null));
     }
     private Task WriteOkJsonResponse(OAuthResult value)
@@ -100,8 +81,6 @@ public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHa
 
     public Task SignOutAsync(AuthenticationProperties? properties)
     {
-        Response.Cookies.Delete(_options.CookieName);
-
         return Task.CompletedTask;
     }
 
@@ -126,8 +105,6 @@ public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHa
         if (!Guid.TryParse(authHeaderValue.Parameter, out Guid sessionId))
             return AuthenticateResult.Fail("Malformed Login Cookie");
 
-        CancellationToken cancellationToken = _context.RequestAborted;
-
         // TODO: Consider doing JWTs instead, and then fetching the user from controllers and check for session expiration there
         SessionEntity? session = await _dbContext.Sessions.AsTracking()
             .Include(s => s.User).ThenInclude(u => u!.ProfilePicture)
@@ -139,7 +116,7 @@ public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHa
             .Include(s => s.User).ThenInclude(u => u!.FriendRequestsIncoming)
             .Include(s => s.User).ThenInclude(u => u!.OauthConnections)
             .AsSplitQuery() // Performance improvement suggested by EF Core
-            .FirstOrDefaultAsync(s => s.Id == sessionId && s.ExpiresAt > requestTime, cancellationToken);
+            .FirstOrDefaultAsync(s => s.Id == sessionId && s.ExpiresAt > requestTime, CancellationToken);
         if (session == null)
         {
             return AuthenticateResult.Fail("Invalid or Expired Login Cookie");

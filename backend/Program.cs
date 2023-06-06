@@ -15,6 +15,7 @@ using ZapMe.Data;
 using ZapMe.Helpers;
 using ZapMe.Middlewares;
 using ZapMe.Options;
+using ZapMe.Options.OAuth;
 using ZapMe.Services;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
@@ -103,7 +104,16 @@ services.Configure<ApiBehaviorOptions>(opt =>
 // ######## ZAPME SERVICES ################
 // ########################################
 
-ZapMeOptions.Register(services, configuration);
+DiscordOAuth2Options.Register(services, configuration);
+GitHubOAuth2Options.Register(services, configuration);
+GoogleOAuth2Options.Register(services, configuration);
+TwitterOAuth1Options.Register(services, configuration);
+ZapMeAuthenticationOptions.Register(services, configuration);
+CloudflareOptions.Register(services, configuration);
+DatabaseOptions.Register(services, configuration);
+GoogleOptions.Register(services, configuration);
+LegalOptions.Register(services, configuration);
+MailGunOptions.Register(services, configuration);
 
 services.AddCloudflareR2(configuration);
 services.AddTransient<IImageManager, ImageManager>();
@@ -125,80 +135,13 @@ services.AddTransient<IFriendRequestStore, FriendRequestStore>();
 //services.AddTransient<IFriendRequestManager, FriendRequestManager>();
 services.AddTransient<IEmailVerificationManager, EmailVerificationManager>();
 services.AddTransient<IWebSocketInstanceManager, WebSocketInstanceManager>();
-services.AddTransient<ITemporaryDataStore, TemporaryDataStore>();
+services.AddTransient<IOAuthStateStore, OAuthStateStore>();
 
 services.AddRateLimiting();
 services.AddSwagger(isDevelopment);
 services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
     .AddZapMe()
-    .AddDiscord("discord", opt =>
-    {
-        opt.ClientId = configuration.GetValue<string>("Discord:OAuth2:ClientId")!;
-        opt.ClientSecret = configuration.GetValue<string>("Discord:OAuth2:ClientSecret")!;
-        opt.CallbackPath = "/api/v1/auth/o/cb/discord";
-        opt.AccessDeniedPath = "/api/v1/auth/o/denied";
-        opt.Scope.Add("email");
-        opt.Scope.Add("identify");
-        opt.Prompt = "none";
-        opt.SaveTokens = true;
-        opt.StateDataFormat = new DistributedCacheSecureDataFormat<AuthenticationProperties>(configuration.GetValue<string>("Redis:ConnectionString")!, TimeSpan.FromMinutes(1));
-        opt.CorrelationCookie.HttpOnly = true;
-        opt.CorrelationCookie.SameSite = SameSiteMode.None;
-        opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
-        opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.ProfileImage, json =>
-        {
-            string? userId = json.GetString("id");
-            string? avatar = json.GetString("avatar");
-            if (String.IsNullOrEmpty(userId) || String.IsNullOrEmpty(avatar))
-                return null;
-
-            return $"https://cdn.discordapp.com/avatars/{userId}/{avatar}.png";
-        });
-        opt.Validate();
-    })
-    .AddGitHub("github", opt =>
-    {
-        opt.ClientId = configuration.GetValue<string>("GitHub:OAuth2:ClientId")!;
-        opt.ClientSecret = configuration.GetValue<string>("GitHub:OAuth2:ClientSecret")!;
-        opt.CallbackPath = "/api/v1/auth/o/cb/github";
-        opt.AccessDeniedPath = "/api/v1/auth/o/denied";
-        opt.Scope.Add("read:user");
-        opt.Scope.Add("user:email");
-        opt.SaveTokens = true;
-        opt.StateDataFormat = new DistributedCacheSecureDataFormat<AuthenticationProperties>(configuration.GetValue<string>("Redis:ConnectionString")!, TimeSpan.FromMinutes(1));
-        opt.CorrelationCookie.HttpOnly = true;
-        opt.CorrelationCookie.SameSite = SameSiteMode.None;
-        opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
-        opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.ProfileImage, json =>
-        {
-            string? avatarUrl = json.GetString("avatar_url");
-            string? gravatarId = json.GetString("gravatar_id");
-
-            if (String.IsNullOrEmpty(gravatarId))
-                return avatarUrl;
-
-            if (String.IsNullOrEmpty(avatarUrl))
-                return $"https://www.gravatar.com/avatar/{gravatarId}?s=256";
-
-            return $"https://www.gravatar.com/avatar/{gravatarId}?s=256&d={Uri.EscapeDataString(avatarUrl)}";
-        });
-        opt.Validate();
-    })
-    .AddTwitter("twitter", opt =>
-    {
-        opt.ConsumerKey = configuration.GetValue<string>("Twitter:OAuth1:ConsumerKey")!;
-        opt.ConsumerSecret = configuration.GetValue<string>("Twitter:OAuth1:ConsumerSecret")!;
-        opt.CallbackPath = "/api/v1/auth/o/cb/twitter";
-        opt.AccessDeniedPath = "/api/v1/auth/o/denied";
-        opt.SaveTokens = true;
-        opt.RetrieveUserDetails = true;
-        opt.StateDataFormat = new DistributedCacheSecureDataFormat<RequestToken>(configuration.GetValue<string>("Redis:ConnectionString")!, TimeSpan.FromMinutes(1));
-        opt.CorrelationCookie.HttpOnly = true;
-        opt.CorrelationCookie.SameSite = SameSiteMode.None;
-        opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
-        opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.ProfileImage, "profile_image_url_https");
-        opt.Validate();
-    });
+    .AddOAuthProviders(configuration);
 services.AddAuthorization(opt =>
 {
     // Example:

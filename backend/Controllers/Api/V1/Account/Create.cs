@@ -38,7 +38,7 @@ public partial class AccountController
         [FromServices] ICloudflareTurnstileService cfTurnstileService,
         [FromServices] IDebounceService debounceService,
         [FromServices] IEmailVerificationManager emailVerificationManager,
-        [FromServices] IOptions<ZapMeOptions> options,
+        [FromServices] IOptions<LegalOptions> options,
         CancellationToken cancellationToken)
     {
         // Verify turnstile token

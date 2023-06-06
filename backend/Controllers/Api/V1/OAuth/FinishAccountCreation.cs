@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ZapMe.Attributes;
-using ZapMe.Authentication;
 using ZapMe.Authentication.Models;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Controllers.Api.V1.OAuth.Models;
@@ -19,7 +18,7 @@ public partial class OAuthController
     /// 
     /// </summary>
     /// <param name="body"></param>
-    /// <param name="temporaryDataStore"></param>
+    /// <param name="stateStore"></param>
     /// <param name="imageManager"></param>
     /// <param name="userStore"></param>
     /// <param name="sessionManager"></param>
@@ -33,7 +32,7 @@ public partial class OAuthController
     [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
     public async Task<IActionResult> OAuthFinishAccountCreation(
         [FromBody] OAuthFinishAccountCreation body,
-        [FromServices] ITemporaryDataStore temporaryDataStore,
+        [FromServices] IOAuthStateStore stateStore,
         [FromServices] IImageManager imageManager,
         [FromServices] IUserStore userStore,
         [FromServices] ISessionManager sessionManager,
@@ -45,7 +44,7 @@ public partial class OAuthController
         string requestingCfIpRegion = CountryRegionLookup.GetCloudflareRegion(requestingCfIpCountry);
         string reqestingUserAgent = this.GetRemoteUserAgent();
 
-        var oauthVariables = await temporaryDataStore.GetAsync<OAuthProviderVariables>("oauthticket:" + body.OAuthTicket, cancellationToken);
+        var oauthVariables = await stateStore.GetRegistrationTicketAsync(body.OAuthTicket, requestingIp, cancellationToken);
         if (oauthVariables == null)
         {
             return CreateHttpError.Generic(

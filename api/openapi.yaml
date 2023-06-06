@@ -378,7 +378,7 @@ paths:
               description: Message sent to server to authenticate user using username and password
       responses:
         '200':
-          description: Returns SignInOk along with a Cookie with similar data
+          description: Success
           content:
             application/json:
               schema:
@@ -444,12 +444,12 @@ paths:
       responses:
         '200':
           description: Health status
-  '/api/v1/oauth/authentiacte/{providerName}':
+  '/api/v1/oauth/{providerName}/auth':
     get:
       tags:
         - OAuth
       summary: Start the OAuth authentication process
-      operationId: OAuth Authorize
+      operationId: OAuth Authenticate
       parameters:
         - name: providerName
           in: path
@@ -466,7 +466,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-  '/api/v1/oauth/callback/{providerName}':
+  '/api/v1/oauth/{providerName}/callback':
     post:
       tags:
         - OAuth
@@ -1386,3 +1386,11 @@ components:
         - online
         - downBad
       type: string
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      description: "JWT Authorization header using the Bearer scheme.\r\n\r\n\r\n                      Enter 'Bearer' [space] and then your token in the text input below.\r\n                      \r\n\r\n                        Example: 'Bearer 12345abcdef'"
+      name: Authorization
+      in: header
+security:
+  - Bearer: [ ]

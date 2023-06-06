@@ -27,32 +27,6 @@ namespace ZapMe.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "tempJsonData",
-                columns: table => new
-                {
-                    key = table.Column<string>(type: "text", nullable: false),
-                    value = table.Column<string>(type: "jsonb", nullable: false),
-                    expiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_tempJsonData", x => x.key);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "tempStringData",
-                columns: table => new
-                {
-                    key = table.Column<string>(type: "text", nullable: false),
-                    value = table.Column<string>(type: "text", nullable: false),
-                    expiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_tempStringData", x => x.key);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "userAgents",
                 columns: table => new
                 {
@@ -327,16 +301,6 @@ namespace ZapMe.Migrations
                 column: "userId");
 
             migrationBuilder.CreateIndex(
-                name: "tempJsonData_expiresAt_idx",
-                table: "tempJsonData",
-                column: "expiresAt");
-
-            migrationBuilder.CreateIndex(
-                name: "tempStringData_expiresAt_idx",
-                table: "tempStringData",
-                column: "expiresAt");
-
-            migrationBuilder.CreateIndex(
                 name: "userAgents_hash_idx",
                 table: "userAgents",
                 column: "sha256",
@@ -437,12 +401,6 @@ namespace ZapMe.Migrations
 
             migrationBuilder.DropTable(
                 name: "sessions");
-
-            migrationBuilder.DropTable(
-                name: "tempJsonData");
-
-            migrationBuilder.DropTable(
-                name: "tempStringData");
 
             migrationBuilder.DropTable(
                 name: "userPasswordResetRequests");

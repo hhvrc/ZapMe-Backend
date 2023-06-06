@@ -5,6 +5,7 @@ using OneOf;
 using System.Security.Claims;
 using System.Text.Json;
 using ZapMe.Authentication.Models;
+using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
@@ -33,14 +34,14 @@ public partial class ZapMeAuthenticationHandler
             .FirstOrDefaultAsync(c => c.ProviderName == oauthClaims.Provider && c.ProviderId == oauthClaims.ProviderId, CancellationToken);
         if (connectionEntity == null)
         {
-            var tempDataStore = _context.RequestServices.GetRequiredService<ITemporaryDataStore>();
+            var stateStore = ServiceProvider.GetRequiredService<IOAuthStateStore>();
 
-            var cacheKey = "oauthticket:" + StringUtils.GenerateUrlSafeRandomString(32);
-            DateTime expiresAt = DateTime.UtcNow.AddMinutes(15);
-            await tempDataStore.SetAsync(
-                cacheKey,
-                oauthClaims,
-                expiresAt,
+            var stateKey = StringUtils.GenerateUrlSafeRandomString(32);
+            var expiresAt = DateTime.UtcNow + OAuthConstants.StateLifetime;
+            await stateStore.CreateStateAsync(
+                stateKey,
+                authScheme,
+                RequestingIpAddress,
                 CancellationToken
             );
 
@@ -48,13 +49,13 @@ public partial class ZapMeAuthenticationHandler
             await WriteOkJsonResponse(new OAuthResult
             {
                 ResultType = OAuthResultType.RequireAccountCreation,
-                OAuthTicket = new OAuthTicket(cacheKey, expiresAt)
+                OAuthTicket = new OAuthTicket(stateKey, expiresAt)
             });
             return;
         }
 
         // Create a new session for the user
-        var sessionManager = _context.RequestServices.GetRequiredService<ISessionManager>();
+        var sessionManager = ServiceProvider.GetRequiredService<ISessionManager>();
         var session = await sessionManager.CreateAsync(
             connectionEntity.User,
             RequestingIpAddress,

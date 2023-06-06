@@ -23,8 +23,7 @@ public partial class AuthController
     /// <param name="lockOutStore"></param>
     /// <param name="options"></param>
     /// <param name="cancellationToken"></param>
-    /// <returns>The user account</returns>
-    /// <response code="200">Returns SignInOk along with a Cookie with similar data</response>
+    /// <returns></returns>
     [AnonymousOnly]
     [RequestSizeLimit(1024)]
     [HttpPost("signin", Name = "AuthSignIn")]
@@ -33,7 +32,7 @@ public partial class AuthController
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status413RequestEntityTooLarge)]
-    public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] ILockOutStore lockOutStore, [FromServices] IOptions<ZapMeOptions> options, CancellationToken cancellationToken)
+    public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] ILockOutStore lockOutStore, [FromServices] IOptions<LegalOptions> options, CancellationToken cancellationToken)
     {
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);
 

@@ -17,10 +17,10 @@ public partial class OAuthController
     [AnonymousOnly]
     [EnableCors("allow_oauth_providers")]
     [RequestSizeLimit(1024)]
-    [HttpPost("callback/{providerName}", Name = "OAuth Callback")]
+    [HttpPost("{providerName}/callback", Name = "OAuth Callback")]
     [ProducesResponseType(typeof(OAuthResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
-    public async Task<IActionResult> OAuthCallback([FromRoute] string providerName)
+    public async Task<IActionResult> Callback([FromRoute] string providerName)
     {
         if (!await HttpContext.IsProviderSupportedAsync(providerName)) return CreateHttpError.UnsupportedOAuthProvider(providerName).ToActionResult();
 

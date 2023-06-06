@@ -14,12 +14,11 @@ public partial class OAuthController
     /// <status code="302">Success, redirects to OAuth provider's login page</status>
     /// <status code="406">Not Acceptable, the OAuth provider is not supported</status>
     [AnonymousOnly]
-    [EnableCors("allow_oauth_providers")]
     [RequestSizeLimit(1024)]
-    [HttpGet("authentiacte/{providerName}", Name = "OAuth Authorize")]
+    [HttpGet("{providerName}/auth", Name = "OAuth Authenticate")]
     [ProducesResponseType(StatusCodes.Status302Found)]
     [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
-    public async Task<IActionResult> OAuthAuthenticate([FromRoute] string providerName)
+    public async Task<IActionResult> Auth([FromRoute] string providerName)
     {
         if (!await HttpContext.IsProviderSupportedAsync(providerName)) return CreateHttpError.UnsupportedOAuthProvider(providerName).ToActionResult();
 
