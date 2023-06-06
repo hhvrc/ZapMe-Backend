@@ -12,8 +12,7 @@ public static class GoogleReCaptchaServiceExtensions
 {
     public static IServiceCollection AddGoogleReCaptchaService(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddOptions<GoogleReCaptchaOptions>().Bind(configuration.GetRequiredSection(GoogleReCaptchaOptions.SectionName)).ValidateOnStart();
-        services.Configure<GoogleReCaptchaOptions>(configuration.GetSection(GoogleReCaptchaOptions.SectionName));
+        GoogleReCaptchaOptions.Register(services, configuration);
         services.AddHttpClient(GoogleReCaptchaService.HttpClientKey, cli =>
         {
             cli.BaseAddress = new Uri(GoogleReCaptchaService.BaseUrl, UriKind.Absolute);
