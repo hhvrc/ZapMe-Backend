@@ -1,18 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Net.Http.Headers;
-using OneOf;
-using System.Globalization;
 using System.Security.Claims;
-using System.Text.Json;
-using ZapMe.Authentication.Models;
 using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
-using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
-using ZapMe.Utils;
 
 namespace ZapMe.Authentication;
 
@@ -47,16 +39,7 @@ public partial class ZapMeAuthenticationHandler
             );
 
             Response.StatusCode = StatusCodes.Status302Found;
-            Response.Headers.Location = QueryHelpers.AddQueryString($"{App.WebsiteUrl}/oauth/create",
-                new Dictionary<string, string?>
-                {
-                    { "ticket", ticket },
-                    { "expiresAt", expiresAt.ToString("O", CultureInfo.InvariantCulture) },
-                    { "email", oauthClaims.Email },
-                    { "name", oauthClaims.Name },
-                    { "profilePictureUrl", oauthClaims.ProfilePictureUrl },
-                }
-            );
+            Response.Headers.Location = QueryHelpers.AddQueryString($"{App.WebsiteUrl}/oauth/connect", "ticket", ticket);
             await Response.StartAsync(CancellationToken);
             return;
         }

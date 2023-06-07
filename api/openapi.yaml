@@ -382,7 +382,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SignInOk'
+                $ref: '#/components/schemas/SessionDto'
         '400':
           description: Bad Request
           content:
@@ -444,7 +444,7 @@ paths:
       responses:
         '200':
           description: Health status
-  '/api/v1/oauth/{providerName}/auth':
+  '/api/v1/oauth/{providerName}/authenticate':
     get:
       tags:
         - OAuth
@@ -480,12 +480,29 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: Success
+        '302':
+          description: Redirect
+        '406':
+          description: Not Acceptable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OAuthResult'
+                $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/oauth/connect:
+    post:
+      tags:
+        - OAuth
+      summary: ''
+      operationId: OAuth Connect Account
+      parameters:
+        - name: oauthTicket
+          in: query
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
         '406':
           description: Not Acceptable
           content:
@@ -497,21 +514,21 @@ paths:
       tags:
         - OAuth
       summary: ''
-      operationId: Complete OAuth Account Creation
+      operationId: OAuth Create Account
       requestBody:
         description: ''
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '#/components/schemas/OAuthFinishAccountCreation'
+                - $ref: '#/components/schemas/OAuthCreateAccount'
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SignInOk'
+                $ref: '#/components/schemas/SessionDto'
         '406':
           description: Not Acceptable
           content:
@@ -1024,7 +1041,7 @@ components:
           description: UserId's of users that this user has sent friend requests to
       additionalProperties: false
       description: List of incoming and outgoing friendrequests
-    OAuthFinishAccountCreation:
+    OAuthCreateAccount:
       required:
         - acceptedPrivacyPolicyVersion
         - acceptedTermsOfServiceVersion
@@ -1062,42 +1079,6 @@ components:
           description: ''
       additionalProperties: false
       description: ''
-    OAuthResult:
-      required:
-        - resultType
-      type: object
-      properties:
-        resultType:
-          allOf:
-            - $ref: '#/components/schemas/OAuthResultType'
-        signInOk:
-          allOf:
-            - $ref: '#/components/schemas/SignInOk'
-          description: ''
-          nullable: true
-        oAuthTicket:
-          allOf:
-            - $ref: '#/components/schemas/OAuthTicket'
-          nullable: true
-      additionalProperties: false
-    OAuthResultType:
-      enum:
-        - signedIn
-        - requireTwoFactor
-        - requireAccountCreation
-      type: string
-    OAuthTicket:
-      required:
-        - expiresAtUtc
-        - ticket
-      type: object
-      properties:
-        ticket:
-          type: string
-        expiresAtUtc:
-          type: string
-          format: date-time
-      additionalProperties: false
     RecoveryConfirm:
       required:
         - newPassword
@@ -1136,11 +1117,11 @@ components:
     SessionDto:
       required:
         - expiresAtUtc
-        - id
         - issuedAtUtc
+        - sessionToken
       type: object
       properties:
-        id:
+        sessionToken:
           type: string
           description: ''
           format: uuid
@@ -1159,23 +1140,6 @@ components:
         - warning
         - error
       type: string
-    SignInOk:
-      required:
-        - account
-        - session
-      type: object
-      properties:
-        session:
-          allOf:
-            - $ref: '#/components/schemas/SessionDto'
-          description: ''
-        account:
-          allOf:
-            - $ref: '#/components/schemas/AccountDto'
-          description: ''
-          readOnly: true
-      additionalProperties: false
-      description: ''
     SocialsConfig:
       type: object
       properties:

@@ -2,7 +2,7 @@
 
 namespace ZapMe.Controllers.Api.V1.OAuth.Models;
 
-public readonly struct OAuthFinishAccountCreation
+public readonly struct OAuthCreateAccount
 {
     /// <summary/>
     public string OAuthTicket { get; init; }

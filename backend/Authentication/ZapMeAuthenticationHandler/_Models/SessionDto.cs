@@ -6,7 +6,7 @@ public readonly struct SessionDto
 {
     public SessionDto(SessionEntity session)
     {
-        Id = session.Id;
+        SessionToken = session.Id;
         IssuedAtUtc = session.CreatedAt;
         ExpiresAtUtc = session.ExpiresAt;
     }
@@ -14,7 +14,7 @@ public readonly struct SessionDto
     /// <summary>
     /// 
     /// </summary>
-    public Guid Id { get; init; }
+    public Guid SessionToken { get; init; }
 
     /// <summary>
     /// 

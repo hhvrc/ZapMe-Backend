@@ -4,6 +4,7 @@ using ZapMe.Attributes;
 using ZapMe.Authentication.Models;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Controllers.Api.V1.OAuth.Models;
+using ZapMe.Data;
 using ZapMe.Data.Models;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
@@ -18,6 +19,7 @@ public partial class OAuthController
     /// 
     /// </summary>
     /// <param name="body"></param>
+    /// <param name="dbContext"></param>
     /// <param name="stateStore"></param>
     /// <param name="imageManager"></param>
     /// <param name="userStore"></param>
@@ -27,12 +29,12 @@ public partial class OAuthController
     [AnonymousOnly]
     [RequestSizeLimit(1024)]
     [Consumes(Application.Json)]
-    [HttpPost("create", Name = "Complete OAuth Account Creation")]
-    [ProducesResponseType(typeof(SignInOk), StatusCodes.Status200OK)]
+    [HttpPost("create", Name = "OAuth Create Account")]
+    [ProducesResponseType(typeof(SessionDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
-    [ResponseCache(CacheProfileName = "no-store")]
-    public async Task<IActionResult> CompleteOAuthAccountCreation(
-        [FromBody] OAuthFinishAccountCreation body,
+    public async Task<IActionResult> CreateAccount(
+        [FromBody] OAuthCreateAccount body,
+        [FromServices] ZapMeContext dbContext,
         [FromServices] IOAuthStateStore stateStore,
         [FromServices] IImageManager imageManager,
         [FromServices] IUserStore userStore,
@@ -56,7 +58,7 @@ public partial class OAuthController
             ).ToActionResult();
         }
 
-        using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+        using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         ImageEntity? imageEntity = null;
         if (!String.IsNullOrEmpty(oauthVariables.ProfilePictureUrl))
@@ -93,7 +95,7 @@ public partial class OAuthController
 
         if (imageEntity != null)
         {
-            await _dbContext.Images
+            await dbContext.Images
                 .Where(i => i.Id == imageEntity.Id)
                 .ExecuteUpdateAsync(spc => spc.SetProperty(i => i.UploaderId, _ => user.Id), cancellationToken);
         }
@@ -106,7 +108,8 @@ public partial class OAuthController
             ProviderId = oauthVariables.ProviderId,
         };
 
-        await _dbContext.OAuthConnections.AddAsync(connectionEntity, cancellationToken);
+        await dbContext.OAuthConnections.AddAsync(connectionEntity, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         var session = await sessionManager.CreateAsync(
             user,
@@ -119,6 +122,6 @@ public partial class OAuthController
 
         transaction.Commit();
 
-        return Ok(new SignInOk(session));
+        return Ok(new SessionDto(session));
     }
 }

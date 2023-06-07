@@ -11,7 +11,6 @@ using ZapMe.Data;
 using ZapMe.Data.Models;
 using ZapMe.Helpers;
 using ZapMe.Options;
-using ZapMe.Utils;
 
 namespace ZapMe.Authentication;
 
@@ -69,14 +68,8 @@ public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHa
     }
     private Task FinishSignInAsync(SessionEntity session)
     {
-        SignInOk signInOk = new SignInOk(session);
-
-        return WriteOkJsonResponse(new OAuthResult(OAuthResultType.SignedIn, signInOk, null));
-    }
-    private Task WriteOkJsonResponse(OAuthResult value)
-    {
         Response.StatusCode = StatusCodes.Status200OK;
-        return Response.WriteAsJsonAsync(value, _jsonSerializerOptions);
+        return Response.WriteAsJsonAsync(new SessionDto(session), _jsonSerializerOptions);
     }
 
     public Task SignOutAsync(AuthenticationProperties? properties)
