@@ -70,8 +70,11 @@ public sealed class MailGunService : IMailGunService
             content.Add(new StringContent(value), name);
         }
 
+#if DEBUG
+        _logger.LogInformation("Sending mail: {}", await content.ReadAsStringAsync(cancellationToken));
+#else
         HttpClient httpClient = _httpClientFactory.CreateClient(HttpClientKey);
-
+        
         using HttpResponseMessage result = await httpClient.PostAsync(Uri.EscapeDataString(App.Domain) + "/" + SendMailEndpoint, content, cancellationToken);
 
         if (!result.IsSuccessStatusCode)
@@ -79,6 +82,7 @@ public sealed class MailGunService : IMailGunService
             _logger.LogError("Failed to send mail: {} {}", result.StatusCode, await result.Content.ReadAsStringAsync(cancellationToken));
             return false;
         }
+#endif
 
         return true;
     }
