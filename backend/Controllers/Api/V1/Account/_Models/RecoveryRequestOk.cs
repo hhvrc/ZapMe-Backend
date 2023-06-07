@@ -5,5 +5,5 @@ public readonly struct RecoveryRequestOk
     /// <summary>
     /// 
     /// </summary>
-    public required string Message { get; init; }
+    public string Message { get; init; }
 }

@@ -36,72 +36,72 @@ public readonly struct AccountDto
     /// <summary>
     /// 
     /// </summary>
-    public Guid Id { get; }
+    public Guid Id { get; init; }
 
     /// <summary>
     /// 
     /// </summary>
     [Username(false)]
-    public string Username { get; }
+    public string Username { get; init; }
 
     /// <summary>
     /// Obfuscated email of your account
     /// </summary>
     [EmailAddress]
-    public string ObscuredEmail { get; }
+    public string ObscuredEmail { get; init; }
 
     /// <summary>
     /// 
     /// </summary>
-    public bool EmailVerified { get; }
+    public bool EmailVerified { get; init; }
 
     /// <summary>
     /// 
     /// </summary>
-    public uint AcceptedPrivacyPolicyVersion { get; }
+    public uint AcceptedPrivacyPolicyVersion { get; init; }
 
     /// <summary>
     /// 
     /// </summary>
-    public uint AcceptedTermsOfServiceVersion { get; }
+    public uint AcceptedTermsOfServiceVersion { get; init; }
 
     /// <summary>
     /// 
     /// </summary>
-    public Uri ProfilePictureUrl { get; }
+    public Uri ProfilePictureUrl { get; init; }
 
     /// <summary>
     /// 
     /// </summary>
-    public UserStatus Status { get; }
+    public UserStatus Status { get; init; }
 
     /// <summary>
     /// 
     /// </summary>
-    public string StatusText { get; }
+    public string StatusText { get; init; }
 
     /// <summary>
     /// Id of friends this account has
     /// </summary>
-    public Guid[] Friends { get; }
+    public Guid[] Friends { get; init; }
 
     /// <summary>
     /// OAuth2 providers this account is connected to
     /// </summary>
-    public string[] OauthConnections { get; }
+    public string[] OauthConnections { get; init; }
 
     /// <summary>
     /// Date this user was created at
     /// </summary>
-    public DateTime CreatedAt { get; }
+    public DateTime CreatedAt { get; init; }
 
     /// <summary>
     /// Last time this user was updated
     /// </summary>
-    public DateTime UpdatedAt { get; }
+    public DateTime UpdatedAt { get; init; }
 
     /// <summary>
     /// Last time this user was online
     /// </summary>
-    public DateTime LastOnline { get; }
+    public DateTime LastOnline { get; init; }
 }

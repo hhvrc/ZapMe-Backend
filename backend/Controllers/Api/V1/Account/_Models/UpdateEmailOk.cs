@@ -8,5 +8,5 @@ public readonly struct UpdateEmailOk
     /// <summary>
     /// Example: "Please check your email to verify your new address."
     /// </summary>
-    public required string Message { get; init; }
+    public string Message { get; init; }
 }

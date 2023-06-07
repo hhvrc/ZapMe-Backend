@@ -10,10 +10,10 @@ public readonly struct UpdateProfilePictureOk
     /// <summary>
     /// 
     /// </summary>
-    public required Uri ImageUrl { get; init; }
+    public Uri ImageUrl { get; init; }
 
     /// <summary>
     /// 
     /// </summary>
-    public required string ImageHash { get; init; }
+    public string ImageHash { get; init; }
 }

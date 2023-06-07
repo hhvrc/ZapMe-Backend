@@ -736,11 +736,9 @@ components:
           type: string
           description: ''
           format: uuid
-          readOnly: true
         username:
           type: string
           description: ''
-          readOnly: true
           example: MyUsername
         obscuredEmail:
           maxLength: 320
@@ -748,64 +746,52 @@ components:
           type: string
           description: Obfuscated email of your account
           format: email
-          readOnly: true
           example: user.name@example.com
         emailVerified:
           type: boolean
           description: ''
-          readOnly: true
         acceptedPrivacyPolicyVersion:
           type: integer
           description: ''
           format: int32
-          readOnly: true
         acceptedTermsOfServiceVersion:
           type: integer
           description: ''
           format: int32
-          readOnly: true
         profilePictureUrl:
           type: string
           description: ''
           format: uri
-          readOnly: true
         status:
           allOf:
             - $ref: '#/components/schemas/UserStatus'
           description: ''
-          readOnly: true
         statusText:
           type: string
           description: ''
-          readOnly: true
         friends:
           type: array
           items:
             type: string
             format: uuid
           description: Id of friends this account has
-          readOnly: true
         oauthConnections:
           type: array
           items:
             type: string
           description: OAuth2 providers this account is connected to
-          readOnly: true
         createdAt:
           type: string
           description: Date this user was created at
           format: date-time
-          readOnly: true
         updatedAt:
           type: string
           description: Last time this user was updated
           format: date-time
-          readOnly: true
         lastOnline:
           type: string
           description: Last time this user was online
           format: date-time
-          readOnly: true
       additionalProperties: false
       description: 'Account object, this can only retrieved for the user you are logged in as'
     AccountOAuthAdd:
@@ -1158,17 +1144,14 @@ components:
           type: string
           description: ''
           format: uuid
-          readOnly: true
         issuedAtUtc:
           type: string
           description: ''
           format: date-time
-          readOnly: true
         expiresAtUtc:
           type: string
           description: ''
           format: date-time
-          readOnly: true
       additionalProperties: false
     SeverityLevel:
       enum:

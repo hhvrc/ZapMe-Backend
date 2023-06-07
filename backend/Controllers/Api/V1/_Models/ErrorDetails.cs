@@ -24,33 +24,33 @@ public readonly struct ErrorDetails
     /// HTTP status code
     /// </summary>
     [JsonIgnore]
-    public int HttpStatusCode { get; }
+    public int HttpStatusCode { get; init; }
 
     /// <summary>
     /// Error code, this is a short string that can be used to identify the error (meant for developers)
     /// </summary>
-    public string Code { get; }
+    public string Code { get; init; }
 
     /// <summary>
     /// Detailed description of what this error is about (meant for developers)
     /// </summary>
-    public string Detail { get; }
+    public string Detail { get; init; }
 
     /// <summary>
     /// Suggestion on how to midegate this error (meant for developers)
     /// </summary>
-    public string? Suggestion { get; }
+    public string? Suggestion { get; init; }
 
     /// <summary>
     /// Errors for specific fields in the request
     /// </summary>
-    public Dictionary<string, string[]>? Fields { get; }
+    public Dictionary<string, string[]>? Fields { get; init; }
 
     /// <summary>
     /// This is a user friendly error message, might help the user understand what went wrong and how to fix it
     /// Completely optional, might be null
     /// </summary>
-    public UserNotification? Notification { get; }
+    public UserNotification? Notification { get; init; }
 
     public ObjectResult ToActionResult() => new ObjectResult(this) { StatusCode = HttpStatusCode, ContentTypes = { Application.Json } };
     public static implicit operator ObjectResult(ErrorDetails errorDetails) => errorDetails.ToActionResult();

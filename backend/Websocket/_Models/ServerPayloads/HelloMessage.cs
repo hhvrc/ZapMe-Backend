@@ -1,5 +1,5 @@
 ﻿namespace ZapMe.Websocket.Models.ServerPayloads;
 
-public readonly struct HelloMessage
+public struct HelloMessage
 {
 }

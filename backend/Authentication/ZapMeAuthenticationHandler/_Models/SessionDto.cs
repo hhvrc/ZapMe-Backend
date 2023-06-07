@@ -14,15 +14,15 @@ public readonly struct SessionDto
     /// <summary>
     /// 
     /// </summary>
-    public Guid Id { get; }
+    public Guid Id { get; init; }
 
     /// <summary>
     /// 
     /// </summary>
-    public DateTime IssuedAtUtc { get; }
+    public DateTime IssuedAtUtc { get; init; }
 
     /// <summary>
     /// 
     /// </summary>
-    public DateTime ExpiresAtUtc { get; }
+    public DateTime ExpiresAtUtc { get; init; }
 }
