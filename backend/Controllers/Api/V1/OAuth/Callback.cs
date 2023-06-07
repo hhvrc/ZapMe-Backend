@@ -20,6 +20,7 @@ public partial class OAuthController
     [HttpPost("{providerName}/callback", Name = "OAuth Callback")]
     [ProducesResponseType(typeof(OAuthResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+    [ResponseCache(CacheProfileName = "no-store")]
     public async Task<IActionResult> Callback([FromRoute] string providerName)
     {
         if (!await HttpContext.IsProviderSupportedAsync(providerName)) return CreateHttpError.UnsupportedOAuthProvider(providerName).ToActionResult();

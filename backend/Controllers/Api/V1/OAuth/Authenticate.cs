@@ -18,6 +18,7 @@ public partial class OAuthController
     [HttpGet("{providerName}/auth", Name = "OAuth Authenticate")]
     [ProducesResponseType(StatusCodes.Status302Found)]
     [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+    [ResponseCache(CacheProfileName = "no-store")]
     public async Task<IActionResult> Auth([FromRoute] string providerName)
     {
         if (!await HttpContext.IsProviderSupportedAsync(providerName)) return CreateHttpError.UnsupportedOAuthProvider(providerName).ToActionResult();

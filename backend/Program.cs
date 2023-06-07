@@ -87,7 +87,12 @@ builder.Services.Configure<ForwardedHeadersOptions>(opt =>
     }
 });
 services.AddRouting(opt => opt.LowercaseUrls = true);
-services.AddControllers().AddJsonOptions(opt =>
+services.AddResponseCaching();
+services.AddControllers(opt =>
+{
+    opt.CacheProfiles.Add("no-store", new CacheProfile { Duration = 0, Location = ResponseCacheLocation.None, NoStore = true });
+})
+.AddJsonOptions(opt =>
 {
     opt.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     opt.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
@@ -239,6 +244,7 @@ app.Map("/api", true, app =>
 
     app.UseRouting();
     app.UseCors(); // Use default policy
+    app.UseResponseCaching();
     app.UseAuthorization();
     app.UseRateLimiter();
     app.UseMiddleware<ActivityTracker>();

@@ -30,6 +30,7 @@ public partial class OAuthController
     [HttpPost("create", Name = "Complete OAuth Account Creation")]
     [ProducesResponseType(typeof(SignInOk), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+    [ResponseCache(CacheProfileName = "no-store")]
     public async Task<IActionResult> CompleteOAuthAccountCreation(
         [FromBody] OAuthFinishAccountCreation body,
         [FromServices] IOAuthStateStore stateStore,

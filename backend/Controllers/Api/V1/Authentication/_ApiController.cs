@@ -13,6 +13,7 @@ namespace ZapMe.Controllers.Api.V1;
 [Produces(Application.Json)]
 [ProducesErrorResponseType(typeof(ErrorDetails))]
 [ApiController, Route("api/v1/[Controller]/")]
+[ResponseCache(CacheProfileName = "no-store")]
 public sealed partial class AuthController : ControllerBase
 {
     private readonly ZapMeContext _dbContext;
