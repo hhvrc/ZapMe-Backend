@@ -2,7 +2,7 @@
 
 namespace ZapMe.Authentication.Models;
 
-public readonly struct SessionDto
+public sealed class SessionDto
 {
     public SessionDto(SessionEntity session)
     {

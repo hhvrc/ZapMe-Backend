@@ -29,4 +29,9 @@ public readonly struct CreateAccount
     /// Response from cloudflare turnstile request
     /// </summary>
     public string TurnstileResponse { get; init; }
+
+    /// <summary>
+    /// SSO token from OAuth flow, this is optional and only used when creating an account from the OAuth flow
+    /// </summary>
+    public string? SSOToken { get; init; }
 }
