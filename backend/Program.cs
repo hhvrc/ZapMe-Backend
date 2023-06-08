@@ -113,7 +113,6 @@ DiscordOAuth2Options.Register(services, configuration);
 GitHubOAuth2Options.Register(services, configuration);
 GoogleOAuth2Options.Register(services, configuration);
 TwitterOAuth1Options.Register(services, configuration);
-ZapMeAuthenticationOptions.Register(services, configuration);
 CloudflareOptions.Register(services, configuration);
 DatabaseOptions.Register(services, configuration);
 GoogleOptions.Register(services, configuration);

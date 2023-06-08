@@ -18,18 +18,15 @@ public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHa
 {
     private AuthenticationScheme _scheme = default!;
     private HttpContext _context = default!;
-    private ZapMeAuthenticationOptions _options = default!;
     private Task<AuthenticateResult>? _authenticateTask = null;
     private readonly ZapMeContext _dbContext;
     private readonly JsonSerializerOptions _jsonSerializerOptions;
-    private readonly IOptionsMonitor<ZapMeAuthenticationOptions> _optionsMonitor;
     private readonly ILogger<ZapMeAuthenticationHandler> _logger;
 
-    public ZapMeAuthenticationHandler(ZapMeContext dbContext, IOptions<JsonOptions> options, IOptionsMonitor<ZapMeAuthenticationOptions> optionsMonitor, ILogger<ZapMeAuthenticationHandler> logger)
+    public ZapMeAuthenticationHandler(ZapMeContext dbContext, IOptions<JsonOptions> options, ILogger<ZapMeAuthenticationHandler> logger)
     {
         _dbContext = dbContext;
         _jsonSerializerOptions = options.Value.JsonSerializerOptions;
-        _optionsMonitor = optionsMonitor;
         _logger = logger;
     }
 
@@ -45,7 +42,6 @@ public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHa
     {
         _scheme = scheme ?? throw new ArgumentNullException(nameof(scheme));
         _context = context ?? throw new ArgumentNullException(nameof(context));
-        _options = _optionsMonitor.CurrentValue;
 
         return Task.CompletedTask;
     }
