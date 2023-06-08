@@ -12,7 +12,7 @@ using ZapMe.Data;
 namespace ZapMe.Migrations
 {
     [DbContext(typeof(ZapMeContext))]
-    [Migration("20230606221829_InitialCreate")]
+    [Migration("20230608134508_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -172,16 +172,16 @@ namespace ZapMe.Migrations
                     b.ToTable("lockOuts", (string)null);
                 });
 
-            modelBuilder.Entity("ZapMe.Data.Models.OAuthConnectionEntity", b =>
+            modelBuilder.Entity("ZapMe.Data.Models.SSOConnectionEntity", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("userId");
-
                     b.Property<string>("ProviderName")
                         .HasMaxLength(16)
                         .HasColumnType("character varying(16)")
                         .HasColumnName("providerName");
+
+                    b.Property<string>("ProviderUserId")
+                        .HasColumnType("text")
+                        .HasColumnName("providerUserId");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -189,14 +189,20 @@ namespace ZapMe.Migrations
                         .HasColumnName("createdAt")
                         .HasDefaultValueSql("now()");
 
-                    b.Property<string>("ProviderId")
+                    b.Property<string>("ProviderUserName")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("providerId");
+                        .HasColumnName("providerUserName");
 
-                    b.HasKey("UserId", "ProviderName");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("userId");
 
-                    b.ToTable("oauthConnections", (string)null);
+                    b.HasKey("ProviderName", "ProviderUserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ssoConnections", (string)null);
                 });
 
             modelBuilder.Entity("ZapMe.Data.Models.SessionEntity", b =>
@@ -562,10 +568,10 @@ namespace ZapMe.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ZapMe.Data.Models.OAuthConnectionEntity", b =>
+            modelBuilder.Entity("ZapMe.Data.Models.SSOConnectionEntity", b =>
                 {
                     b.HasOne("ZapMe.Data.Models.UserEntity", "User")
-                        .WithMany("OauthConnections")
+                        .WithMany("SSOConnections")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -669,11 +675,11 @@ namespace ZapMe.Migrations
 
                     b.Navigation("LockOuts");
 
-                    b.Navigation("OauthConnections");
-
                     b.Navigation("PasswordResetRequest");
 
                     b.Navigation("Relations");
+
+                    b.Navigation("SSOConnections");
 
                     b.Navigation("Sessions");
 

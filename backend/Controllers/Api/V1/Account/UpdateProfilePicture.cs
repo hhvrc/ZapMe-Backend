@@ -37,7 +37,7 @@ public partial class AccountController
         long length = Request.ContentLength ?? -1;
         if (length is <= 0 or > Int32.MaxValue)
         {
-            return CreateHttpError.Generic(StatusCodes.Status411LengthRequired, "Length is required", "Missing or invalid Content-Length header").ToActionResult();
+            return HttpErrors.Generic(StatusCodes.Status411LengthRequired, "Length is required", "Missing or invalid Content-Length header").ToActionResult();
         }
 
         string cfRegion = CountryRegionLookup.GetCloudflareRegion(this.GetCloudflareIPCountry());

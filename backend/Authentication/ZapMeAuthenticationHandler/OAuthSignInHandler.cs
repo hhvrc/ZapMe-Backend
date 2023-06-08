@@ -10,7 +10,7 @@ namespace ZapMe.Authentication;
 
 public partial class ZapMeAuthenticationHandler
 {
-    private async Task SignInOAuthAsync(string authScheme, ClaimsPrincipal claimsIdentity, AuthenticationProperties? properties)
+    private async Task SignInSSOAsync(string authScheme, ClaimsPrincipal claimsIdentity, AuthenticationProperties? properties)
     {
         ErrorDetails errorDetails;
 
@@ -22,24 +22,24 @@ public partial class ZapMeAuthenticationHandler
             return;
         }
 
-        // Try to fetch the user's existing OAuth connection
-        var connectionEntity = await _dbContext.OAuthConnections
+        // Try to fetch the user's existing SSO connection
+        var connectionEntity = await _dbContext.SSOConnections
             .Include(c => c.User)
             .ThenInclude(u => u.ProfilePicture)
-            .FirstOrDefaultAsync(c => c.ProviderName == oauthClaims.Provider && c.ProviderId == oauthClaims.ProviderId, CancellationToken);
+            .FirstOrDefaultAsync(c => c.ProviderName == oauthClaims.ProviderName && c.ProviderUserId == oauthClaims.ProviderUserId, CancellationToken);
         if (connectionEntity == null)
         {
-            var stateStore = ServiceProvider.GetRequiredService<IOAuthStateStore>();
+            var stateStore = ServiceProvider.GetRequiredService<ISSOStateStore>();
 
-            var expiresAt = DateTime.UtcNow + OAuthConstants.StateLifetime;
-            var ticket = await stateStore.CreateRegistrationTicketAsync(
+            var expiresAt = DateTime.UtcNow + SSOConstants.StateLifetime;
+            var ticket = await stateStore.CreateRegistrationTokenAsync(
                 RequestingIpAddress,
                 oauthClaims,
                 CancellationToken
             );
 
             Response.StatusCode = StatusCodes.Status302Found;
-            Response.Headers.Location = QueryHelpers.AddQueryString($"{App.WebsiteUrl}/oauth/connect", "ticket", ticket);
+            Response.Headers.Location = QueryHelpers.AddQueryString($"{App.WebsiteUrl}/sso/connect", "ticket", ticket);
             await Response.StartAsync(CancellationToken);
             return;
         }

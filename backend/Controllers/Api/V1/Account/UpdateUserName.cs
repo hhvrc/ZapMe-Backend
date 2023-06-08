@@ -27,7 +27,7 @@ public partial class AccountController
 
         if (identity.User.PasswordHash != PasswordUtils.HashPassword(body.Password))
         {
-            return CreateHttpError.InvalidPassword().ToActionResult();
+            return HttpErrors.InvalidPassword().ToActionResult();
         }
 
         bool success = await _dbContext.Users
@@ -37,6 +37,6 @@ public partial class AccountController
                 .SetProperty(u => u.UpdatedAt, _ => DateTime.UtcNow)
                 , cancellationToken) > 0;
 
-        return success ? Ok() : CreateHttpError.InternalServerError().ToActionResult();
+        return success ? Ok() : HttpErrors.InternalServerErrorActionResult;
     }
 }

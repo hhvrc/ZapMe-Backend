@@ -7,10 +7,10 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
 using ZapMe.Authentication.Models;
+using ZapMe.Constants;
 using ZapMe.Data;
 using ZapMe.Data.Models;
 using ZapMe.Helpers;
-using ZapMe.Options;
 
 namespace ZapMe.Authentication;
 
@@ -52,7 +52,7 @@ public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHa
         if (String.IsNullOrEmpty(authScheme))
         {
             _logger.LogError($"Cannot sign in with an empty AuthenticationScheme.");
-            return CreateHttpError.InternalServerError().Write(Response);
+            return HttpErrors.InternalServerError.Write(Response);
         }
 
         if (authScheme == _scheme.Name)
@@ -60,7 +60,7 @@ public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHa
             return ZapMeSignInAsync(claimsIdentity, properties);
         }
 
-        return SignInOAuthAsync(authScheme, claimsIdentity, properties);
+        return SignInSSOAsync(authScheme, claimsIdentity, properties);
     }
     private Task FinishSignInAsync(SessionEntity session)
     {
@@ -103,7 +103,7 @@ public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHa
             .Include(s => s.User).ThenInclude(u => u!.Relations)
             .Include(s => s.User).ThenInclude(u => u!.FriendRequestsOutgoing)
             .Include(s => s.User).ThenInclude(u => u!.FriendRequestsIncoming)
-            .Include(s => s.User).ThenInclude(u => u!.OauthConnections)
+            .Include(s => s.User).ThenInclude(u => u!.SSOConnections)
             .AsSplitQuery() // Performance improvement suggested by EF Core
             .FirstOrDefaultAsync(s => s.Id == sessionId && s.ExpiresAt > requestTime, CancellationToken);
         if (session == null)
@@ -132,7 +132,7 @@ public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHa
 
         _context.User = principal; // TODO: is this needed?
 
-        return AuthenticateResult.Success(new AuthenticationTicket(principal, ZapMeAuthenticationDefaults.AuthenticationScheme));
+        return AuthenticateResult.Success(new AuthenticationTicket(principal, AuthSchemes.Main));
     }
 
     // Calling Authenticate more than once should always return the original value.
@@ -140,11 +140,11 @@ public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHa
 
     public Task ChallengeAsync(AuthenticationProperties? properties)
     {
-        return CreateHttpError.Unauthorized().Write(Response);
+        return HttpErrors.Unauthorized.Write(Response);
     }
 
     public Task ForbidAsync(AuthenticationProperties? properties)
     {
-        return CreateHttpError.Forbidden().Write(Response);
+        return HttpErrors.Forbidden.Write(Response);
     }
 }

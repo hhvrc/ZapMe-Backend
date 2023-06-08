@@ -16,7 +16,7 @@ public class AnonymousOnlyAttribute : ActionFilterAttribute, IAllowAnonymous
     {
         if (context.HttpContext.User.Identity?.IsAuthenticated ?? false)
         {
-            context.Result = CreateHttpError.Generic(
+            context.Result = HttpErrors.Generic(
                 StatusCodes.Status403Forbidden,
                 "anon_only",
                 "This endpoint is only available to anonymous users",

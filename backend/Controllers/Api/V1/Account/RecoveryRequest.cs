@@ -38,9 +38,9 @@ public partial class AccountController
                     switch (errorCode)
                     {
                         case "invalid-input-response":
-                            return CreateHttpError.InvalidModelState((nameof(body.TurnstileResponse), "Invalid ReCaptcha Response")).ToActionResult();
+                            return HttpErrors.InvalidModelState((nameof(body.TurnstileResponse), "Invalid ReCaptcha Response")).ToActionResult();
                         case "timeout-or-duplicate":
-                            return CreateHttpError.InvalidModelState((nameof(body.TurnstileResponse), "ReCaptcha Response Expired or Already Used")).ToActionResult();
+                            return HttpErrors.InvalidModelState((nameof(body.TurnstileResponse), "ReCaptcha Response Expired or Already Used")).ToActionResult();
                         default:
                             break;
                     };

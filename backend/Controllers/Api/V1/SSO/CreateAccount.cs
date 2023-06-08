@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ZapMe.Attributes;
 using ZapMe.Authentication.Models;
 using ZapMe.Controllers.Api.V1.Models;
-using ZapMe.Controllers.Api.V1.OAuth.Models;
+using ZapMe.Controllers.Api.V1.SSO.Models;
 using ZapMe.Data;
 using ZapMe.Data.Models;
 using ZapMe.Helpers;
@@ -13,7 +13,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
 
-public partial class OAuthController
+public partial class SSOController
 {
     /// <summary>
     /// 
@@ -29,13 +29,13 @@ public partial class OAuthController
     [AnonymousOnly]
     [RequestSizeLimit(1024)]
     [Consumes(Application.Json)]
-    [HttpPost("create", Name = "OAuth Create Account")]
+    [HttpPost("create", Name = "SSO Create Account")]
     [ProducesResponseType(typeof(SessionDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
     public async Task<IActionResult> CreateAccount(
-        [FromBody] OAuthCreateAccount body,
+        [FromBody] SSOCreateAccount body,
         [FromServices] ZapMeContext dbContext,
-        [FromServices] IOAuthStateStore stateStore,
+        [FromServices] ISSOStateStore stateStore,
         [FromServices] IImageManager imageManager,
         [FromServices] IUserStore userStore,
         [FromServices] ISessionManager sessionManager,
@@ -47,24 +47,19 @@ public partial class OAuthController
         string requestingCfIpRegion = CountryRegionLookup.GetCloudflareRegion(requestingCfIpCountry);
         string reqestingUserAgent = this.GetRemoteUserAgent();
 
-        var oauthVariables = await stateStore.GetRegistrationTicketAsync(body.OAuthTicket, requestingIp, cancellationToken);
-        if (oauthVariables == null)
+        var ssoVariables = await stateStore.GetRegistrationTokenAsync(body.SSOToken, requestingIp, cancellationToken);
+        if (ssoVariables == null)
         {
-            return CreateHttpError.Generic(
-                StatusCodes.Status406NotAcceptable,
-                "ticket_invalid",
-                "The provided OAuth ticket is invalid or expired",
-                "Please restart the OAuth flow by calling the /api/v1/auth/o/req endpoint"
-            ).ToActionResult();
+            return HttpErrors.InvalidSSOTokenActionResult;
         }
 
         using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         ImageEntity? imageEntity = null;
-        if (!String.IsNullOrEmpty(oauthVariables.ProfilePictureUrl))
+        if (!String.IsNullOrEmpty(ssoVariables.ProfilePictureUrl))
         {
             var getOrCreateImageResult = await imageManager.GetOrCreateRecordAsync(
-                oauthVariables.ProfilePictureUrl,
+                ssoVariables.ProfilePictureUrl,
                 requestingCfIpRegion,
                 null,
                 null,
@@ -78,8 +73,8 @@ public partial class OAuthController
 
         var user = new UserEntity
         {
-            Name = oauthVariables.Name,
-            Email = oauthVariables.Email,
+            Name = ssoVariables.ProviderName,
+            Email = ssoVariables.ProviderUserEmail,
             EmailVerified = true,
             PasswordHash = PasswordUtils.HashPassword(body.Password),
             AcceptedPrivacyPolicyVersion = body.AcceptedPrivacyPolicyVersion,
@@ -90,7 +85,7 @@ public partial class OAuthController
         };
         if (!await userStore.TryCreateAsync(user, cancellationToken))
         {
-            return CreateHttpError.InternalServerError().ToActionResult();
+            return HttpErrors.InternalServerErrorActionResult;
         }
 
         if (imageEntity != null)
@@ -100,15 +95,16 @@ public partial class OAuthController
                 .ExecuteUpdateAsync(spc => spc.SetProperty(i => i.UploaderId, _ => user.Id), cancellationToken);
         }
 
-        var connectionEntity = new OAuthConnectionEntity
+        var connectionEntity = new SSOConnectionEntity
         {
             UserId = user.Id,
             User = user,
-            ProviderName = oauthVariables.Provider,
-            ProviderId = oauthVariables.ProviderId,
+            ProviderName = ssoVariables.ProviderName,
+            ProviderUserId = ssoVariables.ProviderUserId,
+            ProviderUserName = ssoVariables.ProviderUserName,
         };
 
-        await dbContext.OAuthConnections.AddAsync(connectionEntity, cancellationToken);
+        await dbContext.SSOConnections.AddAsync(connectionEntity, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         var session = await sessionManager.CreateAsync(

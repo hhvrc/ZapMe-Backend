@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data;
 using ZapMe.Services.Interfaces;
@@ -13,7 +14,8 @@ namespace ZapMe.Controllers.Api.V1;
 [Consumes(Application.Json)]
 [Produces(Application.Json)]
 [ProducesErrorResponseType(typeof(ErrorDetails))]
-[ApiController, Authorize, Route("api/v1/[Controller]/")]
+[ApiController, Route("api/v1/[Controller]/")]
+[Authorize(AuthSchemes.Main)]
 public sealed partial class UserController : ControllerBase
 {
     private readonly ZapMeContext _dbContext;

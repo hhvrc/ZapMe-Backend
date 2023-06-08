@@ -1,8 +1,9 @@
-﻿using ZapMe.Controllers.Api.V1.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using ZapMe.Controllers.Api.V1.Models;
 
 namespace ZapMe.Helpers;
 
-public static class CreateHttpError
+public static class HttpErrors
 {
     private static Dictionary<string, string[]>? ToDict(IEnumerable<(string Key, string[] Value)> items) => items.ToDictionary(static x => x.Key, static x => x.Value);
     private static Dictionary<string, string[]>? ToDict(IEnumerable<(string Key, string Value)> items) => items.ToDictionary(static x => x.Key, static x => new string[] { x.Value });
@@ -57,24 +58,33 @@ public static class CreateHttpError
     /// <returns></returns>
     public static ErrorDetails InvalidPassword(params string[] fields) =>
         Generic(StatusCodes.Status401Unauthorized, "unauthorized", "Invalid password", null, ToDict(fields, "Invalid password"), new UserNotification(UserNotification.SeverityLevel.Error, "Invalid password"));
-    public static ErrorDetails UserNameOrEmailTaken() =>
-        Generic(StatusCodes.Status401Unauthorized, "unauthorized", "Username or email already taken", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "Username or email already taken"));
-    public static ErrorDetails UnsupportedOAuthProvider(string providerName) =>
-        Generic(StatusCodes.Status406NotAcceptable, "oauth_provider_not_supported", $"The OAuth provider \"{providerName}\" is not supported", "Get the list of supported providers from the /api/v1/auth/o/list endpoint");
+
+    public static ErrorDetails UserNameOrEmailTaken => Generic(StatusCodes.Status401Unauthorized, "unauthorized", "Username or email already taken", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "Username or email already taken"));
+    public static IActionResult UserNameOrEmailTakenActionResult => UserNameOrEmailTaken.ToActionResult();
+
+    public static ErrorDetails UnsupportedSSOProvider(string providerName) =>
+        Generic(StatusCodes.Status406NotAcceptable, "sso_provider_not_supported", $"The SSO (Single Sign On) provider \"{providerName}\" is not supported", "Get the list of supported providers from the GET /api/v1/sso/providers endpoint");
+
+    public static ErrorDetails InvalidSSOToken => Generic(StatusCodes.Status401Unauthorized, "sso_token_invalid", "The provided SSO token is invalid or expired", "To retrieve a valid token, start the authentication flow by calling the GET /api/v1/sso/{providerName} endpoint");
+    public static IActionResult InvalidSSOTokenActionResult => InvalidSSOToken.ToActionResult();
+
     /// <summary>
     /// 429 Too Many Requests
     /// </summary>
     /// <returns></returns>
-    public static ErrorDetails TooManyRequests() =>
-        Generic(StatusCodes.Status429TooManyRequests, "ratelimited", "You have exceeded the rate limit", null, null, new UserNotification(UserNotification.SeverityLevel.Warning, "Rate limit exceeded, please try again later"));
+    public static ErrorDetails TooManyRequests => Generic(StatusCodes.Status429TooManyRequests, "ratelimited", "You have exceeded the rate limit", null, null, new UserNotification(UserNotification.SeverityLevel.Warning, "Rate limit exceeded, please try again later"));
+    public static IActionResult TooManyRequestsActionResult => TooManyRequests.ToActionResult();
+
     /// <summary>
     /// 500 Internal Server Error
     /// </summary>
     /// <returns></returns>
-    public static ErrorDetails InternalServerError() =>
-        Generic(StatusCodes.Status500InternalServerError, "internal_error", "An internal server error occurred.", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "Internal server error, please try again later"));
-    public static ErrorDetails Unauthorized() =>
-        Generic(StatusCodes.Status401Unauthorized, "unauthorized", "You are not authorized to perform this action", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "You are not authorized to perform this action"));
-    public static ErrorDetails Forbidden() =>
-        Generic(StatusCodes.Status403Forbidden, "forbidden", "You are not allowed to perform this action", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "You are not allowed to perform this action"));
+    public static ErrorDetails InternalServerError => Generic(StatusCodes.Status500InternalServerError, "internal_error", "An internal server error occurred.", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "Internal server error, please try again later"));
+    public static IActionResult InternalServerErrorActionResult => InternalServerError.ToActionResult();
+
+    public static ErrorDetails Unauthorized => Generic(StatusCodes.Status401Unauthorized, "unauthorized", "You are not authorized to perform this action", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "You are not authorized to perform this action"));
+    public static IActionResult UnauthorizedActionResult => Unauthorized.ToActionResult();
+
+    public static ErrorDetails Forbidden => Generic(StatusCodes.Status403Forbidden, "forbidden", "You are not allowed to perform this action", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "You are not allowed to perform this action"));
+    public static IActionResult ForbiddenActionResult => Forbidden.ToActionResult();
 }

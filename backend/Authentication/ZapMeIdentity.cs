@@ -1,11 +1,12 @@
 ﻿using System.Security.Claims;
+using ZapMe.Constants;
 using ZapMe.Data.Models;
 
 namespace ZapMe.Authentication;
 
 public sealed class ZapMeIdentity : ClaimsIdentity
 {
-    public ZapMeIdentity(SessionEntity session) : base(ZapMeAuthenticationDefaults.AuthenticationScheme)
+    public ZapMeIdentity(SessionEntity session) : base(AuthSchemes.Main)
     {
         Session = session;
 

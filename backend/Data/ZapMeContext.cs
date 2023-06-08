@@ -18,7 +18,7 @@ public sealed class ZapMeContext : DbContext
     public required DbSet<DeletedUserEntity> DeletedUsers { get; set; }
     public required DbSet<UserRelationEntity> UserRelations { get; set; }
     public required DbSet<FriendRequestEntity> FriendRequests { get; set; }
-    public required DbSet<OAuthConnectionEntity> OAuthConnections { get; set; }
+    public required DbSet<SSOConnectionEntity> SSOConnections { get; set; }
     public required DbSet<UserPasswordResetRequestEntity> UserPasswordResetRequests { get; set; }
     public required DbSet<UserEmailVerificationRequestEntity> UserEmailVerificationRequests { get; set; }
 
@@ -33,7 +33,7 @@ public sealed class ZapMeContext : DbContext
         modelBuilder.ApplyConfiguration(new DeletedUserEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserRelationEntityConfiguration());
         modelBuilder.ApplyConfiguration(new FriendRequestEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new OAuthConnectionEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new SSOConnectionEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserPasswordResetRequestEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserEmailAddressChangeRequestEntityConfiguration());
     }

@@ -29,7 +29,7 @@ public partial class AccountController
 
         if (!PasswordUtils.CheckPassword(body.Password, identity.User.PasswordHash))
         {
-            return CreateHttpError.InvalidPassword().ToActionResult();
+            return HttpErrors.InvalidPassword().ToActionResult();
         }
 
         ErrorDetails? errorDetails = await emailVerificationManager.InitiateEmailVerificationAsync(identity.User, body.NewEmail, cancellationToken);

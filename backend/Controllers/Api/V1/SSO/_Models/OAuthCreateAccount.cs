@@ -1,11 +1,11 @@
 ﻿using ZapMe.Attributes;
 
-namespace ZapMe.Controllers.Api.V1.OAuth.Models;
+namespace ZapMe.Controllers.Api.V1.SSO.Models;
 
-public readonly struct OAuthCreateAccount
+public readonly struct SSOCreateAccount
 {
     /// <summary/>
-    public string OAuthTicket { get; init; }
+    public string SSOToken { get; init; }
 
     /// <summary/>
     public uint AcceptedPrivacyPolicyVersion { get; init; }

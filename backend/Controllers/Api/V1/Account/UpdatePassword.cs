@@ -36,6 +36,6 @@ public partial class AccountController
                 .SetProperty(u => u.UpdatedAt, _ => DateTime.UtcNow)
                 , cancellationToken) > 0;
 
-        return success ? Ok() : CreateHttpError.InvalidPassword(UpdatePassword.CurrentPassword_JsonName).ToActionResult();
+        return success ? Ok() : HttpErrors.InvalidPassword(UpdatePassword.CurrentPassword_JsonName).ToActionResult();
     }
 }

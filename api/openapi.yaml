@@ -92,34 +92,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-  '/api/v1/account/oauth/{providerName}':
+  /api/v1/account/sso:
     post:
       tags:
         - Account
-      summary: Add a oauth connection to account
-      operationId: AddOAuthProvider
+      summary: Add a sso connection to account
+      operationId: Connect SSO Provider
       parameters:
-        - name: providerName
-          in: path
-          required: true
+        - name: ssoToken
+          in: query
           schema:
             type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/AccountOAuthAdd'
-              description: Request sent to server to add a oauth connection to a account
       responses:
         '200':
           description: Success
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
         '404':
           description: Not Found
           content:
@@ -129,12 +115,11 @@ paths:
     delete:
       tags:
         - Account
-      summary: Remove a oauth connection from account
-      operationId: RemoveOAuthProvider
+      summary: Remove a sso connection from account
+      operationId: Disconnect SSO Provider
       parameters:
         - name: providerName
-          in: path
-          required: true
+          in: query
           schema:
             type: string
       responses:
@@ -444,16 +429,16 @@ paths:
       responses:
         '200':
           description: Health status
-  '/api/v1/oauth/{providerName}/authenticate':
+  '/api/v1/sso/{providerName}':
     get:
       tags:
-        - OAuth
-      summary: Start the OAuth authentication process
-      operationId: OAuth Authenticate
+        - Single Sign-On
+      summary: "Warning:\r\nThis endpoint is not meant to be called by a 3rd party, it will redirect the request for OAuth authentication with the specified provider.\r\nIt is documented here for transparency, and to automatically generate the OpenAPI client for the frontend."
+      operationId: SSO Authenticate
       parameters:
         - name: providerName
           in: path
-          description: 'Name of the OAuth provider to use, supported providers can be fetched from M:ZapMe.Controllers.Api.V1.OAuthController.ListOAuthProviders'
+          description: 'Name of the SSO provider to use, supported providers can be fetched from /api/v1/sso/providers'
           required: true
           schema:
             type: string
@@ -466,16 +451,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-  '/api/v1/oauth/{providerName}/callback':
     post:
       tags:
-        - OAuth
-      summary: ''
-      operationId: OAuth Callback
+        - Single Sign-On
+      summary: "Warning:\r\nThis endpoint is not meant to be called by a 3rd party, it will redirect the request for OAuth authentication with the specified provider.\r\nIt is documented here for transparency, and to automatically generate the OpenAPI client for the frontend."
+      operationId: SSO Callback
       parameters:
         - name: providerName
           in: path
-          description: 'Name of the OAuth provider to use, supported providers can be fetched from M:ZapMe.Controllers.Api.V1.OAuthController.ListOAuthProviders'
+          description: 'Name of the SSO provider to use, supported providers can be fetched from /api/v1/sso/providers'
           required: true
           schema:
             type: string
@@ -488,40 +472,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-  /api/v1/oauth/connect:
+  /api/v1/sso/create:
     post:
       tags:
-        - OAuth
+        - Single Sign-On
       summary: ''
-      operationId: OAuth Connect Account
-      parameters:
-        - name: oauthTicket
-          in: query
-          description: ''
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-        '406':
-          description: Not Acceptable
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-  /api/v1/oauth/create:
-    post:
-      tags:
-        - OAuth
-      summary: ''
-      operationId: OAuth Create Account
+      operationId: SSO Create Account
       requestBody:
         description: ''
         content:
           application/json:
             schema:
               allOf:
-                - $ref: '#/components/schemas/OAuthCreateAccount'
+                - $ref: '#/components/schemas/SSOCreateAccount'
       responses:
         '200':
           description: Success
@@ -535,19 +498,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-  /api/v1/oauth/list:
+  /api/v1/sso/providers:
     get:
       tags:
-        - OAuth
-      summary: ''
-      operationId: OAuth List Providers
+        - Single Sign-On
+      summary: Returns a list of supported SSO providers
+      operationId: SSO List Providers
       responses:
         '200':
-          description: Returns supported OAuth providers
+          description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OAuthProviderList'
+                type: array
+                items:
+                  type: string
   '/api/v1/user/i/{userId}/friendrequest':
     put:
       tags:
@@ -740,9 +705,9 @@ components:
         - friends
         - id
         - lastOnline
-        - oauthConnections
         - obscuredEmail
         - profilePictureUrl
+        - ssoConnections
         - status
         - statusText
         - updatedAt
@@ -792,11 +757,11 @@ components:
             type: string
             format: uuid
           description: Id of friends this account has
-        oauthConnections:
+        ssoConnections:
           type: array
           items:
             type: string
-          description: OAuth2 providers this account is connected to
+          description: SSO providers this account is connected to
         createdAt:
           type: string
           description: Date this user was created at
@@ -811,15 +776,6 @@ components:
           format: date-time
       additionalProperties: false
       description: 'Account object, this can only retrieved for the user you are logged in as'
-    AccountOAuthAdd:
-      required:
-        - oauthCode
-      type: object
-      properties:
-        oauthCode:
-          type: string
-      additionalProperties: false
-      description: Request sent to server to add a oauth connection to a account
     ApiConfig:
       required:
         - disabledFeatures
@@ -1041,44 +997,6 @@ components:
           description: UserId's of users that this user has sent friend requests to
       additionalProperties: false
       description: List of incoming and outgoing friendrequests
-    OAuthCreateAccount:
-      required:
-        - acceptedPrivacyPolicyVersion
-        - acceptedTermsOfServiceVersion
-        - oAuthTicket
-        - password
-      type: object
-      properties:
-        oAuthTicket:
-          type: string
-          description: ''
-        acceptedPrivacyPolicyVersion:
-          type: integer
-          description: ''
-          format: int32
-        acceptedTermsOfServiceVersion:
-          type: integer
-          description: ''
-          format: int32
-        password:
-          maxLength: 256
-          minLength: 10
-          type: string
-          description: ''
-          example: Hq2yP1B^Fho&zRHxHkEu
-      additionalProperties: false
-    OAuthProviderList:
-      required:
-        - providers
-      type: object
-      properties:
-        providers:
-          type: array
-          items:
-            type: string
-          description: ''
-      additionalProperties: false
-      description: ''
     RecoveryConfirm:
       required:
         - newPassword
@@ -1114,6 +1032,32 @@ components:
           description: Response from cloudflare turnstile request
       additionalProperties: false
       description: Request sent to server to request a password reset token
+    SSOCreateAccount:
+      required:
+        - acceptedPrivacyPolicyVersion
+        - acceptedTermsOfServiceVersion
+        - password
+        - ssoToken
+      type: object
+      properties:
+        ssoToken:
+          type: string
+          description: ''
+        acceptedPrivacyPolicyVersion:
+          type: integer
+          description: ''
+          format: int32
+        acceptedTermsOfServiceVersion:
+          type: integer
+          description: ''
+          format: int32
+        password:
+          maxLength: 256
+          minLength: 10
+          type: string
+          description: ''
+          example: Hq2yP1B^Fho&zRHxHkEu
+      additionalProperties: false
     SessionDto:
       required:
         - expiresAtUtc

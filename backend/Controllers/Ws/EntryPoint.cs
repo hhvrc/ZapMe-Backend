@@ -39,13 +39,13 @@ public sealed partial class WebSocketController
             {
                 _logger.LogError("Failed to create websocket instance");
 
-                return CreateHttpError.InternalServerError().ToActionResult();
+                return HttpErrors.InvalidSSOTokenActionResult;
             }
 
             // Register instance globally, the manager will have the ability to kill this connection
             if (!await _webSocketInstanceManager.RegisterInstanceAsync(identity.UserId, instanceId, instance, cancellationToken))
             {
-                return CreateHttpError.InternalServerError().ToActionResult();
+                return HttpErrors.InternalServerErrorActionResult;
             }
 
             try
@@ -61,7 +61,7 @@ public sealed partial class WebSocketController
         }
         else
         {
-            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Bad request", "This endpoint is purely just a websocket endpoint", "Try to connect with a websocket client instead").ToActionResult();
+            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Bad request", "This endpoint is purely just a websocket endpoint", "Try to connect with a websocket client instead").ToActionResult();
         }
 
         return Ok();

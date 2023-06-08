@@ -31,7 +31,7 @@ public partial class AccountController
 
         if (!PasswordUtils.CheckPassword(password, user.PasswordHash))
         {
-            return CreateHttpError.InvalidPassword().ToActionResult();
+            return HttpErrors.InvalidPassword().ToActionResult();
         }
 
         using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);

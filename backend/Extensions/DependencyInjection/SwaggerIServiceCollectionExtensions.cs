@@ -60,7 +60,7 @@ public static class SwaggerIServiceCollectionExtensions
                             Id = "Bearer",
                             Type = ReferenceType.SecurityScheme
                         },
-                        Scheme = "oauth2",
+                        Scheme = "token",
                         Name = "Bearer",
                         In = ParameterLocation.Header
                     },

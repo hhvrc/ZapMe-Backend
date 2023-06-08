@@ -6,18 +6,18 @@ using ZapMe.Helpers;
 
 namespace ZapMe.Authentication;
 
-public sealed record OAuthProviderVariables(string Name, string Email, string? ProfilePictureUrl, string Provider, string ProviderId);
+public sealed record OAuthProviderVariables(string ProviderName, string ProviderUserId, string ProviderUserName, string ProviderUserEmail, string? ProfilePictureUrl);
 public static class OAuthClaimsFetchers
 {
     public static OneOf<OAuthProviderVariables, ErrorDetails> FetchClaims(string authScheme, ClaimsPrincipal claimsPrincipal, ILogger logger)
     {
         return authScheme.ToLower() switch
         {
-            OAuthConstants.DiscordProviderName => FetchDiscordClaims(claimsPrincipal, logger),
-            OAuthConstants.GitHubProviderName => FetchGithubClaims(claimsPrincipal, logger),
-            OAuthConstants.TwitterProviderName => FetchTwitterClaims(claimsPrincipal, logger),
-            OAuthConstants.GoogleProviderName => FetchGoogleClaims(claimsPrincipal, logger),
-            _ => OneOf<OAuthProviderVariables, ErrorDetails>.FromT1(CreateHttpError.UnsupportedOAuthProvider(authScheme)),
+            AuthSchemes.Discord => FetchDiscordClaims(claimsPrincipal, logger),
+            AuthSchemes.GitHub => FetchGithubClaims(claimsPrincipal, logger),
+            AuthSchemes.Twitter => FetchTwitterClaims(claimsPrincipal, logger),
+            AuthSchemes.Google => FetchGoogleClaims(claimsPrincipal, logger),
+            _ => OneOf<OAuthProviderVariables, ErrorDetails>.FromT1(HttpErrors.UnsupportedSSOProvider(authScheme)),
         };
     }
     private static OneOf<OAuthProviderVariables, ErrorDetails> FetchDiscordClaims(ClaimsPrincipal claimsPrincipal, ILogger logger)
@@ -29,10 +29,10 @@ public static class OAuthClaimsFetchers
         if (String.IsNullOrEmpty(discordId) || String.IsNullOrEmpty(discordName) || String.IsNullOrEmpty(discordEmail))
         {
             logger.LogError("Discord OAuth claims are missing");
-            return OneOf<OAuthProviderVariables, ErrorDetails>.FromT1(CreateHttpError.InternalServerError());
+            return OneOf<OAuthProviderVariables, ErrorDetails>.FromT1(HttpErrors.InternalServerError);
         }
 
-        return new OAuthProviderVariables(discordName, discordEmail, discordProfilePictureUrl, OAuthConstants.DiscordProviderName, discordId);
+        return new OAuthProviderVariables(AuthSchemes.Discord, discordId, discordName, discordEmail, discordProfilePictureUrl);
     }
     private static OneOf<OAuthProviderVariables, ErrorDetails> FetchGithubClaims(ClaimsPrincipal claimsPrincipal, ILogger logger)
     {
@@ -43,10 +43,10 @@ public static class OAuthClaimsFetchers
         if (String.IsNullOrEmpty(githubId) || String.IsNullOrEmpty(githubName) || String.IsNullOrEmpty(githubEmail))
         {
             logger.LogError("GitHub OAuth claims are missing");
-            return OneOf<OAuthProviderVariables, ErrorDetails>.FromT1(CreateHttpError.InternalServerError());
+            return OneOf<OAuthProviderVariables, ErrorDetails>.FromT1(HttpErrors.InternalServerError);
         }
 
-        return new OAuthProviderVariables(githubName, githubEmail, githubProfilePictureUrl, OAuthConstants.GitHubProviderName, githubId);
+        return new OAuthProviderVariables(AuthSchemes.GitHub, githubId, githubName, githubEmail, githubProfilePictureUrl);
     }
     private static OneOf<OAuthProviderVariables, ErrorDetails> FetchTwitterClaims(ClaimsPrincipal claimsPrincipal, ILogger logger)
     {
@@ -57,10 +57,10 @@ public static class OAuthClaimsFetchers
         if (String.IsNullOrEmpty(twitterId) || String.IsNullOrEmpty(twitterName) || String.IsNullOrEmpty(twitterEmail))
         {
             logger.LogError("Twitter OAuth claims are missing");
-            return OneOf<OAuthProviderVariables, ErrorDetails>.FromT1(CreateHttpError.InternalServerError());
+            return OneOf<OAuthProviderVariables, ErrorDetails>.FromT1(HttpErrors.InternalServerError);
         }
 
-        return new OAuthProviderVariables(twitterName, twitterEmail, twitterProfilePictureUrl, OAuthConstants.TwitterProviderName, twitterId);
+        return new OAuthProviderVariables(AuthSchemes.Twitter, twitterId, twitterName, twitterEmail, twitterProfilePictureUrl);
     }
     private static OneOf<OAuthProviderVariables, ErrorDetails> FetchGoogleClaims(ClaimsPrincipal claimsPrincipal, ILogger logger)
     {
@@ -71,8 +71,8 @@ public static class OAuthClaimsFetchers
         if (String.IsNullOrEmpty(googleId) || String.IsNullOrEmpty(googleName) || String.IsNullOrEmpty(googleEmail))
         {
             logger.LogError("Google OAuth claims are missing");
-            return OneOf<OAuthProviderVariables, ErrorDetails>.FromT1(CreateHttpError.InternalServerError());
+            return OneOf<OAuthProviderVariables, ErrorDetails>.FromT1(HttpErrors.InternalServerError);
         }
-        return new OAuthProviderVariables(googleName, googleEmail, googleProfilePictureUrl, OAuthConstants.GoogleProviderName, googleId);
+        return new OAuthProviderVariables(AuthSchemes.Google, googleId, googleName, googleEmail, googleProfilePictureUrl);
     }
 }
