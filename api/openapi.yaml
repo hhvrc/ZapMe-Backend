@@ -40,6 +40,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
         '409':
           description: Conflict
           content:
@@ -466,32 +472,6 @@ paths:
       responses:
         '302':
           description: Redirect
-        '406':
-          description: Not Acceptable
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-  /api/v1/sso/create:
-    post:
-      tags:
-        - Single Sign-On
-      summary: ''
-      operationId: SSO Create Account
-      requestBody:
-        description: ''
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/SSOCreateAccount'
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SessionDto'
         '406':
           description: Not Acceptable
           content:
@@ -929,21 +909,30 @@ components:
         turnstileResponse:
           type: string
           description: Response from cloudflare turnstile request
+        ssoToken:
+          type: string
+          description: 'SSO token from OAuth flow, this is optional and only used when creating an account from the OAuth flow'
+          nullable: true
       additionalProperties: false
       description: Message sent to server to create a new account
     CreateOk:
       required:
-        - id
-        - message
+        - accountId
+        - emailVerificationRequired
       type: object
       properties:
-        id:
+        accountId:
           type: string
-          description: ''
+          description: The account id of the newly created account
           format: uuid
-        message:
-          type: string
-          description: ''
+        session:
+          allOf:
+            - $ref: '#/components/schemas/SessionDto'
+          description: 'If the account was created using OAuth and in a way that ensures the email address is valid, a session will be created and returned here'
+          nullable: true
+        emailVerificationRequired:
+          type: boolean
+          description: If true then the email is already verified by 3rd party
       additionalProperties: false
     ErrorDetails:
       required:
@@ -1032,32 +1021,6 @@ components:
           description: Response from cloudflare turnstile request
       additionalProperties: false
       description: Request sent to server to request a password reset token
-    SSOCreateAccount:
-      required:
-        - acceptedPrivacyPolicyVersion
-        - acceptedTermsOfServiceVersion
-        - password
-        - ssoToken
-      type: object
-      properties:
-        ssoToken:
-          type: string
-          description: ''
-        acceptedPrivacyPolicyVersion:
-          type: integer
-          description: ''
-          format: int32
-        acceptedTermsOfServiceVersion:
-          type: integer
-          description: ''
-          format: int32
-        password:
-          maxLength: 256
-          minLength: 10
-          type: string
-          description: ''
-          example: Hq2yP1B^Fho&zRHxHkEu
-      additionalProperties: false
     SessionDto:
       required:
         - expiresAtUtc
