@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.DTOs;
 using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Authentication;
@@ -16,7 +17,7 @@ public partial class ZapMeAuthenticationHandler
 
         // Fetch the claims provided by the OAuth provider
         var fetchClaimsResult = OAuthClaimsFetchers.FetchClaims(authScheme, claimsIdentity, _logger);
-        if (fetchClaimsResult.TryPickT1(out errorDetails, out var oauthClaims))
+        if (fetchClaimsResult.TryPickT1(out errorDetails, out SSOProviderData? ssoProviderData))
         {
             await errorDetails.Write(Response, _jsonSerializerOptions);
             return;
@@ -26,7 +27,7 @@ public partial class ZapMeAuthenticationHandler
         var connectionEntity = await _dbContext.SSOConnections
             .Include(c => c.User)
             .ThenInclude(u => u.ProfilePicture)
-            .FirstOrDefaultAsync(c => c.ProviderName == oauthClaims.ProviderName && c.ProviderUserId == oauthClaims.ProviderUserId, CancellationToken);
+            .FirstOrDefaultAsync(c => c.ProviderName == ssoProviderData.ProviderName && c.ProviderUserId == ssoProviderData.ProviderUserId, CancellationToken);
         if (connectionEntity == null)
         {
             var stateStore = ServiceProvider.GetRequiredService<ISSOStateStore>();
@@ -34,7 +35,7 @@ public partial class ZapMeAuthenticationHandler
             var expiresAt = DateTime.UtcNow + SSOConstants.StateLifetime;
             var token = await stateStore.CreateRegistrationTokenAsync(
                 RequestingIpAddress,
-                oauthClaims,
+                ssoProviderData,
                 CancellationToken
             );
 

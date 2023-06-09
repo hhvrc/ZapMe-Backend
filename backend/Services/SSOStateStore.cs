@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
-using ZapMe.Authentication;
 using ZapMe.Constants;
+using ZapMe.DTOs;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
 
@@ -23,20 +23,19 @@ public sealed class SSOStateStore : ISSOStateStore
         _logger = logger;
     }
 
-    public sealed record StateData(string RedirectUri);
-    public async Task<string> CreateStateAsync(string providerName, string requestIP, string redirectUri, CancellationToken cancellationToken)
+    public async Task<string> CreateStateAsync(string providerName, string requestIP, SSOStateData stateData, CancellationToken cancellationToken)
     {
         string requestKey = StringUtils.GenerateUrlSafeRandomString(32);
 
-        var stateInternal = new InternalStateData<StateData>(providerName, requestIP, new StateData(redirectUri));
+        var stateInternal = new InternalStateData<SSOStateDataEntry>(providerName, requestIP, new SSOStateDataEntry(stateData.RedirectUrl, DateTime.UtcNow + SSOConstants.StateLifetime));
         await _distributedCache.SetAsync(_CacheKeyStatePrefix + HashingUtils.Sha256_Base64(requestKey), stateInternal, SSOConstants.StateLifetime, cancellationToken);
 
         return requestKey;
     }
 
-    public async Task<StateData?> GetStateAsync(string requestKey, string providerName, string requestIP, CancellationToken cancellationToken)
+    public async Task<SSOStateDataEntry?> GetStateAsync(string requestKey, string providerName, string requestIP, CancellationToken cancellationToken)
     {
-        var stateInternal = await _distributedCache.GetAsync<InternalStateData<StateData>>(_CacheKeyStatePrefix + HashingUtils.Sha256_Base64(requestKey), cancellationToken);
+        var stateInternal = await _distributedCache.GetAsync<InternalStateData<SSOStateDataEntry>>(_CacheKeyStatePrefix + HashingUtils.Sha256_Base64(requestKey), cancellationToken);
 
         if (stateInternal == null || stateInternal.ProviderName != providerName || stateInternal.RequestIP != requestIP)
         {
@@ -47,19 +46,19 @@ public sealed class SSOStateStore : ISSOStateStore
         return stateInternal.Data;
     }
 
-    public async Task<string> CreateRegistrationTokenAsync(string requestIP, OAuthProviderVariables providerVariables, CancellationToken cancellationToken)
+    public async Task<string> CreateRegistrationTokenAsync(string requestIP, SSOProviderData providerData, CancellationToken cancellationToken)
     {
         string requestKey = StringUtils.GenerateUrlSafeRandomString(32);
 
-        var stateInternal = new InternalTokenData<OAuthProviderVariables>(requestIP, providerVariables);
+        var stateInternal = new InternalTokenData<SSOProviderDataEntry>(requestIP, new SSOProviderDataEntry(providerData.ProviderName, providerData.ProviderUserId, providerData.ProviderUserName, providerData.ProviderUserEmail, providerData.ProviderUserEmailVerified, providerData.ProfilePictureUrl, DateTime.UtcNow + SSOConstants.RegistrationTicketLifetime));
         await _distributedCache.SetAsync(_CacheKeyRegistrationTokenPrefix + HashingUtils.Sha256_Base64(requestKey), stateInternal, SSOConstants.RegistrationTicketLifetime, cancellationToken);
 
         return requestKey;
     }
 
-    public async Task<OAuthProviderVariables?> GetRegistrationTokenAsync(string requestKey, string requestIP, CancellationToken cancellationToken)
+    public async Task<SSOProviderDataEntry?> GetRegistrationTokenAsync(string requestKey, string requestIP, CancellationToken cancellationToken)
     {
-        var stateInternal = await _distributedCache.GetAsync<InternalTokenData<OAuthProviderVariables>>(_CacheKeyRegistrationTokenPrefix + HashingUtils.Sha256_Base64(requestKey), cancellationToken);
+        var stateInternal = await _distributedCache.GetAsync<InternalTokenData<SSOProviderDataEntry>>(_CacheKeyRegistrationTokenPrefix + HashingUtils.Sha256_Base64(requestKey), cancellationToken);
 
         if (stateInternal == null || stateInternal.RequestIP != requestIP)
         {

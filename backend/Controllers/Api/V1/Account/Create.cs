@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 using ZapMe.Attributes;
-using ZapMe.Authentication;
 using ZapMe.Authentication.Models;
 using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.Controllers.Api.V1.Models;
@@ -12,7 +11,6 @@ using ZapMe.DTOs;
 using ZapMe.Enums;
 using ZapMe.Helpers;
 using ZapMe.Options;
-using ZapMe.Services;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
 
@@ -45,7 +43,7 @@ public partial class AccountController
         CancellationToken cancellationToken
         )
     {
-        OAuthProviderVariables? providerVariables = null;
+        SSOProviderDataEntry? providerVariables = null;
         if (!String.IsNullOrEmpty(body.SSOToken))
         {
             var stateStore = HttpContext.RequestServices.GetRequiredService<ISSOStateStore>();
@@ -191,8 +189,8 @@ public partial class AccountController
         }
 
         // Send email verification
-        bool emailVerified = providerVariables?.ProviderUserEmailVerified ?? false;
-        if (emailVerified)
+        bool emailVerified = body.Email == providerVariables?.ProviderUserEmail && (providerVariables?.ProviderUserEmailVerified ?? false);
+        if (!emailVerified)
         {
             var emailVerificationManager = HttpContext.RequestServices.GetRequiredService<IEmailVerificationManager>();
             ErrorDetails? test = await emailVerificationManager.InitiateEmailVerificationAsync(user, body.Email, cancellationToken);
@@ -205,7 +203,8 @@ public partial class AccountController
         // Commit transaction
         await transaction.CommitAsync(cancellationToken);
 
-        return CreatedAtAction(nameof(Get), new CreateOk {
+        return CreatedAtAction(nameof(Get), new CreateOk
+        {
             AccountId = user.Id,
             Session = session == null ? null : new SessionDto(session),
             EmailVerificationRequired = emailVerified

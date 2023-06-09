@@ -457,6 +457,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
+  '/api/v1/sso/{providerName}/callback':
     post:
       tags:
         - Single Sign-On
@@ -1014,15 +1015,22 @@ components:
       required:
         - email
         - emailVerified
-        - name
+        - expiresAt
+        - providerName
+        - userName
       type: object
       properties:
-        name:
+        providerName:
+          type: string
+        userName:
           type: string
         email:
           type: string
         emailVerified:
           type: boolean
+        expiresAt:
+          type: string
+          format: date-time
       additionalProperties: false
     RecoveryConfirm:
       required:

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.SSO.Models;
+using ZapMe.DTOs;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
 
@@ -16,7 +16,7 @@ public partial class SSOController
     [ProducesResponseType(StatusCodes.Status401Unauthorized)] // Invalid SSO token
     public async Task<IActionResult> GetProviderData([FromQuery] string ssoToken, [FromServices] ISSOStateStore stateStore, CancellationToken cancellationToken)
     {
-        OAuthProviderVariables? providerVariables = await stateStore.GetRegistrationTokenAsync(ssoToken, this.GetRemoteIP(), cancellationToken);
+        SSOProviderDataEntry? providerVariables = await stateStore.GetRegistrationTokenAsync(ssoToken, this.GetRemoteIP(), cancellationToken);
         if (providerVariables == null)
         {
             return HttpErrors.InvalidSSOTokenActionResult;
@@ -24,9 +24,11 @@ public partial class SSOController
 
         return Ok(new ProviderDataDto
         {
-            Name = providerVariables.ProviderUserName,
+            ProviderName = providerVariables.ProviderName,
+            UserName = providerVariables.ProviderUserName,
             Email = providerVariables.ProviderUserEmail,
-            EmailVerified = providerVariables.ProviderUserEmailVerified
+            EmailVerified = providerVariables.ProviderUserEmailVerified,
+            ExpiresAt = providerVariables.ExpiresAt
         });
     }
 };
