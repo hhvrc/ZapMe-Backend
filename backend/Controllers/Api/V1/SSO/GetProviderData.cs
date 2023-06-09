@@ -28,7 +28,7 @@ public partial class SSOController
             UserName = providerVariables.ProviderUserName,
             Email = providerVariables.ProviderUserEmail,
             EmailVerified = providerVariables.ProviderUserEmailVerified,
-            ExpiresAt = providerVariables.ExpiresAt
+            ExpiresAtUtc = providerVariables.ExpiresAt
         });
     }
 };

@@ -1015,7 +1015,7 @@ components:
       required:
         - email
         - emailVerified
-        - expiresAt
+        - expiresAtUtc
         - providerName
         - userName
       type: object
@@ -1028,7 +1028,7 @@ components:
           type: string
         emailVerified:
           type: boolean
-        expiresAt:
+        expiresAtUtc:
           type: string
           format: date-time
       additionalProperties: false
