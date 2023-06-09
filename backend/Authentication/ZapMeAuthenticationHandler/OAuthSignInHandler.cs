@@ -39,7 +39,7 @@ public partial class ZapMeAuthenticationHandler
             );
 
             Response.StatusCode = StatusCodes.Status302Found;
-            Response.Headers.Location = QueryHelpers.AddQueryString($"{App.WebsiteUrl}/register", "token", token);
+            Response.Headers.Location = QueryHelpers.AddQueryString($"{App.WebsiteUrl}/register", "ssoToken", token);
             await Response.StartAsync(CancellationToken);
             return;
         }
