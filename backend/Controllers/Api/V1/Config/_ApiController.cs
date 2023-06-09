@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using ZapMe.Controllers.Api.V1.Models;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
 
-/// <summary>
-/// 
-/// </summary>
+[EnableCors]
 [Consumes(Application.Json)]
 [Produces(Application.Json)]
 [ProducesErrorResponseType(typeof(ErrorDetails))]

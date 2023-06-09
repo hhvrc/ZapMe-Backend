@@ -32,14 +32,14 @@ public partial class ZapMeAuthenticationHandler
             var stateStore = ServiceProvider.GetRequiredService<ISSOStateStore>();
 
             var expiresAt = DateTime.UtcNow + SSOConstants.StateLifetime;
-            var ticket = await stateStore.CreateRegistrationTokenAsync(
+            var token = await stateStore.CreateRegistrationTokenAsync(
                 RequestingIpAddress,
                 oauthClaims,
                 CancellationToken
             );
 
             Response.StatusCode = StatusCodes.Status302Found;
-            Response.Headers.Location = QueryHelpers.AddQueryString($"{App.WebsiteUrl}/sso/connect", "ticket", ticket);
+            Response.Headers.Location = QueryHelpers.AddQueryString($"{App.WebsiteUrl}/sso/connect", "token", token);
             await Response.StartAsync(CancellationToken);
             return;
         }

@@ -25,7 +25,7 @@ public static class OAuthClaimsFetchers
         string? discordId = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         string? discordName = claimsPrincipal.FindFirst("urn:discord:name")?.Value ?? claimsPrincipal.FindFirst(ClaimTypes.Name)?.Value;
         string? discordEmail = claimsPrincipal.FindFirst(ClaimTypes.Email)?.Value;
-        bool discordEmailVerified = claimsPrincipal.FindFirst("urn:discord:verified")?.Value?.ToLowerInvariant() == "true";
+        bool discordEmailVerified = claimsPrincipal.FindFirst(ZapMeClaimTypes.EmailVerified)?.Value?.ToLowerInvariant() == "true";
         string? discordProfilePictureUrl = claimsPrincipal.FindFirst(ZapMeClaimTypes.ProfileImage)?.Value;
         if (String.IsNullOrEmpty(discordId) || String.IsNullOrEmpty(discordName) || String.IsNullOrEmpty(discordEmail))
         {
@@ -68,7 +68,7 @@ public static class OAuthClaimsFetchers
         string? googleId = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         string? googleName = claimsPrincipal.FindFirst(ClaimTypes.Name)?.Value;
         string? googleEmail = claimsPrincipal.FindFirst(ClaimTypes.Email)?.Value;
-        bool googleEmailVerified = claimsPrincipal.FindFirst("email_verified")?.Value?.ToLowerInvariant() == "true";
+        bool googleEmailVerified = claimsPrincipal.FindFirst(ZapMeClaimTypes.EmailVerified)?.Value?.ToLowerInvariant() == "true";
         string? googleProfilePictureUrl = claimsPrincipal.FindFirst(ZapMeClaimTypes.ProfileImage)?.Value;
         if (String.IsNullOrEmpty(googleId) || String.IsNullOrEmpty(googleName) || String.IsNullOrEmpty(googleEmail))
         {

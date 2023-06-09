@@ -47,6 +47,7 @@ public static class AuthenticationBuilderExtensions
             opt.CorrelationCookie.HttpOnly = true;
             opt.CorrelationCookie.SameSite = SameSiteMode.None;
             opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+            opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.EmailVerified, "verified");
             opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.ProfileImage, json =>
             {
                 string? userId = json.GetString("id");
@@ -121,6 +122,7 @@ public static class AuthenticationBuilderExtensions
             opt.CorrelationCookie.HttpOnly = true;
             opt.CorrelationCookie.SameSite = SameSiteMode.None;
             opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+            opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.EmailVerified, "email_verified");
             opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.ProfileImage, "picture");
             opt.Validate();
         });

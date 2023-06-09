@@ -478,6 +478,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/sso/providerdata:
+    get:
+      tags:
+        - Single Sign-On
+      summary: Returns the data supplied by the SSO provider
+      operationId: SSO Get Provider Data
+      parameters:
+        - name: ssoToken
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProviderDataDto'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
   /api/v1/sso/providers:
     get:
       tags:
@@ -986,6 +1010,20 @@ components:
           description: UserId's of users that this user has sent friend requests to
       additionalProperties: false
       description: List of incoming and outgoing friendrequests
+    ProviderDataDto:
+      required:
+        - email
+        - emailVerified
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        emailVerified:
+          type: boolean
+      additionalProperties: false
     RecoveryConfirm:
       required:
         - newPassword

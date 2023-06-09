@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using ZapMe.Controllers.Api.V1.Models;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
 
+[EnableCors]
 [Tags("Single Sign-On")]
 [Produces(Application.Json)]
 [ProducesErrorResponseType(typeof(ErrorDetails))]
