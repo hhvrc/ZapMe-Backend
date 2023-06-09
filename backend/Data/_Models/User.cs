@@ -88,7 +88,7 @@ public sealed class UserEntity
     public ICollection<UserRelationEntity>? Relations { get; set; }
     public ICollection<FriendRequestEntity>? FriendRequestsOutgoing { get; set; }
     public ICollection<FriendRequestEntity>? FriendRequestsIncoming { get; set; }
-    public ICollection<OAuthConnectionEntity>? OauthConnections { get; set; }
+    public ICollection<SSOConnectionEntity>? SSOConnections { get; set; }
 }
 
 public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>

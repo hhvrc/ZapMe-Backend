@@ -142,26 +142,6 @@ namespace ZapMe.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "oauthConnections",
-                columns: table => new
-                {
-                    userId = table.Column<Guid>(type: "uuid", nullable: false),
-                    providerName = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false),
-                    providerId = table.Column<string>(type: "text", nullable: false),
-                    createdAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_oauthConnections", x => new { x.userId, x.providerName });
-                    table.ForeignKey(
-                        name: "FK_oauthConnections_users_userId",
-                        column: x => x.userId,
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "sessions",
                 columns: table => new
                 {
@@ -185,6 +165,27 @@ namespace ZapMe.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_sessions_users_userId",
+                        column: x => x.userId,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ssoConnections",
+                columns: table => new
+                {
+                    providerName = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false),
+                    providerUserId = table.Column<string>(type: "text", nullable: false),
+                    userId = table.Column<Guid>(type: "uuid", nullable: false),
+                    providerUserName = table.Column<string>(type: "text", nullable: false),
+                    createdAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ssoConnections", x => new { x.providerName, x.providerUserId });
+                    table.ForeignKey(
+                        name: "FK_ssoConnections_users_userId",
                         column: x => x.userId,
                         principalTable: "users",
                         principalColumn: "id",
@@ -301,6 +302,11 @@ namespace ZapMe.Migrations
                 column: "userId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ssoConnections_userId",
+                table: "ssoConnections",
+                column: "userId");
+
+            migrationBuilder.CreateIndex(
                 name: "userAgents_hash_idx",
                 table: "userAgents",
                 column: "sha256",
@@ -397,10 +403,10 @@ namespace ZapMe.Migrations
                 name: "lockOuts");
 
             migrationBuilder.DropTable(
-                name: "oauthConnections");
+                name: "sessions");
 
             migrationBuilder.DropTable(
-                name: "sessions");
+                name: "ssoConnections");
 
             migrationBuilder.DropTable(
                 name: "userPasswordResetRequests");

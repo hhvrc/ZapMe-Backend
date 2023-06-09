@@ -51,7 +51,7 @@ public sealed class ImageManager : IImageManager
         long contentLength = response.Content.Headers.ContentLength ?? -1;
         if (contentLength is <= 0 or > Int32.MaxValue)
         {
-            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Invalid image", "Image size is invalid");
+            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Invalid image", "Image size is invalid");
         }
 
         Stream imageStream = await response.Content.ReadAsStreamAsync(cancellationToken);
@@ -62,7 +62,7 @@ public sealed class ImageManager : IImageManager
     {
         if (imageSizeBytes > 1_112_000) // TODO: remove magic number
         {
-            return CreateHttpError.Generic(StatusCodes.Status413PayloadTooLarge, "Payload too large", "Image too large, max 1MB");
+            return HttpErrors.Generic(StatusCodes.Status413PayloadTooLarge, "Payload too large", "Image too large, max 1MB");
         }
 
         // Create stream that can be read multiple times, imageSizeBytes is initially just a hint
@@ -72,7 +72,7 @@ public sealed class ImageManager : IImageManager
         OneOf<ImageUtils.ParseResult, ErrorDetails> result = await ImageUtils.ParseAndRewriteFromStreamAsync(imageStream, memoryStream, cancellationToken);
         if (result.TryPickT1(out ErrorDetails errorDetails, out ImageUtils.ParseResult imageInfo))
         {
-            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Unsupported or invalid image", errorDetails.Detail);
+            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Unsupported or invalid image", errorDetails.Detail);
         }
 
         // Hash image data
@@ -81,7 +81,7 @@ public sealed class ImageManager : IImageManager
 
         if (sha256Hash != null && !sha256_hex.Equals(sha256Hash, StringComparison.OrdinalIgnoreCase))
         {
-            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "Checksum mismatch", "The provided checksum does not match the image data");
+            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Checksum mismatch", "The provided checksum does not match the image data");
         }
 
         // Check if image already exists
@@ -93,7 +93,7 @@ public sealed class ImageManager : IImageManager
 
         if (imageInfo.Width > 1024 || imageInfo.Height > 1024)
         {
-            return CreateHttpError.Generic(StatusCodes.Status413PayloadTooLarge, "Payload too large", "Image too large, max 1024x1024");
+            return HttpErrors.Generic(StatusCodes.Status413PayloadTooLarge, "Payload too large", "Image too large, max 1024x1024");
         }
 
         Guid id = Guid.NewGuid();

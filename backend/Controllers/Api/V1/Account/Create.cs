@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 using ZapMe.Attributes;
+using ZapMe.Authentication.Models;
 using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data.Models;
@@ -22,8 +24,7 @@ public partial class AccountController
     /// <param name="body"></param>
     /// <param name="cfTurnstileService"></param>
     /// <param name="debounceService"></param>
-    /// <param name="emailVerificationManager"></param>
-    /// <param name="options"></param>
+    /// <param name="legalOptions"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <response code="201">Created account</response>
@@ -32,15 +33,27 @@ public partial class AccountController
     [HttpPost(Name = "CreateAccount")]
     [ProducesResponseType(typeof(CreateOk), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)] // Invalid SSO token
     [ProducesResponseType(StatusCodes.Status409Conflict)] // Username/email already taken
     public async Task<IActionResult> Create(
         [FromBody] CreateAccount body,
         [FromServices] ICloudflareTurnstileService cfTurnstileService,
         [FromServices] IDebounceService debounceService,
-        [FromServices] IEmailVerificationManager emailVerificationManager,
-        [FromServices] IOptions<LegalOptions> options,
-        CancellationToken cancellationToken)
+        [FromServices] IOptions<LegalOptions> legalOptions,
+        CancellationToken cancellationToken
+        )
     {
+        SSOProviderDataEntry? providerVariables = null;
+        if (!String.IsNullOrEmpty(body.SSOToken))
+        {
+            var stateStore = HttpContext.RequestServices.GetRequiredService<ISSOStateStore>();
+            providerVariables = await stateStore.GetRegistrationTokenAsync(body.SSOToken, this.GetRemoteIP(), cancellationToken);
+            if (providerVariables == null)
+            {
+                return HttpErrors.InvalidSSOTokenActionResult;
+            }
+        }
+
         // Verify turnstile token
         CloudflareTurnstileVerifyResponse reCaptchaResponse = await cfTurnstileService.VerifyUserResponseTokenAsync(body.TurnstileResponse, this.GetRemoteIP(), cancellationToken);
         if (!reCaptchaResponse.Success)
@@ -52,11 +65,11 @@ public partial class AccountController
                     switch (errorCode)
                     {
                         case "missing-input-response": // The response parameter was not passed.
-                            return CreateHttpError.InvalidModelState((nameof(body.TurnstileResponse), "Missing Cloudflare Turnstile Response")).ToActionResult();
+                            return HttpErrors.InvalidModelState((nameof(body.TurnstileResponse), "Missing Cloudflare Turnstile Response")).ToActionResult();
                         case "invalid-input-response": // The response parameter is invalid or has expired.
-                            return CreateHttpError.InvalidModelState((nameof(body.TurnstileResponse), "Invalid Cloudflare Turnstile Response")).ToActionResult();
+                            return HttpErrors.InvalidModelState((nameof(body.TurnstileResponse), "Invalid Cloudflare Turnstile Response")).ToActionResult();
                         case "timeout-or-duplicate": // The response parameter has already been validated before.
-                            return CreateHttpError.InvalidModelState((nameof(body.TurnstileResponse), "Cloudflare Turnstile Response Expired or Already Used")).ToActionResult();
+                            return HttpErrors.InvalidModelState((nameof(body.TurnstileResponse), "Cloudflare Turnstile Response Expired or Already Used")).ToActionResult();
                         case "missing-input-secret": // The secret parameter was not passed.
                             _logger.LogError("Missing Cloudflare Turnstile Secret");
                             break;
@@ -81,20 +94,47 @@ public partial class AccountController
         // Attempt to check against debounce if the email is a throwaway email
         if (await debounceService.IsDisposableEmailAsync(body.Email, cancellationToken))
         {
-            return CreateHttpError.InvalidModelState((nameof(body.Email), "Disposable Emails are not allowed")).ToActionResult();
+            return HttpErrors.InvalidModelState((nameof(body.Email), "Disposable Emails are not allowed")).ToActionResult();
         }
 
-        if (body.AcceptedPrivacyPolicyVersion < options.Value.PrivacyPolicyVersion)
+        if (body.AcceptedPrivacyPolicyVersion < legalOptions.Value.PrivacyPolicyVersion)
         {
-            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "review_privpol", "User needs to accept new Privacy Policy", UserNotification.SeverityLevel.Error, "Please read and accept the new Privacy Policy before creating an account").ToActionResult();
+            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "review_privpol", "User needs to accept new Privacy Policy", UserNotification.SeverityLevel.Error, "Please read and accept the new Privacy Policy before creating an account").ToActionResult();
         }
 
-        if (body.AcceptedTermsOfServiceVersion < options.Value.TermsOfServiceVersion)
+        if (body.AcceptedTermsOfServiceVersion < legalOptions.Value.TermsOfServiceVersion)
         {
-            return CreateHttpError.Generic(StatusCodes.Status400BadRequest, "review_tos", "User needs to accept new Terms of Service", UserNotification.SeverityLevel.Error, "Please read and accept the new Terms of Service before creating an account").ToActionResult();
+            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "review_tos", "User needs to accept new Terms of Service", UserNotification.SeverityLevel.Error, "Please read and accept the new Terms of Service before creating an account").ToActionResult();
         }
 
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);
+
+        if (_dbContext.Users.Any(u => u.Name == body.Username || u.Email == body.Email))
+        {
+            return HttpErrors.UserNameOrEmailTakenActionResult;
+        }
+
+        using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        ImageEntity? imageEntity = null;
+        if (providerVariables != null)
+        {
+            var imageManager = HttpContext.RequestServices.GetRequiredService<IImageManager>();
+            if (!String.IsNullOrEmpty(providerVariables.ProfilePictureUrl))
+            {
+                var getOrCreateImageResult = await imageManager.GetOrCreateRecordAsync(
+                    providerVariables.ProfilePictureUrl,
+                    CountryRegionLookup.GetCloudflareRegion(this.GetCloudflareIPCountry()),
+                    null,
+                    null,
+                    cancellationToken
+                    );
+                if (getOrCreateImageResult.TryPickT1(out ErrorDetails errorDetails, out imageEntity))
+                {
+                    return errorDetails.ToActionResult();
+                }
+            }
+        }
 
         UserEntity user = new UserEntity
         {
@@ -108,13 +148,6 @@ public partial class AccountController
             OnlineStatusText = String.Empty
         };
 
-        if (_dbContext.Users.Any(u => u.Name == user.Name || u.Email == user.Email))
-        {
-            return CreateHttpError.UserNameOrEmailTaken().ToActionResult();
-        }
-
-        using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
-
         // Create account
         bool success = await _userStore.TryCreateAsync(user, cancellationToken);
         if (!success)
@@ -122,16 +155,59 @@ public partial class AccountController
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
-        // Send email verification
-        ErrorDetails? test = await emailVerificationManager.InitiateEmailVerificationAsync(user, body.Email, cancellationToken);
-        if (test.HasValue)
+        if (imageEntity != null)
         {
-            return test.Value.ToActionResult();
+            await _dbContext.Images
+                .Where(i => i.Id == imageEntity.Id)
+                .ExecuteUpdateAsync(spc => spc.SetProperty(i => i.UploaderId, _ => user.Id), cancellationToken);
+        }
+
+        SessionEntity? session = null;
+        if (providerVariables != null)
+        {
+            var connectionEntity = new SSOConnectionEntity
+            {
+                UserId = user.Id,
+                User = user,
+                ProviderName = providerVariables.ProviderName,
+                ProviderUserId = providerVariables.ProviderUserId,
+                ProviderUserName = providerVariables.ProviderUserName,
+            };
+
+            await _dbContext.SSOConnections.AddAsync(connectionEntity, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            var sessionManager = HttpContext.RequestServices.GetRequiredService<ISessionManager>();
+            session = await sessionManager.CreateAsync(
+                user,
+                this.GetRemoteIP(),
+                this.GetCloudflareIPCountry(),
+                this.GetRemoteUserAgent(),
+                true, // TODO: Should RememberMe be true by default?
+                cancellationToken
+                );
+        }
+
+        // Send email verification
+        bool emailVerified = body.Email == providerVariables?.ProviderUserEmail && (providerVariables?.ProviderUserEmailVerified ?? false);
+        if (!emailVerified)
+        {
+            var emailVerificationManager = HttpContext.RequestServices.GetRequiredService<IEmailVerificationManager>();
+            ErrorDetails? test = await emailVerificationManager.InitiateEmailVerificationAsync(user, body.Email, cancellationToken);
+            if (test.HasValue)
+            {
+                return test.Value.ToActionResult();
+            }
         }
 
         // Commit transaction
         await transaction.CommitAsync(cancellationToken);
 
-        return CreatedAtAction(nameof(Get), new CreateOk { Id = user.Id, Message = "Account created, please check your email for a verification link" });
+        return CreatedAtAction(nameof(Get), new CreateOk
+        {
+            AccountId = user.Id,
+            Session = session == null ? null : new SessionDto(session),
+            EmailVerificationRequired = emailVerified
+        });
     }
 }

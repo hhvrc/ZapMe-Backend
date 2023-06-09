@@ -30,7 +30,7 @@ public readonly struct AccountDto
         Status = user.OnlineStatus;
         StatusText = user.OnlineStatusText;
         Friends = user.Relations?.Select(fs => fs.TargetUserId).ToArray() ?? Array.Empty<Guid>();
-        OauthConnections = user.OauthConnections?.Select(oc => oc.ProviderName).ToArray() ?? Array.Empty<string>();
+        SSOConnections = user.SSOConnections?.Select(oc => oc.ProviderName).ToArray() ?? Array.Empty<string>();
     }
 
     /// <summary>
@@ -86,9 +86,9 @@ public readonly struct AccountDto
     public Guid[] Friends { get; init; }
 
     /// <summary>
-    /// OAuth2 providers this account is connected to
+    /// SSO providers this account is connected to
     /// </summary>
-    public string[] OauthConnections { get; init; }
+    public string[] SSOConnections { get; init; }
 
     /// <summary>
     /// Date this user was created at

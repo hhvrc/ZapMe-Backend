@@ -57,7 +57,7 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
         bool success = await _mailGunService.SendEmailAsync("System", user.Name, newEmail, "Account Created", "account-created", mailgunValues, cancellationToken);
         if (!success)
         {
-            return CreateHttpError.InternalServerError();
+            return HttpErrors.InternalServerError;
         }
 
         // Commit transaction
@@ -77,7 +77,7 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
         UserEmailVerificationRequestEntity? verificationRequest = await _dbContext.UserEmailVerificationRequests.SingleOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken);
         if (verificationRequest == null)
         {
-            return CreateHttpError.Generic(StatusCodes.Status404NotFound, "Invalid token", "Token invalid, expired, or already used");
+            return HttpErrors.Generic(StatusCodes.Status404NotFound, "Invalid token", "Token invalid, expired, or already used");
         }
 
         // Fetch user
@@ -90,7 +90,7 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
 
         if (nUpdated == 0)
         {
-            return CreateHttpError.Generic(StatusCodes.Status404NotFound, "Invalid token", "Token invalid, expired, or already used");
+            return HttpErrors.Generic(StatusCodes.Status404NotFound, "Invalid token", "Token invalid, expired, or already used");
         }
 
         return null;

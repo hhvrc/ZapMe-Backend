@@ -33,9 +33,9 @@ public static class ActionContextUtils
 
         if (!modelState.IsValid)
         {
-            return CreateHttpError.InvalidModelState(GetErrors(modelState)).ToActionResult();
+            return HttpErrors.InvalidModelState(GetErrors(modelState)).ToActionResult();
         }
 
-        return CreateHttpError.InternalServerError().ToActionResult();
+        return HttpErrors.InternalServerErrorActionResult;
     }
 }

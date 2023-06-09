@@ -1,18 +1,11 @@
-using Amazon.Extensions.NETCore.Setup;
-using Amazon.S3;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Twitter;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.Logging;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using ZapMe.Authentication;
 using ZapMe.Constants;
 using ZapMe.Data;
-using ZapMe.Helpers;
 using ZapMe.Middlewares;
 using ZapMe.Options;
 using ZapMe.Options.OAuth;
@@ -113,7 +106,6 @@ DiscordOAuth2Options.Register(services, configuration);
 GitHubOAuth2Options.Register(services, configuration);
 GoogleOAuth2Options.Register(services, configuration);
 TwitterOAuth1Options.Register(services, configuration);
-ZapMeAuthenticationOptions.Register(services, configuration);
 CloudflareOptions.Register(services, configuration);
 DatabaseOptions.Register(services, configuration);
 GoogleOptions.Register(services, configuration);
@@ -140,11 +132,11 @@ services.AddTransient<IFriendRequestStore, FriendRequestStore>();
 //services.AddTransient<IFriendRequestManager, FriendRequestManager>();
 services.AddTransient<IEmailVerificationManager, EmailVerificationManager>();
 services.AddTransient<IWebSocketInstanceManager, WebSocketInstanceManager>();
-services.AddTransient<IOAuthStateStore, OAuthStateStore>();
+services.AddTransient<ISSOStateStore, SSOStateStore>();
 
 services.AddRateLimiting();
 services.AddSwagger(isDevelopment);
-services.AddAuthentication(ZapMeAuthenticationDefaults.AuthenticationScheme)
+services.AddAuthentication(AuthSchemes.Main)
     .AddZapMe()
     .AddOAuthProviders(configuration);
 services.AddAuthorization(opt =>

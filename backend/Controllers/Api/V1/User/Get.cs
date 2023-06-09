@@ -26,7 +26,7 @@ public partial class UserController
         UserEntity? targetUser = await _dbContext.Users.SingleOrDefaultAsync(u => u.Id == userId && !u.Relations!.Any(r => r.TargetUserId == user.Id || r.SourceUserId == user.Id), cancellationToken);
         if (targetUser == null)
         {
-            return CreateHttpError.Generic(StatusCodes.Status404NotFound, "Not found", $"User with id {userId} not found").ToActionResult();
+            return HttpErrors.Generic(StatusCodes.Status404NotFound, "Not found", $"User with id {userId} not found").ToActionResult();
         }
 
         // TODO: use a mapper

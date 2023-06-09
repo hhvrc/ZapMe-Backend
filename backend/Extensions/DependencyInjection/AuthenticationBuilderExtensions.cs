@@ -13,7 +13,7 @@ public static class AuthenticationBuilderExtensions
     {
         builder.Services.AddOptions<AuthenticationOptions>().Configure(o =>
         {
-            o.AddScheme(ZapMeAuthenticationDefaults.AuthenticationScheme, scheme =>
+            o.AddScheme(AuthSchemes.Main, scheme =>
             {
                 scheme.HandlerType = typeof(ZapMeAuthenticationHandler);
                 scheme.DisplayName = null; // TODO: changeme
@@ -31,7 +31,7 @@ public static class AuthenticationBuilderExtensions
             return new DistributedCacheSecureDataFormat<T>(configuration.GetValue<string>("Redis:ConnectionString")!, TimeSpan.FromMinutes(1));
         }
 
-        return builder.AddDiscord(OAuthConstants.DiscordProviderName, opt =>
+        return builder.AddDiscord(AuthSchemes.Discord, opt =>
         {
             DiscordOAuth2Options discordOptions = DiscordOAuth2Options.Get(configuration);
 
@@ -47,6 +47,7 @@ public static class AuthenticationBuilderExtensions
             opt.CorrelationCookie.HttpOnly = true;
             opt.CorrelationCookie.SameSite = SameSiteMode.None;
             opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+            opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.EmailVerified, "verified");
             opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.ProfileImage, json =>
             {
                 string? userId = json.GetString("id");
@@ -58,7 +59,7 @@ public static class AuthenticationBuilderExtensions
             });
             opt.Validate();
         })
-        .AddGitHub(OAuthConstants.GitHubProviderName, opt =>
+        .AddGitHub(AuthSchemes.GitHub, opt =>
         {
             GitHubOAuth2Options githubOptions = GitHubOAuth2Options.Get(configuration);
 
@@ -88,7 +89,7 @@ public static class AuthenticationBuilderExtensions
             });
             opt.Validate();
         })
-        .AddTwitter(OAuthConstants.TwitterProviderName, opt =>
+        .AddTwitter(AuthSchemes.Twitter, opt =>
         {
             TwitterOAuth1Options twitterOptions = TwitterOAuth1Options.Get(configuration);
 
@@ -106,7 +107,7 @@ public static class AuthenticationBuilderExtensions
             opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.ProfileImage, "profile_image_url_https");
             opt.Validate();
         })
-        .AddGoogle(OAuthConstants.GoogleProviderName, opt =>
+        .AddGoogle(AuthSchemes.Google, opt =>
         {
             GoogleOAuth2Options googleOptions = GoogleOAuth2Options.Get(configuration);
 
@@ -121,6 +122,7 @@ public static class AuthenticationBuilderExtensions
             opt.CorrelationCookie.HttpOnly = true;
             opt.CorrelationCookie.SameSite = SameSiteMode.None;
             opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+            opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.EmailVerified, "email_verified");
             opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.ProfileImage, "picture");
             opt.Validate();
         });

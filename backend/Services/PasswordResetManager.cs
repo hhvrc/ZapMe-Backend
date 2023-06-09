@@ -58,7 +58,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
         if (!success)
         {
             _logger.LogError("Failed to send password reset email to {Email}", user.Email);
-            return CreateHttpError.InternalServerError();
+            return HttpErrors.InternalServerError;
         }
 
         // Commit transaction
@@ -75,7 +75,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
         UserEntity? userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == accountId && u.Email != null, cancellationToken);
         if (userEntity == null)
         {
-            return CreateHttpError.Generic(StatusCodes.Status404NotFound, "Account not found", "The account was not found");
+            return HttpErrors.Generic(StatusCodes.Status404NotFound, "Account not found", "The account was not found");
         }
 
         return await InitiatePasswordReset(userEntity, cancellationToken);
@@ -86,7 +86,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
         UserEntity? userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == accountEmail && u.Email != null, cancellationToken);
         if (userEntity == null)
         {
-            return CreateHttpError.Generic(StatusCodes.Status404NotFound, "Account not found", "The account associated with that email was not found");
+            return HttpErrors.Generic(StatusCodes.Status404NotFound, "Account not found", "The account associated with that email was not found");
         }
 
         return await InitiatePasswordReset(userEntity, cancellationToken);
