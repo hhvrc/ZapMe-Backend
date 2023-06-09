@@ -39,7 +39,6 @@ public sealed class SSOStateStore : ISSOStateStore
 
         if (stateInternal == null || stateInternal.ProviderName != providerName || stateInternal.RequestIP != requestIP)
         {
-            _logger.LogWarning("SSO state for request key {RequestKey} was not found, or the provider name or request IP did not match", requestKey);
             return null;
         }
 

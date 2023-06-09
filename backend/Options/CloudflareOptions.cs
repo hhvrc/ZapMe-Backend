@@ -19,7 +19,7 @@ public sealed class CloudflareOptions
 public sealed class CloudflareR2Options
 {
     public const string SectionName = CloudflareOptions.SectionName + ":R2";
-    
+
     public required string AccessKey { get; set; }
     public required string SecretKey { get; set; }
     public required string ServiceURL { get; set; }

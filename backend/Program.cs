@@ -147,7 +147,7 @@ services.AddAuthorization(opt =>
 services.AddStackExchangeRedisCache(opt =>
 {
     opt.Configuration = configuration.GetValue<string>("Redis:ConnectionString")!;
-    opt.InstanceName = "ZapMe";
+    opt.InstanceName = App.AppName;
 });
 services.AddDatabase(configuration);
 services.AddScheduledJobs();

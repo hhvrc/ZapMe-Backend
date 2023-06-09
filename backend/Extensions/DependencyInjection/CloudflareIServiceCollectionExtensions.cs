@@ -1,15 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using ZapMe.Constants;
-using ZapMe.Data;
 using ZapMe.Options;
-using static System.Net.Mime.MediaTypeNames;
-using ZapMe.Services.Interfaces;
 using ZapMe.Services;
-using Amazon.Extensions.NETCore.Setup;
-using Amazon.S3;
-using Amazon.Runtime;
-using System.Runtime.ConstrainedExecution;
+using ZapMe.Services.Interfaces;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Microsoft.Extensions.DependencyInjection;
 

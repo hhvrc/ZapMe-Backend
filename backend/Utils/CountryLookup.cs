@@ -1,5 +1,4 @@
 using AngleSharp.Common;
-using System.Globalization;
 
 namespace ZapMe.Utils;
 

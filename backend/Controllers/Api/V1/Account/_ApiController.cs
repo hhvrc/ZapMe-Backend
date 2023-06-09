@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using ZapMe.Constants;
 using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data;
 using ZapMe.Services.Interfaces;
@@ -13,8 +12,7 @@ namespace ZapMe.Controllers.Api.V1;
 [Consumes(Application.Json)]
 [Produces(Application.Json)]
 [ProducesErrorResponseType(typeof(ErrorDetails))]
-[ApiController, Route("api/v1/[Controller]/")]
-[Authorize(AuthSchemes.Main)]
+[ApiController, Authorize, Route("api/v1/[Controller]/")]
 [ResponseCache(CacheProfileName = "no-store")]
 public sealed partial class AccountController : ControllerBase
 {
