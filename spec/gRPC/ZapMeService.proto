@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option csharp_namespace = "ZapMe.gRPC";
+
+package zapme;
+
+service ZapMeGrpcService {
+  rpc Ping (PingRequest) returns (PingReply) {}
+}
+
+message PingRequest {
+  string message = 1;
+}
+
+message PingReply {
+  string message = 1;
+}

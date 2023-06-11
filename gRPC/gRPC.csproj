@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -23,4 +23,13 @@
     <ProjectReference Include="..\ZapMeLib\ZapMeLib.csproj" />
   </ItemGroup>
 
+  <Target Name="protoExport" AfterTargets="PostBuildEvent" Condition="Exists('$(OutputPath)$(AssemblyName).dll') And ('$(Configuration)' == 'Release')">
+    <Message Text="exporting proto files" Importance="high" />
+    <!-- Delete all contents of ..\spec\gRPC -->
+    <Exec Command="if exist ..\spec\gRPC rmdir /s /q ..\spec\gRPC" />
+    <!-- Create a new proto folder in ../spec -->
+    <Exec Command="mkdir ..\spec\gRPC" />
+    <!-- Copy all proto files from the Protos folder to ..\spec\gRPC -->
+    <Exec Command="copy $(ProjectDir)Protos\*.proto ..\spec\gRPC" />
+  </Target>
 </Project>
