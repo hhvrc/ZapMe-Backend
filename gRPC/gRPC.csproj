@@ -4,6 +4,12 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>09c442f6-0b36-4620-9fc4-bd8d8b6bc23d</UserSecretsId>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Server</AssemblyName>
+    <RootNamespace>ZapMe</RootNamespace>
+    <Platforms>x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

@@ -713,12 +713,8 @@ components:
           description: ''
           example: MyUsername
         obscuredEmail:
-          maxLength: 320
-          minLength: 5
           type: string
           description: Obfuscated email of your account
-          format: email
-          example: user.name@example.com
         emailVerified:
           type: boolean
           description: ''
@@ -860,19 +856,11 @@ components:
       type: object
       properties:
         emailSupport:
-          maxLength: 320
-          minLength: 5
           type: string
           description: Email address to contact the support of the service
-          format: email
-          example: user.name@example.com
         emailContact:
-          maxLength: 320
-          minLength: 5
           type: string
           description: Email address to contact the owner of the service
-          format: email
-          example: user.name@example.com
         discordInviteUrl:
           type: string
           description: Invite URL to the Discord server where users can get support
@@ -902,12 +890,8 @@ components:
           description: ''
           example: Hq2yP1B^Fho&zRHxHkEu
         email:
-          maxLength: 320
-          minLength: 5
           type: string
           description: ''
-          format: email
-          example: user.name@example.com
         acceptedPrivacyPolicyVersion:
           type: integer
           description: ''
@@ -952,13 +936,10 @@ components:
       properties:
         code:
           type: string
-          description: 'Error code, this is a short string that can be used to identify the error (meant for developers)'
         detail:
           type: string
-          description: Detailed description of what this error is about (meant for developers)
         suggestion:
           type: string
-          description: Suggestion on how to midegate this error (meant for developers)
           nullable: true
         fields:
           type: object
@@ -967,15 +948,12 @@ components:
             items:
               type: string
             nullable: true
-          description: Errors for specific fields in the request
           nullable: true
         notification:
           allOf:
             - $ref: '#/components/schemas/UserNotification'
-          description: "This is a user friendly error message, might help the user understand what went wrong and how to fix it\r\nCompletely optional, might be null"
           nullable: true
       additionalProperties: false
-      description: Details about the error
     FriendRequestList:
       required:
         - incoming
@@ -1041,12 +1019,8 @@ components:
       type: object
       properties:
         email:
-          maxLength: 320
-          minLength: 5
           type: string
           description: Email of your account you want to recover
-          format: email
-          example: user.name@example.com
         turnstileResponse:
           type: string
           description: Response from cloudflare turnstile request
@@ -1061,15 +1035,12 @@ components:
       properties:
         sessionToken:
           type: string
-          description: ''
           format: uuid
         issuedAtUtc:
           type: string
-          description: ''
           format: date-time
         expiresAtUtc:
           type: string
-          description: ''
           format: date-time
       additionalProperties: false
     SeverityLevel:
@@ -1113,12 +1084,8 @@ components:
       type: object
       properties:
         newEmail:
-          maxLength: 320
-          minLength: 5
           type: string
           description: ''
-          format: email
-          example: user.name@example.com
         password:
           type: string
           description: ''
@@ -1239,12 +1206,9 @@ components:
         severity:
           allOf:
             - $ref: '#/components/schemas/SeverityLevel'
-          description: 'Severity of the notification, might be used in clients to determine how to display the notification'
         content:
           type: string
-          description: 'Content of the notification, might be HTML'
       additionalProperties: false
-      description: "System notification to be displayed to the user, do not confuse with user notifications\r\nThis is a hint and clients can choose to ignore it or implement notifications to be independent of this"
     UserReport:
       required:
         - explenation

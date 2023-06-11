@@ -44,6 +44,4 @@ public static class App
     public static readonly MailAddress SupportEmailAddress = new MailAddress("support@" + Domain, "Support");
     public static readonly MailAddress ContactEmailAddress = new MailAddress("contact@" + Domain, "Contact");
     public static readonly MailAddress PrivacyEmailAddress = new MailAddress("privacy@" + Domain, "Privacy");
-
-    public static readonly string AssemblyXmlPath = Path.Combine(AppContext.BaseDirectory, Assembly.GetExecutingAssembly().GetName().Name + ".xml");
 }

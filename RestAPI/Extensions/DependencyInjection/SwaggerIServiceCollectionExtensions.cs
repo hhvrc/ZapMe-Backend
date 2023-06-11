@@ -79,7 +79,7 @@ public static class SwaggerIServiceCollectionExtensions
 
             opt.SupportNonNullableReferenceTypes();
 
-            opt.IncludeXmlComments(App.AssemblyXmlPath);
+            opt.IncludeXmlComments(AssemblyConstants.XmlPath);
         });
     }
 }
