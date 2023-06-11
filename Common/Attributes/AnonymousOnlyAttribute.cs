@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
 using ZapMe.Helpers;
+using ZapMe.DTOs;
 
 namespace ZapMe.Attributes;
 

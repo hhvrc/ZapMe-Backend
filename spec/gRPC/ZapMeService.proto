@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+option csharp_namespace = "ZapMe.gRPC";
+
+package zapme;
+
+service ZapMeGrpcService {
+  rpc Ping (Empty) returns (Empty) {}
+  rpc WebRtcConnect (WebRtcConnectRequest) returns (WebRtcConnectReply) {}
+}
+
+message Empty {}
+message Success {
+  bool success = 1;
+}
+
+message WebRtcConnectRequest {
+  string userId = 1;
+  string offerType = 2;
+  optional string offerSdp = 3;
+}
+
+message WebRtcConnectReply {
+  bool sentOffer = 1;
+  int64 requestExpiresAt = 2;
+}
+
+message CollarCommandPayload {
+  enum CommandType {
+    ZAP = 0;
+	VIBRATE = 1;
+	BEEP = 2;
+  }
+  CommandType type = 1;
+  int32 intensity = 2;
+}

@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using static System.Net.Mime.MediaTypeNames;
-
-namespace ZapMe.DTOs;
+﻿namespace ZapMe.DTOs;
 
 /// <summary>
 /// Details about the error
@@ -51,14 +46,4 @@ public readonly struct ErrorDetails
     /// Completely optional, might be null
     /// </summary>
     public UserNotification? Notification { get; init; }
-
-    public ObjectResult ToActionResult() => new ObjectResult(this) { StatusCode = HttpStatusCode, ContentTypes = { Application.Json } };
-    public static implicit operator ObjectResult(ErrorDetails errorDetails) => errorDetails.ToActionResult();
-
-    public Task Write(HttpResponse response, JsonSerializerOptions? options = null)
-    {
-        response.StatusCode = HttpStatusCode;
-        response.ContentType = Application.Json;
-        return response.WriteAsJsonAsync(this, options);
-    }
 }

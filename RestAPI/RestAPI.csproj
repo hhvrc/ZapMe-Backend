@@ -8,6 +8,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Server</AssemblyName>
     <RootNamespace>ZapMe</RootNamespace>
+    <PlatformTarget>x64</PlatformTarget>
     <Platforms>x64</Platforms>
   </PropertyGroup>
 
@@ -27,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ZapMeLib\ZapMeLib.csproj" />
+    <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 
   <Target Name="openapi" AfterTargets="PostBuildEvent" Condition="Exists('$(OutputPath)$(AssemblyName).dll') And ('$(Configuration)' == 'Release')">

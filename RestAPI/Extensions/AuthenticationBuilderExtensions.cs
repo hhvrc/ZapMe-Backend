@@ -5,7 +5,7 @@ using ZapMe.Constants;
 using ZapMe.Helpers;
 using ZapMe.Options.OAuth;
 
-namespace Microsoft.Extensions.DependencyInjection;
+namespace ZapMe.Extensions;
 
 public static class AuthenticationBuilderExtensions
 {

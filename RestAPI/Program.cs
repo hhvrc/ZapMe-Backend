@@ -5,6 +5,7 @@ using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using ZapMe.Constants;
+using ZapMe.Extensions;
 using ZapMe.Middlewares;
 using ZapMe.Options;
 using ZapMe.Options.OAuth;
@@ -105,8 +106,8 @@ DiscordOAuth2Options.Register(services, configuration);
 GitHubOAuth2Options.Register(services, configuration);
 GoogleOAuth2Options.Register(services, configuration);
 TwitterOAuth1Options.Register(services, configuration);
-CloudflareOptions.Register(services, configuration);
-GoogleOptions.Register(services, configuration);
+CloudflareTurnstileOptions.Register(services, configuration);
+GoogleReCaptchaOptions.Register(services, configuration);
 LegalOptions.Register(services, configuration);
 MailGunOptions.Register(services, configuration);
 

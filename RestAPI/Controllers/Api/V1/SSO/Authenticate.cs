@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using ZapMe.Helpers;
+using ZapMe.DTOs;
 
 namespace ZapMe.Controllers.Api.V1;
 

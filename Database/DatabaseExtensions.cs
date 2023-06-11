@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using ZapMe.Database;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
-public static class ZapMeDatabaseIServiceCollectionExtensions
+public static class ZapMeDatabaseExtensions
 {
     public static IServiceCollection AddZapMeDatabase(this IServiceCollection services, IConfiguration configuration)
     {
@@ -22,5 +24,10 @@ public static class ZapMeDatabaseIServiceCollectionExtensions
                 });
                 dbOpt.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
+    }
+
+    public static async Task<IDbContextTransaction?> BeginTransactionIfNotExistsAsync(this DatabaseFacade db, CancellationToken cancellationToken)
+    {
+        return db.CurrentTransaction is null ? await db.BeginTransactionAsync(cancellationToken) : null;
     }
 }

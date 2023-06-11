@@ -15,13 +15,15 @@ public class ZapMeGrpcServiceImpl : ZapMeGrpcService.ZapMeGrpcServiceBase
         _logger = logger;
     }
 
-    public async Task Initialize()
+    public Task Initialize()
     {
         // NetMQ configuration
         _netmqSocket.Connect("tcp://localhost:5556");
         _netmqSocket.Subscribe("UserEvent");
         _netmqSocket.Subscribe("GroupEvent");
         _netmqSocket.Subscribe("GlobalEvent");
+
+        return Task.CompletedTask;
     }
 
     public override Task<Empty> Ping(Empty request, ServerCallContext context)

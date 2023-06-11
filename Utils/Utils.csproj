@@ -6,6 +6,8 @@
     <Nullable>enable</Nullable>
     <AssemblyName>ZapMe.Utils</AssemblyName>
     <RootNamespace>ZapMe.Utils</RootNamespace>
+    <PlatformTarget>x64</PlatformTarget>
+    <Platforms>x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

@@ -4,8 +4,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
-    <AssemblyName>Tests</AssemblyName>
-    <RootNamespace>ZapMe.Tests</RootNamespace>
+    <AssemblyName>ZapMe.RestAPI.Tests</AssemblyName>
+    <RootNamespace>ZapMe.RestAPI.Tests</RootNamespace>
+    <PlatformTarget>x64</PlatformTarget>
     <Platforms>x64</Platforms>
   </PropertyGroup>
 
