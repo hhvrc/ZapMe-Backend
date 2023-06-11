@@ -1,4 +1,5 @@
 ﻿using Microsoft.OpenApi.Models;
+using System.Xml;
 using ZapMe.Constants;
 using ZapMe.Swagger;
 
@@ -79,7 +80,24 @@ public static class SwaggerIServiceCollectionExtensions
 
             opt.SupportNonNullableReferenceTypes();
 
-            opt.IncludeXmlComments(AssemblyConstants.XmlPath);
+            // Get all XML files in the assembly directory
+            foreach (string xmlFilePath in Directory.GetFiles(AppContext.BaseDirectory, "*.xml"))
+            {
+                // Validate XML structure
+                var xml = new XmlDocument();
+                xml.Load(xmlFilePath);
+
+                // Verify assembly name
+                var name = xml.SelectSingleNode("doc/assembly/name")?.InnerText;
+                if (name == null) continue;
+
+                // Verify assembly members
+                var membersNode = xml.SelectSingleNode("doc/members")?.ChildNodes;
+                if (membersNode?.Count.Equals(0) ?? true) continue;
+
+                // Add assembly to API spec
+                opt.IncludeXmlComments(xmlFilePath);
+            }
         });
     }
 }
