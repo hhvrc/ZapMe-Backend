@@ -1,3 +1,3 @@
-[submodule "backend.tests/DataSet"]
-	path = backend.tests/DataSet
+[submodule "RestAPI.Tests/DataSet"]
+	path = RestAPI.Tests/DataSet
 	url = https://github.com/hhvrc/ZapMe-Backend-UnitTest-DataSet

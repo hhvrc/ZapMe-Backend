@@ -83,11 +83,11 @@ fi
 
 # Remove all build artifacts
 rm -rf "build"
-rm -rf "backend/bin"
-rm -rf "backend/obj"
-rm -rf "backend/build"
+rm -rf "RestAPI/bin"
+rm -rf "RestAPI/obj"
+rm -rf "RestAPI/build"
 
 # Build the backend
 echo_cyan "Building backend"
-dotnet publish backend/Backend.csproj /p:PublishProfile=backend/Properties/PublishProfiles/Linux-x64.pubxml -c Release
+dotnet publish RestAPI/RestAPI.csproj /p:PublishProfile=RestAPI/Properties/PublishProfiles/Linux-x64.pubxml -c Release
 echo_green "Backend build complete"

@@ -51,6 +51,6 @@
   <Target Name="openapi" AfterTargets="PostBuildEvent" Condition="Exists('$(OutputPath)$(AssemblyName).dll') And ('$(Configuration)' == 'Release')">
 	<Message Text="generating openapi" Importance="high" />
 	<Exec Command="dotnet tool restore" />
-	<Exec Command="dotnet swagger tofile --yaml --output $(ProjectDir)..\api\openapi.yaml $(OutputPath)$(AssemblyName).dll v1" EnvironmentVariables="IsBuild=true" />
+	<Exec Command="dotnet swagger tofile --yaml --output $(ProjectDir)..\spec\openapi.yaml $(OutputPath)$(AssemblyName).dll v1" EnvironmentVariables="IsBuild=true" />
   </Target>
 </Project>

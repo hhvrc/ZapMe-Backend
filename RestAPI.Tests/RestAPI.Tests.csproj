@@ -30,10 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\backend\Backend.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="DataSet\**" Exclude="DataSet\.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -42,5 +38,9 @@
   <ItemGroup>
     <None Remove="DataSet\Text\BlackList\Text\LeadingSpaces.txt" />
     <None Remove="DataSet\Text\BlackList\Text\TrailingSpaces.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RestAPI\RestAPI.csproj" />
   </ItemGroup>
 </Project>
