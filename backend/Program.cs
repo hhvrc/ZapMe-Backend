@@ -131,7 +131,6 @@ services.AddTransient<IUserRelationStore, UserRelationStore>();
 services.AddTransient<IFriendRequestStore, FriendRequestStore>();
 //services.AddTransient<IFriendRequestManager, FriendRequestManager>();
 services.AddTransient<IEmailVerificationManager, EmailVerificationManager>();
-services.AddTransient<IWebSocketInstanceManager, WebSocketInstanceManager>();
 services.AddTransient<ISSOStateStore, SSOStateStore>();
 
 services.AddRateLimiting();

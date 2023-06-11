@@ -684,21 +684,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-  /ws:
-    get:
-      tags:
-        - WebSocket
-      summary: "Websocket endpoint for pub/sub communication (e.g. chat, notifications, events)\r\n\r\nDocumentation:\r\nYes"
-      operationId: WebSocket
-      responses:
-        '200':
-          description: Connection closed
-        '400':
-          description: This endpoint is purely just a websocket endpoint
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
 components:
   schemas:
     AccountDto:
@@ -803,16 +788,16 @@ components:
     ApiDisabledFeatures:
       required:
         - endpoints
+        - grpc
         - webRTC
-        - webSockets
       type: object
       properties:
         webRTC:
           type: boolean
           description: 'If true, WebRTC is disabled'
-        webSockets:
+        grpc:
           type: boolean
-          description: 'If true, WebSockets are disabled'
+          description: 'If true, gRPC is disabled'
         endpoints:
           type: array
           items:
