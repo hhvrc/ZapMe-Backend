@@ -3,6 +3,7 @@ using ZapMe.gRPC.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddGrpc();
+builder.Services.AddMediator();
 
 var app = builder.Build();
 

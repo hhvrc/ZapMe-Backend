@@ -150,6 +150,7 @@ services.AddStackExchangeRedisCache(opt =>
 });
 services.AddDatabase(configuration);
 services.AddScheduledJobs();
+services.AddMediator();
 
 // ########################################
 // ######## CORS CONFIGURATION ############
