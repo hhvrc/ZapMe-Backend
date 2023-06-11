@@ -2,12 +2,12 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using ZapMe.Constants;
+using ZapMe.Database;
+using ZapMe.Database.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
-using ZapMe.Database.Models;
-using ZapMe.Database;
 
 namespace ZapMe.Services;
 

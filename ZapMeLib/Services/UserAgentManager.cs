@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using UAParser;
-using ZapMe.Database.Models;
 using ZapMe.Constants;
+using ZapMe.Database;
+using ZapMe.Database.Models;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
-using ZapMe.Database;
 
 namespace ZapMe.Services;
 

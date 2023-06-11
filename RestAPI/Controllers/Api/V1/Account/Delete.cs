@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.ComponentModel.DataAnnotations;
-using ZapMe.Database.Models;
 using ZapMe.Attributes;
 using ZapMe.Authentication;
+using ZapMe.Database.Models;
 using ZapMe.Helpers;
 using ZapMe.Utils;
 

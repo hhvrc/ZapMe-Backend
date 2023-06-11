@@ -6,11 +6,11 @@ using Microsoft.Extensions.Primitives;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
-using ZapMe.Database.Models;
 using ZapMe.Authentication.Models;
 using ZapMe.Constants;
-using ZapMe.Helpers;
 using ZapMe.Database;
+using ZapMe.Database.Models;
+using ZapMe.Helpers;
 
 namespace ZapMe.Authentication;
 

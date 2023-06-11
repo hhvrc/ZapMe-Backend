@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ZapMe.Database.Models;
 using ZapMe.Authentication;
+using ZapMe.Database.Models;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
 

@@ -5,12 +5,12 @@ using ZapMe.Attributes;
 using ZapMe.Authentication;
 using ZapMe.Authentication.Models;
 using ZapMe.Constants;
+using ZapMe.Database.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
 using ZapMe.Options;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
-using ZapMe.Database.Models;
 
 namespace ZapMe.Controllers.Api.V1;
 

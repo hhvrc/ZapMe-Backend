@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
-using ZapMe.Database.Models;
 using ZapMe.Constants;
+using ZapMe.Database.Models;
 
 namespace ZapMe.Authentication;
 
