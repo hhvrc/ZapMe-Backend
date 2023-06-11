@@ -10,7 +10,7 @@ public readonly struct RecoveryConfirm
     /// <summary>
     /// The new password to set
     /// </summary>
-    [Password(true)]
+    [PasswordOAPI(true)]
     public string NewPassword { get; init; }
 
     /// <summary>

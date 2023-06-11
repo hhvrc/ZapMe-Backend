@@ -8,7 +8,7 @@ namespace ZapMe.Attributes;
 /// and format. The attribute can be applied multiple times to a single method to specify multiple media types.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-public sealed class BinaryPayloadAttribute : Attribute, IOperationAttribute
+public sealed class BinaryPayloadOAPIAttribute : Attribute, IOperationAttribute
 {
     private readonly bool _required;
     private readonly string[] _mediaTypes;
@@ -18,7 +18,7 @@ public sealed class BinaryPayloadAttribute : Attribute, IOperationAttribute
     /// </summary>
     /// <param name="Required">A boolean value indicating whether the payload is required.</param>
     /// <param name="MediaTypes">A variable-length list of strings representing the media types for the payload.</param>
-    public BinaryPayloadAttribute(bool Required = true, params string[] MediaTypes)
+    public BinaryPayloadOAPIAttribute(bool Required = true, params string[] MediaTypes)
     {
         _required = Required;
         _mediaTypes = MediaTypes;

@@ -1,5 +1,3 @@
-using AngleSharp.Common;
-
 namespace ZapMe.Utils;
 
 public static class CountryRegionLookup
@@ -259,6 +257,7 @@ public static class CountryRegionLookup
 
     public static string GetCloudflareRegion(string alpha2)
     {
-        return CountryRegionDict.GetOrDefault(alpha2, "weur");
+        if (CountryRegionDict.TryGetValue(alpha2, out var region)) return region;
+        return "weur";
     }
 }

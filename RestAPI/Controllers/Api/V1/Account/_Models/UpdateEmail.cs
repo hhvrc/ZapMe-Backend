@@ -12,6 +12,6 @@ public readonly struct UpdateEmail
     public string NewEmail { get; init; }
 
     /// <summary/>
-    [Password(false)]
+    [PasswordOAPI(false)]
     public string Password { get; init; }
 }

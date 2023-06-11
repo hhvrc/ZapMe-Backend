@@ -1,5 +1,4 @@
-﻿using AngleSharp.Text;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace System;
 
@@ -69,7 +68,7 @@ public static class StringExtensions
         {
             char c = span[i++];
 
-            if (c.IsWhiteSpaceCharacter())
+            if (Char.IsWhiteSpace(c))
             {
                 buffer[j++] = ' ';
 
@@ -77,7 +76,7 @@ public static class StringExtensions
                 {
                     if (i >= len) goto exit; // Break twice
                 }
-                while ((c = span[i++]).IsWhiteSpaceCharacter());
+                while (Char.IsWhiteSpace(c = span[i++]));
             }
 
             buffer[j++] = c;

@@ -6,7 +6,7 @@ public sealed class GoogleOptions
 
     public required GoogleReCaptchaOptions ReCaptcha { get; set; }
 
-    internal static void Register(IServiceCollection services, IConfiguration configuration)
+    public static void Register(IServiceCollection services, IConfiguration configuration)
     {
         services.AddOptions<GoogleOptions>().Bind(configuration.GetRequiredSection(SectionName)).ValidateOnStart();
         GoogleReCaptchaOptions.Register(services, configuration);

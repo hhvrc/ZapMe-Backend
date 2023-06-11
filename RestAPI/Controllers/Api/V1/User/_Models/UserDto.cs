@@ -37,7 +37,7 @@ public readonly struct UserDto
     /// <summary>
     /// 
     /// </summary>
-    [Username(false)]
+    [UsernameOAPI(false)]
     [JsonPropertyOrder(1)]
     public string Username { get; init; }
 

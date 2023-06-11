@@ -1,7 +1,4 @@
-﻿using AngleSharp.Text;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using ZapMe.Constants;
 using ZapMe.Utils;
 
@@ -11,10 +8,10 @@ namespace ZapMe.Attributes;
 /// An attribute used to validate whether a username is valid.
 /// </summary>
 /// <remarks>
-/// Implements <see cref="IParameterAttribute"/> and inherits from <see cref="ValidationAttribute"/>.
+/// Inherits from <see cref="ValidationAttribute"/>.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-public sealed class UsernameAttribute : ValidationAttribute, IParameterAttribute
+public class UsernameAttribute : ValidationAttribute
 {
     /// <summary>
     /// Regular expression for username validation.
@@ -72,7 +69,7 @@ public sealed class UsernameAttribute : ValidationAttribute, IParameterAttribute
             return new ValidationResult(_ErrMsgTooLong);
         }
 
-        if (username[0].IsWhiteSpaceCharacter() || username[^1].IsWhiteSpaceCharacter())
+        if (Char.IsWhiteSpace(username[0]) || Char.IsWhiteSpace(username[^1]))
         {
             return new ValidationResult(_ErrMsgNoWhiteSpaceAtEnds);
         }
@@ -88,24 +85,5 @@ public sealed class UsernameAttribute : ValidationAttribute, IParameterAttribute
         }
 
         return ValidationResult.Success;
-    }
-
-    /// <inheritdoc/>
-    public void Apply(OpenApiSchema schema)
-    {
-        if (ShouldValidate)
-        {
-            schema.MinLength = GeneralHardLimits.UsernameMinLength;
-            schema.MaxLength = GeneralHardLimits.UsernameMaxLength;
-            schema.Pattern = UsernameRegex;
-        }
-
-        schema.Example = new OpenApiString(ExampleUsername);
-    }
-
-    /// <inheritdoc/>
-    public void Apply(OpenApiParameter parameter)
-    {
-        Apply(parameter.Schema);
     }
 }

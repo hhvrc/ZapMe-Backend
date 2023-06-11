@@ -1,6 +1,4 @@
-﻿using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using ZapMe.Constants;
 using ZapMe.Utils;
 
@@ -10,10 +8,10 @@ namespace ZapMe.Attributes;
 /// Custom attribute used for validating email address properties or fields.
 /// </summary>
 /// <remarks>
-/// This attribute implements the <see cref="ValidationAttribute"/> and <see cref="IParameterAttribute"/> interfaces.
+/// This attribute implements the <see cref="ValidationAttribute"/> interface.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-public sealed class EmailAddressAttribute : ValidationAttribute, IParameterAttribute
+public class EmailAddressAttribute : ValidationAttribute
 {
     /// <summary>
     /// The example email to use for the OpenApi schema.
@@ -78,20 +76,5 @@ public sealed class EmailAddressAttribute : ValidationAttribute, IParameterAttri
         }
 
         return ValidationResult.Success;
-    }
-
-    /// <inheritdoc/>
-    public void Apply(OpenApiSchema schema)
-    {
-        schema.MinLength = GeneralHardLimits.EmailAddressMinLength;
-        schema.MaxLength = GeneralHardLimits.EmailAddressMaxLength;
-        schema.Format = "email";
-        schema.Example = new OpenApiString(ExampleEmail);
-    }
-
-    /// <inheritdoc/>
-    public void Apply(OpenApiParameter parameter)
-    {
-        Apply(parameter.Schema);
     }
 }

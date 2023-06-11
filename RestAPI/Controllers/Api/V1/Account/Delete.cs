@@ -22,7 +22,7 @@ public partial class AccountController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Delete(
-        [FromHeader][Password(true)] string password,
+        [FromHeader][PasswordOAPI(true)] string password,
         [FromHeader][StringLength(1024)] string? reason,
         CancellationToken cancellationToken
         )

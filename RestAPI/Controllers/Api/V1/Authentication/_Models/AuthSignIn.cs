@@ -10,13 +10,13 @@ public readonly struct AuthSignIn
     /// <summary>
     /// Username or email address
     /// </summary>
-    [Username(false)]
+    [UsernameOAPI(false)]
     public string UsernameOrEmail { get; init; }
 
     /// <summary>
     /// Password
     /// </summary>
-    [Password(false)]
+    [PasswordOAPI(false)]
     public string Password { get; init; }
 
     /// <summary>

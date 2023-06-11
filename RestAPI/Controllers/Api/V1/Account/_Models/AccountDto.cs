@@ -41,7 +41,7 @@ public readonly struct AccountDto
     /// <summary>
     /// 
     /// </summary>
-    [Username(false)]
+    [UsernameOAPI(false)]
     public string Username { get; init; }
 
     /// <summary>

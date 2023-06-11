@@ -12,12 +12,12 @@ public readonly struct UpdatePassword
     public const string CurrentPassword_JsonName = "password_current";
 
     /// <summary/>
-    [Password(true)]
+    [PasswordOAPI(true)]
     [JsonPropertyName(NewPassword_JsonName)]
     public string NewPassword { get; init; }
 
     /// <summary/>
-    [Password(false)]
+    [PasswordOAPI(false)]
     [JsonPropertyName(CurrentPassword_JsonName)]
     public string CurrentPassword { get; init; }
 }

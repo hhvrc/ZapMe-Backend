@@ -8,10 +8,10 @@ namespace ZapMe.Controllers.Api.V1.Account.Models;
 public readonly struct UpdateUserName
 {
     /// <summary/>
-    [Username(true)]
+    [UsernameOAPI(true)]
     public string NewUsername { get; init; }
 
     /// <summary/>
-    [Password(false)]
+    [PasswordOAPI(false)]
     public string Password { get; init; }
 }

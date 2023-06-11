@@ -1,6 +1,4 @@
-﻿using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using ZapMe.Constants;
 
 namespace ZapMe.Attributes;
@@ -9,7 +7,7 @@ namespace ZapMe.Attributes;
 /// Represents a validation attribute that can be applied to a password property or field.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = false)]
-public sealed class PasswordAttribute : ValidationAttribute, IParameterAttribute
+public class PasswordAttribute : ValidationAttribute
 {
     /// <summary>
     /// The example password to use for the OpenApi schema.
@@ -60,22 +58,5 @@ public sealed class PasswordAttribute : ValidationAttribute, IParameterAttribute
         }
 
         return ValidationResult.Success;
-    }
-
-    /// <inheritdoc/>
-    public void Apply(OpenApiSchema schema)
-    {
-        if (ShouldValidate)
-        {
-            schema.MinLength = GeneralHardLimits.PasswordMinLength;
-            schema.MaxLength = GeneralHardLimits.PasswordMaxLength;
-        }
-        schema.Example = new OpenApiString(ExamplePassword);
-    }
-
-    /// <inheritdoc/>
-    public void Apply(OpenApiParameter parameter)
-    {
-        Apply(parameter.Schema);
     }
 }

@@ -8,11 +8,11 @@ namespace ZapMe.Controllers.Api.V1.Account.Models;
 public readonly struct CreateAccount
 {
     /// <summary/>
-    [Username(true)]
+    [UsernameOAPI(true)]
     public string Username { get; init; }
 
     /// <summary/>
-    [Password(true)]
+    [PasswordOAPI(true)]
     public string Password { get; init; }
 
     /// <summary/>

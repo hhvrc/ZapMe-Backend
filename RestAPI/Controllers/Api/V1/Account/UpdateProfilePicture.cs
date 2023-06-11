@@ -25,7 +25,7 @@ public partial class AccountController
     /// <response code="411">Length is required</response>
     /// <response code="413">Image dimensions or byte size is too large</response>
     [HttpPut("pfp", Name = "UpdateProfilePicture")]
-    [BinaryPayload(true, "image/png", "image/jpeg", "image/webp", "image/gif")]
+    [BinaryPayloadOAPI(true, "image/png", "image/jpeg", "image/webp", "image/gif")]
     [ProducesResponseType(typeof(UpdateProfilePictureOk), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status411LengthRequired)]
