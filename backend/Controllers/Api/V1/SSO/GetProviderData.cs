@@ -16,7 +16,7 @@ public partial class SSOController
     [ProducesResponseType(StatusCodes.Status401Unauthorized)] // Invalid SSO token
     public async Task<IActionResult> GetProviderData([FromQuery] string ssoToken, [FromServices] ISSOStateStore stateStore, CancellationToken cancellationToken)
     {
-        SSOProviderDataEntry? providerVariables = await stateStore.GetRegistrationTokenAsync(ssoToken, this.GetRemoteIP(), cancellationToken);
+        SSOProviderDataEntry? providerVariables = await stateStore.GetProviderDataAsync(ssoToken, this.GetRemoteIP(), cancellationToken);
         if (providerVariables == null)
         {
             return HttpErrors.InvalidSSOTokenActionResult;

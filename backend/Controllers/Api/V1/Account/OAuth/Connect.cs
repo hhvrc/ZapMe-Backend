@@ -25,7 +25,7 @@ public partial class AccountController
 
         string requestingIp = this.GetRemoteIP();
 
-        var oauthVariables = await stateStore.GetRegistrationTokenAsync(ssoToken, requestingIp, cancellationToken);
+        var oauthVariables = await stateStore.GetProviderDataAsync(ssoToken, requestingIp, cancellationToken);
         if (oauthVariables == null)
         {
             return HttpErrors.InvalidSSOTokenActionResult;

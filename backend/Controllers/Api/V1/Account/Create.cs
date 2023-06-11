@@ -47,7 +47,7 @@ public partial class AccountController
         if (!String.IsNullOrEmpty(body.SSOToken))
         {
             var stateStore = HttpContext.RequestServices.GetRequiredService<ISSOStateStore>();
-            providerVariables = await stateStore.GetRegistrationTokenAsync(body.SSOToken, this.GetRemoteIP(), cancellationToken);
+            providerVariables = await stateStore.GetProviderDataAsync(body.SSOToken, this.GetRemoteIP(), cancellationToken);
             if (providerVariables == null)
             {
                 return HttpErrors.InvalidSSOTokenActionResult;

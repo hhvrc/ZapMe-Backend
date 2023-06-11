@@ -33,7 +33,7 @@ public partial class ZapMeAuthenticationHandler
             var stateStore = ServiceProvider.GetRequiredService<ISSOStateStore>();
 
             var expiresAt = DateTime.UtcNow + SSOConstants.StateLifetime;
-            var token = await stateStore.CreateRegistrationTokenAsync(
+            var token = await stateStore.InsertProviderDataAsync(
                 RequestingIpAddress,
                 ssoProviderData,
                 CancellationToken
