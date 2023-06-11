@@ -1,15 +1,15 @@
-﻿using ZapMe.Constants;
-using ZapMe.Data;
-using ZapMe.Data.Models;
+﻿using ZapMe.Database.Models;
+using ZapMe.Constants;
 using ZapMe.Services.Interfaces;
+using ZapMe.Database;
 
 namespace ZapMe.Services;
 
 public sealed class UserAgentStore : IUserAgentStore
 {
-    private readonly ZapMeContext _dbContext;
+    private readonly DatabaseContext _dbContext;
 
-    public UserAgentStore(ZapMeContext dbContext)
+    public UserAgentStore(DatabaseContext dbContext)
     {
         _dbContext = dbContext;
     }

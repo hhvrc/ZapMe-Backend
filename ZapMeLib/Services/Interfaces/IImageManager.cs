@@ -1,6 +1,6 @@
 ﻿using Amazon.S3;
 using OneOf;
-using ZapMe.Data.Models;
+using ZapMe.Database.Models;
 using ZapMe.DTOs;
 
 namespace ZapMe.Services.Interfaces;

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ZapMe.Database.Models;
 using ZapMe.Authentication;
-using ZapMe.Data.Models;
 
 namespace ZapMe.Controllers.Api.V1;
 

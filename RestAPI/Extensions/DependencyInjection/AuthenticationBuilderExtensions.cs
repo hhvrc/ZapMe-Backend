@@ -9,6 +9,21 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class AuthenticationBuilderExtensions
 {
+    public static AuthenticationBuilder AddZapMe(this AuthenticationBuilder builder)
+    {
+        builder.Services.AddOptions<AuthenticationOptions>().Configure(o =>
+        {
+            o.AddScheme(AuthSchemes.Main, scheme =>
+            {
+                scheme.HandlerType = typeof(ZapMeAuthenticationHandler);
+                scheme.DisplayName = null; // TODO: changeme
+            });
+        });
+
+        builder.Services.AddTransient<IAuthenticationSignInHandler, ZapMeAuthenticationHandler>();
+        return builder;
+    }
+
     public static AuthenticationBuilder AddOAuthProviders(this AuthenticationBuilder builder, IConfiguration configuration)
     {
         ISecureDataFormat<T> GetSecureDataFormat<T>()

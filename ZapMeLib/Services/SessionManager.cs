@@ -1,17 +1,17 @@
-﻿using ZapMe.Data;
-using ZapMe.Data.Models;
+﻿using ZapMe.Database;
+using ZapMe.Database.Models;
 using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Services;
 
 public sealed class SessionManager : ISessionManager
 {
-    private readonly ZapMeContext _dbContext;
+    private readonly DatabaseContext _dbContext;
     public ISessionStore SessionStore { get; }
     public IUserAgentManager UserAgentManager { get; }
     private readonly ILogger<SessionManager> _logger;
 
-    public SessionManager(ZapMeContext dbContext, ISessionStore sessionStore, IUserAgentManager userAgentManager, ILogger<SessionManager> logger)
+    public SessionManager(DatabaseContext dbContext, ISessionStore sessionStore, IUserAgentManager userAgentManager, ILogger<SessionManager> logger)
     {
         _dbContext = dbContext;
         SessionStore = sessionStore;

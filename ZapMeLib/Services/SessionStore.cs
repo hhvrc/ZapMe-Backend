@@ -1,15 +1,15 @@
-﻿using ZapMe.Data;
-using ZapMe.Data.Models;
+﻿using ZapMe.Database;
+using ZapMe.Database.Models;
 using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Services;
 
 public sealed class SessionStore : ISessionStore
 {
-    private readonly ZapMeContext _dbContext;
+    private readonly DatabaseContext _dbContext;
     private readonly ILogger<SessionStore> _logger;
 
-    public SessionStore(ZapMeContext dbContext, ILogger<SessionStore> logger)
+    public SessionStore(DatabaseContext dbContext, ILogger<SessionStore> logger)
     {
         _dbContext = dbContext;
         _logger = logger;

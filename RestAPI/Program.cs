@@ -4,8 +4,9 @@ using Microsoft.IdentityModel.Logging;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using ZapMe;
 using ZapMe.Constants;
-using ZapMe.Data;
+using ZapMe.Database;
 using ZapMe.Middlewares;
 using ZapMe.Options;
 using ZapMe.Options.OAuth;
@@ -107,7 +108,7 @@ GitHubOAuth2Options.Register(services, configuration);
 GoogleOAuth2Options.Register(services, configuration);
 TwitterOAuth1Options.Register(services, configuration);
 CloudflareOptions.Register(services, configuration);
-DatabaseOptions.Register(services, configuration);
+DatabaseOptions.Register(services, configuration).ValidateOnStart();
 GoogleOptions.Register(services, configuration);
 LegalOptions.Register(services, configuration);
 MailGunOptions.Register(services, configuration);
@@ -148,7 +149,7 @@ services.AddStackExchangeRedisCache(opt =>
     opt.Configuration = configuration.GetValue<string>("Redis:ConnectionString")!;
     opt.InstanceName = App.AppName;
 });
-services.AddDatabase(configuration);
+services.AddZapMeDatabase(configuration);
 services.AddScheduledJobs();
 services.AddMediator();
 
@@ -203,11 +204,11 @@ if (!isBuild)
 {
     using IServiceScope scope = app.Services.CreateScope();
 
-    ZapMeContext context = scope.ServiceProvider.GetRequiredService<ZapMeContext>();
+    DatabaseContext context = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
 
     if (context.Database.EnsureCreated())
     {
-        await DataSeeders.SeedAsync(context);
+        await DatabaseSeeders.SeedAsync(context);
     }
 }
 else

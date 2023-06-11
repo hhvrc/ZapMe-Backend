@@ -1,4 +1,4 @@
-﻿using ZapMe.Data.Models;
+﻿using ZapMe.Database.Models;
 
 namespace ZapMe.DTOs;
 

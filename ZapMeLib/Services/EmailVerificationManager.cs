@@ -3,20 +3,20 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using ZapMe.Constants;
 using ZapMe.DTOs;
-using ZapMe.Data;
-using ZapMe.Data.Models;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
+using ZapMe.Database.Models;
+using ZapMe.Database;
 
 namespace ZapMe.Services;
 
 public sealed class EmailVerificationManager : IEmailVerificationManager
 {
-    private readonly ZapMeContext _dbContext;
+    private readonly DatabaseContext _dbContext;
     private readonly IMailGunService _mailGunService;
 
-    public EmailVerificationManager(ZapMeContext dbContext, IMailGunService mailGunService)
+    public EmailVerificationManager(DatabaseContext dbContext, IMailGunService mailGunService)
     {
         _dbContext = dbContext;
         _mailGunService = mailGunService;

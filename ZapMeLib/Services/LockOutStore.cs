@@ -1,15 +1,15 @@
-﻿using ZapMe.Data;
-using ZapMe.Data.Models;
+﻿using ZapMe.Database;
+using ZapMe.Database.Models;
 using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Services;
 
 public sealed class LockOutStore : ILockOutStore
 {
-    private readonly ZapMeContext _dbContext;
+    private readonly DatabaseContext _dbContext;
     private readonly ILogger<LockOutStore> _logger;
 
-    public LockOutStore(ZapMeContext dbContext, ILogger<LockOutStore> logger)
+    public LockOutStore(DatabaseContext dbContext, ILogger<LockOutStore> logger)
     {
         _dbContext = dbContext;
         _logger = logger;

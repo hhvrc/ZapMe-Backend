@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using OneOf;
-using ZapMe.Data;
-using ZapMe.Data.Models;
+using ZapMe.Database;
+using ZapMe.Database.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
@@ -13,10 +13,10 @@ namespace ZapMe.Services;
 
 public sealed class ImageManager : IImageManager
 {
-    readonly ZapMeContext _dbContext;
+    readonly DatabaseContext _dbContext;
     readonly ICloudflareR2Service _cloudflareR2Service;
 
-    public ImageManager(ZapMeContext dbContext, ICloudflareR2Service cloudflareR2Service, IConfiguration configuration)
+    public ImageManager(DatabaseContext dbContext, ICloudflareR2Service cloudflareR2Service, IConfiguration configuration)
     {
         _dbContext = dbContext;
         _cloudflareR2Service = cloudflareR2Service;

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
+using ZapMe.Database.Models;
 using ZapMe.Attributes;
-using ZapMe.Data.Models;
 using ZapMe.Enums;
 
 namespace ZapMe.Controllers.Api.V1.User.Models;

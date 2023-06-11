@@ -1,15 +1,15 @@
-﻿using ZapMe.Data;
-using ZapMe.Data.Models;
+﻿using ZapMe.Database;
+using ZapMe.Database.Models;
 using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Services;
 
 public sealed class FriendRequestStore : IFriendRequestStore
 {
-    private readonly ZapMeContext _dbContext;
+    private readonly DatabaseContext _dbContext;
     private readonly ILogger<FriendRequestStore> _logger;
 
-    public FriendRequestStore(ZapMeContext dbContext, ILogger<FriendRequestStore> logger)
+    public FriendRequestStore(DatabaseContext dbContext, ILogger<FriendRequestStore> logger)
     {
         _dbContext = dbContext;
         _logger = logger;

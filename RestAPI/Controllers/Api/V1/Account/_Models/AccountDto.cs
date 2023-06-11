@@ -1,5 +1,5 @@
-﻿using ZapMe.Attributes;
-using ZapMe.Data.Models;
+﻿using ZapMe.Database.Models;
+using ZapMe.Attributes;
 using ZapMe.Enums;
 using ZapMe.Utils;
 

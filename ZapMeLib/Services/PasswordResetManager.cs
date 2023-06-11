@@ -3,22 +3,22 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using ZapMe.Constants;
 using ZapMe.DTOs;
-using ZapMe.Data;
-using ZapMe.Data.Models;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
+using ZapMe.Database.Models;
+using ZapMe.Database;
 
 namespace ZapMe.Services;
 
 public sealed class PasswordResetManager : IPasswordResetManager
 {
-    private readonly ZapMeContext _dbContext;
+    private readonly DatabaseContext _dbContext;
     private readonly IMailGunService _mailGunService;
     private readonly IPasswordResetRequestStore _passwordResetRequestStore;
     private readonly ILogger<PasswordResetManager> _logger;
 
-    public PasswordResetManager(ZapMeContext dbContext, IMailGunService emailGunService, IPasswordResetRequestStore passwordResetRequestStore, ILogger<PasswordResetManager> logger)
+    public PasswordResetManager(DatabaseContext dbContext, IMailGunService emailGunService, IPasswordResetRequestStore passwordResetRequestStore, ILogger<PasswordResetManager> logger)
     {
         _dbContext = dbContext;
         _mailGunService = emailGunService;

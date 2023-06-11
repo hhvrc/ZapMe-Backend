@@ -1,5 +1,5 @@
 ﻿using ZapMe.DTOs;
-using ZapMe.Data.Models;
+using ZapMe.Database.Models;
 
 namespace ZapMe.Services.Interfaces;
 

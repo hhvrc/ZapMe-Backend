@@ -1,17 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ZapMe.Database.Models;
 using ZapMe.Constants;
-using ZapMe.Data;
-using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
+using ZapMe.Database;
 
 namespace ZapMe.Services;
 
 public sealed class PasswordResetRequestStore : IPasswordResetRequestStore
 {
-    private readonly ZapMeContext _dbContext;
+    private readonly DatabaseContext _dbContext;
     private readonly ILogger<PasswordResetRequestStore> _logger;
 
-    public PasswordResetRequestStore(ZapMeContext dbContext, ILogger<PasswordResetRequestStore> logger)
+    public PasswordResetRequestStore(DatabaseContext dbContext, ILogger<PasswordResetRequestStore> logger)
     {
         _dbContext = dbContext;
         _logger = logger;

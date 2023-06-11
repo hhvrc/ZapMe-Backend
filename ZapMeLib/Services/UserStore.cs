@@ -1,18 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Npgsql;
-using ZapMe.Data;
-using ZapMe.Data.Models;
+using ZapMe.Database;
+using ZapMe.Database.Models;
 using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Services;
 
 public sealed class UserStore : IUserStore
 {
-    private readonly ZapMeContext _dbContext;
+    private readonly DatabaseContext _dbContext;
     private readonly ILogger<UserStore> _logger;
 
-    public UserStore(ZapMeContext dbContext, ILogger<UserStore> logger)
+    public UserStore(DatabaseContext dbContext, ILogger<UserStore> logger)
     {
         _dbContext = dbContext;
         _logger = logger;

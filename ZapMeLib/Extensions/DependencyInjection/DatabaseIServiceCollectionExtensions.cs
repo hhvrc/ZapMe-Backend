@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ZapMe.Data;
+using ZapMe;
+using ZapMe.Database;
 using ZapMe.Options;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -10,7 +11,7 @@ public static class DatabaseIServiceCollectionExtensions
     {
         DatabaseOptions options = configuration.GetRequiredSection(DatabaseOptions.SectionName).Get<DatabaseOptions>()!;
 
-        return services.AddDbContextPool<ZapMeContext>(dbOpt =>
+        return services.AddDbContextPool<DatabaseContext>(dbOpt =>
             {
                 dbOpt.UseNpgsql(options.ConnectionString, npgSqlOpt =>
                 {

@@ -1,20 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using UAParser;
+using ZapMe.Database.Models;
 using ZapMe.Constants;
-using ZapMe.Data;
-using ZapMe.Data.Models;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
+using ZapMe.Database;
 
 namespace ZapMe.Services;
 
 public sealed class UserAgentManager : IUserAgentManager
 {
-    private readonly ZapMeContext _dbContext;
+    private readonly DatabaseContext _dbContext;
     private readonly IUserAgentStore _userAgentStore;
     private readonly ILogger<UserAgentManager> _logger;
 
-    public UserAgentManager(ZapMeContext dbContext, IUserAgentStore userAgentStore, ILogger<UserAgentManager> logger)
+    public UserAgentManager(DatabaseContext dbContext, IUserAgentStore userAgentStore, ILogger<UserAgentManager> logger)
     {
         _dbContext = dbContext;
         _userAgentStore = userAgentStore;

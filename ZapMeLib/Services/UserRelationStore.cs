@@ -1,15 +1,15 @@
-﻿using ZapMe.Data;
-using ZapMe.Data.Models;
+﻿using ZapMe.Database;
+using ZapMe.Database.Models;
 using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Services;
 
 public sealed class UserRelationStore : IUserRelationStore
 {
-    private readonly ZapMeContext _dbContext;
+    private readonly DatabaseContext _dbContext;
     private readonly ILogger<UserRelationStore> _logger;
 
-    public UserRelationStore(ZapMeContext dbContext, ILogger<UserRelationStore> logger)
+    public UserRelationStore(DatabaseContext dbContext, ILogger<UserRelationStore> logger)
     {
         _dbContext = dbContext;
         _logger = logger;
