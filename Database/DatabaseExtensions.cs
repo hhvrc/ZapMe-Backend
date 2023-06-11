@@ -8,7 +8,11 @@ public static class ZapMeDatabaseIServiceCollectionExtensions
 {
     public static IServiceCollection AddZapMeDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        DatabaseOptions options = configuration.GetRequiredSection(DatabaseOptions.SectionName).Get<DatabaseOptions>()!;
+        IConfigurationSection section = configuration.GetRequiredSection(DatabaseOptions.SectionName);
+
+        services.AddOptions<DatabaseOptions>().Bind(section);
+
+        DatabaseOptions options = section.Get<DatabaseOptions>()!;
 
         return services.AddDbContextPool<DatabaseContext>(dbOpt =>
             {

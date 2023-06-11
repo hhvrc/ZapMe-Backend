@@ -21,7 +21,4 @@ public sealed class DatabaseOptions
 
     [JsonIgnore]
     public string ConnectionString => $"Host={Host};Port={Port};Database={Database};Username={Username};Password={Password};Include Error Details={IncludeErrorDetails};{ExtraArguments}";
-
-    public static OptionsBuilder<DatabaseOptions> Register(IServiceCollection services, IConfiguration configuration) =>
-        services.AddOptions<DatabaseOptions>().Bind(configuration.GetRequiredSection(SectionName));
 }

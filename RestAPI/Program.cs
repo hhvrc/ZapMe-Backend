@@ -108,7 +108,6 @@ GitHubOAuth2Options.Register(services, configuration);
 GoogleOAuth2Options.Register(services, configuration);
 TwitterOAuth1Options.Register(services, configuration);
 CloudflareOptions.Register(services, configuration);
-DatabaseOptions.Register(services, configuration).ValidateOnStart();
 GoogleOptions.Register(services, configuration);
 LegalOptions.Register(services, configuration);
 MailGunOptions.Register(services, configuration);
@@ -195,26 +194,6 @@ services.AddCors(opt =>
 // ########################################
 
 WebApplication app = builder.Build();
-
-// ########################################
-// ######## SET UP DATABASE ###############
-// ########################################
-
-if (!isBuild)
-{
-    using IServiceScope scope = app.Services.CreateScope();
-
-    DatabaseContext context = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-
-    if (context.Database.EnsureCreated())
-    {
-        await DatabaseSeeders.SeedAsync(context);
-    }
-}
-else
-{
-    Console.WriteLine("Project is being built, skipping database setup.");
-}
 
 // ########################################
 // ######## MIDDLEWARE PIPELINE ###########

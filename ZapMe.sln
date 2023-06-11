@@ -32,6 +32,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utilities\Utils.cs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Enums", "Enums\Enums.csproj", "{C45D0AD5-31C6-4378-B6EF-588DDCE83C5B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Migrator", "Migrator\Migrator.csproj", "{F38841D7-FA46-4D46-8997-7455748AD0E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -104,6 +106,14 @@ Global
 		{C45D0AD5-31C6-4378-B6EF-588DDCE83C5B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C45D0AD5-31C6-4378-B6EF-588DDCE83C5B}.Release|x64.ActiveCfg = Release|Any CPU
 		{C45D0AD5-31C6-4378-B6EF-588DDCE83C5B}.Release|x64.Build.0 = Release|Any CPU
+		{F38841D7-FA46-4D46-8997-7455748AD0E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F38841D7-FA46-4D46-8997-7455748AD0E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F38841D7-FA46-4D46-8997-7455748AD0E5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F38841D7-FA46-4D46-8997-7455748AD0E5}.Debug|x64.Build.0 = Debug|Any CPU
+		{F38841D7-FA46-4D46-8997-7455748AD0E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F38841D7-FA46-4D46-8997-7455748AD0E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F38841D7-FA46-4D46-8997-7455748AD0E5}.Release|x64.ActiveCfg = Release|Any CPU
+		{F38841D7-FA46-4D46-8997-7455748AD0E5}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
