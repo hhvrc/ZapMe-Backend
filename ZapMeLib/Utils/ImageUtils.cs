@@ -1,5 +1,5 @@
 ﻿using OneOf;
-using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.DTOs;
 
 namespace ZapMe.Utils;
 

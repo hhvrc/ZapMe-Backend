@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.DTOs;
 using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Controllers.Api.V1;

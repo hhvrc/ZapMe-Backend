@@ -1,7 +1,6 @@
 ﻿using OneOf;
 using System.Security.Claims;
 using ZapMe.Constants;
-using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
 

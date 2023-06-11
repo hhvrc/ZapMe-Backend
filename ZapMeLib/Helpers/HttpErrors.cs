@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.DTOs;
 
 namespace ZapMe.Helpers;
 
@@ -13,21 +13,21 @@ public static class HttpErrors
         new ErrorDetails(httpCode, code, detail, suggestion, fields, notification);
     public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion = null) =>
         Generic(httpCode, code, detail, suggestion, null, null);
-    public static ErrorDetails Generic(int httpCode, string code, string detail, UserNotification.SeverityLevel notificationSeverity, string notificationContent) =>
+    public static ErrorDetails Generic(int httpCode, string code, string detail, NotificationSeverityLevel notificationSeverity, string notificationContent) =>
         Generic(httpCode, code, detail, null, null, new UserNotification(notificationSeverity, notificationContent));
-    public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion, UserNotification.SeverityLevel notificationSeverity, string notificationContent) =>
+    public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion, NotificationSeverityLevel notificationSeverity, string notificationContent) =>
         Generic(httpCode, code, detail, suggestion, null, new UserNotification(notificationSeverity, notificationContent));
     public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion = null, params (string field, string error)[] fields) =>
         Generic(httpCode, code, detail, suggestion, ToDict(fields), null);
     public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion = null, params (string field, string[] errors)[] fields) =>
         Generic(httpCode, code, detail, suggestion, ToDict(fields), null);
-    public static ErrorDetails Generic(int httpCode, string code, string detail, UserNotification.SeverityLevel notificationSeverity, string notificationContent, params (string field, string error)[] fields) =>
+    public static ErrorDetails Generic(int httpCode, string code, string detail, NotificationSeverityLevel notificationSeverity, string notificationContent, params (string field, string error)[] fields) =>
         Generic(httpCode, code, detail, null, ToDict(fields), new UserNotification(notificationSeverity, notificationContent));
-    public static ErrorDetails Generic(int httpCode, string code, string detail, UserNotification.SeverityLevel notificationSeverity, string notificationContent, params (string field, string[] errors)[] fields) =>
+    public static ErrorDetails Generic(int httpCode, string code, string detail, NotificationSeverityLevel notificationSeverity, string notificationContent, params (string field, string[] errors)[] fields) =>
         Generic(httpCode, code, detail, null, ToDict(fields), new UserNotification(notificationSeverity, notificationContent));
-    public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion, UserNotification.SeverityLevel notificationSeverity, string notificationContent, params (string field, string error)[] fields) =>
+    public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion, NotificationSeverityLevel notificationSeverity, string notificationContent, params (string field, string error)[] fields) =>
         Generic(httpCode, code, detail, suggestion, ToDict(fields), new UserNotification(notificationSeverity, notificationContent));
-    public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion, UserNotification.SeverityLevel notificationSeverity, string notificationContent, params (string field, string[] errors)[] fields) =>
+    public static ErrorDetails Generic(int httpCode, string code, string detail, string? suggestion, NotificationSeverityLevel notificationSeverity, string notificationContent, params (string field, string[] errors)[] fields) =>
         Generic(httpCode, code, detail, suggestion, ToDict(fields), new UserNotification(notificationSeverity, notificationContent));
 
     /// <summary>
@@ -57,9 +57,9 @@ public static class HttpErrors
     /// <param name="fields"></param>
     /// <returns></returns>
     public static ErrorDetails InvalidPassword(params string[] fields) =>
-        Generic(StatusCodes.Status401Unauthorized, "unauthorized", "Invalid password", null, ToDict(fields, "Invalid password"), new UserNotification(UserNotification.SeverityLevel.Error, "Invalid password"));
+        Generic(StatusCodes.Status401Unauthorized, "unauthorized", "Invalid password", null, ToDict(fields, "Invalid password"), new UserNotification(NotificationSeverityLevel.Error, "Invalid password"));
 
-    public static ErrorDetails UserNameOrEmailTaken => Generic(StatusCodes.Status401Unauthorized, "unauthorized", "Username or email already taken", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "Username or email already taken"));
+    public static ErrorDetails UserNameOrEmailTaken => Generic(StatusCodes.Status401Unauthorized, "unauthorized", "Username or email already taken", null, null, new UserNotification(NotificationSeverityLevel.Error, "Username or email already taken"));
     public static IActionResult UserNameOrEmailTakenActionResult => UserNameOrEmailTaken.ToActionResult();
 
     public static ErrorDetails UnsupportedSSOProvider(string providerName) =>
@@ -72,19 +72,19 @@ public static class HttpErrors
     /// 429 Too Many Requests
     /// </summary>
     /// <returns></returns>
-    public static ErrorDetails TooManyRequests => Generic(StatusCodes.Status429TooManyRequests, "ratelimited", "You have exceeded the rate limit", null, null, new UserNotification(UserNotification.SeverityLevel.Warning, "Rate limit exceeded, please try again later"));
+    public static ErrorDetails TooManyRequests => Generic(StatusCodes.Status429TooManyRequests, "ratelimited", "You have exceeded the rate limit", null, null, new UserNotification(NotificationSeverityLevel.Warning, "Rate limit exceeded, please try again later"));
     public static IActionResult TooManyRequestsActionResult => TooManyRequests.ToActionResult();
 
     /// <summary>
     /// 500 Internal Server Error
     /// </summary>
     /// <returns></returns>
-    public static ErrorDetails InternalServerError => Generic(StatusCodes.Status500InternalServerError, "internal_error", "An internal server error occurred.", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "Internal server error, please try again later"));
+    public static ErrorDetails InternalServerError => Generic(StatusCodes.Status500InternalServerError, "internal_error", "An internal server error occurred.", null, null, new UserNotification(NotificationSeverityLevel.Error, "Internal server error, please try again later"));
     public static IActionResult InternalServerErrorActionResult => InternalServerError.ToActionResult();
 
-    public static ErrorDetails Unauthorized => Generic(StatusCodes.Status401Unauthorized, "unauthorized", "You are not authorized to perform this action", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "You are not authorized to perform this action"));
+    public static ErrorDetails Unauthorized => Generic(StatusCodes.Status401Unauthorized, "unauthorized", "You are not authorized to perform this action", null, null, new UserNotification(NotificationSeverityLevel.Error, "You are not authorized to perform this action"));
     public static IActionResult UnauthorizedActionResult => Unauthorized.ToActionResult();
 
-    public static ErrorDetails Forbidden => Generic(StatusCodes.Status403Forbidden, "forbidden", "You are not allowed to perform this action", null, null, new UserNotification(UserNotification.SeverityLevel.Error, "You are not allowed to perform this action"));
+    public static ErrorDetails Forbidden => Generic(StatusCodes.Status403Forbidden, "forbidden", "You are not allowed to perform this action", null, null, new UserNotification(NotificationSeverityLevel.Error, "You are not allowed to perform this action"));
     public static IActionResult ForbiddenActionResult => Forbidden.ToActionResult();
 }

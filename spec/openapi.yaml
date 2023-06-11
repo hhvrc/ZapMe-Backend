@@ -974,6 +974,12 @@ components:
           description: UserId's of users that this user has sent friend requests to
       additionalProperties: false
       description: List of incoming and outgoing friendrequests
+    NotificationSeverityLevel:
+      enum:
+        - info
+        - warning
+        - error
+      type: string
     ProviderDataDto:
       required:
         - email
@@ -1043,12 +1049,6 @@ components:
           type: string
           format: date-time
       additionalProperties: false
-    SeverityLevel:
-      enum:
-        - info
-        - warning
-        - error
-      type: string
     SocialsConfig:
       type: object
       properties:
@@ -1205,7 +1205,7 @@ components:
       properties:
         severity:
           allOf:
-            - $ref: '#/components/schemas/SeverityLevel'
+            - $ref: '#/components/schemas/NotificationSeverityLevel'
         content:
           type: string
       additionalProperties: false

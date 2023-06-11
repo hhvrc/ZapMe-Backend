@@ -1,7 +1,7 @@
 ﻿using Amazon.S3;
 using OneOf;
-using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data.Models;
+using ZapMe.DTOs;
 
 namespace ZapMe.Services.Interfaces;
 

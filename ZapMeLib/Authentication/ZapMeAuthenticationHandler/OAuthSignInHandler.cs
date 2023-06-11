@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using ZapMe.Constants;
-using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.DTOs;
 using ZapMe.Services.Interfaces;
 

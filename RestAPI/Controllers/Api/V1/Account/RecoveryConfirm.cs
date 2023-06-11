@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ZapMe.Controllers.Api.V1.Account.Models;
-using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.DTOs;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
 
@@ -26,7 +26,7 @@ public partial class AccountController
     {
         if (!await passwordResetManager.TryCompletePasswordReset(body.Token, body.NewPassword, cancellationToken))
         {
-            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Bad reset token", "The reset token is invalid, expired, or has already been used.", UserNotification.SeverityLevel.Error, "Token invalid, expired, or has already been used.").ToActionResult();
+            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Bad reset token", "The reset token is invalid, expired, or has already been used.", NotificationSeverityLevel.Error, "Token invalid, expired, or has already been used.").ToActionResult();
         }
 
         return Ok();

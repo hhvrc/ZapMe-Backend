@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.DTOs;
 using ZapMe.Data;
 using ZapMe.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;

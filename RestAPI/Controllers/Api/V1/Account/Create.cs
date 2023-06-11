@@ -5,9 +5,8 @@ using Microsoft.Extensions.Options;
 using ZapMe.Attributes;
 using ZapMe.Authentication.Models;
 using ZapMe.Controllers.Api.V1.Account.Models;
-using ZapMe.Controllers.Api.V1.Models;
-using ZapMe.Data.Models;
 using ZapMe.DTOs;
+using ZapMe.Data.Models;
 using ZapMe.Enums;
 using ZapMe.Helpers;
 using ZapMe.Options;
@@ -99,12 +98,12 @@ public partial class AccountController
 
         if (body.AcceptedPrivacyPolicyVersion < legalOptions.Value.PrivacyPolicyVersion)
         {
-            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "review_privpol", "User needs to accept new Privacy Policy", UserNotification.SeverityLevel.Error, "Please read and accept the new Privacy Policy before creating an account").ToActionResult();
+            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "review_privpol", "User needs to accept new Privacy Policy", NotificationSeverityLevel.Error, "Please read and accept the new Privacy Policy before creating an account").ToActionResult();
         }
 
         if (body.AcceptedTermsOfServiceVersion < legalOptions.Value.TermsOfServiceVersion)
         {
-            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "review_tos", "User needs to accept new Terms of Service", UserNotification.SeverityLevel.Error, "Please read and accept the new Terms of Service before creating an account").ToActionResult();
+            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "review_tos", "User needs to accept new Terms of Service", NotificationSeverityLevel.Error, "Please read and accept the new Terms of Service before creating an account").ToActionResult();
         }
 
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);

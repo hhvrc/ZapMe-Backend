@@ -3,7 +3,7 @@ using OneOf;
 using ZapMe.Attributes;
 using ZapMe.Authentication;
 using ZapMe.Controllers.Api.V1.Account.Models;
-using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.DTOs;
 using ZapMe.Data.Models;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;

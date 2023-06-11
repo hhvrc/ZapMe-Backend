@@ -1,4 +1,4 @@
-﻿using ZapMe.Controllers.Api.V1.Models;
+﻿using ZapMe.DTOs;
 using ZapMe.Data.Models;
 
 namespace ZapMe.Services.Interfaces;

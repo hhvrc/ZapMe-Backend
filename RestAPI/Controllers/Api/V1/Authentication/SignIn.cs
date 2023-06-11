@@ -5,7 +5,7 @@ using ZapMe.Attributes;
 using ZapMe.Authentication;
 using ZapMe.Authentication.Models;
 using ZapMe.Constants;
-using ZapMe.Controllers.Api.V1.Models;
+using ZapMe.DTOs;
 using ZapMe.Data.Models;
 using ZapMe.Helpers;
 using ZapMe.Options;
@@ -43,14 +43,14 @@ public partial class AuthController
                     StatusCodes.Status401Unauthorized,
                     "invalid_credentials",
                     "Please check that your entered the correct username/email and password",
-                    UserNotification.SeverityLevel.Warning,
+                    NotificationSeverityLevel.Warning,
                     "Invalid credentials"
                 ).ToActionResult();
         }
 
         if (!user.EmailVerified)
         {
-            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Unverified Email", "Email has not been verified", UserNotification.SeverityLevel.Warning, "Please verify your email address before signing in").ToActionResult();
+            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Unverified Email", "Email has not been verified", NotificationSeverityLevel.Warning, "Please verify your email address before signing in").ToActionResult();
         }
 
         LockOutEntity[] lockouts = await _dbContext.LockOuts
@@ -66,22 +66,22 @@ public partial class AuthController
                 reason = "Reason(s):\n" + String.Join("\n", publicList.Select(static x => x.Reason));
             }
 
-            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Account disabled", "Account has been disabled either by moderative or administrative reasons", UserNotification.SeverityLevel.Error, "Account disabled: " + reason).ToActionResult();
+            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Account disabled", "Account has been disabled either by moderative or administrative reasons", NotificationSeverityLevel.Error, "Account disabled: " + reason).ToActionResult();
         }
 
         if (String.IsNullOrEmpty(user.Email))
         {
-            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Unverified Email", "Email has not been verified", UserNotification.SeverityLevel.Error, "Please verify your email address before signing in").ToActionResult();
+            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Unverified Email", "Email has not been verified", NotificationSeverityLevel.Error, "Please verify your email address before signing in").ToActionResult();
         }
 
         if (user.AcceptedPrivacyPolicyVersion < options.Value.PrivacyPolicyVersion)
         {
-            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "review_privpol", "User needs to accept new Privacy Policy", UserNotification.SeverityLevel.Error, "Please read and accept the new Privacy Policy before creating an account").ToActionResult();
+            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "review_privpol", "User needs to accept new Privacy Policy", NotificationSeverityLevel.Error, "Please read and accept the new Privacy Policy before creating an account").ToActionResult();
         }
 
         if (user.AcceptedTermsOfServiceVersion < options.Value.TermsOfServiceVersion)
         {
-            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "review_tos", "User needs to accept new Terms of Service", UserNotification.SeverityLevel.Error, "Please read and accept the new Terms of Service before creating an account").ToActionResult();
+            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "review_tos", "User needs to accept new Terms of Service", NotificationSeverityLevel.Error, "Please read and accept the new Terms of Service before creating an account").ToActionResult();
         }
 
         string userAgent = this.GetRemoteUserAgent();
@@ -89,7 +89,7 @@ public partial class AuthController
         if (userAgent.Length > UserAgentLimits.MaxUploadLength)
         {
             // Request body too large
-            return HttpErrors.Generic(StatusCodes.Status413RequestEntityTooLarge, "User-Agent too long", $"User-Agent header has a hard limit on {UserAgentLimits.MaxUploadLength} characters", UserNotification.SeverityLevel.Error, "Unexpected behaviour, please contact developers").ToActionResult();
+            return HttpErrors.Generic(StatusCodes.Status413RequestEntityTooLarge, "User-Agent too long", $"User-Agent header has a hard limit on {UserAgentLimits.MaxUploadLength} characters", NotificationSeverityLevel.Error, "Unexpected behaviour, please contact developers").ToActionResult();
         }
 
         SessionEntity session = await _sessionManager.CreateAsync(user, this.GetRemoteIP(), this.GetCloudflareIPCountry(), userAgent, body.RememberMe, cancellationToken);

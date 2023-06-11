@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using OneOf;
-using ZapMe.Controllers.Api.V1.Models;
 using ZapMe.Data;
 using ZapMe.Data.Models;
+using ZapMe.DTOs;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;

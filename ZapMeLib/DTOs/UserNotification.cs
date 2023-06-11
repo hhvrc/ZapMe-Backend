@@ -1,4 +1,4 @@
-﻿namespace ZapMe.Controllers.Api.V1.Models;
+﻿namespace ZapMe.DTOs;
 
 /// <summary>
 /// System notification to be displayed to the user, do not confuse with user notifications
@@ -6,23 +6,16 @@
 /// </summary>
 public sealed class UserNotification
 {
-    public UserNotification(SeverityLevel severity, string message)
+    public UserNotification(NotificationSeverityLevel severity, string message)
     {
         Severity = severity;
         Content = message;
     }
 
-    public enum SeverityLevel
-    {
-        Info,
-        Warning,
-        Error
-    };
-
     /// <summary>
     /// Severity of the notification, might be used in clients to determine how to display the notification
     /// </summary>
-    public SeverityLevel Severity { get; set; }
+    public NotificationSeverityLevel Severity { get; set; }
 
     /// <summary>
     /// Content of the notification, might be HTML
