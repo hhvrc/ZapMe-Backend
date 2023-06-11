@@ -32,7 +32,7 @@ jobs:
           sha256sum ~/.microsoft/usersecrets/09c442f6-0b36-4620-9fc4-bd8d8b6bc23d/secrets.json
 
       - name: Build
-        run: dotnet publish backend/Backend.csproj /p:PublishProfile=backend/Properties/PublishProfiles/Linux-x64.pubxml -c Release
+        run: dotnet publish RestAPI/RestAPI.csproj /p:PublishProfile=RestAPI/Properties/PublishProfiles/Linux-x64.pubxml -c Release
 
       - uses: release-drafter/release-drafter@v5
         env:
