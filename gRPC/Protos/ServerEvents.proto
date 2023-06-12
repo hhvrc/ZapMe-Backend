@@ -3,11 +3,11 @@ syntax = "proto3";
 message ServerEvent {
   uint64 timestamp = 1;
   oneof event {
-	AnnouncementEvent announcement = 2;
-	ModerationEvent moderation = 3;
-	UserEvent user = 4;
-	GroupEvent group = 5;
-	SessionEvent session = 6;
+    AnnouncementEvent announcement = 2;
+	  ModerationEvent moderation = 3;
+	  FriendEvent friend = 4;
+	  GroupEvent group = 5;
+	  SessionEvent session = 6;
   }
 }
 
@@ -19,18 +19,32 @@ message ModerationEvent {
   string message = 1;
 }
 
-enum UserEventType {
-  Online = 0;
-  Offline = 1;
+enum FriendEventType {
+  ADDED = 0;
+  REMOVED = 1;
+  ONLINE = 2;
+  OFFLINE = 3;
+  TYPING = 4;
+  MESSAGE = 5;
+  NAME_CHANGED = 6;
+  STATUS_CHANGED = 7;
+  STATUS_TEXT_CHANGED = 8;
+  AVATAR_CHANGED = 9;
+  BANNER_CHANGED = 10;
 }
-message UserEvent {
-  string user_id = 1;
-  UserEventType type = 2;
+message FriendEvent {
+  FriendEventType type = 1;
+  string user_id = 2;
+  optional string data = 3;
 }
 
 enum GroupEventType {
-  Join = 0;
-  Leave = 1;
+  JOINED = 0;
+  LEFT = 1;
+  OPTIONS_CHANGED = 2;
+  USER_JOINED = 3;
+  USER_LEFT = 4;
+  USER_TYPING = 5;
 }
 message GroupEvent {
   string group_id = 1;

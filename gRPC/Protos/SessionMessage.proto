@@ -2,9 +2,17 @@ syntax = "proto3";
 
 message SessionMessage {
   oneof payload {
-    WebRtc webrtc = 1;
-    Device device = 2;
-    Voice voice = 3;
+    InitSession initSession = 1;
+    WebRtc webrtc = 5;
+    Device device = 12;
+    Voice voice = 13;
+  }
+
+  message InitSession {
+    oneof payload {
+      string userId = 1;
+      string groupId = 2;
+    }
   }
 
   message WebRtc {
@@ -35,6 +43,9 @@ message SessionMessage {
     MessageType type = 1;
     bytes payload = 2;
   }
+}
+message SessionServerMessage {
+
 }
 
 

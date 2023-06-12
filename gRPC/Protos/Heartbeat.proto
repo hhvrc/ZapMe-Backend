@@ -1,10 +1,12 @@
 syntax = "proto3";
 
 message ClientPulse {
-  uint64 timestamp = 1;
+  // If the RTT is not yet known, this field is set to UINT32_MAX.
+  uint32 measuredRtt = 2;
 }
 message ServerPulse {
-  uint64 timestamp = 1;
-  // This is the interval in milliseconds that the client should wait before sending another ping.
-  uint32 pingInterval = 2;
+  // If the RTT is not yet known, this field is set to UINT32_MAX.
+  uint32 measuredRtt = 2;
+  // The interval at which the client should initiate a	pulse check.
+  uint32 interval = 3;
 }
