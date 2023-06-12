@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Events\Events.csproj" />
   </ItemGroup>
 
   <Target Name="protoExport" AfterTargets="PostBuildEvent" Condition="Exists('$(OutputPath)$(AssemblyName).dll') And ('$(Configuration)' == 'Release')">

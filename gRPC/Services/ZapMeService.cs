@@ -1,28 +1,18 @@
 ﻿using Grpc.Core;
-using NetMQ;
-using NetMQ.Sockets;
 
 namespace ZapMe.gRPC.Services;
 
 public class ZapMeGrpcServiceImpl : ZapMeGrpcService.ZapMeGrpcServiceBase
 {
-    private readonly SubscriberSocket _netmqSocket;
     private readonly ILogger<ZapMeGrpcServiceImpl> _logger;
 
     public ZapMeGrpcServiceImpl(ILogger<ZapMeGrpcServiceImpl> logger)
     {
-        _netmqSocket = new SubscriberSocket();
         _logger = logger;
     }
 
     public Task Initialize()
     {
-        // NetMQ configuration
-        _netmqSocket.Connect("tcp://localhost:5556");
-        _netmqSocket.Subscribe("UserEvent");
-        _netmqSocket.Subscribe("GroupEvent");
-        _netmqSocket.Subscribe("GlobalEvent");
-
         return Task.CompletedTask;
     }
 
@@ -33,16 +23,7 @@ public class ZapMeGrpcServiceImpl : ZapMeGrpcService.ZapMeGrpcServiceBase
 
     public override Task<WebRtcConnectReply> WebRtcConnect(WebRtcConnectRequest request, ServerCallContext context)
     {
-        // Push the request onto the NetMQ queue
         _logger.LogInformation("WebRtcConnect");
-        NetMQMessage message = new NetMQMessage();
-        message.Append("WebRtcConnect");
-        message.Append(request.UserId);
-        message.Append(request.OfferType);
-        if (request.HasOfferSdp) message.Append(request.OfferSdp);
-
-        // Fire and forget
-        _netmqSocket.SendFrame("WebRtcConnect");
 
         return Task.FromResult(new WebRtcConnectReply
         {
