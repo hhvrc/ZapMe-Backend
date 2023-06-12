@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+message SessionMessage {
+  oneof payload {
+    WebRtc webrtc = 1;
+    Device device = 2;
+    Voice voice = 3;
+  }
+
+  message WebRtc {
+    enum MessageType {
+      OFFER = 0;
+      ANSWER = 1;
+      ICE_CANDIDATE = 2;
+    }
+    MessageType type = 1;
+    string payload = 2;
+  }
+
+  message Device {
+    enum MessageType {
+      CONNECT = 0;
+      DISCONNECT = 1;
+    }
+    MessageType type = 1;
+    string payload = 2;
+  }
+
+  message Voice {
+    enum MessageType {
+      START = 0;
+      STOP = 1;
+      PACKET = 2;
+    }
+    MessageType type = 1;
+    bytes payload = 2;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+message CollarCommandPayload {
+  enum CommandType {
+    ZAP = 0;
+	VIBRATE = 1;
+	BEEP = 2;
+  }
+  CommandType type = 1;
+  int32 intensity = 2;
+}
