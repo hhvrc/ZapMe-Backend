@@ -2,7 +2,11 @@ using ZapMe.gRPC.Services;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddGrpc();
+builder.Services.AddGrpc(opt =>
+{
+    opt.MaxReceiveMessageSize = 1024 * 1024; // 1MB
+    //opt.Interceptors.Add<ZapMeGrpcServiceInterceptor>();
+});
 builder.Services.AddMediator();
 
 WebApplication app = builder.Build();
