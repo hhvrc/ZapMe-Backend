@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using ZapMe.Authentication;
 using ZapMe.Database.Models;
 using ZapMe.DTOs.API.User;
+using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
+using System.Security.Claims;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -16,18 +18,19 @@ public partial class UserController
     [RequestSizeLimit(1024)]
     [HttpGet("friendrequests", Name = "ListFriendRequests")]
     [ProducesResponseType(typeof(FriendRequestList), StatusCodes.Status200OK)]
-    public async Task<FriendRequestList> ListFriendRequests([FromServices] IFriendRequestStore friendRequestStore, CancellationToken cancellationToken)
+    public async Task<IActionResult> ListFriendRequests(CancellationToken cancellationToken)
     {
-        ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
+        Guid? userId = User.GetUserId();
+        if (!userId.HasValue) return HttpErrors.UnauthorizedActionResult;
 
         FriendRequestEntity[] friendRequests = await _dbContext.FriendRequests
-            .Where(fr => fr.ReceiverId == identity.UserId || fr.SenderId == identity.UserId)
+            .Where(fr => fr.ReceiverId == userId || fr.SenderId == userId)
             .ToArrayAsync(cancellationToken);
 
-        return new FriendRequestList
+        return Ok(new FriendRequestList
         {
-            Incoming = friendRequests.Where(fr => fr.ReceiverId == identity.UserId).Select(fr => fr.SenderId),
-            Outgoing = friendRequests.Where(fr => fr.SenderId == identity.UserId).Select(fr => fr.ReceiverId)
-        };
+            Incoming = friendRequests.Where(fr => fr.ReceiverId == userId).Select(fr => fr.SenderId),
+            Outgoing = friendRequests.Where(fr => fr.SenderId == userId).Select(fr => fr.ReceiverId)
+        });
     }
 }

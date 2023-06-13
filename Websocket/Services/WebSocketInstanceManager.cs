@@ -17,7 +17,7 @@ public sealed class WebSocketInstanceManager : IWebSocketInstanceManager
         _logger = logger;
     }
 
-    public async Task<bool> RegisterInstanceAsync(Guid ownerId, string instanceId, WebSocketInstance instance, CancellationToken cancellationToken)
+    public async Task<bool> RegisterInstanceAsync(Guid userId, string instanceId, WebSocketInstance instance, CancellationToken cancellationToken)
     {
         if (!_Instances.TryAdd(instanceId, instance))
         {
@@ -50,8 +50,11 @@ public sealed class WebSocketInstanceManager : IWebSocketInstanceManager
         }
     }
 
-    public async Task RemoveAllInstancesAsync(Guid ownerId, string reason, CancellationToken cancellationToken)
+    public async Task RemoveAllInstancesAsync(Guid userId, string reason, CancellationToken cancellationToken)
     {
-        await Task.CompletedTask; // TODO: implement me
+        foreach (var instance in _Instances.Where(x => x.Value.UserId == userId).ToArray()) // ToArray is very important here to avoid collection modified exception
+        {
+            await RemoveInstanceAsync(instance.Key, reason, cancellationToken);
+        }
     }
 }

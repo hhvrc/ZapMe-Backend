@@ -2,6 +2,7 @@
 using ZapMe.Authentication;
 using ZapMe.Helpers;
 using ZapMe.Websocket;
+using System.Security.Claims;
 
 namespace ZapMe.Controllers.Ws;
 
@@ -27,8 +28,12 @@ public sealed partial class WebSocketController
 
         if (wsManager.IsWebSocketRequest)
         {
-            // Get the authenticated identity
-            ZapMeIdentity identity = (User as ZapMePrincipal)!.Identity;
+            Guid? userId = User.GetUserId();
+            if (!userId.HasValue)
+            {
+                return HttpErrors.UnauthorizedActionResult;
+            }
+
 
             // The trace identifier is used to identify the websocket instance, it will be unique for each websocket connection
             string instanceId = HttpContext.TraceIdentifier;
@@ -43,7 +48,7 @@ public sealed partial class WebSocketController
             }
 
             // Register instance globally, the manager will have the ability to kill this connection
-            if (!await _webSocketInstanceManager.RegisterInstanceAsync(identity.UserId, instanceId, instance, cancellationToken))
+            if (!await _webSocketInstanceManager.RegisterInstanceAsync(userId.Value, instanceId, instance, cancellationToken))
             {
                 return HttpErrors.InternalServerErrorActionResult;
             }

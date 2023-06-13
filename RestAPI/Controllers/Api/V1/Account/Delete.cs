@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using ZapMe.Attributes;
-using ZapMe.Authentication;
 using ZapMe.Database.Models;
 using ZapMe.Helpers;
 using ZapMe.Utils;
@@ -27,11 +27,10 @@ public partial class AccountController
         CancellationToken cancellationToken
         )
     {
-        UserEntity user = (User as ZapMePrincipal)!.Identity.User;
-
-        if (!PasswordUtils.CheckPassword(password, user.PasswordHash))
+        var user = await User.CheckPasswordAsync(password, _dbContext, cancellationToken);
+        if (user == null)
         {
-            return HttpErrors.InvalidPassword().ToActionResult();
+            return HttpErrors.UnauthorizedActionResult;
         }
 
         using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);

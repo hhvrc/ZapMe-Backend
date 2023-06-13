@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ZapMe.Authentication;
+using ZapMe.Database.Models;
 using ZapMe.DTOs;
 using ZapMe.DTOs.API.User;
 using ZapMe.Helpers;
 using ZapMe.Utils;
+using System.Security.Claims;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -24,19 +26,20 @@ public partial class AccountController
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Update([FromBody] UpdatePassword body, CancellationToken cancellationToken)
     {
-        ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
+        Guid? userId = User.GetUserId();
+        if (!userId.HasValue) return HttpErrors.UnauthorizedActionResult;
 
         string oldPasswordHash = PasswordUtils.HashPassword(body.CurrentPassword);
         string newPasswordHash = PasswordUtils.HashPassword(body.NewPassword);
 
         // Do password update as a single atomic operation
         bool success = await _dbContext.Users
-            .Where(u => u.Id == identity.UserId && u.PasswordHash == oldPasswordHash)
+            .Where(u => u.Id == userId && u.PasswordHash == oldPasswordHash)
             .ExecuteUpdateAsync(spc => spc
                 .SetProperty(u => u.PasswordHash, _ => newPasswordHash)
                 .SetProperty(u => u.UpdatedAt, _ => DateTime.UtcNow)
                 , cancellationToken) > 0;
 
-        return success ? Ok() : HttpErrors.InvalidPassword(UpdatePassword.CurrentPassword_JsonName).ToActionResult();
+        return success ? Ok() : HttpErrors.InvalidPasswordActionResult;
     }
 }

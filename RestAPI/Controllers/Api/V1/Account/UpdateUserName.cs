@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using ZapMe.Authentication;
+using ZapMe.Database.Models;
 using ZapMe.DTOs.API.User;
 using ZapMe.Helpers;
 using ZapMe.Utils;
@@ -23,15 +25,14 @@ public partial class AccountController
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> UpdateUsername([FromBody] UpdateUserName body, CancellationToken cancellationToken)
     {
-        ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
-
-        if (identity.User.PasswordHash != PasswordUtils.HashPassword(body.Password))
+        UserEntity? user = await User.CheckPasswordAsync(body.Password, _dbContext, cancellationToken);
+        if (user == null)
         {
-            return HttpErrors.InvalidPassword().ToActionResult();
+            return HttpErrors.InvalidPasswordActionResult;
         }
 
         bool success = await _dbContext.Users
-            .Where(u => u.Id == identity.UserId)
+            .Where(u => u.Id == user.Id)
             .ExecuteUpdateAsync(spc => spc
                 .SetProperty(u => u.Name, _ => body.NewUsername)
                 .SetProperty(u => u.UpdatedAt, _ => DateTime.UtcNow)

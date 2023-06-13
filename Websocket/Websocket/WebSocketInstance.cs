@@ -12,11 +12,18 @@ public sealed class WebSocketInstance : IDisposable
 {
     public static async Task<WebSocketInstance?> CreateAsync(WebSocketManager wsManager, ClaimsPrincipal user, ILogger<WebSocketInstance> logger)
     {
+        Guid? userId = user.GetUserId();
+        Guid? sessionId = user.GetSessionId();
+        if (userId == null || sessionId == null) return null;
+
         var ws = await wsManager.AcceptWebSocketAsync();
         if (ws == null) return null;
 
-        return new WebSocketInstance(ws, user, logger);
+        return new WebSocketInstance(ws, userId.Value, sessionId.Value, logger);
     }
+
+    public Guid UserId { get; init; }
+    public Guid SessionId { get; init; }
 
     private const int _WebSocketBufferSize = 4096;
     private readonly ILogger<WebSocketInstance> _logger;
@@ -24,18 +31,19 @@ public sealed class WebSocketInstance : IDisposable
     private readonly byte[] _webSocketBuffer;
     private ArraySegment<byte> _webSocketBufferData;
     private WebSocketMessageType _webSocketMessageType;
-    private readonly ClaimsPrincipal _user;
 
     private readonly int _heartbeatIntervalMs = 30 * 1000;
     private DateTime _lastHeartbeat = DateTime.UtcNow;
     private int MsUntilTimeout => _heartbeatIntervalMs + 2000 - (int)(DateTime.UtcNow - _lastHeartbeat).TotalMilliseconds;
 
-    private WebSocketInstance(WebSocket webSocket, ClaimsPrincipal user, ILogger<WebSocketInstance> logger)
+    private WebSocketInstance(WebSocket webSocket, Guid userId, Guid sessionId, ILogger<WebSocketInstance> logger)
     {
         _webSocket = webSocket;
         _webSocketBuffer = new byte[_WebSocketBufferSize];
-        _user = user;
         _logger = logger;
+
+        UserId = userId;
+        SessionId = sessionId;
     }
 
     public async Task RunAsync(CancellationToken cs)

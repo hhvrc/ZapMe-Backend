@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ZapMe.Authentication;
+using System.Security.Claims;
+using ZapMe.Database.Models;
 using ZapMe.DTOs;
+using ZapMe.Helpers;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -14,10 +16,14 @@ public partial class AccountController
     [HttpGet(Name = "GetAccount")]
     [ProducesResponseType(typeof(AccountDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public AccountDto Get()
+    public async Task<IActionResult> Get(CancellationToken cancellationToken)
     {
-        ZapMeIdentity identity = (User as ZapMePrincipal)!.Identity;
+        UserEntity? user = await User.GetUserAsync(_dbContext, cancellationToken);
+        if (user == null)
+        {
+            return HttpErrors.UnauthorizedActionResult;
+        }
 
-        return identity.User.ToAccountDto();
+        return Ok(user.ToAccountDto());
     }
 }

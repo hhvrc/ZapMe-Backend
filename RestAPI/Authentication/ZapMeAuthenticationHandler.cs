@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
@@ -11,10 +12,11 @@ using ZapMe.Database;
 using ZapMe.Database.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
+using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Authentication;
 
-public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
+public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
 {
     private AuthenticationScheme _scheme = default!;
     private HttpContext _context = default!;
@@ -43,29 +45,74 @@ public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHa
         _scheme = scheme ?? throw new ArgumentNullException(nameof(scheme));
         _context = context ?? throw new ArgumentNullException(nameof(context));
 
+        if (_scheme.Name != AuthSchemes.Main) throw new ArgumentException($"Invalid scheme: {_scheme.Name}");
+
         return Task.CompletedTask;
     }
 
-    public Task SignInAsync(ClaimsPrincipal claimsIdentity, AuthenticationProperties? properties)
+    public async Task SignInAsync(ClaimsPrincipal claimsIdentity, AuthenticationProperties? properties)
     {
         string? authScheme = claimsIdentity.Identity?.AuthenticationType;
         if (String.IsNullOrEmpty(authScheme))
         {
             _logger.LogError($"Cannot sign in with an empty AuthenticationScheme.");
-            return HttpErrors.InternalServerError.Write(Response);
+            await HttpErrors.Unauthorized.Write(Response);
+            return;
         }
 
-        if (authScheme == _scheme.Name)
+        ErrorDetails errorDetails;
+        SessionEntity? session;
+        if (authScheme == AuthSchemes.Main)
         {
-            return ZapMeSignInAsync(claimsIdentity, properties);
+            session = await claimsIdentity.GetSessionAsync(_dbContext, CancellationToken);
+        }
+        else
+        {
+            // Fetch the claims provided by the OAuth provider
+            var fetchClaimsResult = OAuthClaimsFetchers.FetchClaims(authScheme, claimsIdentity, _logger);
+            if (fetchClaimsResult.TryPickT1(out errorDetails, out SSOProviderData? ssoProviderData))
+            {
+                await errorDetails.Write(Response, _jsonSerializerOptions);
+                return;
+            }
+
+            // Try to fetch the user's existing SSO connection
+            SSOConnectionEntity? connectionEntity = await _dbContext.SSOConnections.Include(c => c.User).ThenInclude(u => u.ProfilePicture)
+                .FirstOrDefaultAsync(c => c.ProviderName == ssoProviderData.ProviderName && c.ProviderUserId == ssoProviderData.ProviderUserId, CancellationToken);
+            if (connectionEntity == null)
+            {
+                string token = await ServiceProvider.GetRequiredService<ISSOStateStore>().InsertProviderDataAsync(
+                    RequestingIpAddress,
+                    ssoProviderData,
+                    CancellationToken
+                );
+
+                Response.StatusCode = StatusCodes.Status302Found;
+                Response.Headers.Location = QueryHelpers.AddQueryString($"{App.WebsiteUrl}/register", "ssoToken", token);
+                await Response.WriteAsync("");
+                return;
+            }
+
+            // Create a new session for the user
+            session = await ServiceProvider.GetRequiredService<ISessionManager>().CreateAsync(
+                connectionEntity.User.Id,
+                RequestingIpAddress,
+                RequestingIpCountry,
+                RequestingUserAgent,
+                true, // TODO: pass in a parameter to determine if the session should be persistent
+                CancellationToken
+            );
         }
 
-        return SignInSSOAsync(authScheme, claimsIdentity, properties);
-    }
-    private Task FinishSignInAsync(SessionEntity session)
-    {
+        if (session == null)
+        {
+            _logger.LogError($"Cannot sign in with an empty session.");
+            await HttpErrors.Unauthorized.Write(Response);
+            return;
+        }
+
         Response.StatusCode = StatusCodes.Status200OK;
-        return Response.WriteAsJsonAsync(session.ToDto(), _jsonSerializerOptions);
+        await Response.WriteAsJsonAsync(session.ToDto(), _jsonSerializerOptions);
     }
 
     public Task SignOutAsync(AuthenticationProperties? properties)
@@ -94,17 +141,8 @@ public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHa
         if (!Guid.TryParse(authHeaderValue.Parameter, out Guid sessionId))
             return AuthenticateResult.Fail("Malformed Login Cookie");
 
-        // TODO: Consider doing JWTs instead, and then fetching the user from controllers and check for session expiration there
         SessionEntity? session = await _dbContext.Sessions.AsTracking()
-            .Include(s => s.User).ThenInclude(u => u!.ProfilePicture)
-            .Include(s => s.User).ThenInclude(u => u!.Sessions)
-            .Include(s => s.User).ThenInclude(u => u!.LockOuts)
-            .Include(s => s.User).ThenInclude(u => u!.UserRoles)
-            .Include(s => s.User).ThenInclude(u => u!.Relations)
-            .Include(s => s.User).ThenInclude(u => u!.FriendRequestsOutgoing)
-            .Include(s => s.User).ThenInclude(u => u!.FriendRequestsIncoming)
-            .Include(s => s.User).ThenInclude(u => u!.SSOConnections)
-            .AsSplitQuery() // Performance improvement suggested by EF Core
+            .Include(s => s.User)
             .FirstOrDefaultAsync(s => s.Id == sessionId && s.ExpiresAt > requestTime, CancellationToken);
         if (session == null)
         {
@@ -128,11 +166,7 @@ public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHa
             await _dbContext.SaveChangesAsync();
         }
 
-        ZapMePrincipal principal = new ZapMePrincipal(session);
-
-        _context.User = principal; // TODO: is this needed?
-
-        return AuthenticateResult.Success(new AuthenticationTicket(principal, AuthSchemes.Main));
+        return AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(session.ToClaimsIdentity()), AuthSchemes.Main));
     }
 
     // Calling Authenticate more than once should always return the original value.

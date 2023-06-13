@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ZapMe.Authentication;
+using System.Security.Claims;
 using ZapMe.Database;
 
 namespace ZapMe.Middlewares;
@@ -23,10 +23,11 @@ public sealed class ActivityTracker
         });
 
         // Add activity to the database
-        if (context.User?.Identity is ZapMeIdentity identity)
+        Guid? userId = context.User?.GetUserId();
+        if (userId.HasValue)
         {
             await dbContext.Users
-                .Where(s => s.Id == identity.UserId)
+                .Where(s => s.Id == userId)
                 .ExecuteUpdateAsync(spc => spc
                     .SetProperty(u => u.LastOnline, _ => DateTime.UtcNow)
                     );

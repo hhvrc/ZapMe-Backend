@@ -177,11 +177,11 @@ public partial class AccountController
 
             var sessionManager = HttpContext.RequestServices.GetRequiredService<ISessionManager>();
             session = await sessionManager.CreateAsync(
-                user,
+                user.Id,
                 this.GetRemoteIP(),
                 this.GetCloudflareIPCountry(),
                 this.GetRemoteUserAgent(),
-                true, // TODO: Should RememberMe be true by default?
+                false,
                 cancellationToken
                 );
         }

@@ -4,6 +4,7 @@ using ZapMe.Authentication;
 using ZapMe.Database.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
+using System.Security.Claims;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -21,15 +22,15 @@ public partial class UserController
     [ProducesResponseType(StatusCodes.Status404NotFound)] // User not found
     public async Task<IActionResult> LookUp([FromRoute] string userName, CancellationToken cancellationToken)
     {
-        UserEntity user = (User as ZapMePrincipal)!.Identity.User;
+        Guid? userId = User.GetUserId();
+        if (!userId.HasValue) return HttpErrors.UnauthorizedActionResult;
 
-        UserEntity? targetUser = await _dbContext.Users.SingleOrDefaultAsync(u => u.Name == userName && !u.Relations!.Any(r => r.TargetUserId == user.Id || r.SourceUserId == user.Id), cancellationToken);
+        UserEntity? targetUser = await _dbContext.Users.SingleOrDefaultAsync(u => u.Name == userName && !u.Relations!.Any(r => r.TargetUserId == userId || r.SourceUserId == userId), cancellationToken);
         if (targetUser == null)
         {
             return HttpErrors.Generic(StatusCodes.Status404NotFound, "Not found", $"User with nane {userName} not found").ToActionResult();
         }
 
-        // TODO: use a mapper
         return Ok(targetUser.ToUserDto());
     }
 }

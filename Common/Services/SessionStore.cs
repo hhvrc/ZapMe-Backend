@@ -15,15 +15,15 @@ public sealed class SessionStore : ISessionStore
         _logger = logger;
     }
 
-    public async Task<SessionEntity> CreateAsync(UserEntity user, string ipAddress, string countryCode, UserAgentEntity userAgent, DateTime expiresAt, CancellationToken cancellationToken)
+    public async Task<SessionEntity> CreateAsync(Guid userId, string ipAddress, string countryCode, Guid userAgentId, DateTime expiresAt, CancellationToken cancellationToken)
     {
         SessionEntity session = new SessionEntity
         {
             User = null!,
-            UserId = user.Id,
+            UserId = userId,
             IpAddress = ipAddress,
             CountryCode = countryCode,
-            UserAgentId = userAgent.Id,
+            UserAgentId = userAgentId,
             UserAgent = null!,
             ExpiresAt = expiresAt
         };

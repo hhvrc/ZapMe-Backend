@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ZapMe.Authentication;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using ZapMe.Database.Models;
 using ZapMe.DTOs;
 using ZapMe.DTOs.API.User;
 using ZapMe.Helpers;
@@ -25,14 +27,13 @@ public partial class AccountController
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> UpdateEmail([FromBody] UpdateEmail body, [FromServices] IEmailVerificationManager emailVerificationManager, CancellationToken cancellationToken)
     {
-        ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
-
-        if (!PasswordUtils.CheckPassword(body.Password, identity.User.PasswordHash))
+        var user = await User.CheckPasswordAsync(body.Password, _dbContext, cancellationToken);
+        if (user == null)
         {
-            return HttpErrors.InvalidPassword().ToActionResult();
+            return HttpErrors.UnauthorizedActionResult;
         }
 
-        ErrorDetails? errorDetails = await emailVerificationManager.InitiateEmailVerificationAsync(identity.User, body.NewEmail, cancellationToken);
+        ErrorDetails? errorDetails = await emailVerificationManager.InitiateEmailVerificationAsync(user, body.NewEmail, cancellationToken);
         if (errorDetails.HasValue)
         {
             return errorDetails.Value.ToActionResult();

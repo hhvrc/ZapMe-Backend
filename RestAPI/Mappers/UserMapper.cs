@@ -1,4 +1,5 @@
 ﻿using ZapMe.Database.Models;
+using ZapMe.Enums;
 using ZapMe.Utils;
 
 namespace ZapMe.DTOs;
@@ -17,6 +18,22 @@ public static class UserMapper
             StatusMessage = user.StatusMessage,
             CreatedAt = user.CreatedAt,
             LastSeenAt = user.LastOnline,
+        };
+    }
+
+    // Exposes minimal information about a user
+    public static UserDto ToMinimalUserDto(this UserEntity user)
+    {
+        return new UserDto
+        {
+            Id = user.Id,
+            Username = user.Name,
+            ProfilePictureUrl = null,
+            ProfileBannerUrl = null,
+            Presence = UserPresence.Offline,
+            StatusMessage = String.Empty,
+            CreatedAt = DateTime.MinValue,
+            LastSeenAt = DateTime.MinValue
         };
     }
 

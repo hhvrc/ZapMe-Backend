@@ -8,6 +8,7 @@ using ZapMe.DTOs.API.User;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
+using System.Security.Claims;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -32,7 +33,8 @@ public partial class AccountController
     [ProducesResponseType(StatusCodes.Status413PayloadTooLarge)]
     public async Task<IActionResult> UpdateProfilePicture([FromHeader(Name = "Hash-Sha256")] string? sha256Hash, [FromServices] IImageManager imageManager, CancellationToken cancellationToken)
     {
-        ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
+        Guid? userId = User.GetUserId();
+        if (!userId.HasValue) return HttpErrors.UnauthorizedActionResult;
 
         long length = Request.ContentLength ?? -1;
         if (length is <= 0 or > Int32.MaxValue)
@@ -42,7 +44,7 @@ public partial class AccountController
 
         string cfRegion = CountryRegionLookup.GetCloudflareRegion(this.GetCloudflareIPCountry());
 
-        OneOf<ImageEntity, ErrorDetails> res = await imageManager.GetOrCreateRecordAsync(Request.Body, cfRegion, (int)length, sha256Hash, identity.UserId, cancellationToken);
+        OneOf<ImageEntity, ErrorDetails> res = await imageManager.GetOrCreateRecordAsync(Request.Body, cfRegion, (int)length, sha256Hash, userId, cancellationToken);
         if (res.TryPickT1(out ErrorDetails error, out ImageEntity image))
         {
             return error.ToActionResult();

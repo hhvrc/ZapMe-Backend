@@ -47,8 +47,8 @@ public static class AuthenticationBuilderExtensions
             opt.CorrelationCookie.HttpOnly = true;
             opt.CorrelationCookie.SameSite = SameSiteMode.None;
             opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
-            opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.EmailVerified, "verified");
-            opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.ProfileImage, json =>
+            opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.UserEmailVerified, "verified");
+            opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.UserProfileImage, json =>
             {
                 string? userId = json.GetString("id");
                 string? avatar = json.GetString("avatar");
@@ -74,7 +74,7 @@ public static class AuthenticationBuilderExtensions
             opt.CorrelationCookie.HttpOnly = true;
             opt.CorrelationCookie.SameSite = SameSiteMode.None;
             opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
-            opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.ProfileImage, json =>
+            opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.UserProfileImage, json =>
             {
                 string? avatarUrl = json.GetString("avatar_url");
                 string? gravatarId = json.GetString("gravatar_id");
@@ -104,7 +104,7 @@ public static class AuthenticationBuilderExtensions
             opt.CorrelationCookie.HttpOnly = true;
             opt.CorrelationCookie.SameSite = SameSiteMode.None;
             opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
-            opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.ProfileImage, "profile_image_url_https");
+            opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.UserProfileImage, "profile_image_url_https");
             opt.Validate();
         })
         .AddGoogle(AuthSchemes.Google, opt =>
@@ -122,8 +122,8 @@ public static class AuthenticationBuilderExtensions
             opt.CorrelationCookie.HttpOnly = true;
             opt.CorrelationCookie.SameSite = SameSiteMode.None;
             opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
-            opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.EmailVerified, "email_verified");
-            opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.ProfileImage, "picture");
+            opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.UserEmailVerified, "email_verified");
+            opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.UserProfileImage, "picture");
             opt.Validate();
         });
     }

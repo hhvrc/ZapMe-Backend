@@ -25,7 +25,6 @@ public sealed class PasswordResetManager : IPasswordResetManager
         _logger = logger;
     }
 
-    // TODO: Make this method return a Any<> type, bool if success, string/IActionResult if not
     public async Task<ErrorDetails?> InitiatePasswordReset(UserEntity user, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(user.Email);

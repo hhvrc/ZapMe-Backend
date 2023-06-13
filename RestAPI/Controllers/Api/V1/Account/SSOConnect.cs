@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ZapMe.Authentication;
+using System.Security.Claims;
 using ZapMe.Database.Models;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
@@ -20,8 +20,11 @@ public partial class AccountController
         CancellationToken cancellationToken
         )
     {
-        ZapMeIdentity identity = (User as ZapMePrincipal)!.Identity;
-        UserEntity user = identity.User;
+        UserEntity? user = await User.GetUserAsync(_dbContext, cancellationToken);
+        if (user == null)
+        {
+            return HttpErrors.UnauthorizedActionResult;
+        }
 
         string requestingIp = this.GetRemoteIP();
 

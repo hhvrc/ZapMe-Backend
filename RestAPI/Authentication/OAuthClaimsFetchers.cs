@@ -24,8 +24,8 @@ public static class OAuthClaimsFetchers
         string? discordId = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         string? discordName = claimsPrincipal.FindFirst("urn:discord:name")?.Value ?? claimsPrincipal.FindFirst(ClaimTypes.Name)?.Value;
         string? discordEmail = claimsPrincipal.FindFirst(ClaimTypes.Email)?.Value;
-        bool discordEmailVerified = claimsPrincipal.FindFirst(ZapMeClaimTypes.EmailVerified)?.Value?.ToLowerInvariant() == "true";
-        string? discordProfilePictureUrl = claimsPrincipal.FindFirst(ZapMeClaimTypes.ProfileImage)?.Value;
+        bool discordEmailVerified = claimsPrincipal.FindFirst(ZapMeClaimTypes.UserEmailVerified)?.Value?.ToLowerInvariant() == "true";
+        string? discordProfilePictureUrl = claimsPrincipal.FindFirst(ZapMeClaimTypes.UserProfileImage)?.Value;
         if (String.IsNullOrEmpty(discordId) || String.IsNullOrEmpty(discordName) || String.IsNullOrEmpty(discordEmail))
         {
             logger.LogError("Discord OAuth claims are missing");
@@ -39,7 +39,7 @@ public static class OAuthClaimsFetchers
         string? githubId = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         string? githubName = claimsPrincipal.FindFirst("urn:github:name")?.Value ?? claimsPrincipal.FindFirst(ClaimTypes.Name)?.Value;
         string? githubEmail = claimsPrincipal.FindFirst(ClaimTypes.Email)?.Value;
-        string? githubProfilePictureUrl = claimsPrincipal.FindFirst(ZapMeClaimTypes.ProfileImage)?.Value;
+        string? githubProfilePictureUrl = claimsPrincipal.FindFirst(ZapMeClaimTypes.UserProfileImage)?.Value;
         if (String.IsNullOrEmpty(githubId) || String.IsNullOrEmpty(githubName) || String.IsNullOrEmpty(githubEmail))
         {
             logger.LogError("GitHub OAuth claims are missing");
@@ -53,7 +53,7 @@ public static class OAuthClaimsFetchers
         string? twitterId = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         string? twitterName = claimsPrincipal.FindFirst("urn:twitter:name")?.Value ?? claimsPrincipal.FindFirst(ClaimTypes.Name)?.Value;
         string? twitterEmail = claimsPrincipal.FindFirst(ClaimTypes.Email)?.Value;
-        string? twitterProfilePictureUrl = claimsPrincipal.FindFirst(ZapMeClaimTypes.ProfileImage)?.Value?.Replace("_normal", "_400x400");
+        string? twitterProfilePictureUrl = claimsPrincipal.FindFirst(ZapMeClaimTypes.UserProfileImage)?.Value?.Replace("_normal", "_400x400");
         if (String.IsNullOrEmpty(twitterId) || String.IsNullOrEmpty(twitterName) || String.IsNullOrEmpty(twitterEmail))
         {
             logger.LogError("Twitter OAuth claims are missing");
@@ -67,8 +67,8 @@ public static class OAuthClaimsFetchers
         string? googleId = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         string? googleName = claimsPrincipal.FindFirst(ClaimTypes.Name)?.Value;
         string? googleEmail = claimsPrincipal.FindFirst(ClaimTypes.Email)?.Value;
-        bool googleEmailVerified = claimsPrincipal.FindFirst(ZapMeClaimTypes.EmailVerified)?.Value?.ToLowerInvariant() == "true";
-        string? googleProfilePictureUrl = claimsPrincipal.FindFirst(ZapMeClaimTypes.ProfileImage)?.Value;
+        bool googleEmailVerified = claimsPrincipal.FindFirst(ZapMeClaimTypes.UserEmailVerified)?.Value?.ToLowerInvariant() == "true";
+        string? googleProfilePictureUrl = claimsPrincipal.FindFirst(ZapMeClaimTypes.UserProfileImage)?.Value;
         if (String.IsNullOrEmpty(googleId) || String.IsNullOrEmpty(googleName) || String.IsNullOrEmpty(googleEmail))
         {
             logger.LogError("Google OAuth claims are missing");

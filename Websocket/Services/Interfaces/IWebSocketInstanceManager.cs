@@ -12,12 +12,12 @@ public interface IWebSocketInstanceManager
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="ownerId"></param>
+    /// <param name="userId"></param>
     /// <param name="instanceId"></param>
     /// <param name="instance"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> RegisterInstanceAsync(Guid ownerId, string instanceId, WebSocketInstance instance, CancellationToken cancellationToken = default);
+    Task<bool> RegisterInstanceAsync(Guid userId, string instanceId, WebSocketInstance instance, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -31,9 +31,9 @@ public interface IWebSocketInstanceManager
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="ownerId"></param>
+    /// <param name="userId"></param>
     /// <param name="reason"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task RemoveAllInstancesAsync(Guid ownerId, string reason = DefaultRemovalReason, CancellationToken cancellationToken = default);
+    Task RemoveAllInstancesAsync(Guid userId, string reason = DefaultRemovalReason, CancellationToken cancellationToken = default);
 }

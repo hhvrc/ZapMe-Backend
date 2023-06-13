@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
 using ZapMe.Attributes;
 using ZapMe.Authentication;
 using ZapMe.Constants;
@@ -92,10 +93,10 @@ public partial class AuthController
             return HttpErrors.Generic(StatusCodes.Status413RequestEntityTooLarge, "User-Agent too long", $"User-Agent header has a hard limit on {UserAgentLimits.MaxUploadLength} characters", NotificationSeverityLevel.Error, "Unexpected behaviour, please contact developers").ToActionResult();
         }
 
-        SessionEntity session = await _sessionManager.CreateAsync(user, this.GetRemoteIP(), this.GetCloudflareIPCountry(), userAgent, body.RememberMe, cancellationToken);
+        SessionEntity session = await _sessionManager.CreateAsync(user.Id, this.GetRemoteIP(), this.GetCloudflareIPCountry(), userAgent, body.RememberMe, cancellationToken);
 
         session.User = user;
 
-        return SignIn(new ZapMePrincipal(session));
+        return SignIn(new ClaimsPrincipal(session.ToClaimsIdentity())); // TODO: provide session entity to the authentication handler
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using OneOf;
+using ZapMe.Constants;
 using ZapMe.Database;
 using ZapMe.Database.Models;
 using ZapMe.DTOs;
@@ -59,9 +60,9 @@ public sealed class ImageManager : IImageManager
 
     public async Task<OneOf<ImageEntity, ErrorDetails>> GetOrCreateRecordAsync(Stream imageStream, string regionName, int imageSizeBytes, string? sha256Hash, Guid? uploaderId, CancellationToken cancellationToken)
     {
-        if (imageSizeBytes > 1_112_000) // TODO: remove magic number
+        if (imageSizeBytes > ImageConstants.MaxImageSize)
         {
-            return HttpErrors.Generic(StatusCodes.Status413PayloadTooLarge, "Payload too large", "Image too large, max 1MB");
+            return HttpErrors.Generic(StatusCodes.Status413PayloadTooLarge, "Payload too large", "Image too large, max " + ImageConstants.MaxImageSizeString);
         }
 
         // Create stream that can be read multiple times, imageSizeBytes is initially just a hint
@@ -72,6 +73,15 @@ public sealed class ImageManager : IImageManager
         if (result.TryPickT1(out ErrorDetails errorDetails, out ImageUtils.ParseResult imageInfo))
         {
             return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Unsupported or invalid image", errorDetails.Detail);
+        }
+        long contentLength = memoryStream.Length;
+        if (contentLength > ImageConstants.MaxImageSize)
+        {
+            return HttpErrors.Generic(StatusCodes.Status413PayloadTooLarge, "Payload too large", "Image too large, max " + ImageConstants.MaxImageSizeString);
+        }
+        if (contentLength <= 0)
+        {
+            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Invalid image", "Image size is invalid");
         }
 
         // Hash image data
@@ -102,7 +112,7 @@ public sealed class ImageManager : IImageManager
             Height = imageInfo.Height,
             Width = imageInfo.Width,
             FrameCount = imageInfo.FrameCount,
-            SizeBytes = (uint)memoryStream.Length, // TODO: maybe possible crash if image is too large (very unlikely though)
+            SizeBytes = (uint)contentLength,
             MimeType = imageInfo.MimeType,
             Sha256 = sha256_hex,
             R2RegionName = regionName,

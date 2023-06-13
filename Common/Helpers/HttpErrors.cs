@@ -51,13 +51,9 @@ public static class HttpErrors
     /// <returns></returns>
     public static ErrorDetails InvalidModelState(params (string field, string[] errors)[] fields) =>
         InvalidModelState(ToDict(fields));
-    /// <summary>
-    /// 401 Unauthorized
-    /// </summary>
-    /// <param name="fields"></param>
-    /// <returns></returns>
-    public static ErrorDetails InvalidPassword(params string[] fields) =>
-        Generic(StatusCodes.Status401Unauthorized, "unauthorized", "Invalid password", null, ToDict(fields, "Invalid password"), new UserNotification(NotificationSeverityLevel.Error, "Invalid password"));
+
+    public static ErrorDetails InvalidPassword => Generic(StatusCodes.Status401Unauthorized, "password_invalid", "Invalid password", null, null, new UserNotification(NotificationSeverityLevel.Error, "Invalid password"));
+    public static IActionResult InvalidPasswordActionResult => InvalidPassword.ToActionResult();
 
     public static ErrorDetails UserNameOrEmailTaken => Generic(StatusCodes.Status401Unauthorized, "unauthorized", "Username or email already taken", null, null, new UserNotification(NotificationSeverityLevel.Error, "Username or email already taken"));
     public static IActionResult UserNameOrEmailTakenActionResult => UserNameOrEmailTaken.ToActionResult();
@@ -87,4 +83,7 @@ public static class HttpErrors
 
     public static ErrorDetails Forbidden => Generic(StatusCodes.Status403Forbidden, "forbidden", "You are not allowed to perform this action", null, null, new UserNotification(NotificationSeverityLevel.Error, "You are not allowed to perform this action"));
     public static IActionResult ForbiddenActionResult => Forbidden.ToActionResult();
+
+    public static ErrorDetails UserNotFound => Generic(StatusCodes.Status404NotFound, "user_not_found", "User not found", null, null, new UserNotification(NotificationSeverityLevel.Error, "User not found"));
+    public static IActionResult UserNotFoundActionResult => UserNotFound.ToActionResult();
 }

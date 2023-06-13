@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using ZapMe.Authentication;
+using ZapMe.Helpers;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -18,14 +20,15 @@ public partial class AuthController
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> SignOut(CancellationToken cancellationToken)
     {
-        ZapMeIdentity identity = (User.Identity as ZapMeIdentity)!;
+        Guid? sessionId = User.GetSessionId();
+        if (!sessionId.HasValue) return HttpErrors.UnauthorizedActionResult;
 
         int nDeleted = await _dbContext.Sessions
-            .Where(s => s.Id == identity.SessionId)
+            .Where(s => s.Id == sessionId)
             .ExecuteDeleteAsync(cancellationToken);
         if (nDeleted < 0)
         {
-            _logger.LogWarning("User {UserId} signed out but session {SessionId} was not found/deleted", identity.UserId, identity.SessionId);
+            _logger.LogWarning("User {UserId} signed out but session {SessionId} was not found/deleted", User.GetUserId(), sessionId);
         }
 
         return SignOut();
