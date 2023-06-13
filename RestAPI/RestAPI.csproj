@@ -20,11 +20,12 @@
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.Discord" Version="7.0.2" />
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="7.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="7.0.7" />
     <PackageReference Include="Microsoft.IdentityModel.Logging" Version="6.31.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.31.0" />
   </ItemGroup>
 
   <ItemGroup>

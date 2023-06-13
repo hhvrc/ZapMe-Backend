@@ -12,10 +12,10 @@ public static class OAuthClaimsFetchers
     {
         return authScheme.ToLower() switch
         {
-            AuthSchemes.Discord => FetchDiscordClaims(claimsPrincipal, logger),
-            AuthSchemes.GitHub => FetchGithubClaims(claimsPrincipal, logger),
-            AuthSchemes.Twitter => FetchTwitterClaims(claimsPrincipal, logger),
-            AuthSchemes.Google => FetchGoogleClaims(claimsPrincipal, logger),
+            AuthenticationConstants.DiscordScheme => FetchDiscordClaims(claimsPrincipal, logger),
+            AuthenticationConstants.GitHubScheme => FetchGithubClaims(claimsPrincipal, logger),
+            AuthenticationConstants.TwitterScheme => FetchTwitterClaims(claimsPrincipal, logger),
+            AuthenticationConstants.GoogleScheme => FetchGoogleClaims(claimsPrincipal, logger),
             _ => OneOf<SSOProviderData, ErrorDetails>.FromT1(HttpErrors.UnsupportedSSOProvider(authScheme)),
         };
     }
@@ -32,7 +32,7 @@ public static class OAuthClaimsFetchers
             return OneOf<SSOProviderData, ErrorDetails>.FromT1(HttpErrors.InternalServerError);
         }
 
-        return new SSOProviderData(AuthSchemes.Discord, discordId, discordName, discordEmail, discordEmailVerified, discordProfilePictureUrl);
+        return new SSOProviderData(AuthenticationConstants.DiscordScheme, discordId, discordName, discordEmail, discordEmailVerified, discordProfilePictureUrl);
     }
     private static OneOf<SSOProviderData, ErrorDetails> FetchGithubClaims(ClaimsPrincipal claimsPrincipal, ILogger logger)
     {
@@ -46,7 +46,7 @@ public static class OAuthClaimsFetchers
             return OneOf<SSOProviderData, ErrorDetails>.FromT1(HttpErrors.InternalServerError);
         }
 
-        return new SSOProviderData(AuthSchemes.GitHub, githubId, githubName, githubEmail, false, githubProfilePictureUrl); // GitHub doesn't provide email verification status
+        return new SSOProviderData(AuthenticationConstants.GitHubScheme, githubId, githubName, githubEmail, false, githubProfilePictureUrl); // GitHub doesn't provide email verification status
     }
     private static OneOf<SSOProviderData, ErrorDetails> FetchTwitterClaims(ClaimsPrincipal claimsPrincipal, ILogger logger)
     {
@@ -60,7 +60,7 @@ public static class OAuthClaimsFetchers
             return OneOf<SSOProviderData, ErrorDetails>.FromT1(HttpErrors.InternalServerError);
         }
 
-        return new SSOProviderData(AuthSchemes.Twitter, twitterId, twitterName, twitterEmail, true, twitterProfilePictureUrl); // Twitter will set email to null if it's not verified
+        return new SSOProviderData(AuthenticationConstants.TwitterScheme, twitterId, twitterName, twitterEmail, true, twitterProfilePictureUrl); // Twitter will set email to null if it's not verified
     }
     private static OneOf<SSOProviderData, ErrorDetails> FetchGoogleClaims(ClaimsPrincipal claimsPrincipal, ILogger logger)
     {
@@ -74,6 +74,6 @@ public static class OAuthClaimsFetchers
             logger.LogError("Google OAuth claims are missing");
             return OneOf<SSOProviderData, ErrorDetails>.FromT1(HttpErrors.InternalServerError);
         }
-        return new SSOProviderData(AuthSchemes.Google, googleId, googleName, googleEmail, googleEmailVerified, googleProfilePictureUrl);
+        return new SSOProviderData(AuthenticationConstants.GoogleScheme, googleId, googleName, googleEmail, googleEmailVerified, googleProfilePictureUrl);
     }
 }

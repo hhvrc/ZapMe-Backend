@@ -102,6 +102,7 @@ services.Configure<ApiBehaviorOptions>(opt =>
 // ######## ZAPME SERVICES ################
 // ########################################
 
+JwtOptions.Register(services, configuration);
 DiscordOAuth2Options.Register(services, configuration);
 GitHubOAuth2Options.Register(services, configuration);
 GoogleOAuth2Options.Register(services, configuration);
@@ -135,7 +136,7 @@ services.AddTransient<ISSOStateStore, SSOStateStore>();
 
 services.AddRateLimiting();
 services.AddSwagger(isDevelopment);
-services.AddAuthentication(AuthSchemes.Main)
+services.AddAuthentication(AuthenticationConstants.ZapMeScheme)
     .AddZapMe()
     .AddOAuthProviders(configuration);
 services.AddAuthorization(opt =>

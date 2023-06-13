@@ -52,7 +52,7 @@ public sealed class CloudflareTurnstileService : ICloudflareTurnstileService
 
             response = await httpResponse.Content.ReadFromJsonAsync<CloudflareTurnstileVerifyResponse>(cancellationToken: cancellationToken);
         }
-        while (response.ErrorCodes != null && response.ErrorCodes.Contains("internal-error") && retryCount++ < 3);
+        while (response.ErrorCodes is not null && response.ErrorCodes.Contains("internal-error") && retryCount++ < 3);
 
         return response;
     }

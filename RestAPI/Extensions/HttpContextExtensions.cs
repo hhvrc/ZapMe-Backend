@@ -9,11 +9,11 @@ public static class HttpContextExtensions
     {
         IAuthenticationSchemeProvider schemesProvider = context.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
 
-        return (await schemesProvider.GetAllSchemesAsync()).Where(scheme => AuthSchemes.OAuth2.Contains(scheme.Name)).Select(scheme => scheme.Name);
+        return (await schemesProvider.GetAllSchemesAsync()).Where(scheme => AuthenticationConstants.OAuth2Schemes.Contains(scheme.Name)).Select(scheme => scheme.Name);
     }
 
     public static async Task<bool> IsOAuthProviderSupportedAsync(this HttpContext context, string provider)
     {
-        return AuthSchemes.OAuth2.Contains(provider) && (await context.GetOAuthSchemeNamesAsync()).Contains(provider);
+        return AuthenticationConstants.OAuth2Schemes.Contains(provider) && (await context.GetOAuthSchemeNamesAsync()).Contains(provider);
     }
 }

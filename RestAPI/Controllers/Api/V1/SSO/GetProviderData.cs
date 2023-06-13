@@ -17,7 +17,7 @@ public partial class SSOController
     public async Task<IActionResult> GetProviderData([FromQuery] string ssoToken, [FromServices] ISSOStateStore stateStore, CancellationToken cancellationToken)
     {
         SSOProviderDataEntry? providerVariables = await stateStore.GetProviderDataAsync(ssoToken, this.GetRemoteIP(), cancellationToken);
-        if (providerVariables == null)
+        if (providerVariables is null)
         {
             return HttpErrors.InvalidSSOTokenActionResult;
         }

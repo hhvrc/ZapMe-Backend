@@ -42,7 +42,7 @@ public sealed class WebSocketInstanceManager : IWebSocketInstanceManager
 
     public async Task RemoveInstanceAsync(string instanceId, string reason, CancellationToken cancellationToken)
     {
-        if (_Instances.Remove(instanceId, out var instance) && instance != null)
+        if (_Instances.Remove(instanceId, out var instance) && instance is not null)
         {
             await instance.CloseAsync(WebSocketCloseStatus.NormalClosure, reason, cancellationToken);
 

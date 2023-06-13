@@ -28,7 +28,7 @@ public sealed class UserStore : IUserStore
             await _dbContext.Users.AddAsync(user, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
-            if (transaction != null)
+            if (transaction is not null)
             {
                 await transaction.CommitAsync(cancellationToken);
             }

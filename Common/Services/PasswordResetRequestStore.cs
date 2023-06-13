@@ -23,7 +23,7 @@ public sealed class PasswordResetRequestStore : IPasswordResetRequestStore
 
         UserPasswordResetRequestEntity? request = await _dbContext.UserPasswordResetRequests.AsTracking().FirstOrDefaultAsync(s => s.UserId == userId, cancellationToken);
 
-        if (request == null)
+        if (request is null)
         {
             request = new UserPasswordResetRequestEntity
             {

@@ -88,14 +88,14 @@ public sealed class ImageManager : IImageManager
         byte[] sha256 = HashingUtils.Sha256_Bytes(memoryStream);
         string sha256_hex = Convert.ToHexString(sha256);
 
-        if (sha256Hash != null && !sha256_hex.Equals(sha256Hash, StringComparison.OrdinalIgnoreCase))
+        if (sha256Hash is not null && !sha256_hex.Equals(sha256Hash, StringComparison.OrdinalIgnoreCase))
         {
             return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Checksum mismatch", "The provided checksum does not match the image data");
         }
 
         // Check if image already exists
         ImageEntity? image = await _dbContext.Images.SingleOrDefaultAsync(i => i.Sha256 == sha256_hex, cancellationToken);
-        if (image != null)
+        if (image is not null)
         {
             return image;
         }
@@ -134,7 +134,7 @@ public sealed class ImageManager : IImageManager
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             // Commit transaction
-            if (transaction != null)
+            if (transaction is not null)
             {
                 await transaction.CommitAsync(cancellationToken);
             }

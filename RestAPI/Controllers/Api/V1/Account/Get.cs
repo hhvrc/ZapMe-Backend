@@ -18,8 +18,8 @@ public partial class AccountController
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Get(CancellationToken cancellationToken)
     {
-        UserEntity? user = await User.GetUserAsync(_dbContext, cancellationToken);
-        if (user == null)
+        UserEntity? user = await User.TryGetUserAsync(_dbContext, cancellationToken);
+        if (user is null)
         {
             return HttpErrors.UnauthorizedActionResult;
         }

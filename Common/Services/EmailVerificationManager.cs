@@ -60,7 +60,7 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
         }
 
         // Commit transaction
-        if (transaction != null)
+        if (transaction is not null)
         {
             await transaction.CommitAsync(cancellationToken);
         }
@@ -74,7 +74,7 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
 
         // Fetch email verification request
         UserEmailVerificationRequestEntity? verificationRequest = await _dbContext.UserEmailVerificationRequests.SingleOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken);
-        if (verificationRequest == null)
+        if (verificationRequest is null)
         {
             return HttpErrors.Generic(StatusCodes.Status404NotFound, "Invalid token", "Token invalid, expired, or already used");
         }

@@ -46,7 +46,7 @@ public partial class AccountController
         {
             var stateStore = HttpContext.RequestServices.GetRequiredService<ISSOStateStore>();
             providerVariables = await stateStore.GetProviderDataAsync(body.SSOToken, this.GetRemoteIP(), cancellationToken);
-            if (providerVariables == null)
+            if (providerVariables is null)
             {
                 return HttpErrors.InvalidSSOTokenActionResult;
             }
@@ -56,7 +56,7 @@ public partial class AccountController
         CloudflareTurnstileVerifyResponse reCaptchaResponse = await cfTurnstileService.VerifyUserResponseTokenAsync(body.TurnstileResponse, this.GetRemoteIP(), cancellationToken);
         if (!reCaptchaResponse.Success)
         {
-            if (reCaptchaResponse.ErrorCodes != null)
+            if (reCaptchaResponse.ErrorCodes is not null)
             {
                 foreach (string errorCode in reCaptchaResponse.ErrorCodes)
                 {
@@ -115,7 +115,7 @@ public partial class AccountController
         using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         ImageEntity? imageEntity = null;
-        if (providerVariables != null)
+        if (providerVariables is not null)
         {
             var imageManager = HttpContext.RequestServices.GetRequiredService<IImageManager>();
             if (!String.IsNullOrEmpty(providerVariables.ProfilePictureUrl))
@@ -153,15 +153,15 @@ public partial class AccountController
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
-        if (imageEntity != null)
+        if (imageEntity is not null)
         {
             await _dbContext.Images
                 .Where(i => i.Id == imageEntity.Id)
                 .ExecuteUpdateAsync(spc => spc.SetProperty(i => i.UploaderId, _ => user.Id), cancellationToken);
         }
 
-        SessionEntity? session = null;
-        if (providerVariables != null)
+        string? jwtToken = null;
+        if (providerVariables is not null)
         {
             var connectionEntity = new SSOConnectionEntity
             {
@@ -176,14 +176,18 @@ public partial class AccountController
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             var sessionManager = HttpContext.RequestServices.GetRequiredService<ISessionManager>();
-            session = await sessionManager.CreateAsync(
-                user.Id,
+            SessionEntity? session = await sessionManager.CreateAsync(
+                user,
                 this.GetRemoteIP(),
                 this.GetCloudflareIPCountry(),
                 this.GetRemoteUserAgent(),
                 false,
                 cancellationToken
                 );
+
+            var jwtOptions = HttpContext.RequestServices.GetRequiredService<JwtOptions>();
+
+            jwtToken = JwtTokenUtils.GenerateJwtToken(session, jwtOptions.SigningKey);
         }
 
         // Send email verification
@@ -204,7 +208,7 @@ public partial class AccountController
         return CreatedAtAction(nameof(Get), new CreateOk
         {
             AccountId = user.Id,
-            Session = session?.ToDto(),
+            Session = jwtToken is null ? null : new AuthenticationResponse(jwtToken),
             EmailVerificationRequired = emailVerified
         });
     }

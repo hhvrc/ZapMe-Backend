@@ -38,12 +38,12 @@ public static class ImageUtils
             // Write
             if (frameCount == 1)
             {
-                if (outputStream != null) await image.SaveAsWebpAsync(outputStream, cancellationToken);
+                if (outputStream is not null) await image.SaveAsWebpAsync(outputStream, cancellationToken);
                 return new ParseResult((uint)width, (uint)height, (uint)frameCount, "image/webp");
             }
             else
             {
-                if (outputStream != null) await image.SaveAsGifAsync(outputStream, cancellationToken);
+                if (outputStream is not null) await image.SaveAsGifAsync(outputStream, cancellationToken);
                 return new ParseResult((uint)width, (uint)height, (uint)frameCount, "image/gif");
             }
         }

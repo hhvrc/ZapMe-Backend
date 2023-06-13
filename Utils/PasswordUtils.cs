@@ -12,7 +12,7 @@ public static class PasswordUtils
         return BCrypt.Net.BCrypt.EnhancedHashPassword(password, HashType.SHA512, 13);
     }
 
-    public static bool CheckPassword(string submittedPassword, string hashedPassword)
+    public static bool VerifyPassword(string submittedPassword, string hashedPassword)
     {
         ArgumentNullException.ThrowIfNull(submittedPassword);
         ArgumentNullException.ThrowIfNull(hashedPassword);

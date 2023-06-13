@@ -38,7 +38,7 @@ public partial class UserController
             )
             .Include(u => u.Relations)
             .FirstOrDefaultAsync(cancellationToken);
-        if (targetUser == null)
+        if (targetUser is null)
         {
             return HttpErrors.UserNotFoundActionResult;
         }

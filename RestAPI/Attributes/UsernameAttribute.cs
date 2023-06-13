@@ -51,7 +51,7 @@ public class UsernameAttribute : ValidationAttribute, IParameterAttribute
     {
         if (!ShouldValidate) return ValidationResult.Success;
 
-        if (value == null)
+        if (value is null)
         {
             return ValidationResult.Success;
         }

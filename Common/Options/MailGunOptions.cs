@@ -1,13 +1,13 @@
 ﻿namespace ZapMe.Options;
 
-public sealed class MailGunOptions
+public sealed class JwtOptions
 {
-    public const string SectionName = "MailGun";
+    public const string SectionName = "Jwt";
 
-    public required string ApiKey { get; set; }
+    public required string SigningKey { get; set; }
 
     public static void Register(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddOptions<MailGunOptions>().Bind(configuration.GetRequiredSection(SectionName)).ValidateOnStart();
+        services.AddOptions<JwtOptions>().Bind(configuration.GetRequiredSection(SectionName)).ValidateOnStart();
     }
 }

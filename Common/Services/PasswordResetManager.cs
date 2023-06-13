@@ -60,7 +60,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
         }
 
         // Commit transaction
-        if (transaction != null)
+        if (transaction is not null)
         {
             await transaction.CommitAsync(cancellationToken);
         }
@@ -71,7 +71,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
     public async Task<ErrorDetails?> InitiatePasswordReset(Guid accountId, CancellationToken cancellationToken)
     {
         UserEntity? userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == accountId && u.Email != null, cancellationToken);
-        if (userEntity == null)
+        if (userEntity is null)
         {
             return HttpErrors.Generic(StatusCodes.Status404NotFound, "Account not found", "The account was not found");
         }
@@ -82,7 +82,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
     public async Task<ErrorDetails?> InitiatePasswordReset(string accountEmail, CancellationToken cancellationToken)
     {
         UserEntity? userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == accountEmail && u.Email != null, cancellationToken);
-        if (userEntity == null)
+        if (userEntity is null)
         {
             return HttpErrors.Generic(StatusCodes.Status404NotFound, "Account not found", "The account associated with that email was not found");
         }
@@ -95,7 +95,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
         string tokenHash = HashingUtils.Sha256_Hex(token);
 
         UserPasswordResetRequestEntity? passwordResetRequest = await _dbContext.UserPasswordResetRequests.FirstOrDefaultAsync(p => p.TokenHash == tokenHash, cancellationToken);
-        if (passwordResetRequest == null) return false;
+        if (passwordResetRequest is null) return false;
 
         // Check if token is valid
         if (passwordResetRequest.CreatedAt.AddMinutes(30) < DateTime.UtcNow) return false;
@@ -120,7 +120,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
         if (!success) return false; // Uhh, race condition?
 
         // Commit transaction
-        if (transaction != null)
+        if (transaction is not null)
         {
             await transaction.CommitAsync(cancellationToken);
         }

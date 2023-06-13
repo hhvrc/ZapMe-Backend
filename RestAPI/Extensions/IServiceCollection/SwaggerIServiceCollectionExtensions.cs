@@ -89,7 +89,7 @@ public static class SwaggerIServiceCollectionExtensions
 
                 // Verify assembly name
                 var name = xml.SelectSingleNode("doc/assembly/name")?.InnerText;
-                if (name == null) continue;
+                if (name is null) continue;
 
                 // Verify assembly members
                 var membersNode = xml.SelectSingleNode("doc/members")?.ChildNodes;

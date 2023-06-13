@@ -20,8 +20,8 @@ public partial class AccountController
         CancellationToken cancellationToken
         )
     {
-        UserEntity? user = await User.GetUserAsync(_dbContext, cancellationToken);
-        if (user == null)
+        UserEntity? user = await User.TryGetUserAsync(_dbContext, cancellationToken);
+        if (user is null)
         {
             return HttpErrors.UnauthorizedActionResult;
         }
@@ -29,7 +29,7 @@ public partial class AccountController
         string requestingIp = this.GetRemoteIP();
 
         var oauthVariables = await stateStore.GetProviderDataAsync(ssoToken, requestingIp, cancellationToken);
-        if (oauthVariables == null)
+        if (oauthVariables is null)
         {
             return HttpErrors.InvalidSSOTokenActionResult;
         }

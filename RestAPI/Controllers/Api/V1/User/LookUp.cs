@@ -26,7 +26,7 @@ public partial class UserController
         if (!userId.HasValue) return HttpErrors.UnauthorizedActionResult;
 
         UserEntity? targetUser = await _dbContext.Users.SingleOrDefaultAsync(u => u.Name == userName && !u.Relations!.Any(r => r.TargetUserId == userId || r.SourceUserId == userId), cancellationToken);
-        if (targetUser == null)
+        if (targetUser is null)
         {
             return HttpErrors.Generic(StatusCodes.Status404NotFound, "Not found", $"User with nane {userName} not found").ToActionResult();
         }

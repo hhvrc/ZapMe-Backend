@@ -35,13 +35,13 @@ public class DistributedCacheSecureDataFormat<T> : ISecureDataFormat<T>
 
     public T? Unprotect(string? protectedText)
     {
-        if (protectedText == null)
+        if (protectedText is null)
         {
             return default;
         }
 
         byte[]? bytes = _redisCache.Get(protectedText);
-        if (bytes == null)
+        if (bytes is null)
         {
             return default;
         }

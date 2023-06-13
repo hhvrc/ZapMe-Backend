@@ -41,7 +41,7 @@ public class EmailAddressAttribute : ValidationAttribute, IParameterAttribute
     /// <inheritdoc/>
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
-        if (value == null)
+        if (value is null)
         {
             return ValidationResult.Success;
         }

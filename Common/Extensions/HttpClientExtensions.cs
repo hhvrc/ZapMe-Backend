@@ -24,7 +24,7 @@ public static class HttpClientExtensions
 
         AddHeaders(sb, request.Headers);
 
-        if (request.Content?.Headers != null)
+        if (request.Content?.Headers is not null)
         {
             AddHeaders(sb, request.Content.Headers);
         }

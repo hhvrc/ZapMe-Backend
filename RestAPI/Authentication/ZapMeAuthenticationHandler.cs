@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using Microsoft.IdentityModel.Tokens;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
@@ -12,7 +13,9 @@ using ZapMe.Database;
 using ZapMe.Database.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
+using ZapMe.Options;
 using ZapMe.Services.Interfaces;
+using ZapMe.Utils;
 
 namespace ZapMe.Authentication;
 
@@ -23,12 +26,14 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
     private Task<AuthenticateResult>? _authenticateTask = null;
     private readonly DatabaseContext _dbContext;
     private readonly JsonSerializerOptions _jsonSerializerOptions;
+    private readonly JwtOptions _jwtOptions;
     private readonly ILogger<ZapMeAuthenticationHandler> _logger;
 
-    public ZapMeAuthenticationHandler(DatabaseContext dbContext, IOptions<JsonOptions> options, ILogger<ZapMeAuthenticationHandler> logger)
+    public ZapMeAuthenticationHandler(DatabaseContext dbContext, IOptions<JsonOptions> jsonOptions, IOptions<JwtOptions> jwtOptions, ILogger<ZapMeAuthenticationHandler> logger)
     {
         _dbContext = dbContext;
-        _jsonSerializerOptions = options.Value.JsonSerializerOptions;
+        _jsonSerializerOptions = jsonOptions.Value.JsonSerializerOptions;
+        _jwtOptions = jwtOptions.Value;
         _logger = logger;
     }
 
@@ -45,32 +50,28 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
         _scheme = scheme ?? throw new ArgumentNullException(nameof(scheme));
         _context = context ?? throw new ArgumentNullException(nameof(context));
 
-        if (_scheme.Name != AuthSchemes.Main) throw new ArgumentException($"Invalid scheme: {_scheme.Name}");
+        if (_scheme.Name != AuthenticationConstants.ZapMeScheme) throw new ArgumentException($"Invalid scheme: {_scheme.Name}");
 
         return Task.CompletedTask;
     }
 
-    public async Task SignInAsync(ClaimsPrincipal claimsIdentity, AuthenticationProperties? properties)
+    public async Task SignInAsync(ClaimsPrincipal claimsPrincipal, AuthenticationProperties? properties)
     {
-        string? authScheme = claimsIdentity.Identity?.AuthenticationType;
+        string? authScheme = claimsPrincipal.Identity?.AuthenticationType;
         if (String.IsNullOrEmpty(authScheme))
         {
             _logger.LogError($"Cannot sign in with an empty AuthenticationScheme.");
-            await HttpErrors.Unauthorized.Write(Response);
+            await HttpErrors.Unauthorized.Write(Response, _jsonSerializerOptions);
             return;
         }
 
-        ErrorDetails errorDetails;
-        SessionEntity? session;
-        if (authScheme == AuthSchemes.Main)
-        {
-            session = await claimsIdentity.GetSessionAsync(_dbContext, CancellationToken);
-        }
-        else
+        DateTime issuedAt;
+        DateTime expiresAt;
+        if (authScheme != AuthenticationConstants.ZapMeScheme)
         {
             // Fetch the claims provided by the OAuth provider
-            var fetchClaimsResult = OAuthClaimsFetchers.FetchClaims(authScheme, claimsIdentity, _logger);
-            if (fetchClaimsResult.TryPickT1(out errorDetails, out SSOProviderData? ssoProviderData))
+            var fetchClaimsResult = OAuthClaimsFetchers.FetchClaims(authScheme, claimsPrincipal, _logger);
+            if (fetchClaimsResult.TryPickT1(out ErrorDetails errorDetails, out SSOProviderData? ssoProviderData))
             {
                 await errorDetails.Write(Response, _jsonSerializerOptions);
                 return;
@@ -79,7 +80,7 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             // Try to fetch the user's existing SSO connection
             SSOConnectionEntity? connectionEntity = await _dbContext.SSOConnections.Include(c => c.User).ThenInclude(u => u.ProfilePicture)
                 .FirstOrDefaultAsync(c => c.ProviderName == ssoProviderData.ProviderName && c.ProviderUserId == ssoProviderData.ProviderUserId, CancellationToken);
-            if (connectionEntity == null)
+            if (connectionEntity is null)
             {
                 string token = await ServiceProvider.GetRequiredService<ISSOStateStore>().InsertProviderDataAsync(
                     RequestingIpAddress,
@@ -94,25 +95,35 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             }
 
             // Create a new session for the user
-            session = await ServiceProvider.GetRequiredService<ISessionManager>().CreateAsync(
-                connectionEntity.User.Id,
+            var session = await ServiceProvider.GetRequiredService<ISessionManager>().CreateAsync(
+                connectionEntity.User,
                 RequestingIpAddress,
                 RequestingIpCountry,
                 RequestingUserAgent,
                 true, // TODO: pass in a parameter to determine if the session should be persistent
                 CancellationToken
             );
-        }
 
-        if (session == null)
+            if (session is null)
+            {
+                _logger.LogError($"Cannot sign in with an empty session.");
+                await HttpErrors.Unauthorized.Write(Response, _jsonSerializerOptions);
+                return;
+            }
+
+            issuedAt = session.CreatedAt;
+            expiresAt = session.ExpiresAt;
+            claimsPrincipal = new ClaimsPrincipal(session.ToClaimsIdentity());
+        }
+        else
         {
-            _logger.LogError($"Cannot sign in with an empty session.");
-            await HttpErrors.Unauthorized.Write(Response);
-            return;
+            ArgumentNullException.ThrowIfNull(properties);
+            issuedAt = properties.IssuedUtc?.UtcDateTime ?? throw new ArgumentNullException(nameof(properties.IssuedUtc));
+            expiresAt = properties.ExpiresUtc?.UtcDateTime ?? throw new ArgumentNullException(nameof(properties.ExpiresUtc));
         }
 
         Response.StatusCode = StatusCodes.Status200OK;
-        await Response.WriteAsJsonAsync(session.ToDto(), _jsonSerializerOptions);
+        await Response.WriteAsJsonAsync(new AuthenticationResponse(JwtToken: JwtTokenUtils.GenerateJwtToken(claimsPrincipal, expiresAt, _jwtOptions.SigningKey)));
     }
 
     public Task SignOutAsync(AuthenticationProperties? properties)
@@ -132,41 +143,34 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
 
         if (
             !AuthenticationHeaderValue.TryParse(Request.Headers.Authorization, out AuthenticationHeaderValue? authHeaderValue) ||
-            !String.Equals(authHeaderValue.Scheme, "Bearer", StringComparison.OrdinalIgnoreCase)
+            !String.Equals(authHeaderValue.Scheme, "Bearer", StringComparison.OrdinalIgnoreCase) ||
+            String.IsNullOrEmpty(authHeaderValue.Parameter)
            )
         {
             return AuthenticateResult.Fail("Invalid Authorization header.");
         }
 
-        if (!Guid.TryParse(authHeaderValue.Parameter, out Guid sessionId))
-            return AuthenticateResult.Fail("Malformed Login Cookie");
+        if (!JwtTokenUtils.ValidateJwtToken(authHeaderValue.Parameter, _jwtOptions.SigningKey, out ClaimsPrincipal claimsPrincipal, out SecurityToken securityToken))
+        {
+            return AuthenticateResult.Fail("Invalid JWT token.");
+        }
 
-        SessionEntity? session = await _dbContext.Sessions.AsTracking()
-            .Include(s => s.User)
-            .FirstOrDefaultAsync(s => s.Id == sessionId && s.ExpiresAt > requestTime, CancellationToken);
-        if (session == null)
+        var sessionId = claimsPrincipal.TryGetSessionId();
+
+        // Do moderation checks
+        if (!sessionId.HasValue || !await _dbContext.Sessions.Where(s => s.Id == sessionId.Value).AnyAsync(CancellationToken))
         {
             return AuthenticateResult.Fail("Invalid or Expired Login Cookie");
         }
 
-        if (!session.User!.EmailVerified)
+        var userEmailVerified = claimsPrincipal.GetUserEmailVerified();
+
+        if (!userEmailVerified)
         {
             return AuthenticateResult.Fail("Email is not verified");
         }
 
-        TimeSpan lifeTime = session.ExpiresAt - session.CreatedAt;
-        DateTime halfLife = session.CreatedAt + (lifeTime / 2);
-
-        // TODO: is this good or bad?
-        // Sliding window refresh
-        if (requestTime > halfLife)
-        {
-            // refresh session
-            session.ExpiresAt = requestTime.Add(lifeTime);
-            await _dbContext.SaveChangesAsync();
-        }
-
-        return AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(session.ToClaimsIdentity()), AuthSchemes.Main));
+        return AuthenticateResult.Success(new AuthenticationTicket(claimsPrincipal, AuthenticationConstants.ZapMeScheme));
     }
 
     // Calling Authenticate more than once should always return the original value.
@@ -174,11 +178,11 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
 
     public Task ChallengeAsync(AuthenticationProperties? properties)
     {
-        return HttpErrors.Unauthorized.Write(Response);
+        return HttpErrors.Unauthorized.Write(Response, _jsonSerializerOptions);
     }
 
     public Task ForbidAsync(AuthenticationProperties? properties)
     {
-        return HttpErrors.Forbidden.Write(Response);
+        return HttpErrors.Forbidden.Write(Response, _jsonSerializerOptions);
     }
 }

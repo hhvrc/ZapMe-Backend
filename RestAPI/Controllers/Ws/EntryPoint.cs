@@ -40,7 +40,7 @@ public sealed partial class WebSocketController
 
             // Create the connection instance
             using WebSocketInstance? instance = await WebSocketInstance.CreateAsync(wsManager, User, logger);
-            if (instance == null)
+            if (instance is null)
             {
                 _logger.LogError("Failed to create websocket instance");
 

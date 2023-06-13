@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
@@ -28,7 +29,7 @@ public partial class AuthController
     [AnonymousOnly]
     [RequestSizeLimit(1024)]
     [HttpPost("signin", Name = "AuthSignIn")]
-    [ProducesResponseType(typeof(SessionDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AuthenticationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -38,7 +39,7 @@ public partial class AuthController
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);
 
         UserEntity? user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Name == body.UsernameOrEmail || u.Email == body.UsernameOrEmail, cancellationToken);
-        if (user == null || !PasswordUtils.CheckPassword(body.Password, user.PasswordHash))
+        if (user is null || !PasswordUtils.VerifyPassword(body.Password, user.PasswordHash))
         {
             return HttpErrors.Generic(
                     StatusCodes.Status401Unauthorized,
@@ -93,10 +94,14 @@ public partial class AuthController
             return HttpErrors.Generic(StatusCodes.Status413RequestEntityTooLarge, "User-Agent too long", $"User-Agent header has a hard limit on {UserAgentLimits.MaxUploadLength} characters", NotificationSeverityLevel.Error, "Unexpected behaviour, please contact developers").ToActionResult();
         }
 
-        SessionEntity session = await _sessionManager.CreateAsync(user.Id, this.GetRemoteIP(), this.GetCloudflareIPCountry(), userAgent, body.RememberMe, cancellationToken);
+        SessionEntity session = await _sessionManager.CreateAsync(user, this.GetRemoteIP(), this.GetCloudflareIPCountry(), userAgent, body.RememberMe, cancellationToken);
 
-        session.User = user;
+        AuthenticationProperties props = new AuthenticationProperties
+        {
+            IssuedUtc = session.CreatedAt,
+            ExpiresUtc = session.ExpiresAt
+        };
 
-        return SignIn(new ClaimsPrincipal(session.ToClaimsIdentity())); // TODO: provide session entity to the authentication handler
+        return SignIn(new ClaimsPrincipal(session.ToClaimsIdentity()), props);
     }
 }

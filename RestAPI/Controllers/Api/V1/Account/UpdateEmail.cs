@@ -27,8 +27,8 @@ public partial class AccountController
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> UpdateEmail([FromBody] UpdateEmail body, [FromServices] IEmailVerificationManager emailVerificationManager, CancellationToken cancellationToken)
     {
-        var user = await User.CheckPasswordAsync(body.Password, _dbContext, cancellationToken);
-        if (user == null)
+        var user = await User.VerifyUserPasswordAsync(body.Password, _dbContext, cancellationToken);
+        if (user is null)
         {
             return HttpErrors.UnauthorizedActionResult;
         }

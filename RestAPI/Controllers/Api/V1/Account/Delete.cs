@@ -27,8 +27,8 @@ public partial class AccountController
         CancellationToken cancellationToken
         )
     {
-        var user = await User.CheckPasswordAsync(password, _dbContext, cancellationToken);
-        if (user == null)
+        var user = await User.VerifyUserPasswordAsync(password, _dbContext, cancellationToken);
+        if (user is null)
         {
             return HttpErrors.UnauthorizedActionResult;
         }

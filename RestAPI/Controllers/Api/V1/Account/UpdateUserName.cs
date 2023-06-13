@@ -25,8 +25,8 @@ public partial class AccountController
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> UpdateUsername([FromBody] UpdateUserName body, CancellationToken cancellationToken)
     {
-        UserEntity? user = await User.CheckPasswordAsync(body.Password, _dbContext, cancellationToken);
-        if (user == null)
+        UserEntity? user = await User.VerifyUserPasswordAsync(body.Password, _dbContext, cancellationToken);
+        if (user is null)
         {
             return HttpErrors.InvalidPasswordActionResult;
         }

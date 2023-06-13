@@ -14,10 +14,10 @@ public sealed class WebSocketInstance : IDisposable
     {
         Guid? userId = user.GetUserId();
         Guid? sessionId = user.GetSessionId();
-        if (userId == null || sessionId == null) return null;
+        if (userId is null || sessionId is null) return null;
 
         var ws = await wsManager.AcceptWebSocketAsync();
-        if (ws == null) return null;
+        if (ws is null) return null;
 
         return new WebSocketInstance(ws, userId.Value, sessionId.Value, logger);
     }
@@ -117,7 +117,7 @@ public sealed class WebSocketInstance : IDisposable
         string str = Encoding.UTF8.GetString(_webSocketBufferData);
         var msg = JsonSerializer.Deserialize<ClientMessage>(str);
 
-        if (msg == null)
+        if (msg is null)
         {
             _logger.LogWarning("Invalid message received: {nessageStr}", str);
             return false;

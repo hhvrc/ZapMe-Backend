@@ -36,7 +36,7 @@ public sealed class SSOStateStore : ISSOStateStore
     {
         var stateInternal = await _distributedCache.GetAsync<InternalData<SSOStateDataEntry>>(GetStateCacheKey(requestKey), cancellationToken);
 
-        if (stateInternal == null || stateInternal.ProviderName != providerName || stateInternal.RequestIP != requestIP)
+        if (stateInternal is null || stateInternal.ProviderName != providerName || stateInternal.RequestIP != requestIP)
         {
             return null;
         }
@@ -60,7 +60,7 @@ public sealed class SSOStateStore : ISSOStateStore
     {
         var stateInternal = await _distributedCache.GetAsync<InternalData<SSOProviderDataEntry>>(GetProviderDataCacheKey(requestKey), cancellationToken);
 
-        if (stateInternal == null || stateInternal.RequestIP != requestIP)
+        if (stateInternal is null || stateInternal.RequestIP != requestIP)
         {
             return null;
         }

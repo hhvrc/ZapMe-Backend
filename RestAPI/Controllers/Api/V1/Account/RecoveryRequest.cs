@@ -31,7 +31,7 @@ public partial class AccountController
         CloudflareTurnstileVerifyResponse reCaptchaResponse = await cfTurnstileService.VerifyUserResponseTokenAsync(body.TurnstileResponse, this.GetRemoteIP(), cancellationToken);
         if (!reCaptchaResponse.Success)
         {
-            if (reCaptchaResponse.ErrorCodes != null)
+            if (reCaptchaResponse.ErrorCodes is not null)
             {
                 foreach (string errorCode in reCaptchaResponse.ErrorCodes)
                 {

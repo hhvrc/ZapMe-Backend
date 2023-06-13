@@ -27,7 +27,7 @@ public sealed class UserAgentManager : IUserAgentManager
         string sha256 = HashingUtils.Sha256_Hex(userAgent);
 
         UserAgentEntity? entry = await _dbContext.UserAgents.FirstOrDefaultAsync(u => u.Sha256 == sha256, cancellationToken);
-        if (entry != null)
+        if (entry is not null)
         {
             return entry;
         }

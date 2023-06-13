@@ -32,7 +32,7 @@ public sealed class UserEntity
     public bool EmailVerified { get; set; }
 
     /// <summary>
-    /// Secure hash of the user's password, hashed with <see cref="Utils.PasswordUtils"/>.
+    /// Secure hash of the user's password, hashed with BCrypt.
     /// </summary>
     public required string PasswordHash { get; set; }
 

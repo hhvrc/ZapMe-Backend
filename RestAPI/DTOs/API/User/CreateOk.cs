@@ -10,7 +10,7 @@ public readonly struct CreateOk
     /// <summary>
     /// If the account was created using OAuth and in a way that ensures the email address is valid, a session will be created and returned here
     /// </summary>
-    public SessionDto? Session { get; init; }
+    public AuthenticationResponse? Session { get; init; }
 
     /// <summary>
     /// If true then the email is already verified by 3rd party

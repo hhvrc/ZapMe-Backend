@@ -29,7 +29,7 @@ partial class UserController
             .Where(u => u.Id == userId)
             .Include(u => u.Relations)
             .FirstOrDefaultAsync(cancellationToken);
-        if (user == null) return HttpErrors.UnauthorizedActionResult;
+        if (user is null) return HttpErrors.UnauthorizedActionResult;
 
         // Check if requesting user has blocked target user, or if user is trying to send a friend request to themselves
         if (user.Relations!.Any(u => u.TargetUserId == targetUserId && u.RelationType == UserRelationType.Blocked) || userId == targetUserId)
@@ -48,7 +48,7 @@ partial class UserController
             )
             .Include(u => u.Relations)
             .FirstOrDefaultAsync(cancellationToken);
-        if (targetUser == null)
+        if (targetUser is null)
         {
             return NotFound();
         }
