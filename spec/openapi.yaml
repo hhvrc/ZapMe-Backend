@@ -98,45 +98,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-  /api/v1/account/sso:
-    post:
-      tags:
-        - Account
-      summary: Add a sso connection to account
-      operationId: Connect SSO Provider
-      parameters:
-        - name: ssoToken
-          in: query
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-    delete:
-      tags:
-        - Account
-      summary: Remove a sso connection from account
-      operationId: Disconnect SSO Provider
-      parameters:
-        - name: providerName
-          in: query
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
   /api/v1/account/recover-confirm:
     post:
       tags:
@@ -177,6 +138,45 @@ paths:
       responses:
         '200':
           description: Ok
+  /api/v1/account/sso:
+    post:
+      tags:
+        - Account
+      summary: Add a sso connection to account
+      operationId: Connect SSO Provider
+      parameters:
+        - name: ssoToken
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+    delete:
+      tags:
+        - Account
+      summary: Remove a sso connection from account
+      operationId: Disconnect SSO Provider
+      parameters:
+        - name: providerName
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
   /api/v1/account/email:
     put:
       tags:
@@ -684,6 +684,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
+  /ws:
+    get:
+      tags:
+        - WebSocket
+      summary: "Websocket endpoint for pub/sub communication (e.g. chat, notifications, events)\r\n\r\nDocumentation:\r\nYes"
+      operationId: WebSocket
+      responses:
+        '200':
+          description: Connection closed
+        '400':
+          description: This endpoint is purely just a websocket endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
 components:
   schemas:
     AccountDto:
@@ -706,37 +721,33 @@ components:
       properties:
         id:
           type: string
-          description: ''
           format: uuid
         username:
           type: string
-          description: ''
           example: MyUsername
         obscuredEmail:
+          maxLength: 320
+          minLength: 5
           type: string
           description: Obfuscated email of your account
+          format: email
+          example: user.name@example.com
         emailVerified:
           type: boolean
-          description: ''
         acceptedPrivacyPolicyVersion:
           type: integer
-          description: ''
           format: int32
         acceptedTermsOfServiceVersion:
           type: integer
-          description: ''
           format: int32
         profilePictureUrl:
           type: string
-          description: ''
           format: uri
         status:
           allOf:
             - $ref: '#/components/schemas/UserPresence'
-          description: ''
         statusText:
           type: string
-          description: ''
         friends:
           type: array
           items:
@@ -784,16 +795,16 @@ components:
     ApiDisabledFeatures:
       required:
         - endpoints
-        - grpc
         - webRTC
+        - webSockets
       type: object
       properties:
         webRTC:
           type: boolean
           description: 'If true, WebRTC is disabled'
-        grpc:
+        webSockets:
           type: boolean
-          description: 'If true, gRPC is disabled'
+          description: 'If true, WebSockets are disabled'
         endpoints:
           type: array
           items:
@@ -856,11 +867,19 @@ components:
       type: object
       properties:
         emailSupport:
+          maxLength: 320
+          minLength: 5
           type: string
           description: Email address to contact the support of the service
+          format: email
+          example: user.name@example.com
         emailContact:
+          maxLength: 320
+          minLength: 5
           type: string
           description: Email address to contact the owner of the service
+          format: email
+          example: user.name@example.com
         discordInviteUrl:
           type: string
           description: Invite URL to the Discord server where users can get support
@@ -881,24 +900,23 @@ components:
           minLength: 3
           pattern: '^[^\s].*[^\s]$'
           type: string
-          description: ''
           example: MyUsername
         password:
           maxLength: 256
           minLength: 10
           type: string
-          description: ''
           example: Hq2yP1B^Fho&zRHxHkEu
         email:
+          maxLength: 320
+          minLength: 5
           type: string
-          description: ''
+          format: email
+          example: user.name@example.com
         acceptedPrivacyPolicyVersion:
           type: integer
-          description: ''
           format: int32
         acceptedTermsOfServiceVersion:
           type: integer
-          description: ''
           format: int32
         turnstileResponse:
           type: string
@@ -1031,8 +1049,12 @@ components:
       type: object
       properties:
         email:
+          maxLength: 320
+          minLength: 5
           type: string
           description: Email of your account you want to recover
+          format: email
+          example: user.name@example.com
         turnstileResponse:
           type: string
           description: Response from cloudflare turnstile request
@@ -1047,15 +1069,12 @@ components:
       properties:
         sessionToken:
           type: string
-          description: ''
           format: uuid
         issuedAtUtc:
           type: string
-          description: ''
           format: date-time
         expiresAtUtc:
           type: string
-          description: ''
           format: date-time
       additionalProperties: false
     SocialsConfig:
@@ -1093,8 +1112,12 @@ components:
       type: object
       properties:
         newEmail:
+          maxLength: 320
+          minLength: 5
           type: string
           description: ''
+          format: email
+          example: user.name@example.com
         password:
           type: string
           description: ''
@@ -1179,29 +1202,23 @@ components:
       properties:
         id:
           type: string
-          description: ''
           format: uuid
         username:
           type: string
-          description: ''
           example: MyUsername
         profilePictureUrl:
           type: string
-          description: ''
           format: uri
           nullable: true
         profileBannerUrl:
           type: string
-          description: ''
           format: uri
           nullable: true
         presence:
           allOf:
             - $ref: '#/components/schemas/UserPresence'
-          description: ''
         statusMessage:
           type: string
-          description: ''
         createdAt:
           type: string
           description: Date this user was created at
@@ -1245,10 +1262,8 @@ components:
           format: uuid
         title:
           type: string
-          description: ''
         explenation:
           type: string
-          description: ''
       additionalProperties: false
       description: Message sent to server to report a user
   securitySchemes:
