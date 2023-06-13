@@ -1,14 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using ZapMe.Enums;
 
 namespace ZapMe.Database.Models;
-
-public enum UserRelationType
-{
-    None,
-    Friend,
-    Blocked
-}
 
 public sealed class UserRelationEntity
 {

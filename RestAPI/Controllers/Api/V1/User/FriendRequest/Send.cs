@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using ZapMe.Authentication;
 using ZapMe.Database.Models;
+using ZapMe.Enums;
 
 namespace ZapMe.Controllers.Api.V1;
 
