@@ -18,4 +18,12 @@ public interface ISessionStore
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<SessionEntity> CreateAsync(Guid userId, string ipAddress, string countryCode, Guid userAgentId, DateTime expiresAt, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sessionId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<SessionEntity?> TryGetAsync(Guid sessionId, CancellationToken cancellationToken = default);
 }

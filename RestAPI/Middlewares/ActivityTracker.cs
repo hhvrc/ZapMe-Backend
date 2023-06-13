@@ -23,7 +23,7 @@ public sealed class ActivityTracker
         });
 
         // Add activity to the database
-        Guid? userId = context.User?.GetUserId();
+        Guid? userId = context.User?.TryGetUserId();
         if (userId.HasValue)
         {
             await dbContext.Users

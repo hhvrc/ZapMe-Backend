@@ -25,13 +25,15 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
     private HttpContext _context = default!;
     private Task<AuthenticateResult>? _authenticateTask = null;
     private readonly DatabaseContext _dbContext;
+    private readonly ISessionStore _sessionStore;
     private readonly JsonSerializerOptions _jsonSerializerOptions;
     private readonly JwtOptions _jwtOptions;
     private readonly ILogger<ZapMeAuthenticationHandler> _logger;
 
-    public ZapMeAuthenticationHandler(DatabaseContext dbContext, IOptions<JsonOptions> jsonOptions, IOptions<JwtOptions> jwtOptions, ILogger<ZapMeAuthenticationHandler> logger)
+    public ZapMeAuthenticationHandler(DatabaseContext dbContext, ISessionStore sessionStore, IOptions<JsonOptions> jsonOptions, IOptions<JwtOptions> jwtOptions, ILogger<ZapMeAuthenticationHandler> logger)
     {
         _dbContext = dbContext;
+        _sessionStore = sessionStore;
         _jsonSerializerOptions = jsonOptions.Value.JsonSerializerOptions;
         _jwtOptions = jwtOptions.Value;
         _logger = logger;
@@ -155,12 +157,10 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             return AuthenticateResult.Fail("Invalid JWT token.");
         }
 
-        var sessionId = claimsPrincipal.TryGetSessionId();
-
-        // Do moderation checks
-        if (!sessionId.HasValue || !await _dbContext.Sessions.Where(s => s.Id == sessionId.Value).AnyAsync(CancellationToken))
+        var session = await _sessionStore.TryGetAsync(claimsPrincipal.GetSessionId(), CancellationToken);
+        if (session is null)
         {
-            return AuthenticateResult.Fail("Invalid or Expired Login Cookie");
+            return AuthenticateResult.Fail("Invalid or Expired Session");
         }
 
         var userEmailVerified = claimsPrincipal.GetUserEmailVerified();
@@ -170,7 +170,7 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             return AuthenticateResult.Fail("Email is not verified");
         }
 
-        return AuthenticateResult.Success(new AuthenticationTicket(claimsPrincipal, AuthenticationConstants.ZapMeScheme));
+        return AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(session.ToClaimsIdentity()), AuthenticationConstants.ZapMeScheme));
     }
 
     // Calling Authenticate more than once should always return the original value.

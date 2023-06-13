@@ -14,7 +14,7 @@ public static class RateLimitingIServiceCollectionExtensions
             opt.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             opt.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
             {
-                Guid? userId = ctx.User.GetUserId();
+                Guid? userId = ctx.User.TryGetUserId();
 
                 bool authenticated = ctx.User.Identity?.IsAuthenticated ?? false;
                 if (!authenticated || !userId.HasValue)
