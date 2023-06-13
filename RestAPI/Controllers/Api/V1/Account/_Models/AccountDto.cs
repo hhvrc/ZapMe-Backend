@@ -27,8 +27,8 @@ public readonly struct AccountDto
         AcceptedPrivacyPolicyVersion = user.AcceptedPrivacyPolicyVersion;
         AcceptedTermsOfServiceVersion = user.AcceptedTermsOfServiceVersion;
         ProfilePictureUrl = user.ProfilePicture?.PublicUrl!;
-        Status = user.OnlineStatus;
-        StatusText = user.OnlineStatusText;
+        Status = user.Presence;
+        StatusText = user.StatusMessage;
         Friends = user.Relations?.Select(fs => fs.TargetUserId).ToArray() ?? Array.Empty<Guid>();
         SSOConnections = user.SSOConnections?.Select(oc => oc.ProviderName).ToArray() ?? Array.Empty<string>();
     }
@@ -73,7 +73,7 @@ public readonly struct AccountDto
     /// <summary>
     /// 
     /// </summary>
-    public UserStatus Status { get; init; }
+    public UserPresence Status { get; init; }
 
     /// <summary>
     /// 

@@ -143,8 +143,8 @@ public partial class AccountController
             PasswordHash = PasswordUtils.HashPassword(body.Password),
             AcceptedPrivacyPolicyVersion = body.AcceptedPrivacyPolicyVersion,
             AcceptedTermsOfServiceVersion = body.AcceptedTermsOfServiceVersion,
-            OnlineStatus = UserStatus.Online,
-            OnlineStatusText = String.Empty
+            Presence = UserPresence.Online,
+            StatusMessage = String.Empty
         };
 
         // Create account

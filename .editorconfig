@@ -308,3 +308,10 @@ dotnet_style_qualification_for_field = false:silent
 dotnet_style_qualification_for_method = false:silent
 dotnet_style_qualification_for_property = false:silent
 dotnet_style_qualification_for_event = false:silent
+
+# Protobuf files
+[*.proto]
+indent_size = 2
+indent_style = space
+end_of_line = crlf
+trim_trailing_whitespace = true
