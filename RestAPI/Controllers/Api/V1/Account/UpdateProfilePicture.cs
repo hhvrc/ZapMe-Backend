@@ -2,9 +2,9 @@
 using OneOf;
 using ZapMe.Attributes;
 using ZapMe.Authentication;
-using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.Database.Models;
 using ZapMe.DTOs;
+using ZapMe.DTOs.API.User;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
@@ -25,7 +25,7 @@ public partial class AccountController
     /// <response code="411">Length is required</response>
     /// <response code="413">Image dimensions or byte size is too large</response>
     [HttpPut("pfp", Name = "UpdateProfilePicture")]
-    [BinaryPayloadOAPI(true, "image/png", "image/jpeg", "image/webp", "image/gif")]
+    [BinaryPayload(true, "image/png", "image/jpeg", "image/webp", "image/gif")]
     [ProducesResponseType(typeof(UpdateProfilePictureOk), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status411LengthRequired)]

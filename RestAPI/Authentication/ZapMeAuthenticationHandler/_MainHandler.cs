@@ -6,10 +6,10 @@ using Microsoft.Extensions.Primitives;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
-using ZapMe.Authentication.Models;
 using ZapMe.Constants;
 using ZapMe.Database;
 using ZapMe.Database.Models;
+using ZapMe.DTOs;
 using ZapMe.Helpers;
 
 namespace ZapMe.Authentication;
@@ -65,7 +65,7 @@ public sealed partial class ZapMeAuthenticationHandler : IAuthenticationSignInHa
     private Task FinishSignInAsync(SessionEntity session)
     {
         Response.StatusCode = StatusCodes.Status200OK;
-        return Response.WriteAsJsonAsync(new SessionDto(session), _jsonSerializerOptions);
+        return Response.WriteAsJsonAsync(session.ToDto(), _jsonSerializerOptions);
     }
 
     public Task SignOutAsync(AuthenticationProperties? properties)

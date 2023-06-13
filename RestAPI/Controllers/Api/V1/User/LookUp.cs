@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ZapMe.Authentication;
-using ZapMe.Controllers.Api.V1.User.Models;
 using ZapMe.Database.Models;
+using ZapMe.DTOs;
 using ZapMe.Helpers;
 
 namespace ZapMe.Controllers.Api.V1;
@@ -30,6 +30,6 @@ public partial class UserController
         }
 
         // TODO: use a mapper
-        return Ok(new UserDto(targetUser));
+        return Ok(targetUser.ToUserDto());
     }
 }

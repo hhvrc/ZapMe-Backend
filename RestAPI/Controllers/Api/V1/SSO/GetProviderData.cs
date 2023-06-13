@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ZapMe.Controllers.Api.V1.SSO.Models;
 using ZapMe.DTOs;
+using ZapMe.DTOs.SSO;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
 

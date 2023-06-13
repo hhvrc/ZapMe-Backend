@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ZapMe.Authentication;
-using ZapMe.Controllers.Api.V1.User.Models;
 using ZapMe.Database.Models;
+using ZapMe.DTOs;
 using ZapMe.Helpers;
 
 namespace ZapMe.Controllers.Api.V1;
@@ -17,8 +17,8 @@ public partial class UserController
     /// <returns></returns>
     [RequestSizeLimit(1024)]
     [HttpGet("i/{userId}", Name = "GetUser")]
-    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]     // Accepted
-    [ProducesResponseType(StatusCodes.Status404NotFound)] // User not found
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)] // Accepted
+    [ProducesResponseType(StatusCodes.Status404NotFound)]            // User not found
     public async Task<IActionResult> Get([FromRoute] Guid userId, CancellationToken cancellationToken)
     {
         UserEntity user = (User as ZapMePrincipal)!.Identity.User;
@@ -29,7 +29,6 @@ public partial class UserController
             return HttpErrors.Generic(StatusCodes.Status404NotFound, "Not found", $"User with id {userId} not found").ToActionResult();
         }
 
-        // TODO: use a mapper
-        return Ok(new UserDto(targetUser));
+        return Ok(targetUser.ToUserDto());
     }
 }

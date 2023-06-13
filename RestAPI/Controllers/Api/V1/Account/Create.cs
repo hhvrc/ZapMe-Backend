@@ -3,10 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 using ZapMe.Attributes;
-using ZapMe.Authentication.Models;
-using ZapMe.Controllers.Api.V1.Account.Models;
 using ZapMe.Database.Models;
 using ZapMe.DTOs;
+using ZapMe.DTOs.API.User;
 using ZapMe.Enums;
 using ZapMe.Helpers;
 using ZapMe.Options;
@@ -205,7 +204,7 @@ public partial class AccountController
         return CreatedAtAction(nameof(Get), new CreateOk
         {
             AccountId = user.Id,
-            Session = session == null ? null : new SessionDto(session),
+            Session = session?.ToDto(),
             EmailVerificationRequired = emailVerified
         });
     }

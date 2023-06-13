@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ZapMe.Authentication;
-using ZapMe.Controllers.Api.V1.Account.Models;
+using ZapMe.DTOs;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -18,6 +18,6 @@ public partial class AccountController
     {
         ZapMeIdentity identity = (User as ZapMePrincipal)!.Identity;
 
-        return new AccountDto(identity.User); // TODO: use a mapper FFS
+        return identity.User.ToAccountDto();
     }
 }

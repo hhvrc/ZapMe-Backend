@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Constants\Constants.csproj" />
-    <ProjectReference Include="..\DTOs\DTOs.csproj" />
     <ProjectReference Include="..\Enums\Enums.csproj" />
     <ProjectReference Include="..\Utils\Utils.csproj" />
   </ItemGroup>

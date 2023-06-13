@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using ZapMe.Attributes;
 using ZapMe.Authentication;
-using ZapMe.Authentication.Models;
 using ZapMe.Constants;
 using ZapMe.Database.Models;
 using ZapMe.DTOs;
+using ZapMe.DTOs.API.Auth;
 using ZapMe.Helpers;
 using ZapMe.Options;
 using ZapMe.Services.Interfaces;
@@ -32,7 +32,7 @@ public partial class AuthController
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status413RequestEntityTooLarge)]
-    public async Task<IActionResult> SignIn([FromBody] Authentication.Models.AuthSignIn body, [FromServices] ILockOutStore lockOutStore, [FromServices] IOptions<LegalOptions> options, CancellationToken cancellationToken)
+    public async Task<IActionResult> SignIn([FromBody] AuthSignIn body, [FromServices] ILockOutStore lockOutStore, [FromServices] IOptions<LegalOptions> options, CancellationToken cancellationToken)
     {
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);
 

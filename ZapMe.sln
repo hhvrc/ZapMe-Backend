@@ -36,6 +36,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utils", "Utils\Utils.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Events", "Events\Events.csproj", "{D2980538-A94F-49F7-ACE4-45EDAD8EC3D9}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Websocket", "Websocket\Websocket.csproj", "{8EC93646-7F21-4E57-8820-7D7F1C356C48}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -82,6 +84,10 @@ Global
 		{D2980538-A94F-49F7-ACE4-45EDAD8EC3D9}.Debug|x64.Build.0 = Debug|x64
 		{D2980538-A94F-49F7-ACE4-45EDAD8EC3D9}.Release|x64.ActiveCfg = Release|x64
 		{D2980538-A94F-49F7-ACE4-45EDAD8EC3D9}.Release|x64.Build.0 = Release|x64
+		{8EC93646-7F21-4E57-8820-7D7F1C356C48}.Debug|x64.ActiveCfg = Debug|x64
+		{8EC93646-7F21-4E57-8820-7D7F1C356C48}.Debug|x64.Build.0 = Debug|x64
+		{8EC93646-7F21-4E57-8820-7D7F1C356C48}.Release|x64.ActiveCfg = Release|x64
+		{8EC93646-7F21-4E57-8820-7D7F1C356C48}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

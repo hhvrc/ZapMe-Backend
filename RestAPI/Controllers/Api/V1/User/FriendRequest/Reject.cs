@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ZapMe.Controllers.Api.V1.User.Models;
+using ZapMe.DTOs;
 
 namespace ZapMe.Controllers.Api.V1;
 
