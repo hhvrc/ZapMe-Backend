@@ -1,5 +1,8 @@
 syntax = "proto3";
 
+import "Protos/Common.proto";
+import "Protos/User.proto";
+
 message ServerEvent {
   uint64 timestamp = 1;
   oneof event {
@@ -24,11 +27,6 @@ message SystemEvent {
     string message = 3;
     SeverityLevel severity_level = 4;
 
-    enum SeverityLevel {
-      INFO = 0;
-      WARNING = 1;
-      ERROR = 2;
-    }
   }
   message GrpcServerInfo {
     // If the server is online
@@ -65,19 +63,6 @@ message UserEvent {
     string banner_changed = 9;
   }
 
-  enum RelationshipStatus {
-    NONE = 0;
-    REQUEST_INCOMING = 1;
-    REQUEST_OUTGOING = 2;
-    FRIEND = 3;
-    BLOCKED = 4;
-  }
-  enum UserPresence {
-    OFFLINE = 0;
-    AWAY = 1;
-    BUSY = 2;
-    ONLINE = 3;
-  }
   message UserMessage {
     uint64 timestamp = 1;
     string message_id = 2;

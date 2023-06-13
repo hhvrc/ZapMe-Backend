@@ -8,3 +8,9 @@ message SuccessWithExpiration {
   optional string error = 1;
   uint64 expiresAt = 2;
 }
+
+enum SeverityLevel {
+  INFO = 0;
+  WARNING = 1;
+  ERROR = 2;
+}

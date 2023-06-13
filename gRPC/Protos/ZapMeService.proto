@@ -1,7 +1,6 @@
 syntax = "proto3";
 option csharp_namespace = "ZapMe.gRPC";
 
-import "Protos/Common.proto";
 import "Protos/Heartbeat.proto";
 import "Protos/ServerEvents.proto";
 import "Protos/SessionMessage.proto";
@@ -10,16 +9,9 @@ package zapme;
 
 service ZapMeGrpcService {
   /*
-    Used to keep the connection alive and to determine the RTT.
+    Used to keep the connection alive.
 	This should be called every 30 seconds by default.
 	This timing is subject to change, and is specified in the ServerPulse response.
-	These calls need to be responded to as quickly as possible to ensure the RTT is accurate.
-	The result of this operation will be that both the client and server will know their RTT.
-	The calls will be:
-	Client: Pulse
-	Server: PulseAck
-	Client: PulseFin (RTT)
-	Server: PulseFinAck (RTT, interval)
   */
   rpc PulseCheck (stream ClientPulse) returns (stream ServerPulse) {}
 
@@ -39,6 +31,14 @@ service ZapMeGrpcService {
   rpc Session (stream SessionMessage) returns (stream SessionServerMessage) {}
 }
 
+message Empty {}
+message Success {
+  optional string error = 2;
+}
+message SuccessWithExpiration {
+  optional string error = 1;
+  uint64 expiresAt = 2;
+}
 
 message AuthorizeRequest {
   string SessionToken = 1;

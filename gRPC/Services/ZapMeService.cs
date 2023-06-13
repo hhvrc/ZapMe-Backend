@@ -103,7 +103,7 @@ public class ZapMeGrpcServiceImpl : ZapMeGrpcService.ZapMeGrpcServiceBase
         {
             while (await requestStream.MoveNext(combinedCancellationToken))
             {
-                var message = requestStream.Current!;
+                SessionMessage message = requestStream.Current!;
 
                 switch (message.PayloadCase)
                 {

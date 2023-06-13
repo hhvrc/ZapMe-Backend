@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+enum UserPresence {
+  OFFLINE = 0;
+  DO_NOT_DISTURB = 1;
+  INACTIVE = 2;
+  ONLINE = 3;
+}
+enum RelationshipStatus {
+  NONE = 0;
+  REQUEST_INCOMING = 1;
+  REQUEST_OUTGOING = 2;
+  FRIEND = 3;
+  BLOCKED = 4;
+}
+message User {
+  string id = 1;
+  string name = 2;
+  optional string profilePictureUrl = 3;
+  optional string ProfileBannerUrl = 4;
+  UserPresence presence = 5;
+  string statusMessage = 6;
+}

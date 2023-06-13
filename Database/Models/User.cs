@@ -46,23 +46,25 @@ public sealed class UserEntity
     /// </summary>
     public uint AcceptedTermsOfServiceVersion { get; set; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// 
+    /// </summary>
     public Guid? ProfilePictureId { get; set; }
 
     /// <summary>
     /// 
     /// </summary>
-    public ImageEntity? ProfilePicture { get; set; }
+    public Guid? ProfileBannerId { get; set; }
 
     /// <summary>
     /// 
     /// </summary>
-    public UserStatus OnlineStatus { get; set; }
+    public UserPresence Presence { get; set; }
 
     /// <summary>
     /// 
     /// </summary>
-    public required string OnlineStatusText { get; set; }
+    public required string StatusMessage { get; set; }
 
     /// <summary>
     /// Date this account was created at
@@ -79,6 +81,8 @@ public sealed class UserEntity
     /// </summary>
     public DateTime LastOnline { get; set; }
 
+    public ImageEntity? ProfilePicture { get; set; }
+    public ImageEntity? ProfileBanner { get; set; }
     public UserPasswordResetRequestEntity? PasswordResetRequest { get; set; }
     public UserEmailVerificationRequestEntity? EmailVerificationRequest { get; set; }
 
@@ -127,11 +131,14 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntit
         builder.Property(u => u.ProfilePictureId)
             .HasColumnName("profilePictureId");
 
-        builder.Property(u => u.OnlineStatus)
-            .HasColumnName("statusOnline");
+        builder.Property(u => u.ProfileBannerId)
+            .HasColumnName("profileBannerId");
 
-        builder.Property(u => u.OnlineStatusText)
-            .HasColumnName("statusText")
+        builder.Property(u => u.Presence)
+            .HasColumnName("presence");
+
+        builder.Property(u => u.StatusMessage)
+            .HasColumnName("statusMessage")
             .HasMaxLength(128);
 
         builder.Property(u => u.CreatedAt)

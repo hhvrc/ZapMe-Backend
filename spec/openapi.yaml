@@ -732,7 +732,7 @@ components:
           format: uri
         status:
           allOf:
-            - $ref: '#/components/schemas/UserStatus'
+            - $ref: '#/components/schemas/UserPresence'
           description: ''
         statusText:
           type: string
@@ -1172,8 +1172,8 @@ components:
         - createdAt
         - id
         - lastSeenAt
-        - status
-        - statusText
+        - presence
+        - statusMessage
         - username
       type: object
       properties:
@@ -1185,16 +1185,21 @@ components:
           type: string
           description: ''
           example: MyUsername
-        profilePictureId:
+        profilePictureUrl:
           type: string
           description: ''
-          format: uuid
+          format: uri
           nullable: true
-        status:
-          allOf:
-            - $ref: '#/components/schemas/UserStatus'
+        profileBannerUrl:
+          type: string
           description: ''
-        statusText:
+          format: uri
+          nullable: true
+        presence:
+          allOf:
+            - $ref: '#/components/schemas/UserPresence'
+          description: ''
+        statusMessage:
           type: string
           description: ''
         createdAt:
@@ -1221,6 +1226,13 @@ components:
           description: 'Content of the notification, might be HTML'
       additionalProperties: false
       description: "System notification to be displayed to the user, do not confuse with user notifications\r\nThis is a hint and clients can choose to ignore it or implement notifications to be independent of this"
+    UserPresence:
+      enum:
+        - offline
+        - doNotDisturb
+        - inactive
+        - online
+      type: string
     UserReport:
       required:
         - explenation
@@ -1239,14 +1251,6 @@ components:
           description: ''
       additionalProperties: false
       description: Message sent to server to report a user
-    UserStatus:
-      enum:
-        - offline
-        - doNotDisturb
-        - inactive
-        - online
-        - downBad
-      type: string
   securitySchemes:
     Bearer:
       type: apiKey

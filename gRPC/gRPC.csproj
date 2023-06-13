@@ -17,6 +17,7 @@
     <Protobuf Include="Protos\Heartbeat.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\ServerEvents.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\SessionMessage.proto" GrpcServices="Server" />
+	  <Protobuf Include="Protos\User.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\ZapMeService.proto" GrpcServices="Server" />
   </ItemGroup>
 
