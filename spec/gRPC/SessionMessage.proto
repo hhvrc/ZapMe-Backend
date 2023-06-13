@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "Protos/Common.proto";
+
 message SessionMessage {
   oneof payload {
     InitSession initSession = 1;
@@ -45,7 +47,17 @@ message SessionMessage {
   }
 }
 message SessionServerMessage {
+  oneof payload {
+    SessionStartInfo sessionStarted = 1;
+    Empty sessionDeclined = 2;
+    Empty sessionEnded = 3;
+  }
 
+  message SessionStartInfo {
+    string userId = 1;
+    string grpcUrl = 2;
+    bool attemptWebRtc = 3;
+  }
 }
 
 

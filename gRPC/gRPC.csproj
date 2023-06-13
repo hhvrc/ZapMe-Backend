@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Protobuf Include="Protos\Common.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\Heartbeat.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\ServerEvents.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\SessionMessage.proto" GrpcServices="Server" />

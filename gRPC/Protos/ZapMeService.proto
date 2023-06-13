@@ -1,6 +1,7 @@
 syntax = "proto3";
 option csharp_namespace = "ZapMe.gRPC";
 
+import "Protos/Common.proto";
 import "Protos/Heartbeat.proto";
 import "Protos/ServerEvents.proto";
 import "Protos/SessionMessage.proto";
@@ -38,14 +39,6 @@ service ZapMeGrpcService {
   rpc Session (stream SessionMessage) returns (stream SessionServerMessage) {}
 }
 
-message Empty {}
-message Success {
-  optional string error = 2;
-}
-message SuccessWithExpiration {
-  optional string error = 1;
-  uint64 expiresAt = 2;
-}
 
 message AuthorizeRequest {
   string SessionToken = 1;

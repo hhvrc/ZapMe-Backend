@@ -70,7 +70,7 @@ public class ZapMeGrpcServiceImpl : ZapMeGrpcService.ZapMeGrpcServiceBase
         var session = await _dbContext.Sessions.FirstOrDefaultAsync(s => s.Id == Guid.Parse(request.SessionToken), context.CancellationToken);
         if (session == null)
         {
-            // TODO: end session
+            await CloseConnectionAsync();
             return;
         }
 
@@ -105,7 +105,20 @@ public class ZapMeGrpcServiceImpl : ZapMeGrpcService.ZapMeGrpcServiceBase
             {
                 var message = requestStream.Current!;
 
-                // TODO: process message
+                switch (message.PayloadCase)
+                {
+                    case SessionMessage.PayloadOneofCase.InitSession:
+                        break;
+                    case SessionMessage.PayloadOneofCase.Webrtc:
+                        break;
+                    case SessionMessage.PayloadOneofCase.Device:
+                        break;
+                    case SessionMessage.PayloadOneofCase.Voice:
+                        break;
+                    case SessionMessage.PayloadOneofCase.None:
+                    default:
+                        break;
+                }
             }
             lock (combinedCancellation) combinedCancellation.Cancel();
         }
