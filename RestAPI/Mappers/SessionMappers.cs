@@ -19,16 +19,16 @@ public static class SessionMappers
         claimsIdentity.AddClaim(new Claim(ZapMeClaimTypes.UserEmail, session.User.Email));
         claimsIdentity.AddClaim(new Claim(ZapMeClaimTypes.UserEmailVerified, session.User.EmailVerified.ToString()));
 
-        // Add Profile Picture URL Claim
-        if (session.User.ProfilePicture is not null)
+        // Add Avatar URL Claim
+        if (session.User.ProfileAvatar is not null)
         {
-            claimsIdentity.AddClaim(new Claim(ZapMeClaimTypes.UserProfileImage, session.User.ProfilePicture.PublicUrl.ToString()));
+            claimsIdentity.AddClaim(new Claim(ZapMeClaimTypes.UserAvatarUrl, session.User.ProfileAvatar.PublicUrl.ToString()));
         }
 
-        // Add Profile Banner URL Claim
+        // Add Banner URL Claim
         if (session.User.ProfileBanner is not null)
         {
-            claimsIdentity.AddClaim(new Claim(ZapMeClaimTypes.UserProfileBanner, session.User.ProfileBanner.PublicUrl.ToString()));
+            claimsIdentity.AddClaim(new Claim(ZapMeClaimTypes.UserBannerUrl, session.User.ProfileBanner.PublicUrl.ToString()));
         }
 
         // Add Role Claims

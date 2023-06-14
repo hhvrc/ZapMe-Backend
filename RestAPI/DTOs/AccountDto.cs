@@ -25,21 +25,23 @@ public readonly struct AccountDto
 
     public uint AcceptedTermsOfServiceVersion { get; init; }
 
-    public Uri ProfilePictureUrl { get; init; }
+    public Uri? AvatarUrl { get; init; }
 
-    public UserPresence Status { get; init; }
+    public Uri? BannerUrl { get; init; }
 
-    public string StatusText { get; init; }
+    public UserPresence Presence { get; init; }
+
+    public string StatusMessage { get; init; }
 
     /// <summary>
     /// Id of friends this account has
     /// </summary>
-    public Guid[] Friends { get; init; }
+    public IEnumerable<Guid> Friends { get; init; }
 
     /// <summary>
     /// SSO providers this account is connected to
     /// </summary>
-    public string[] SSOConnections { get; init; }
+    public IEnumerable<string> SSOConnections { get; init; }
 
     /// <summary>
     /// Date this user was created at

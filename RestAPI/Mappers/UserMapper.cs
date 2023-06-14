@@ -12,8 +12,8 @@ public static class UserMapper
         {
             Id = user.Id,
             Username = user.Name,
-            ProfilePictureUrl = user.ProfilePicture?.PublicUrl,
-            ProfileBannerUrl = user.ProfileBanner?.PublicUrl,
+            AvatarUrl = user.ProfileAvatar?.PublicUrl,
+            BannerUrl = user.ProfileBanner?.PublicUrl,
             Presence = user.Presence,
             StatusMessage = user.StatusMessage,
             CreatedAt = user.CreatedAt,
@@ -28,8 +28,8 @@ public static class UserMapper
         {
             Id = user.Id,
             Username = user.Name,
-            ProfilePictureUrl = null,
-            ProfileBannerUrl = null,
+            AvatarUrl = null,
+            BannerUrl = null,
             Presence = UserPresence.Offline,
             StatusMessage = String.Empty,
             CreatedAt = DateTime.MinValue,
@@ -55,11 +55,15 @@ public static class UserMapper
             EmailVerified = emailVerified,
             AcceptedPrivacyPolicyVersion = user.AcceptedPrivacyPolicyVersion,
             AcceptedTermsOfServiceVersion = user.AcceptedTermsOfServiceVersion,
-            ProfilePictureUrl = user.ProfilePicture?.PublicUrl!,
-            Status = user.Presence,
-            StatusText = user.StatusMessage,
-            Friends = user.Relations?.Select(fs => fs.TargetUserId).ToArray() ?? Array.Empty<Guid>(),
-            SSOConnections = user.SSOConnections?.Select(oc => oc.ProviderName).ToArray() ?? Array.Empty<string>(),
+            AvatarUrl = user.ProfileAvatar?.PublicUrl,
+            BannerUrl = user.ProfileBanner?.PublicUrl,
+            Presence = user.Presence,
+            StatusMessage = user.StatusMessage,
+            Friends = user.Relations?.Select(fs => fs.TargetUserId) ?? Enumerable.Empty<Guid>(),
+            SSOConnections = user.SSOConnections?.Select(oc => oc.ProviderName) ?? Enumerable.Empty<string>(),
+            CreatedAt = user.CreatedAt,
+            UpdatedAt = user.UpdatedAt,
+            LastOnline = user.LastOnline,
         };
     }
 }

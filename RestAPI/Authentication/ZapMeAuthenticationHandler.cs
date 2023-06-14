@@ -81,7 +81,9 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             }
 
             // Try to fetch the user's existing SSO connection
-            SSOConnectionEntity? connectionEntity = await _dbContext.SSOConnections.Include(c => c.User).ThenInclude(u => u.ProfilePicture)
+            SSOConnectionEntity? connectionEntity = await _dbContext.SSOConnections
+                .Include(c => c.User).ThenInclude(u => u.ProfileAvatar)
+                .Include(c => c.User).ThenInclude(u => u.ProfileBanner)
                 .FirstOrDefaultAsync(c => c.ProviderName == ssoProviderData.ProviderName && c.ProviderUserId == ssoProviderData.ProviderUserId, CancellationToken);
             if (connectionEntity is null)
             {

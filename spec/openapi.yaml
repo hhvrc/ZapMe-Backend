@@ -711,10 +711,9 @@ components:
         - id
         - lastOnline
         - obscuredEmail
-        - profilePictureUrl
+        - presence
         - ssoConnections
-        - status
-        - statusText
+        - statusMessage
         - updatedAt
         - username
       type: object
@@ -740,13 +739,18 @@ components:
         acceptedTermsOfServiceVersion:
           type: integer
           format: int32
-        profilePictureUrl:
+        avatarUrl:
           type: string
           format: uri
-        status:
+          nullable: true
+        bannerUrl:
+          type: string
+          format: uri
+          nullable: true
+        presence:
           allOf:
             - $ref: '#/components/schemas/UserPresence'
-        statusText:
+        statusMessage:
           type: string
         friends:
           type: array
@@ -1197,11 +1201,11 @@ components:
         username:
           type: string
           example: MyUsername
-        profilePictureUrl:
+        avatarUrl:
           type: string
           format: uri
           nullable: true
-        profileBannerUrl:
+        bannerUrl:
           type: string
           format: uri
           nullable: true

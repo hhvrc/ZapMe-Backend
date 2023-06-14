@@ -10,9 +10,9 @@ public readonly struct UserDto
     [Username(false)]
     public string Username { get; init; }
 
-    public Uri? ProfilePictureUrl { get; init; }
+    public Uri? AvatarUrl { get; init; }
 
-    public Uri? ProfileBannerUrl { get; init; }
+    public Uri? BannerUrl { get; init; }
 
     public UserPresence Presence { get; init; }
 

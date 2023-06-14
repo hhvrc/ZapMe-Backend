@@ -49,7 +49,7 @@ public sealed class UserEntity
     /// <summary>
     /// 
     /// </summary>
-    public Guid? ProfilePictureId { get; set; }
+    public Guid? ProfileAvatarId { get; set; }
 
     /// <summary>
     /// 
@@ -81,7 +81,7 @@ public sealed class UserEntity
     /// </summary>
     public DateTime LastOnline { get; set; }
 
-    public ImageEntity? ProfilePicture { get; set; }
+    public ImageEntity? ProfileAvatar { get; set; }
     public ImageEntity? ProfileBanner { get; set; }
     public UserPasswordResetRequestEntity? PasswordResetRequest { get; set; }
     public UserEmailVerificationRequestEntity? EmailVerificationRequest { get; set; }
@@ -128,8 +128,8 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntit
         builder.Property(u => u.AcceptedTermsOfServiceVersion)
             .HasColumnName("acceptedTermsOfServiceVersion");
 
-        builder.Property(u => u.ProfilePictureId)
-            .HasColumnName("profilePictureId");
+        builder.Property(u => u.ProfileAvatarId)
+            .HasColumnName("profileAvatarId");
 
         builder.Property(u => u.ProfileBannerId)
             .HasColumnName("profileBannerId");
@@ -153,7 +153,7 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntit
             .HasColumnName("lastOnline")
             .HasDefaultValueSql("now()");
 
-        builder.HasOne(u => u.ProfilePicture)
+        builder.HasOne(u => u.ProfileAvatar)
             .WithMany()
             .OnDelete(DeleteBehavior.SetNull);
 

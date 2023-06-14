@@ -114,20 +114,35 @@ public partial class AccountController
 
         using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 
-        ImageEntity? imageEntity = null;
+        ImageEntity? avatarImageEntity = null;
+        ImageEntity? bannerImageEntity = null;
         if (providerVariables is not null)
         {
             var imageManager = HttpContext.RequestServices.GetRequiredService<IImageManager>();
-            if (!String.IsNullOrEmpty(providerVariables.ProfilePictureUrl))
+            if (!String.IsNullOrEmpty(providerVariables.ProviderAvatarUrl))
             {
                 var getOrCreateImageResult = await imageManager.GetOrCreateRecordAsync(
-                    providerVariables.ProfilePictureUrl,
+                    providerVariables.ProviderAvatarUrl,
                     CountryRegionLookup.GetCloudflareRegion(this.GetCloudflareIPCountry()),
                     null,
                     null,
                     cancellationToken
                     );
-                if (getOrCreateImageResult.TryPickT1(out ErrorDetails errorDetails, out imageEntity))
+                if (getOrCreateImageResult.TryPickT1(out ErrorDetails errorDetails, out avatarImageEntity))
+                {
+                    return errorDetails.ToActionResult();
+                }
+            }
+            if (!String.IsNullOrEmpty(providerVariables.ProviderBannerUrl))
+            {
+                var getOrCreateImageResult = await imageManager.GetOrCreateRecordAsync(
+                    providerVariables.ProviderBannerUrl,
+                    CountryRegionLookup.GetCloudflareRegion(this.GetCloudflareIPCountry()),
+                    null,
+                    null,
+                    cancellationToken
+                    );
+                if (getOrCreateImageResult.TryPickT1(out ErrorDetails errorDetails, out bannerImageEntity))
                 {
                     return errorDetails.ToActionResult();
                 }
@@ -142,6 +157,8 @@ public partial class AccountController
             PasswordHash = PasswordUtils.HashPassword(body.Password),
             AcceptedPrivacyPolicyVersion = body.AcceptedPrivacyPolicyVersion,
             AcceptedTermsOfServiceVersion = body.AcceptedTermsOfServiceVersion,
+            ProfileAvatarId = avatarImageEntity?.Id,
+            ProfileBannerId = bannerImageEntity?.Id,
             Presence = UserPresence.Online,
             StatusMessage = String.Empty
         };
@@ -153,10 +170,16 @@ public partial class AccountController
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
-        if (imageEntity is not null)
+        if (avatarImageEntity is not null)
         {
             await _dbContext.Images
-                .Where(i => i.Id == imageEntity.Id)
+                .Where(i => i.Id == avatarImageEntity.Id)
+                .ExecuteUpdateAsync(spc => spc.SetProperty(i => i.UploaderId, _ => user.Id), cancellationToken);
+        }
+        if (bannerImageEntity is not null)
+        {
+            await _dbContext.Images
+                .Where(i => i.Id == bannerImageEntity.Id)
                 .ExecuteUpdateAsync(spc => spc.SetProperty(i => i.UploaderId, _ => user.Id), cancellationToken);
         }
 

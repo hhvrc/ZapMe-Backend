@@ -48,7 +48,7 @@ public static class AuthenticationBuilderExtensions
             opt.CorrelationCookie.SameSite = SameSiteMode.None;
             opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
             opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.UserEmailVerified, "verified");
-            opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.UserProfileImage, json =>
+            opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.UserAvatarUrl, json =>
             {
                 string? userId = json.GetString("id");
                 string? avatar = json.GetString("avatar");
@@ -56,6 +56,15 @@ public static class AuthenticationBuilderExtensions
                     return null;
 
                 return $"https://cdn.discordapp.com/avatars/{userId}/{avatar}.png";
+            });
+            opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.UserBannerUrl, json =>
+            {
+                string? userId = json.GetString("id");
+                string? banner = json.GetString("banner");
+                if (String.IsNullOrEmpty(userId) || String.IsNullOrEmpty(banner))
+                    return null;
+
+                return $"https://cdn.discordapp.com/banners/{userId}/{banner}.png";
             });
             opt.Validate();
         })
@@ -74,7 +83,7 @@ public static class AuthenticationBuilderExtensions
             opt.CorrelationCookie.HttpOnly = true;
             opt.CorrelationCookie.SameSite = SameSiteMode.None;
             opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
-            opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.UserProfileImage, json =>
+            opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.UserAvatarUrl, json =>
             {
                 string? avatarUrl = json.GetString("avatar_url");
                 string? gravatarId = json.GetString("gravatar_id");
@@ -104,7 +113,15 @@ public static class AuthenticationBuilderExtensions
             opt.CorrelationCookie.HttpOnly = true;
             opt.CorrelationCookie.SameSite = SameSiteMode.None;
             opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
-            opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.UserProfileImage, "profile_image_url_https");
+            opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.UserAvatarUrl, "profile_image_url_https");
+            opt.ClaimActions.MapCustomJson(ZapMeClaimTypes.UserBannerUrl, json =>
+            {
+                string? bannerUrl = json.GetString("profile_banner_url");
+                if (String.IsNullOrEmpty(bannerUrl))
+                    return null;
+
+                return bannerUrl + "/1500x500";
+            });
             opt.Validate();
         })
         .AddGoogle(AuthenticationConstants.GoogleScheme, opt =>
@@ -123,7 +140,7 @@ public static class AuthenticationBuilderExtensions
             opt.CorrelationCookie.SameSite = SameSiteMode.None;
             opt.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
             opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.UserEmailVerified, "email_verified");
-            opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.UserProfileImage, "picture");
+            opt.ClaimActions.MapJsonKey(ZapMeClaimTypes.UserAvatarUrl, "picture");
             opt.Validate();
         });
     }

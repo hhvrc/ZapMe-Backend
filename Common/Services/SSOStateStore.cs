@@ -50,7 +50,7 @@ public sealed class SSOStateStore : ISSOStateStore
     {
         string requestKey = StringUtils.GenerateUrlSafeRandomString(32);
 
-        var stateInternal = new InternalData<SSOProviderDataEntry>(providerData.ProviderName, requestIP, new SSOProviderDataEntry(providerData.ProviderName, providerData.ProviderUserId, providerData.ProviderUserName, providerData.ProviderUserEmail, providerData.ProviderUserEmailVerified, providerData.ProfilePictureUrl, DateTime.UtcNow + SSOConstants.RegistrationTicketLifetime));
+        var stateInternal = new InternalData<SSOProviderDataEntry>(providerData.ProviderName, requestIP, new SSOProviderDataEntry(providerData.ProviderName, providerData.ProviderUserId, providerData.ProviderUserName, providerData.ProviderUserEmail, providerData.ProviderUserEmailVerified, providerData.ProviderAvatarUrl, providerData.ProviderBannerUrl, DateTime.UtcNow + SSOConstants.RegistrationTicketLifetime));
         await _distributedCache.SetAsync(GetProviderDataCacheKey(requestKey), stateInternal, SSOConstants.RegistrationTicketLifetime, cancellationToken);
 
         return requestKey;
