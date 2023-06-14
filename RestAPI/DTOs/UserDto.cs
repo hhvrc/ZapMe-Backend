@@ -14,9 +14,9 @@ public readonly struct UserDto
 
     public Uri? BannerUrl { get; init; }
 
-    public UserPresence Presence { get; init; }
+    public UserStatus Status { get; init; }
 
-    public string StatusMessage { get; init; }
+    public string StatusText { get; init; }
 
     /// <summary>
     /// Date this user was created at

@@ -59,12 +59,12 @@ public sealed class UserEntity
     /// <summary>
     /// 
     /// </summary>
-    public UserPresence Presence { get; set; }
+    public UserStatus Status { get; set; }
 
     /// <summary>
     /// 
     /// </summary>
-    public required string StatusMessage { get; set; }
+    public required string StatusText { get; set; }
 
     /// <summary>
     /// Date this account was created at
@@ -134,11 +134,11 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntit
         builder.Property(u => u.ProfileBannerId)
             .HasColumnName("profileBannerId");
 
-        builder.Property(u => u.Presence)
-            .HasColumnName("presence");
+        builder.Property(u => u.Status)
+            .HasColumnName("status");
 
-        builder.Property(u => u.StatusMessage)
-            .HasColumnName("statusMessage")
+        builder.Property(u => u.StatusText)
+            .HasColumnName("statusText")
             .HasMaxLength(128);
 
         builder.Property(u => u.CreatedAt)

@@ -14,8 +14,8 @@ public static class UserMapper
             Username = user.Name,
             AvatarUrl = user.ProfileAvatar?.PublicUrl,
             BannerUrl = user.ProfileBanner?.PublicUrl,
-            Presence = user.Presence,
-            StatusMessage = user.StatusMessage,
+            Status = user.Status,
+            StatusText = user.StatusText,
             CreatedAt = user.CreatedAt,
             LastSeenAt = user.LastOnline,
         };
@@ -30,8 +30,8 @@ public static class UserMapper
             Username = user.Name,
             AvatarUrl = null,
             BannerUrl = null,
-            Presence = UserPresence.Offline,
-            StatusMessage = String.Empty,
+            Status = UserStatus.Offline,
+            StatusText = String.Empty,
             CreatedAt = DateTime.MinValue,
             LastSeenAt = DateTime.MinValue
         };
@@ -57,8 +57,8 @@ public static class UserMapper
             AcceptedTermsOfServiceVersion = user.AcceptedTermsOfServiceVersion,
             AvatarUrl = user.ProfileAvatar?.PublicUrl,
             BannerUrl = user.ProfileBanner?.PublicUrl,
-            Presence = user.Presence,
-            StatusMessage = user.StatusMessage,
+            Status = user.Status,
+            StatusText = user.StatusText,
             Friends = user.Relations?.Select(fs => fs.TargetUserId) ?? Enumerable.Empty<Guid>(),
             SSOConnections = user.SSOConnections?.Select(oc => oc.ProviderName) ?? Enumerable.Empty<string>(),
             CreatedAt = user.CreatedAt,

@@ -1,6 +1,6 @@
 ﻿namespace ZapMe.Enums;
 
-public enum UserPresence
+public enum UserStatus
 {
     Offline,
     DoNotDisturb,

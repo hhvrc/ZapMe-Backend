@@ -159,8 +159,8 @@ public partial class AccountController
             AcceptedTermsOfServiceVersion = body.AcceptedTermsOfServiceVersion,
             ProfileAvatarId = avatarImageEntity?.Id,
             ProfileBannerId = bannerImageEntity?.Id,
-            Presence = UserPresence.Online,
-            StatusMessage = String.Empty
+            Status = UserStatus.Online,
+            StatusText = String.Empty
         };
 
         // Create account

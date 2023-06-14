@@ -29,9 +29,9 @@ public readonly struct AccountDto
 
     public Uri? BannerUrl { get; init; }
 
-    public UserPresence Presence { get; init; }
+    public UserStatus Status { get; init; }
 
-    public string StatusMessage { get; init; }
+    public string StatusText { get; init; }
 
     /// <summary>
     /// Id of friends this account has
