@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ZapMe.Authentication;
-using ZapMe.Database.Models;
+using System.Security.Claims;
 using ZapMe.DTOs;
 using ZapMe.DTOs.API.User;
 using ZapMe.Helpers;
 using ZapMe.Utils;
-using System.Security.Claims;
 
 namespace ZapMe.Controllers.Api.V1;
 

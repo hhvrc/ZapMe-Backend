@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using ZapMe.Attributes;
-using ZapMe.Authentication;
 using ZapMe.Constants;
 using ZapMe.Database.Models;
 using ZapMe.DTOs;

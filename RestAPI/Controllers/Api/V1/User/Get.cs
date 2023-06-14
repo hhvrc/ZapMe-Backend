@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ZapMe.Authentication;
+using System.Security.Claims;
 using ZapMe.Database.Models;
 using ZapMe.DTOs;
-using ZapMe.Helpers;
-using System.Security.Claims;
 using ZapMe.Enums;
+using ZapMe.Helpers;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -14,25 +13,25 @@ public partial class UserController
     /// <summary>
     /// Get user
     /// </summary>
-    /// <param name="targetUserId"></param>
+    /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [RequestSizeLimit(1024)]
     [HttpGet("i/{userId}", Name = "GetUser")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)] // Accepted
     [ProducesResponseType(StatusCodes.Status404NotFound)]            // User not found
-    public async Task<IActionResult> Get([FromRoute] Guid targetUserId, CancellationToken cancellationToken)
+    public async Task<IActionResult> Get([FromRoute] Guid userId, CancellationToken cancellationToken)
     {
-        Guid? userId = User.GetUserId();
-        if (!userId.HasValue) return HttpErrors.UnauthorizedActionResult;
+        Guid? authenticatedUserId = User.GetUserId();
+        if (!authenticatedUserId.HasValue) return HttpErrors.UnauthorizedActionResult;
 
         // VVVV TODO: move this to a more logical place VVVV
         // Get target user if exists and has not blocked the requesting user
         UserEntity? targetUser = await _dbContext.Users
             .Where(u =>
-                u.Id == targetUserId &&
+                u.Id == userId &&
                 !u.Relations!.Any(r =>
-                    r.TargetUserId == userId &&
+                    r.TargetUserId == authenticatedUserId &&
                     r.RelationType == UserRelationType.Blocked
                 )
             )
@@ -44,7 +43,7 @@ public partial class UserController
         }
 
         // Avoid users to see details of blocked users
-        if (targetUser.Relations!.Any(r => r.SourceUserId == userId && r.RelationType == UserRelationType.Blocked))
+        if (targetUser.Relations!.Any(r => r.SourceUserId == authenticatedUserId && r.RelationType == UserRelationType.Blocked))
         {
             return Ok(targetUser.ToMinimalUserDto());
         }

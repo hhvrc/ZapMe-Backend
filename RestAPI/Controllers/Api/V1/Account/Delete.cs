@@ -6,7 +6,6 @@ using System.Security.Claims;
 using ZapMe.Attributes;
 using ZapMe.Database.Models;
 using ZapMe.Helpers;
-using ZapMe.Utils;
 
 namespace ZapMe.Controllers.Api.V1;
 

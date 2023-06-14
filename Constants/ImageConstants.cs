@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-
-namespace ZapMe.Constants;
+﻿namespace ZapMe.Constants;
 
 public static class ImageConstants
 {

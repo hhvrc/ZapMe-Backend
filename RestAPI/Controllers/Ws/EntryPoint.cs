@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ZapMe.Authentication;
+using System.Security.Claims;
 using ZapMe.Helpers;
 using ZapMe.Websocket;
-using System.Security.Claims;
 
 namespace ZapMe.Controllers.Ws;
 

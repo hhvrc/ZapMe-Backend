@@ -1,7 +1,6 @@
 ﻿using System.Security.Claims;
 using ZapMe.Constants;
 using ZapMe.Database.Models;
-using ZapMe.DTOs;
 
 namespace ZapMe.DTOs;
 

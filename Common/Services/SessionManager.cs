@@ -1,5 +1,4 @@
-﻿using ZapMe.Database;
-using ZapMe.Database.Models;
+﻿using ZapMe.Database.Models;
 using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Services;

@@ -1,6 +1,5 @@
-﻿using System.Threading.RateLimiting;
-using ZapMe.Authentication;
-using System.Security.Claims;
+﻿using System.Security.Claims;
+using System.Threading.RateLimiting;
 using ZapMe.Constants;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -30,7 +29,7 @@ public static class RateLimitingIServiceCollectionExtensions
                     });
                 }
 
-            if (ctx.User.IsInRole(ZapMeRoleNames.Admin))
+                if (ctx.User.IsInRole(ZapMeRoleNames.Admin))
                 {
                     return RateLimitPartition.GetNoLimiter("admin");
                 }

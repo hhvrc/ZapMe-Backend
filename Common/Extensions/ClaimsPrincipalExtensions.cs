@@ -2,7 +2,6 @@
 using ZapMe.Constants;
 using ZapMe.Database;
 using ZapMe.Database.Models;
-using ZapMe.Helpers;
 using ZapMe.Utils;
 
 namespace System.Security.Claims;

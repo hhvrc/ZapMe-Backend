@@ -373,7 +373,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SessionDto'
+                $ref: '#/components/schemas/AuthenticationResponse'
         '400':
           description: Bad Request
           content:
@@ -831,6 +831,14 @@ components:
           description: Make this login persist for a longer period of time
       additionalProperties: false
       description: Message sent to server to authenticate user using username and password
+    AuthenticationResponse:
+      required:
+        - jwtToken
+      type: object
+      properties:
+        jwtToken:
+          type: string
+      additionalProperties: false
     Config:
       required:
         - api
@@ -939,7 +947,7 @@ components:
           format: uuid
         session:
           allOf:
-            - $ref: '#/components/schemas/SessionDto'
+            - $ref: '#/components/schemas/AuthenticationResponse'
           description: 'If the account was created using OAuth and in a way that ensures the email address is valid, a session will be created and returned here'
           nullable: true
         emailVerificationRequired:
@@ -1060,23 +1068,6 @@ components:
           description: Response from cloudflare turnstile request
       additionalProperties: false
       description: Request sent to server to request a password reset token
-    SessionDto:
-      required:
-        - expiresAtUtc
-        - issuedAtUtc
-        - sessionToken
-      type: object
-      properties:
-        sessionToken:
-          type: string
-          format: uuid
-        issuedAtUtc:
-          type: string
-          format: date-time
-        expiresAtUtc:
-          type: string
-          format: date-time
-      additionalProperties: false
     SocialsConfig:
       type: object
       properties:
