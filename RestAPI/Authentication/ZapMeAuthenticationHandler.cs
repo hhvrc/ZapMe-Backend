@@ -69,6 +69,7 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
 
         DateTime issuedAt;
         DateTime expiresAt;
+        ClaimsIdentity claimsIdentity;
         if (authScheme != AuthenticationConstants.ZapMeScheme)
         {
             // Fetch the claims provided by the OAuth provider
@@ -115,17 +116,18 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
 
             issuedAt = session.CreatedAt;
             expiresAt = session.ExpiresAt;
-            claimsPrincipal = new ClaimsPrincipal(session.ToClaimsIdentity());
+            claimsIdentity = session.ToClaimsIdentity();
         }
         else
         {
             ArgumentNullException.ThrowIfNull(properties);
             issuedAt = properties.IssuedUtc?.UtcDateTime ?? throw new ArgumentNullException(nameof(properties.IssuedUtc));
             expiresAt = properties.ExpiresUtc?.UtcDateTime ?? throw new ArgumentNullException(nameof(properties.ExpiresUtc));
+            claimsIdentity = claimsPrincipal.Identities.FirstOrDefault() ?? throw new ArgumentNullException(nameof(claimsPrincipal.Identities));
         }
 
         Response.StatusCode = StatusCodes.Status200OK;
-        await Response.WriteAsJsonAsync(new AuthenticationResponse(JwtToken: JwtTokenUtils.GenerateJwtToken(claimsPrincipal, expiresAt, _jwtOptions.SigningKey)));
+        await Response.WriteAsJsonAsync(new AuthenticationResponse(JwtToken: JwtTokenUtils.GenerateJwtToken(claimsIdentity, issuedAt, expiresAt, _jwtOptions.SigningKey)));
     }
 
     public Task SignOutAsync(AuthenticationProperties? properties)

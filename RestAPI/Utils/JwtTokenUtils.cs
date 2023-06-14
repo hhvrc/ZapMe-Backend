@@ -10,38 +10,32 @@ namespace ZapMe.Utils;
 
 public static class JwtTokenUtils
 {
-    public static string GenerateJwtToken(IEnumerable<Claim> claims, DateTime expiresAt, string jwtSecret)
+    public static string GenerateJwtToken(ClaimsIdentity claimsIdentity, DateTime issuedAt, DateTime expiresAt, string jwtSecret)
     {
-        ArgumentNullException.ThrowIfNull(claims);
+        ArgumentNullException.ThrowIfNull(claimsIdentity);
         ArgumentException.ThrowIfNullOrEmpty(jwtSecret);
 
+        var tokenHandler = new JwtSecurityTokenHandler();
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-        var token = new JwtSecurityToken(
-                       issuer: AuthenticationConstants.JwtIssuer,
-                       audience: AuthenticationConstants.JwtAudience,
-                       claims: claims,
-                       expires: expiresAt,
-                       signingCredentials: credentials
-                    );
+        var descriptor = new SecurityTokenDescriptor
+        {
+            Subject = claimsIdentity,
+            IssuedAt = issuedAt,
+            Expires = expiresAt,
+            SigningCredentials = credentials,
+            Issuer = AuthenticationConstants.JwtIssuer,
+            Audience = AuthenticationConstants.JwtAudience,
+        };
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
-    }
-    public static string GenerateJwtToken(ClaimsIdentity claimsIdentity, DateTime expiresAt, string jwtSecret)
-    {
-        ArgumentNullException.ThrowIfNull(claimsIdentity);
-        return GenerateJwtToken(claimsIdentity.Claims, expiresAt, jwtSecret);
-    }
-    public static string GenerateJwtToken(ClaimsPrincipal claimsPrincipal, DateTime expiresAt, string jwtSecret)
-    {
-        ArgumentNullException.ThrowIfNull(claimsPrincipal);
-        return GenerateJwtToken(claimsPrincipal.Claims, expiresAt, jwtSecret);
+        var securityToken = tokenHandler.CreateToken(descriptor);
+        return tokenHandler.WriteToken(securityToken);
     }
     public static string GenerateJwtToken(SessionEntity session, string jwtSecret)
     {
         ArgumentNullException.ThrowIfNull(session);
-        return GenerateJwtToken(session.ToClaimsIdentity(), session.ExpiresAt, jwtSecret);
+        return GenerateJwtToken(session.ToClaimsIdentity(), session.CreatedAt, session.ExpiresAt, jwtSecret);
     }
 
     public static bool ValidateJwtToken(string jwtToken, string jwtSecret, out ClaimsPrincipal claimsPrincipal, out SecurityToken validatedToken)
