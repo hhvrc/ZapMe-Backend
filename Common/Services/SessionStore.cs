@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using ZapMe.Constants;
 using ZapMe.Database;
 using ZapMe.Database.Models;
@@ -36,9 +37,18 @@ public sealed class SessionStore : ISessionStore
 
         await _dbContext.Sessions.AddAsync(session, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
+        session = await _dbContext.Sessions
+            .Where(s => s.Id == session.Id)
+            .Include(s => s.User)
+            .Include(s => s.UserAgent)
+            .SingleAsync(cancellationToken);
 
         string sessionKey = RedisCachePrefixes.Session + session.Id.ToString();
 
+        // TODO: VVVV THIS IS A RETARDED WAY TO FIX CYCLIC REFERENCES VVVV URGENT FIX
+        if (session.User is not null) session.User.Sessions = null;
+        if (session.UserAgent is not null) session.UserAgent.Sessions = null;
+        // TODO: AAAA THIS IS A RETARDED WAY TO FIX CYCLIC REFERENCES AAAA URGENT FIX
         await _cache.SetAsync(sessionKey, JsonSerializer.SerializeToUtf8Bytes(session), new DistributedCacheEntryOptions
         {
             AbsoluteExpiration = session.ExpiresAt
@@ -50,13 +60,19 @@ public sealed class SessionStore : ISessionStore
     public async Task<SessionEntity?> TryGetAsync(Guid sessionId, CancellationToken cancellationToken)
     {
         string sessionKey = RedisCachePrefixes.Session + sessionId.ToString();
+        SessionEntity? session;
 
         var bytes = await _cache.GetAsync(sessionKey, cancellationToken);
         if (bytes is not null)
         {
             try
             {
-                return JsonSerializer.Deserialize<SessionEntity>(bytes);
+                session = JsonSerializer.Deserialize<SessionEntity>(bytes);
+                // TODO: VVVV THIS IS EXTREMELY RETARDED VVVV URGENT FIX
+                if (session is not null && session.User is not null && session.UserAgent is not null)
+                {
+                    return session;
+                }
             }
             catch (JsonException ex)
             {
@@ -64,7 +80,7 @@ public sealed class SessionStore : ISessionStore
             }
         }
 
-        SessionEntity? session = await _dbContext.Sessions
+        session = await _dbContext.Sessions
             .Where(s => s.Id == sessionId)
             .Include(s => s.User)
             .Include(s => s.UserAgent)
@@ -72,6 +88,10 @@ public sealed class SessionStore : ISessionStore
 
         if (session is not null)
         {
+            // TODO: VVVV THIS IS A RETARDED WAY TO FIX CYCLIC REFERENCES VVVV URGENT FIX
+            if (session.User is not null) session.User.Sessions = null;
+            if (session.UserAgent is not null) session.UserAgent.Sessions = null;
+            // TODO: AAAA THIS IS A RETARDED WAY TO FIX CYCLIC REFERENCES AAAA URGENT FIX
             await _cache.SetAsync(sessionKey, JsonSerializer.SerializeToUtf8Bytes(session), new DistributedCacheEntryOptions
             {
                 AbsoluteExpiration = session.ExpiresAt
