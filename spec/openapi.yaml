@@ -711,9 +711,9 @@ components:
         - id
         - lastOnline
         - obscuredEmail
-        - presence
         - ssoConnections
-        - statusMessage
+        - status
+        - statusText
         - updatedAt
         - username
       type: object
@@ -747,10 +747,10 @@ components:
           type: string
           format: uri
           nullable: true
-        presence:
+        status:
           allOf:
-            - $ref: '#/components/schemas/UserPresence'
-        statusMessage:
+            - $ref: '#/components/schemas/UserStatus'
+        statusText:
           type: string
         friends:
           type: array
@@ -1190,8 +1190,8 @@ components:
         - createdAt
         - id
         - lastSeenAt
-        - presence
-        - statusMessage
+        - status
+        - statusText
         - username
       type: object
       properties:
@@ -1209,10 +1209,10 @@ components:
           type: string
           format: uri
           nullable: true
-        presence:
+        status:
           allOf:
-            - $ref: '#/components/schemas/UserPresence'
-        statusMessage:
+            - $ref: '#/components/schemas/UserStatus'
+        statusText:
           type: string
         createdAt:
           type: string
@@ -1238,13 +1238,6 @@ components:
           description: 'Content of the notification, might be HTML'
       additionalProperties: false
       description: "System notification to be displayed to the user, do not confuse with user notifications\r\nThis is a hint and clients can choose to ignore it or implement notifications to be independent of this"
-    UserPresence:
-      enum:
-        - offline
-        - doNotDisturb
-        - inactive
-        - online
-      type: string
     UserReport:
       required:
         - explenation
@@ -1261,6 +1254,13 @@ components:
           type: string
       additionalProperties: false
       description: Message sent to server to report a user
+    UserStatus:
+      enum:
+        - offline
+        - doNotDisturb
+        - inactive
+        - online
+      type: string
   securitySchemes:
     Bearer:
       type: apiKey
