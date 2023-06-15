@@ -35,9 +35,9 @@ public sealed class MailGunService : IMailGunService
     public const string SendMailEndpoint = "messages";
 
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<LockOutStore> _logger;
+    private readonly ILogger<MailGunService> _logger;
 
-    public MailGunService(IHttpClientFactory httpClientFactory, ILogger<LockOutStore> logger)
+    public MailGunService(IHttpClientFactory httpClientFactory, ILogger<MailGunService> logger)
     {
         _httpClientFactory = httpClientFactory;
         _logger = logger;
