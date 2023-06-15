@@ -518,7 +518,7 @@ paths:
                 type: array
                 items:
                   type: string
-  /api/v1/user/block:
+  '/api/v1/user/block/{userId}':
     put:
       tags:
         - User
