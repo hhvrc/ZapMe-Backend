@@ -88,7 +88,8 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
             .Users
             .Where(u => u.Id == verificationRequest.UserId)
             .ExecuteUpdateAsync(spc => spc
-                .SetProperty(u => u.Email, verificationRequest.NewEmail), cancellationToken);
+                .SetProperty(u => u.Email, verificationRequest.NewEmail)
+                .SetProperty(u => u.EmailVerified, true), cancellationToken);
 
         // Delete email verification request
         await _dbContext.UserEmailVerificationRequests

@@ -18,7 +18,9 @@ public sealed class UserEntity
     /// </summary>
     public required string Name { get; set; }
 
-    public string? Email { get; set; }
+    public required string Email { get; set; }
+
+    public bool EmailVerified { get; set; }
 
     /// <summary>
     /// Secure hash of the user's password, hashed with BCrypt.
@@ -81,6 +83,9 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntit
         builder.Property(u => u.Email)
             .HasColumnName("email")
             .HasMaxLength(GeneralHardLimits.EmailAddressMaxLength);
+
+        builder.Property(u => u.EmailVerified)
+            .HasColumnName("emailVerified");
 
         builder.Property(u => u.PasswordHash)
             .HasColumnName("passwordHash")

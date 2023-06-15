@@ -149,19 +149,14 @@ public partial class AccountController
             }
         }
 
-        // Only accept emails we know are verified
-        string? verifiedEmail = null;
-        bool emailVerificationRequired = true;
-        if (providerVariables?.ProviderUserEmail == body.Email && providerVariables.ProviderUserEmailVerified)
-        {
-            verifiedEmail = providerVariables.ProviderUserEmail;
-            emailVerificationRequired = false;
-        }
+        // If a OAuth provider has verified the email, and the user has not changed it, then we can mark the email as verified
+        bool emailVerified = providerVariables?.ProviderUserEmail == body.Email && providerVariables.ProviderUserEmailVerified;
 
         UserEntity user = new UserEntity
         {
             Name = body.Username,
-            Email = verifiedEmail,
+            Email = body.Email,
+            EmailVerified = emailVerified,
             PasswordHash = PasswordUtils.HashPassword(body.Password),
             AcceptedPrivacyPolicyVersion = body.AcceptedPrivacyPolicyVersion,
             AcceptedTermsOfServiceVersion = body.AcceptedTermsOfServiceVersion,
@@ -218,7 +213,7 @@ public partial class AccountController
         }
 
         // Send email verification
-        if (emailVerificationRequired)
+        if (!emailVerified)
         {
             var emailVerificationManager = HttpContext.RequestServices.GetRequiredService<IEmailVerificationManager>();
             ErrorDetails? test = await emailVerificationManager.InitiateEmailVerificationAsync(user, body.Email, cancellationToken);
@@ -235,7 +230,7 @@ public partial class AccountController
         {
             AccountId = user.Id,
             Session = jwtToken is null ? null : new AuthenticationResponse(jwtToken),
-            EmailVerificationRequired = emailVerificationRequired
+            EmailVerificationRequired = !emailVerified
         });
     }
 }

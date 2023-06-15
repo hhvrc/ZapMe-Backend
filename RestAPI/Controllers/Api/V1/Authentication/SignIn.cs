@@ -70,7 +70,7 @@ public partial class AuthController
             return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Account disabled", "Account has been disabled either by moderative or administrative reasons", NotificationSeverityLevel.Error, "Account disabled: " + reason).ToActionResult();
         }
 
-        if (String.IsNullOrEmpty(user.Email))
+        if (!user.EmailVerified)
         {
             return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Unverified Email", "Email has not been verified", NotificationSeverityLevel.Error, "Please verify your email address before signing in").ToActionResult();
         }
