@@ -55,13 +55,13 @@ public sealed class UserEntity
     public ImageEntity? ProfileBanner { get; private set; } = null;
     public UserPasswordResetRequestEntity? PasswordResetRequest { get; private set; } = null;
     public UserEmailVerificationRequestEntity? EmailVerificationRequest { get; private set; } = null;
-    public ICollection<SessionEntity> Sessions { get; private set; } = null!;
-    public ICollection<LockOutEntity> LockOuts { get; private set; } = null!;
-    public ICollection<UserRoleEntity> UserRoles { get; private set; } = null!;
-    public ICollection<UserRelationEntity> Relations { get; private set; } = null!;
-    public ICollection<FriendRequestEntity> FriendRequestsOutgoing { get; private set; } = null!;
-    public ICollection<FriendRequestEntity> FriendRequestsIncoming { get; private set; } = null!;
-    public ICollection<SSOConnectionEntity> SSOConnections { get; private set; } = null!;
+    public List<SessionEntity> Sessions { get; private set; } = new List<SessionEntity>();
+    public List<LockOutEntity> LockOuts { get; private set; } = new List<LockOutEntity>();
+    public List<UserRoleEntity> UserRoles { get; private set; } = new List<UserRoleEntity>();
+    public List<UserRelationEntity> Relations { get; private set; } = new List<UserRelationEntity>();
+    public List<FriendRequestEntity> FriendRequestsOutgoing { get; private set; } = new List<FriendRequestEntity>();
+    public List<FriendRequestEntity> FriendRequestsIncoming { get; private set; } = new List<FriendRequestEntity>();
+    public List<SSOConnectionEntity> SSOConnections { get; private set; } = new List<SSOConnectionEntity>();
 }
 
 public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>

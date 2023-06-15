@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ZapMe.Constants;
 using ZapMe.DTOs;
 
 namespace ZapMe.Helpers;
@@ -86,4 +87,16 @@ public static class HttpErrors
 
     public static ErrorDetails UserNotFound => Generic(StatusCodes.Status404NotFound, "user_not_found", "User not found", null, null, new UserNotification(NotificationSeverityLevel.Error, "User not found"));
     public static IActionResult UserNotFoundActionResult => UserNotFound.ToActionResult();
+
+    public static ErrorDetails UnverifiedEmail => HttpErrors.Generic(StatusCodes.Status400BadRequest, "Unverified Email", "Email has not been verified", NotificationSeverityLevel.Warning, "Please verify your email address, and then try again");
+    public static IActionResult UnverifiedEmailActionResult => UnverifiedEmail.ToActionResult();
+
+    public static ErrorDetails ReviewPrivacyPolicy => HttpErrors.Generic(StatusCodes.Status400BadRequest, "review_privpol", "User needs to accept new Privacy Policy", NotificationSeverityLevel.Error, "Please read and accept the new Privacy Policy, and then try again");
+    public static IActionResult ReviewPrivacyPolicyActionResult => ReviewPrivacyPolicy.ToActionResult();
+
+    public static ErrorDetails ReviewTermsOfService => HttpErrors.Generic(StatusCodes.Status400BadRequest, "review_tos", "User needs to accept new Terms of Service", NotificationSeverityLevel.Error, "Please read and accept the new Terms of Service, and then try again");
+    public static IActionResult ReviewTermsOfServiceActionResult => ReviewTermsOfService.ToActionResult();
+
+    public static ErrorDetails UserAgentTooLong => HttpErrors.Generic(StatusCodes.Status413RequestEntityTooLarge, "User-Agent too long", $"User-Agent header has a hard limit on {UserAgentLimits.MaxUploadLength} characters", NotificationSeverityLevel.Error, "Unexpected behaviour, please contact developers");
+    public static IActionResult UserAgentTooLongActionResult => UserAgentTooLong.ToActionResult();
 }

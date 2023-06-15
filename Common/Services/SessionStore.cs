@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
-using ZapMe.Constants;
 using ZapMe.Database;
 using ZapMe.Database.Models;
 using ZapMe.Services.Interfaces;
@@ -46,14 +45,15 @@ public sealed class SessionStore : ISessionStore
         await _dbContext.Sessions.AddAsync(session, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        string sessionKey = RedisCachePrefixes.Session + session.Id.ToString();
-        await SetCacheAsync(sessionKey, session, cancellationToken);
+        //string sessionKey = RedisCachePrefixes.Session + session.Id.ToString();
+        //await SetCacheAsync(sessionKey, session, cancellationToken);
 
         return session;
     }
 
     public async Task<SessionEntity?> TryGetAsync(Guid sessionId, CancellationToken cancellationToken)
     {
+        /*
         string sessionKey = RedisCachePrefixes.Session + sessionId.ToString();
 
         SessionEntity? session = await _cache.GetAsync<SessionEntity>(sessionKey, cancellationToken);
@@ -61,10 +61,11 @@ public sealed class SessionStore : ISessionStore
         {
             return session;
         }
+        */
 
-        session = await _dbContext.Sessions.SingleOrDefaultAsync(s => s.Id == sessionId, cancellationToken);
+        SessionEntity? session = await _dbContext.Sessions.Include(s => s.User).Include(s => s.UserAgent).SingleOrDefaultAsync(s => s.Id == sessionId, cancellationToken);
 
-        await SetCacheAsync(sessionKey, session, cancellationToken);
+        //await SetCacheAsync(sessionKey, session, cancellationToken);
 
         return session;
     }

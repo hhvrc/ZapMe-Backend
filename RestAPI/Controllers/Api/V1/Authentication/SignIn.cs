@@ -49,9 +49,9 @@ public partial class AuthController
                 ).ToActionResult();
         }
 
-        if (String.IsNullOrEmpty(user.Email))
+        if (!user.EmailVerified)
         {
-            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Unverified Email", "Email has not been verified", NotificationSeverityLevel.Warning, "Please verify your email address before signing in").ToActionResult();
+            return HttpErrors.UnverifiedEmailActionResult;
         }
 
         LockOutEntity[] lockouts = await _dbContext.LockOuts
@@ -70,27 +70,21 @@ public partial class AuthController
             return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Account disabled", "Account has been disabled either by moderative or administrative reasons", NotificationSeverityLevel.Error, "Account disabled: " + reason).ToActionResult();
         }
 
-        if (!user.EmailVerified)
-        {
-            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Unverified Email", "Email has not been verified", NotificationSeverityLevel.Error, "Please verify your email address before signing in").ToActionResult();
-        }
-
         if (user.AcceptedPrivacyPolicyVersion < options.Value.PrivacyPolicyVersion)
         {
-            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "review_privpol", "User needs to accept new Privacy Policy", NotificationSeverityLevel.Error, "Please read and accept the new Privacy Policy before creating an account").ToActionResult();
+            return HttpErrors.ReviewPrivacyPolicyActionResult;
         }
 
         if (user.AcceptedTermsOfServiceVersion < options.Value.TermsOfServiceVersion)
         {
-            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "review_tos", "User needs to accept new Terms of Service", NotificationSeverityLevel.Error, "Please read and accept the new Terms of Service before creating an account").ToActionResult();
+            return HttpErrors.ReviewTermsOfServiceActionResult;
         }
 
         string userAgent = this.GetRemoteUserAgent();
 
         if (userAgent.Length > UserAgentLimits.MaxUploadLength)
         {
-            // Request body too large
-            return HttpErrors.Generic(StatusCodes.Status413RequestEntityTooLarge, "User-Agent too long", $"User-Agent header has a hard limit on {UserAgentLimits.MaxUploadLength} characters", NotificationSeverityLevel.Error, "Unexpected behaviour, please contact developers").ToActionResult();
+            return HttpErrors.UserAgentTooLongActionResult;
         }
 
         SessionEntity session = await _sessionManager.CreateAsync(user, this.GetRemoteIP(), this.GetCloudflareIPCountry(), userAgent, body.RememberMe, cancellationToken);

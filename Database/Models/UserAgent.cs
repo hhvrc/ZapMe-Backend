@@ -25,7 +25,7 @@ public sealed class UserAgentEntity
 
     public DateTime CreatedAt { get; set; }
 
-    public ICollection<SessionEntity> Sessions { get; private set; } = null!;
+    public List<SessionEntity> Sessions { get; private set; } = new List<SessionEntity>();
 }
 
 public sealed class UserAgentEntityConfiguration : IEntityTypeConfiguration<UserAgentEntity>
