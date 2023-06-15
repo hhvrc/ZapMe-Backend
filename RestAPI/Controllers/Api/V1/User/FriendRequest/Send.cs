@@ -18,6 +18,7 @@ partial class UserController
     [RequestSizeLimit(1024)]
     [HttpPost("i/{userId}/friendrequest", Name = "SendFriendRequest")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status304NotModified)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> FriendRequestSend([FromRoute] Guid userId, CancellationToken cancellationToken)
     {
@@ -52,10 +53,18 @@ partial class UserController
             return NotFound();
         }
 
+        // Check if friend request has already been sent
+        if (await _dbContext.FriendRequests.AnyAsync(r => r.SenderId == authenticatedUserId && r.ReceiverId == userId, cancellationToken))
+        {
+            // Respond with 304 Not Modified, as the request has already been sent
+            return StatusCode(StatusCodes.Status304NotModified);
+        }
+
         // Check if target user has already sent a friend request
         if (await _dbContext.FriendRequests.AnyAsync(r => r.SenderId == userId && r.ReceiverId == authenticatedUserId, cancellationToken))
         {
-            return NotFound();
+            // TODO URGENT: accept friend request
+            throw new NotImplementedException();
         }
 
         await _dbContext.FriendRequests.AddAsync(new()

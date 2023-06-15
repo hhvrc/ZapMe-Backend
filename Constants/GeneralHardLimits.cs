@@ -15,4 +15,8 @@ public static class GeneralHardLimits
     public const int UserAgentStoredLength = 512;
 
     public const int IPAddressMaxLength = 40;
+
+    public const int StatusTextMaxLength = 128;
+    public const int NickNameMaxLength = 32;
+    public const int NotesMaxLength = 128;
 }

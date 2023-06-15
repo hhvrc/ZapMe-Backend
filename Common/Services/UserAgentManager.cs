@@ -44,7 +44,7 @@ public sealed class UserAgentManager : IUserAgentManager
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to parse user agent {UserAgent}", userAgent);
+            _logger.LogError(ex, "Failed to parse user agent with hash [{hash}], inserting into database with fields set to \"unknown\"", sha256);
             os = "Unknown";
             device = "Unknown";
             browser = "Unknown";

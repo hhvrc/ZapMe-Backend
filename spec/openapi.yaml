@@ -518,6 +518,29 @@ paths:
                 type: array
                 items:
                   type: string
+  /api/v1/user/block:
+    post:
+      tags:
+        - User
+      summary: Block a user
+      operationId: Block User
+      parameters:
+        - name: userId
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
   '/api/v1/user/i/{userId}/friendrequest':
     put:
       tags:
@@ -589,6 +612,8 @@ paths:
       responses:
         '200':
           description: Success
+        '304':
+          description: Not Modified
         '404':
           description: Not Found
           content:

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using ZapMe.Constants;
 using ZapMe.Enums;
 
 namespace ZapMe.Database.Models;
@@ -8,45 +9,21 @@ public sealed class UserRelationEntity
 {
     public const string TableName = "userRelations";
 
-    /// <summary>
-    /// 
-    /// </summary>
     public Guid SourceUserId { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public UserEntity? SourceUser { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
     public Guid TargetUserId { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public UserEntity? TargetUser { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
     public UserRelationType RelationType { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public string? NickName { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public string? Notes { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public DateTime CreatedAt { get; set; }
+
+    public UserEntity? SourceUser { get; set; }
+
+    public UserEntity? TargetUser { get; set; }
 }
 
 public sealed class UserRelationEntityConfiguration : IEntityTypeConfiguration<UserRelationEntity>
@@ -68,11 +45,11 @@ public sealed class UserRelationEntityConfiguration : IEntityTypeConfiguration<U
 
         builder.Property(ur => ur.NickName)
             .HasColumnName("nickName")
-            .HasMaxLength(32);
+            .HasMaxLength(GeneralHardLimits.NickNameMaxLength);
 
         builder.Property(ur => ur.Notes)
             .HasColumnName("notes")
-            .HasMaxLength(128);
+            .HasMaxLength(GeneralHardLimits.NotesMaxLength);
 
         builder.Property(ur => ur.CreatedAt)
             .HasColumnName("createdAt")

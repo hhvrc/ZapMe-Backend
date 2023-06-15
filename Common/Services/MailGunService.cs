@@ -47,14 +47,14 @@ public sealed class MailGunService : IMailGunService
     {
         if (!EmailUtils.IsValid(recepient))
         {
-            _logger.LogError("Failed to parse recepient email: {}", recepient);
+            _logger.LogError("Failed to parse recepient email");
             return false;
         }
 
         string sender = $"{senderName} <{senderName.ToLower()}@{App.Domain}>";
         if (!EmailUtils.IsValid(sender))
         {
-            _logger.LogError("Failed to parse sender email: {}", sender);
+            _logger.LogError("Failed to parse sender email");
             return false;
         }
 

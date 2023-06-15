@@ -164,7 +164,7 @@ public partial class AccountController
         };
 
         // Create account
-        bool success = await _userStore.TryCreateAsync(user, cancellationToken);
+        bool success = await _dbContext.TryCreateAsync(db => db.Users, user, _logger, cancellationToken);
         if (!success)
         {
             return StatusCode(StatusCodes.Status500InternalServerError);

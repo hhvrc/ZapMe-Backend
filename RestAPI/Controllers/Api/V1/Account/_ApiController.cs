@@ -17,13 +17,11 @@ namespace ZapMe.Controllers.Api.V1;
 public sealed partial class AccountController : ControllerBase
 {
     private readonly DatabaseContext _dbContext;
-    private readonly IUserStore _userStore;
     private readonly ILogger<AccountController> _logger;
 
-    public AccountController(DatabaseContext dbContext, IUserStore userManager, ILogger<AccountController> logger)
+    public AccountController(DatabaseContext dbContext, ILogger<AccountController> logger)
     {
         _dbContext = dbContext;
-        _userStore = userManager;
         _logger = logger;
     }
 }

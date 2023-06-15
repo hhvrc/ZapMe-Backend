@@ -23,4 +23,8 @@
     <ProjectReference Include="..\Enums\Enums.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+  </ItemGroup>
+
 </Project>

@@ -16,11 +16,9 @@ namespace ZapMe.Controllers.Api.V1;
 public sealed partial class UserController : ControllerBase
 {
     private readonly DatabaseContext _dbContext;
-    private readonly IUserStore _userStore;
 
-    public UserController(DatabaseContext dbContext, IUserStore userManager)
+    public UserController(DatabaseContext dbContext)
     {
         _dbContext = dbContext;
-        _userStore = userManager;
     }
 }

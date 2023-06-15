@@ -120,7 +120,7 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntit
 
         builder.Property(u => u.PasswordHash)
             .HasColumnName("passwordHash")
-            .HasMaxLength(120);
+            .HasMaxLength(HashConstants.BCryptHashLength);
 
         builder.Property(u => u.AcceptedPrivacyPolicyVersion)
             .HasColumnName("acceptedPrivacyPolicyVersion");
@@ -139,7 +139,7 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntit
 
         builder.Property(u => u.StatusText)
             .HasColumnName("statusText")
-            .HasMaxLength(128);
+            .HasMaxLength(GeneralHardLimits.StatusTextMaxLength);
 
         builder.Property(u => u.CreatedAt)
             .HasColumnName("createdAt")

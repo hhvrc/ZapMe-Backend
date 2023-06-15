@@ -48,7 +48,7 @@ public sealed class DebounceService : IDebounceService
         EmailUtils.ParsedResult parsed = EmailUtils.Parse(emailAddress);
         if (!parsed.Success)
         {
-            _logger.LogError("Failed to parse email: {}", emailAddress);
+            _logger.LogError("Failed to parse email, aborting");
             return false;
         }
 
@@ -77,13 +77,13 @@ public sealed class DebounceService : IDebounceService
         }
         catch (Exception)
         {
-            _logger.LogError("disposable.io sent back invalid return for {}", emailAddress);
+            _logger.LogError("disposable.io sent back invalid return");
             return false;
         }
 
         if (!Boolean.TryParse(isDisposableStr, out bool isDisposable))
         {
-            _logger.LogError("disposable.io sent back invalid return for {}", emailAddress);
+            _logger.LogError("disposable.io sent back invalid return");
             return false;
         }
 

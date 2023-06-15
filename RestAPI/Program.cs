@@ -119,7 +119,6 @@ services.AddDebounceService(configuration);
 //services.AddGoogleReCaptchaService(configuration);
 services.AddMailGunService(configuration);
 
-services.AddTransient<IUserStore, UserStore>();
 services.AddTransient<IPasswordResetRequestStore, PasswordResetRequestStore>();
 services.AddTransient<IPasswordResetManager, PasswordResetManager>();
 services.AddTransient<IUserAgentStore, UserAgentStore>();
@@ -127,7 +126,6 @@ services.AddTransient<IUserAgentManager, UserAgentManager>();
 services.AddTransient<ISessionStore, SessionStore>();
 services.AddTransient<ISessionManager, SessionManager>();
 services.AddTransient<ILockOutStore, LockOutStore>();
-services.AddTransient<IUserRelationStore, UserRelationStore>();
 services.AddTransient<IFriendRequestStore, FriendRequestStore>();
 //services.AddTransient<IFriendRequestManager, FriendRequestManager>();
 services.AddTransient<IEmailVerificationManager, EmailVerificationManager>();
