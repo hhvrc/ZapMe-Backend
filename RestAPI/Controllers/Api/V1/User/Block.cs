@@ -18,7 +18,7 @@ public partial class UserController
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    [HttpPost("block", Name = "Block User")]
+    [HttpPut("block", Name = "Block User")]
     [ProducesResponseType(StatusCodes.Status200OK)] // User blocked
     [ProducesResponseType(StatusCodes.Status404NotFound)] // User not found
     public async Task<IActionResult> Block([FromRoute] Guid userId, CancellationToken cancellationToken)
