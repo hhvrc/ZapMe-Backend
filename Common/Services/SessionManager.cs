@@ -23,9 +23,6 @@ public sealed class SessionManager : ISessionManager
 
         SessionEntity session = await _sessionStore.CreateAsync(user.Id, ipAddress, countryCode, userAgentEntity.Id, expiresAt, cancellationToken);
 
-        session.User = user;
-        session.UserAgent = userAgentEntity;
-
         return session;
     }
 }

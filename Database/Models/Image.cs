@@ -27,7 +27,8 @@ public sealed class ImageEntity
     public required string R2RegionName { get; set; }
 
     public Guid? UploaderId { get; set; }
-    public UserEntity? Uploader { get; set; }
+
+    public UserEntity? Uploader { get; private set; } = null;
 
     [NotMapped]
     public Uri PublicUrl => new Uri($"https://r2-{R2RegionName}.{App.Domain}/img_{Id}");

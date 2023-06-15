@@ -8,12 +8,13 @@ public sealed class FriendRequestEntity
     public const string TableName = "friendRequests";
 
     public Guid SenderId { get; set; }
-    public UserEntity? Sender { get; set; }
 
     public Guid ReceiverId { get; set; }
-    public UserEntity? Receiver { get; set; }
 
     public DateTime CreatedAt { get; set; }
+
+    public UserEntity Sender { get; private set; } = null!;
+    public UserEntity Receiver { get; private set; } = null!;
 }
 
 public sealed class FriendRequestEntityConfiguration : IEntityTypeConfiguration<FriendRequestEntity>

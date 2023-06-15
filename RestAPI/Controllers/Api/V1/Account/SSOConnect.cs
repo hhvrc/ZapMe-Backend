@@ -37,7 +37,6 @@ public partial class AccountController
         var connectionEntity = new SSOConnectionEntity
         {
             UserId = user.Id,
-            User = user,
             ProviderName = oauthVariables.ProviderName,
             ProviderUserId = oauthVariables.ProviderUserId,
             ProviderUserName = oauthVariables.ProviderUserName,

@@ -11,7 +11,6 @@ public sealed class SSOConnectionEntity
     /// The id of the user that owns this connection
     /// </summary>
     public Guid UserId { get; set; }
-    public required UserEntity User { get; set; }
 
     /// <summary>
     /// Lowercase name of the provider
@@ -29,6 +28,8 @@ public sealed class SSOConnectionEntity
     public required string ProviderUserName { get; set; }
 
     public DateTime CreatedAt { get; set; }
+
+    public UserEntity User { get; private set; } = null!;
 }
 
 public sealed class SSOConnectionEntityConfiguration : IEntityTypeConfiguration<SSOConnectionEntity>

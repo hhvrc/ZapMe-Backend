@@ -194,7 +194,6 @@ public partial class AccountController
             var connectionEntity = new SSOConnectionEntity
             {
                 UserId = user.Id,
-                User = user,
                 ProviderName = providerVariables.ProviderName,
                 ProviderUserId = providerVariables.ProviderUserId,
                 ProviderUserName = providerVariables.ProviderUserName,

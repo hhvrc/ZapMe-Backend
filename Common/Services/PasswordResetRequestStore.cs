@@ -28,7 +28,6 @@ public sealed class PasswordResetRequestStore : IPasswordResetRequestStore
             request = new UserPasswordResetRequestEntity
             {
                 UserId = userId,
-                User = null!,
                 TokenHash = tokenHash
             };
 

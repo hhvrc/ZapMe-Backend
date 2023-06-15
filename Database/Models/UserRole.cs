@@ -10,11 +10,12 @@ public sealed class UserRoleEntity
     public const string TableRoleNameIndex = TableName + "_roleName_idx";
 
     public Guid UserId { get; set; }
-    public UserEntity? User { get; set; }
 
     public required string RoleName { get; set; }
 
     public DateTime CreatedAt { get; set; }
+
+    public UserEntity User { get; private set; } = null!;
 }
 
 public sealed class UserRoleEntityConfiguration : IEntityTypeConfiguration<UserRoleEntity>

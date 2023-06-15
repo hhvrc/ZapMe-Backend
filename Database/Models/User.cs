@@ -11,9 +11,6 @@ public sealed class UserEntity
     public const string TableUserNameIndex = TableName + "_name_idx";
     public const string TableUserEmailIndex = TableName + "_email_idx";
 
-    /// <summary>
-    /// 
-    /// </summary>
     public Guid Id { get; set; }
 
     /// <summary>
@@ -21,9 +18,6 @@ public sealed class UserEntity
     /// </summary>
     public required string Name { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public string? Email { get; set; }
 
     /// <summary>
@@ -31,36 +25,16 @@ public sealed class UserEntity
     /// </summary>
     public required string PasswordHash { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public uint AcceptedPrivacyPolicyVersion { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public uint AcceptedTermsOfServiceVersion { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public Guid? ProfileAvatarId { get; set; }
-    public ImageEntity? ProfileAvatar { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public Guid? ProfileBannerId { get; set; }
-    public ImageEntity? ProfileBanner { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public UserStatus Status { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public required string StatusText { get; set; }
 
     /// <summary>
@@ -68,9 +42,6 @@ public sealed class UserEntity
     /// </summary>
     public DateTime CreatedAt { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public DateTime UpdatedAt { get; set; }
 
     /// <summary>
@@ -78,16 +49,17 @@ public sealed class UserEntity
     /// </summary>
     public DateTime LastOnline { get; set; }
 
-    public UserPasswordResetRequestEntity? PasswordResetRequest { get; set; }
-    public UserEmailVerificationRequestEntity? EmailVerificationRequest { get; set; }
-
-    public ICollection<SessionEntity> Sessions { get; set; } = null!;
-    public ICollection<LockOutEntity> LockOuts { get; set; } = null!;
-    public ICollection<UserRoleEntity> UserRoles { get; set; } = null!;
-    public ICollection<UserRelationEntity> Relations { get; set; } = null!;
-    public ICollection<FriendRequestEntity> FriendRequestsOutgoing { get; set; } = null!;
-    public ICollection<FriendRequestEntity> FriendRequestsIncoming { get; set; } = null!;
-    public ICollection<SSOConnectionEntity> SSOConnections { get; set; } = null!;
+    public ImageEntity? ProfileAvatar { get; private set; } = null;
+    public ImageEntity? ProfileBanner { get; private set; } = null;
+    public UserPasswordResetRequestEntity? PasswordResetRequest { get; private set; } = null;
+    public UserEmailVerificationRequestEntity? EmailVerificationRequest { get; private set; } = null;
+    public ICollection<SessionEntity> Sessions { get; private set; } = null!;
+    public ICollection<LockOutEntity> LockOuts { get; private set; } = null!;
+    public ICollection<UserRoleEntity> UserRoles { get; private set; } = null!;
+    public ICollection<UserRelationEntity> Relations { get; private set; } = null!;
+    public ICollection<FriendRequestEntity> FriendRequestsOutgoing { get; private set; } = null!;
+    public ICollection<FriendRequestEntity> FriendRequestsIncoming { get; private set; } = null!;
+    public ICollection<SSOConnectionEntity> SSOConnections { get; private set; } = null!;
 }
 
 public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>

@@ -10,7 +10,6 @@ public sealed class LockOutEntity
     public Guid Id { get; set; }
 
     public Guid UserId { get; set; }
-    public UserEntity? User { get; set; }
 
     public string? Reason { get; set; }
 
@@ -19,6 +18,8 @@ public sealed class LockOutEntity
     public DateTime CreatedAt { get; set; }
 
     public DateTime? ExpiresAt { get; set; }
+
+    public UserEntity User { get; private set; } = null!;
 }
 
 public sealed class LockOutEntityConfiguration : IEntityTypeConfiguration<LockOutEntity>

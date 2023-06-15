@@ -11,7 +11,6 @@ public sealed class SessionEntity
     public Guid Id { get; set; }
 
     public Guid UserId { get; set; }
-    public UserEntity? User { get; set; }
 
     /// <summary>
     /// User provided name for this session
@@ -33,11 +32,13 @@ public sealed class SessionEntity
     public required string CountryCode { get; set; }
 
     public Guid UserAgentId { get; set; }
-    public UserAgentEntity? UserAgent { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
     public DateTime ExpiresAt { get; set; }
+
+    public UserEntity User { get; private set; } = null!;
+    public UserAgentEntity UserAgent { get; private set; } = null!;
 }
 
 public sealed class SessionEntityConfiguration : IEntityTypeConfiguration<SessionEntity>

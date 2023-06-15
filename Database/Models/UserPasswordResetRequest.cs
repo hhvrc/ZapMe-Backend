@@ -10,11 +10,12 @@ public sealed class UserPasswordResetRequestEntity
     public const string TableTokenIndex = TableName + "_tokenHash_idx";
 
     public Guid UserId { get; set; }
-    public required UserEntity User { get; set; }
 
     public required string TokenHash { get; set; }
 
     public DateTime CreatedAt { get; set; }
+
+    public UserEntity User { get; private set; } = null!;
 }
 
 public sealed class UserPasswordResetRequestEntityConfiguration : IEntityTypeConfiguration<UserPasswordResetRequestEntity>

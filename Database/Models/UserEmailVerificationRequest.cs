@@ -11,7 +11,6 @@ public sealed class UserEmailVerificationRequestEntity
     public const string TableTokenIndex = TableName + "_tokenHash_idx";
 
     public Guid UserId { get; set; }
-    public UserEntity User { get; set; } = null!;
 
     /// <summary>
     /// The new email address to be verified.
@@ -26,6 +25,8 @@ public sealed class UserEmailVerificationRequestEntity
     public required string TokenHash { get; set; }
 
     public DateTime CreatedAt { get; set; }
+
+    public UserEntity User { get; private set; } = null!;
 }
 
 public sealed class UserEmailAddressChangeRequestEntityConfiguration : IEntityTypeConfiguration<UserEmailVerificationRequestEntity>
