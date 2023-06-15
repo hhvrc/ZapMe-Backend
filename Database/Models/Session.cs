@@ -8,19 +8,9 @@ public sealed class SessionEntity
 {
     public const string TableName = "sessions";
 
-    /// <summary>
-    /// 
-    /// </summary>
     public Guid Id { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public Guid UserId { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
     public UserEntity? User { get; set; }
 
     /// <summary>
@@ -42,24 +32,11 @@ public sealed class SessionEntity
     /// </summary>
     public required string CountryCode { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public Guid UserAgentId { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
     public UserAgentEntity? UserAgent { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public DateTime CreatedAt { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public DateTime ExpiresAt { get; set; }
 }
 
@@ -107,6 +84,7 @@ public sealed class SessionEntityConfiguration : IEntityTypeConfiguration<Sessio
 
         builder.HasOne(si => si.UserAgent)
             .WithMany(ua => ua.Sessions)
-            .HasForeignKey(si => si.UserAgentId);
+            .HasForeignKey(si => si.UserAgentId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

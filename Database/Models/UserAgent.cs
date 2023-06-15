@@ -9,49 +9,22 @@ public sealed class UserAgentEntity
     public const string TableName = "userAgents";
     public const string TableHashIndex = TableName + "_hash_idx";
 
-    /// <summary>
-    /// 
-    /// </summary>
     public Guid Id { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public required string Sha256 { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public uint Length { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public required string Value { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public required string OperatingSystem { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public required string Device { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public required string Browser { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public DateTime CreatedAt { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public ICollection<SessionEntity>? Sessions { get; set; }
 }
 

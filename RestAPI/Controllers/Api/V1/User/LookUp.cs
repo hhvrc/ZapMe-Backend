@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using System.Security.Claims;
 using ZapMe.Database.Models;
 using ZapMe.DTOs;
+using ZapMe.Enums;
 using ZapMe.Helpers;
 
 namespace ZapMe.Controllers.Api.V1;
@@ -21,15 +23,34 @@ public partial class UserController
     [ProducesResponseType(StatusCodes.Status404NotFound)] // User not found
     public async Task<IActionResult> LookUp([FromRoute] string userName, CancellationToken cancellationToken)
     {
-        Guid? userId = User.GetUserId();
-        if (!userId.HasValue) return HttpErrors.UnauthorizedActionResult;
+        Guid userId = User.GetUserId();
 
-        UserEntity? targetUser = await _dbContext.Users.SingleOrDefaultAsync(u => u.Name == userName && !u.Relations!.Any(r => r.TargetUserId == userId || r.SourceUserId == userId), cancellationToken);
-        if (targetUser is null)
+        string cacheKey = "zapme.users.byname:" + userName;
+
+        UserEntity? user = await _cache.GetAsync<UserEntity>(cacheKey, cancellationToken);
+        if (user is null)
         {
-            return HttpErrors.Generic(StatusCodes.Status404NotFound, "Not found", $"User with nane {userName} not found").ToActionResult();
+            user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Name == userName, cancellationToken: cancellationToken);
+            if (user is null)
+            {
+                return HttpErrors.UserNotFoundActionResult;
+            }
+
+            await _cache.SetAsync(cacheKey, user, cancellationToken);
         }
 
-        return Ok(targetUser.ToUserDto());
+        // If the target user has blocked the current user, return 404
+        if (user.Relations.Any(r => r.TargetUserId == userId && r.RelationType == UserRelationType.Blocked))
+        {
+            return HttpErrors.UserNotFoundActionResult;
+        }
+
+        // Else if the current user has blocked the target user, return minimal user info
+        if (user.Relations.Any(r => r.SourceUserId == userId && r.RelationType == UserRelationType.Blocked))
+        {
+            return Ok(user.ToMinimalUserDto());
+        }
+
+        return Ok(user.ToUserDto());
     }
 }

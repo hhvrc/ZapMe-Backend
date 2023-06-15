@@ -7,39 +7,17 @@ public sealed class LockOutEntity
 {
     public const string TableName = "lockOuts";
 
-    /// <summary>
-    /// 
-    /// </summary>
     public Guid Id { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public Guid UserId { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
     public UserEntity? User { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public string? Reason { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public required string Flags { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public DateTime CreatedAt { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public DateTime? ExpiresAt { get; set; }
 }
 

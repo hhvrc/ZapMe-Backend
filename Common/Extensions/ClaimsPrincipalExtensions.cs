@@ -37,9 +37,9 @@ public static class ClaimsPrincipalExtensions
         return principal.FindFirst(ZapMeClaimTypes.UserName)?.Value ?? throw new NullReferenceException(ZapMeClaimTypes.UserName + " claim not found");
     }
 
-    public static string GetUserEmail(this ClaimsPrincipal principal)
+    public static string? GetUserEmail(this ClaimsPrincipal principal)
     {
-        return principal.FindFirst(ZapMeClaimTypes.UserEmail)?.Value ?? throw new NullReferenceException(ZapMeClaimTypes.UserEmail + " claim not found");
+        return principal.FindFirst(ZapMeClaimTypes.UserEmail)?.Value;
     }
 
     public static bool GetUserEmailVerified(this ClaimsPrincipal principal)
@@ -52,7 +52,7 @@ public static class ClaimsPrincipalExtensions
         Guid? sessionId = TryGetSessionId(principal);
         if (!sessionId.HasValue) return null;
 
-        return await dbContext.Sessions.Where(u => u.Id == sessionId).SingleOrDefaultAsync(cancellationToken);
+        return await dbContext.Sessions.SingleOrDefaultAsync(u => u.Id == sessionId, cancellationToken);
     }
 
     public static async Task<UserEntity?> TryGetUserAsync(this ClaimsPrincipal principal, DatabaseContext dbContext, CancellationToken cancellationToken = default)
@@ -60,7 +60,9 @@ public static class ClaimsPrincipalExtensions
         Guid? userId = TryGetUserId(principal);
         if (!userId.HasValue) return null;
 
-        return await dbContext.Users.Where(u => u.Id == userId).SingleOrDefaultAsync(cancellationToken);
+        return await dbContext
+            .Users
+            .SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
     }
 
     /// <summary>

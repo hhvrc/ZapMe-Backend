@@ -10,59 +10,25 @@ public sealed class ImageEntity
     public const string TableName = "images";
     public const string TableSha256Index = TableName + "_sha256_idx";
 
-    /// <summary>
-    /// 
-    /// </summary>
     public Guid Id { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public uint Height { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public uint Width { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public uint FrameCount { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public uint SizeBytes { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public required string MimeType { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public required string Sha256 { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public required string R2RegionName { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public Guid? UploaderId { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
     public UserEntity? Uploader { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     [NotMapped]
     public Uri PublicUrl => new Uri($"https://r2-{R2RegionName}.{App.Domain}/img_{Id}");
 }

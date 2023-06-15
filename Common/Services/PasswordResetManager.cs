@@ -70,7 +70,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
 
     public async Task<ErrorDetails?> InitiatePasswordReset(Guid accountId, CancellationToken cancellationToken)
     {
-        UserEntity? userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == accountId && u.Email != null, cancellationToken);
+        UserEntity? userEntity = await _dbContext.Users.SingleOrDefaultAsync(u => u.Id == accountId && u.Email != null, cancellationToken);
         if (userEntity is null)
         {
             return HttpErrors.Generic(StatusCodes.Status404NotFound, "Account not found", "The account was not found");
@@ -81,7 +81,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
 
     public async Task<ErrorDetails?> InitiatePasswordReset(string accountEmail, CancellationToken cancellationToken)
     {
-        UserEntity? userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == accountEmail && u.Email != null, cancellationToken);
+        UserEntity? userEntity = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email == accountEmail && u.Email != null, cancellationToken);
         if (userEntity is null)
         {
             return HttpErrors.Generic(StatusCodes.Status404NotFound, "Account not found", "The account associated with that email was not found");
@@ -94,7 +94,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
     {
         string tokenHash = HashingUtils.Sha256_Hex(token);
 
-        UserPasswordResetRequestEntity? passwordResetRequest = await _dbContext.UserPasswordResetRequests.FirstOrDefaultAsync(p => p.TokenHash == tokenHash, cancellationToken);
+        UserPasswordResetRequestEntity? passwordResetRequest = await _dbContext.UserPasswordResetRequests.SingleOrDefaultAsync(p => p.TokenHash == tokenHash, cancellationToken);
         if (passwordResetRequest is null) return false;
 
         // Check if token is valid
@@ -106,18 +106,19 @@ public sealed class PasswordResetManager : IPasswordResetManager
         using IDbContextTransaction? transaction = await _dbContext.Database.BeginTransactionIfNotExistsAsync(cancellationToken);
 
         // Important to delete by token hash, and not account id as if the token has changed, someone else has issued a password reset
-        bool deleted = await _dbContext.UserPasswordResetRequests
+        int nDeleted = await _dbContext
+            .UserPasswordResetRequests
             .Where(p => p.TokenHash == tokenHash)
-            .ExecuteDeleteAsync(cancellationToken) > 0;
-        if (!deleted) return false; // Another caller made it before we did
+            .ExecuteDeleteAsync(cancellationToken);
+        if (nDeleted <= 0) return false; // Another caller made it before we did
 
         // Finally set the new password
-        bool success = await _dbContext.Users
+        int nUpdated = await _dbContext
+            .Users
             .Where(u => u.Id == passwordResetRequest.UserId)
             .ExecuteUpdateAsync(spc => spc
-            .SetProperty(u => u.PasswordHash, _ => newPasswordHash)
-            , cancellationToken) > 0;
-        if (!success) return false; // Uhh, race condition?
+                .SetProperty(u => u.PasswordHash, _ => newPasswordHash), cancellationToken);
+        if (nDeleted <= 0) return false; // Uhh, race condition?
 
         // Commit transaction
         if (transaction is not null)
@@ -125,13 +126,14 @@ public sealed class PasswordResetManager : IPasswordResetManager
             await transaction.CommitAsync(cancellationToken);
         }
 
-        return success;
+        return true;
     }
 
     public Task<int> RemoveExpiredRequests(CancellationToken cancellationToken)
     {
+        DateTime expiryDate = DateTime.UtcNow.AddHours(-24);
         return _dbContext.UserPasswordResetRequests
-            .Where(x => x.CreatedAt < DateTime.UtcNow.AddHours(-24))
+            .Where(x => x.CreatedAt < expiryDate)
             .ExecuteDeleteAsync(cancellationToken);
     }
 }

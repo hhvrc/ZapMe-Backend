@@ -94,7 +94,9 @@ public sealed class ImageManager : IImageManager
         }
 
         // Check if image already exists
-        ImageEntity? image = await _dbContext.Images.SingleOrDefaultAsync(i => i.Sha256 == sha256_hex, cancellationToken);
+        ImageEntity? image = await _dbContext
+            .Images
+            .SingleOrDefaultAsync(i => i.Sha256 == sha256_hex, cancellationToken);
         if (image is not null)
         {
             return image;
@@ -130,7 +132,9 @@ public sealed class ImageManager : IImageManager
             uploaded = true;
 
             // Create DB record
-            await _dbContext.Images.AddAsync(image, cancellationToken);
+            await _dbContext
+                .Images
+                .AddAsync(image, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             // Commit transaction

@@ -49,7 +49,7 @@ public partial class AuthController
                 ).ToActionResult();
         }
 
-        if (!user.EmailVerified)
+        if (String.IsNullOrEmpty(user.Email))
         {
             return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Unverified Email", "Email has not been verified", NotificationSeverityLevel.Warning, "Please verify your email address before signing in").ToActionResult();
         }

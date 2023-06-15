@@ -10,8 +10,10 @@ public sealed class UserRelationEntity
     public const string TableName = "userRelations";
 
     public Guid SourceUserId { get; set; }
+    public UserEntity? SourceUser { get; set; }
 
     public Guid TargetUserId { get; set; }
+    public UserEntity? TargetUser { get; set; }
 
     public UserRelationType RelationType { get; set; }
 
@@ -20,10 +22,6 @@ public sealed class UserRelationEntity
     public string? Notes { get; set; }
 
     public DateTime CreatedAt { get; set; }
-
-    public UserEntity? SourceUser { get; set; }
-
-    public UserEntity? TargetUser { get; set; }
 }
 
 public sealed class UserRelationEntityConfiguration : IEntityTypeConfiguration<UserRelationEntity>

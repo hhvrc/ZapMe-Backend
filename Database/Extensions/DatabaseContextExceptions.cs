@@ -1,0 +1,24 @@
+﻿using Microsoft.Extensions.Logging;
+
+namespace ZapMe.Database;
+
+public static class DatabaseContextExceptions
+{
+    public static async Task<T> GetOrAddAsync<T>(this DatabaseContext ctx, Func<DatabaseContext, Task<T>> entitySelector, Func<T> factory, ILogger logger, CancellationToken cancellationToken) where T : class
+    {
+        // Try to get entity from database
+        T entity = await entitySelector(ctx);
+        if (entity is not null)
+        {
+            return entity;
+        }
+
+        // Try to create entity
+        entity = factory();
+        await ctx.AddAsync(entity, cancellationToken);
+        await ctx.SaveChangesAsync(cancellationToken);
+
+        // Possible race condition, try to get entity one last time
+        return await entitySelector(ctx);
+    }
+}

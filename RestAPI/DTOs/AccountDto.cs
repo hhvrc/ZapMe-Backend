@@ -16,7 +16,6 @@ public readonly struct AccountDto
     /// <summary>
     /// Obfuscated email of your account
     /// </summary>
-    [EmailAddress]
     public string ObscuredEmail { get; init; }
 
     public bool EmailVerified { get; init; }

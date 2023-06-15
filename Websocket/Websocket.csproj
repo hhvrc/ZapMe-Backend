@@ -20,8 +20,4 @@
     <ProjectReference Include="..\Events\Events.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Websocket\_Models\ClientPayloads\" />
-  </ItemGroup>
-
 </Project>

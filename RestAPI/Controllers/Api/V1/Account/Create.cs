@@ -149,11 +149,19 @@ public partial class AccountController
             }
         }
 
+        // Only accept emails we know are verified
+        string? verifiedEmail = null;
+        bool emailVerificationRequired = true;
+        if (providerVariables?.ProviderUserEmail == body.Email && providerVariables.ProviderUserEmailVerified)
+        {
+            verifiedEmail = providerVariables.ProviderUserEmail;
+            emailVerificationRequired = false;
+        }
+
         UserEntity user = new UserEntity
         {
             Name = body.Username,
-            Email = body.Email,
-            EmailVerified = false,
+            Email = verifiedEmail,
             PasswordHash = PasswordUtils.HashPassword(body.Password),
             AcceptedPrivacyPolicyVersion = body.AcceptedPrivacyPolicyVersion,
             AcceptedTermsOfServiceVersion = body.AcceptedTermsOfServiceVersion,
@@ -164,11 +172,8 @@ public partial class AccountController
         };
 
         // Create account
-        bool success = await _dbContext.TryCreateAsync(db => db.Users, user, _logger, cancellationToken);
-        if (!success)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
+        await _dbContext.Users.AddAsync(user, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         if (avatarImageEntity is not null)
         {
@@ -214,8 +219,7 @@ public partial class AccountController
         }
 
         // Send email verification
-        bool emailVerified = body.Email == providerVariables?.ProviderUserEmail && (providerVariables?.ProviderUserEmailVerified ?? false);
-        if (!emailVerified)
+        if (emailVerificationRequired)
         {
             var emailVerificationManager = HttpContext.RequestServices.GetRequiredService<IEmailVerificationManager>();
             ErrorDetails? test = await emailVerificationManager.InitiateEmailVerificationAsync(user, body.Email, cancellationToken);
@@ -232,7 +236,7 @@ public partial class AccountController
         {
             AccountId = user.Id,
             Session = jwtToken is null ? null : new AuthenticationResponse(jwtToken),
-            EmailVerificationRequired = emailVerified
+            EmailVerificationRequired = emailVerificationRequired
         });
     }
 }

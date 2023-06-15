@@ -16,8 +16,13 @@ public static class SessionMappers
         claimsIdentity.AddClaim(new Claim(ZapMeClaimTypes.SessionId, session.Id.ToString()));
         claimsIdentity.AddClaim(new Claim(ZapMeClaimTypes.UserId, session.UserId.ToString()));
         claimsIdentity.AddClaim(new Claim(ZapMeClaimTypes.UserName, session.User.Name));
-        claimsIdentity.AddClaim(new Claim(ZapMeClaimTypes.UserEmail, session.User.Email));
-        claimsIdentity.AddClaim(new Claim(ZapMeClaimTypes.UserEmailVerified, session.User.EmailVerified.ToString()));
+        claimsIdentity.AddClaims(session.User.UserRoles.Select(r => new Claim(ClaimTypes.Role, r.RoleName)));
+
+        // Add Email Claim
+        if (session.User.Email is not null)
+        {
+            claimsIdentity.AddClaim(new Claim(ZapMeClaimTypes.UserEmail, session.User.Email));
+        }
 
         // Add Avatar URL Claim
         if (session.User.ProfileAvatar is not null)
@@ -29,12 +34,6 @@ public static class SessionMappers
         if (session.User.ProfileBanner is not null)
         {
             claimsIdentity.AddClaim(new Claim(ZapMeClaimTypes.UserBannerUrl, session.User.ProfileBanner.PublicUrl.ToString()));
-        }
-
-        // Add Role Claims
-        if (session.User.UserRoles is not null)
-        {
-            claimsIdentity.AddClaims(session.User.UserRoles.Select(r => new Claim(ClaimTypes.Role, r.RoleName)));
         }
 
         return claimsIdentity;

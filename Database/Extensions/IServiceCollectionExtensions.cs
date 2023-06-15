@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
-using ZapMe.Database;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.Extensions.DependencyInjection;
+namespace ZapMe.Database;
 
 public static class ZapMeDatabaseExtensions
 {
@@ -21,13 +19,8 @@ public static class ZapMeDatabaseExtensions
                 dbOpt.UseNpgsql(options.ConnectionString, npgSqlOpt =>
                 {
                     npgSqlOpt.SetPostgresVersion(options.ServerVersionMajor, options.ServerVersionMinor);
+                    npgSqlOpt.EnableRetryOnFailure(3); // Retry 3 times if we get a transient failure, more then this will throw (im happy with this)
                 });
-                dbOpt.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
-    }
-
-    public static async Task<IDbContextTransaction?> BeginTransactionIfNotExistsAsync(this DatabaseFacade db, CancellationToken cancellationToken)
-    {
-        return db.CurrentTransaction is null ? await db.BeginTransactionAsync(cancellationToken) : null;
     }
 }

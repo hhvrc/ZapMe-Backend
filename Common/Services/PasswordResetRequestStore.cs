@@ -21,7 +21,7 @@ public sealed class PasswordResetRequestStore : IPasswordResetRequestStore
     {
         if (tokenHash.Length != HashConstants.Sha256LengthHex) throw new ArgumentException($"Tokenhash should be {HashConstants.Sha256LengthHex} characters", nameof(tokenHash));
 
-        UserPasswordResetRequestEntity? request = await _dbContext.UserPasswordResetRequests.AsTracking().FirstOrDefaultAsync(s => s.UserId == userId, cancellationToken);
+        UserPasswordResetRequestEntity? request = await _dbContext.UserPasswordResetRequests.SingleOrDefaultAsync(s => s.UserId == userId, cancellationToken);
 
         if (request is null)
         {

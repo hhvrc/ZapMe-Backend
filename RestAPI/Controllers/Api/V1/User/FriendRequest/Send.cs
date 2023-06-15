@@ -32,8 +32,6 @@ partial class UserController
 
         UserEntity[] users = await _dbContext.Users
             .Where(u => u.Id == authenticatedUserId || u.Id == userId)
-            .Include(u => u.Relations)
-            .Include(u => u.FriendRequestsOutgoing)
             .ToArrayAsync(cancellationToken);
         if (users.Length < 2)
             return HttpErrors.UserNotFoundActionResult;
@@ -44,17 +42,17 @@ partial class UserController
         }
 
         // Check if authenticated user exists
-        UserEntity? authenticatedUser = users.FirstOrDefault(u => u.Id == authenticatedUserId);
+        UserEntity? authenticatedUser = users.SingleOrDefault(u => u.Id == authenticatedUserId);
         if (authenticatedUser is null)
             return HttpErrors.UnauthorizedActionResult;
 
         // Check if authenticated user has blocked the target user
-        if (authenticatedUser.Relations!.Any(r => r.TargetUserId == userId && r.RelationType == UserRelationType.Blocked))
+        if (authenticatedUser.Relations.Any(r => r.TargetUserId == userId && r.RelationType == UserRelationType.Blocked))
             return BadRequest();
 
         // Check if target user exists and has not blocked the requesting user
-        UserEntity? targetUser = users.FirstOrDefault(u => u.Id == userId);
-        if (targetUser is null || targetUser.Relations!.Any(r => r.TargetUserId == authenticatedUserId && r.RelationType == UserRelationType.Blocked))
+        UserEntity? targetUser = users.SingleOrDefault(u => u.Id == userId);
+        if (targetUser is null || targetUser.Relations.Any(r => r.TargetUserId == authenticatedUserId && r.RelationType == UserRelationType.Blocked))
             return HttpErrors.UserNotFoundActionResult;
 
         // Check if friend request has already been sent

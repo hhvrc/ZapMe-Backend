@@ -9,24 +9,11 @@ public sealed class UserRoleEntity
     public const string TableUserIdIndex = TableName + "_userId_idx";
     public const string TableRoleNameIndex = TableName + "_roleName_idx";
 
-    /// <summary>
-    /// 
-    /// </summary>
     public Guid UserId { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
     public UserEntity? User { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public required string RoleName { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public DateTime CreatedAt { get; set; }
 }
 
@@ -48,6 +35,11 @@ public sealed class UserRoleEntityConfiguration : IEntityTypeConfiguration<UserR
         builder.Property(ur => ur.CreatedAt)
             .HasColumnName("createdAt")
             .HasDefaultValueSql("now()");
+
+        builder.HasOne(ur => ur.User)
+            .WithMany(u => u.UserRoles)
+            .HasForeignKey(ur => ur.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(ur => ur.UserId)
             .HasDatabaseName(UserRoleEntity.TableUserIdIndex);

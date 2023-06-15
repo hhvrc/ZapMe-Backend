@@ -24,12 +24,7 @@ public sealed class UserEntity
     /// <summary>
     /// 
     /// </summary>
-    public required string Email { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public bool EmailVerified { get; set; }
+    public string? Email { get; set; }
 
     /// <summary>
     /// Secure hash of the user's password, hashed with BCrypt.
@@ -50,11 +45,13 @@ public sealed class UserEntity
     /// 
     /// </summary>
     public Guid? ProfileAvatarId { get; set; }
+    public ImageEntity? ProfileAvatar { get; set; }
 
     /// <summary>
     /// 
     /// </summary>
     public Guid? ProfileBannerId { get; set; }
+    public ImageEntity? ProfileBanner { get; set; }
 
     /// <summary>
     /// 
@@ -81,18 +78,16 @@ public sealed class UserEntity
     /// </summary>
     public DateTime LastOnline { get; set; }
 
-    public ImageEntity? ProfileAvatar { get; set; }
-    public ImageEntity? ProfileBanner { get; set; }
     public UserPasswordResetRequestEntity? PasswordResetRequest { get; set; }
     public UserEmailVerificationRequestEntity? EmailVerificationRequest { get; set; }
 
-    public ICollection<SessionEntity>? Sessions { get; set; }
-    public ICollection<LockOutEntity>? LockOuts { get; set; }
-    public ICollection<UserRoleEntity>? UserRoles { get; set; }
-    public ICollection<UserRelationEntity>? Relations { get; set; }
-    public ICollection<FriendRequestEntity>? FriendRequestsOutgoing { get; set; }
-    public ICollection<FriendRequestEntity>? FriendRequestsIncoming { get; set; }
-    public ICollection<SSOConnectionEntity>? SSOConnections { get; set; }
+    public ICollection<SessionEntity> Sessions { get; set; } = null!;
+    public ICollection<LockOutEntity> LockOuts { get; set; } = null!;
+    public ICollection<UserRoleEntity> UserRoles { get; set; } = null!;
+    public ICollection<UserRelationEntity> Relations { get; set; } = null!;
+    public ICollection<FriendRequestEntity> FriendRequestsOutgoing { get; set; } = null!;
+    public ICollection<FriendRequestEntity> FriendRequestsIncoming { get; set; } = null!;
+    public ICollection<SSOConnectionEntity> SSOConnections { get; set; } = null!;
 }
 
 public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
@@ -114,9 +109,6 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntit
         builder.Property(u => u.Email)
             .HasColumnName("email")
             .HasMaxLength(GeneralHardLimits.EmailAddressMaxLength);
-
-        builder.Property(u => u.EmailVerified)
-            .HasColumnName("emailVerified");
 
         builder.Property(u => u.PasswordHash)
             .HasColumnName("passwordHash")
@@ -155,12 +147,13 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntit
 
         builder.HasOne(u => u.ProfileAvatar)
             .WithMany()
+            .HasForeignKey(u => u.ProfileAvatarId)
             .OnDelete(DeleteBehavior.SetNull);
 
-        builder.HasMany(u => u.UserRoles)
-            .WithOne(r => r.User)
-            .HasForeignKey(r => r.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+        builder.HasOne(u => u.ProfileBanner)
+            .WithMany()
+            .HasForeignKey(u => u.ProfileBannerId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         builder.HasIndex(u => u.Name)
             .HasDatabaseName(UserEntity.TableUserNameIndex)

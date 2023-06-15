@@ -84,7 +84,7 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             SSOConnectionEntity? connectionEntity = await _dbContext.SSOConnections
                 .Include(c => c.User).ThenInclude(u => u.ProfileAvatar)
                 .Include(c => c.User).ThenInclude(u => u.ProfileBanner)
-                .FirstOrDefaultAsync(c => c.ProviderName == ssoProviderData.ProviderName && c.ProviderUserId == ssoProviderData.ProviderUserId, CancellationToken);
+                .SingleOrDefaultAsync(c => c.ProviderName == ssoProviderData.ProviderName && c.ProviderUserId == ssoProviderData.ProviderUserId, CancellationToken);
             if (connectionEntity is null)
             {
                 string token = await ServiceProvider.GetRequiredService<ISSOStateStore>().InsertProviderDataAsync(
@@ -161,17 +161,15 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             return AuthenticateResult.Fail("Invalid JWT token.");
         }
 
+        if (!claimsPrincipal.GetUserEmailVerified())
+        {
+            return AuthenticateResult.Fail("Email is not verified.");
+        }
+
         var session = await _sessionStore.TryGetAsync(claimsPrincipal.GetSessionId(), CancellationToken);
         if (session is null)
         {
             return AuthenticateResult.Fail("Invalid or Expired Session");
-        }
-
-        var userEmailVerified = claimsPrincipal.GetUserEmailVerified();
-
-        if (!userEmailVerified)
-        {
-            return AuthenticateResult.Fail("Email is not verified");
         }
 
         return AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(session.ToClaimsIdentity()), AuthenticationConstants.ZapMeScheme));

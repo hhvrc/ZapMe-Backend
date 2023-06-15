@@ -7,29 +7,12 @@ public sealed class FriendRequestEntity
 {
     public const string TableName = "friendRequests";
 
-    /// <summary>
-    /// 
-    /// </summary>
     public Guid SenderId { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
     public UserEntity? Sender { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public Guid ReceiverId { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
     public UserEntity? Receiver { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public DateTime CreatedAt { get; set; }
 }
 

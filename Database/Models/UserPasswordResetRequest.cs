@@ -9,24 +9,11 @@ public sealed class UserPasswordResetRequestEntity
     public const string TableName = "userPasswordResetRequests";
     public const string TableTokenIndex = TableName + "_tokenHash_idx";
 
-    /// <summary>
-    /// 
-    /// </summary>
     public Guid UserId { get; set; }
+    public required UserEntity User { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public UserEntity? User { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
     public required string TokenHash { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public DateTime CreatedAt { get; set; }
 }
 

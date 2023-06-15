@@ -39,28 +39,27 @@ public static class UserMapper
 
     public static AccountDto ToAccountDto(this UserEntity user)
     {
-        string? email = user.Email;
-        bool emailVerified = true;
-        if (String.IsNullOrEmpty(email))
+        string? email = user.Email ?? user.EmailVerificationRequest?.NewEmail;
+
+        if (email is null)
         {
-            emailVerified = false;
-            email = user.EmailVerificationRequest?.NewEmail;
+            throw new InvalidOperationException("Cannot return a user with no email address, and no pending email verification request");
         }
 
         return new AccountDto
         {
             Id = user.Id,
             Username = user.Name,
-            ObscuredEmail = Transformers.ObscureEmail(email!),
-            EmailVerified = emailVerified,
+            ObscuredEmail = Transformers.ObscureEmail(email),
+            EmailVerified = !String.IsNullOrEmpty(user.Email),
             AcceptedPrivacyPolicyVersion = user.AcceptedPrivacyPolicyVersion,
             AcceptedTermsOfServiceVersion = user.AcceptedTermsOfServiceVersion,
             AvatarUrl = user.ProfileAvatar?.PublicUrl,
             BannerUrl = user.ProfileBanner?.PublicUrl,
             Status = user.Status,
             StatusText = user.StatusText,
-            Friends = user.Relations?.Select(fs => fs.TargetUserId) ?? Enumerable.Empty<Guid>(),
-            SSOConnections = user.SSOConnections?.Select(oc => oc.ProviderName) ?? Enumerable.Empty<string>(),
+            Friends = user.Relations.Select(fs => fs.TargetUserId),
+            SSOConnections = user.SSOConnections.Select(oc => oc.ProviderName),
             CreatedAt = user.CreatedAt,
             UpdatedAt = user.UpdatedAt,
             LastOnline = user.LastOnline,

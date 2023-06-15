@@ -10,15 +10,8 @@ public sealed class UserEmailVerificationRequestEntity
     public const string TableNewEmailIndex = TableName + "_newEmail_idx";
     public const string TableTokenIndex = TableName + "_tokenHash_idx";
 
-    /// <summary>
-    /// 
-    /// </summary>
     public Guid UserId { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public UserEntity? User { get; set; }
+    public UserEntity User { get; set; } = null!;
 
     /// <summary>
     /// The new email address to be verified.
@@ -32,9 +25,6 @@ public sealed class UserEmailVerificationRequestEntity
     /// </summary>
     public required string TokenHash { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public DateTime CreatedAt { get; set; }
 }
 

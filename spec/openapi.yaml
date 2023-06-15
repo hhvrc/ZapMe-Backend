@@ -750,12 +750,8 @@ components:
           type: string
           example: MyUsername
         obscuredEmail:
-          maxLength: 320
-          minLength: 5
           type: string
           description: Obfuscated email of your account
-          format: email
-          example: user.name@example.com
         emailVerified:
           type: boolean
         acceptedPrivacyPolicyVersion:
