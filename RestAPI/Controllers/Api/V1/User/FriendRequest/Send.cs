@@ -23,47 +23,48 @@ partial class UserController
     public async Task<IActionResult> FriendRequestSend([FromRoute] Guid userId, CancellationToken cancellationToken)
     {
         Guid? authenticatedUserId = User.GetUserId();
-        if (!authenticatedUserId.HasValue) return HttpErrors.UnauthorizedActionResult;
+        if (!authenticatedUserId.HasValue)
+            return HttpErrors.UnauthorizedActionResult;
 
-        UserEntity? user = await _dbContext.Users
-            .Where(u => u.Id == authenticatedUserId)
-            .Include(u => u.Relations)
-            .FirstOrDefaultAsync(cancellationToken);
-        if (user is null) return HttpErrors.UnauthorizedActionResult;
-
-        // Check if requesting user has blocked target user, or if user is trying to send a friend request to themselves
-        if (user.Relations!.Any(u => u.TargetUserId == userId && u.RelationType == UserRelationType.Blocked) || authenticatedUserId == userId)
-        {
+        // You cannot send a friend request to yourself
+        if (authenticatedUserId == userId)
             return BadRequest();
+
+        UserEntity[] users = await _dbContext.Users
+            .Where(u => u.Id == authenticatedUserId || u.Id == userId)
+            .Include(u => u.Relations)
+            .Include(u => u.FriendRequestsOutgoing)
+            .ToArrayAsync(cancellationToken);
+        if (users.Length < 2)
+            return HttpErrors.UserNotFoundActionResult;
+        if (users.Length > 2)
+        {
+            _logger.LogError("Found more than 2 users with the same ID. This should never happen.");
+            return HttpErrors.InternalServerErrorActionResult;
         }
 
-        // Get target user if exists and has not blocked the requesting user
-        UserEntity? targetUser = await _dbContext.Users
-            .Where(u =>
-                u.Id == userId &&
-                !u.Relations!.Any(r =>
-                    r.TargetUserId == authenticatedUserId &&
-                    r.RelationType == UserRelationType.Blocked
-                )
-            )
-            .Include(u => u.Relations)
-            .FirstOrDefaultAsync(cancellationToken);
-        if (targetUser is null)
-        {
-            return NotFound();
-        }
+        // Check if authenticated user exists
+        UserEntity? authenticatedUser = users.FirstOrDefault(u => u.Id == authenticatedUserId);
+        if (authenticatedUser is null)
+            return HttpErrors.UnauthorizedActionResult;
+
+        // Check if authenticated user has blocked the target user
+        if (authenticatedUser.Relations!.Any(r => r.TargetUserId == userId && r.RelationType == UserRelationType.Blocked))
+            return BadRequest();
+
+        // Check if target user exists and has not blocked the requesting user
+        UserEntity? targetUser = users.FirstOrDefault(u => u.Id == userId);
+        if (targetUser is null || targetUser.Relations!.Any(r => r.TargetUserId == authenticatedUserId && r.RelationType == UserRelationType.Blocked))
+            return HttpErrors.UserNotFoundActionResult;
 
         // Check if friend request has already been sent
-        if (await _dbContext.FriendRequests.AnyAsync(r => r.SenderId == authenticatedUserId && r.ReceiverId == userId, cancellationToken))
-        {
-            // Respond with 304 Not Modified, as the request has already been sent
+        if (authenticatedUser.FriendRequestsOutgoing!.Any(r => r.ReceiverId == userId))
             return StatusCode(StatusCodes.Status304NotModified);
-        }
 
         // Check if target user has already sent a friend request
-        if (await _dbContext.FriendRequests.AnyAsync(r => r.SenderId == userId && r.ReceiverId == authenticatedUserId, cancellationToken))
+        if (targetUser.FriendRequestsOutgoing!.Any(r => r.ReceiverId == authenticatedUserId))
         {
-            // TODO URGENT: accept friend request
+            // TODO URGENT: accept friend request and raise notification
             throw new NotImplementedException();
         }
 
@@ -73,6 +74,8 @@ partial class UserController
             ReceiverId = userId
         }, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        // TODO: raise notification
 
         return Ok(userId);
     }

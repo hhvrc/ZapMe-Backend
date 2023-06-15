@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using ZapMe.Database;
 using ZapMe.DTOs;
-using ZapMe.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api.V1;
@@ -16,9 +15,11 @@ namespace ZapMe.Controllers.Api.V1;
 public sealed partial class UserController : ControllerBase
 {
     private readonly DatabaseContext _dbContext;
+    private readonly ILogger<UserController> _logger;
 
-    public UserController(DatabaseContext dbContext)
+    public UserController(DatabaseContext dbContext, ILogger<UserController> logger)
     {
         _dbContext = dbContext;
+        _logger = logger;
     }
 }
