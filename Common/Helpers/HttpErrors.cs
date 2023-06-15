@@ -88,6 +88,9 @@ public static class HttpErrors
     public static ErrorDetails UserNotFound => Generic(StatusCodes.Status404NotFound, "user_not_found", "User not found", null, null, new UserNotification(NotificationSeverityLevel.Error, "User not found"));
     public static IActionResult UserNotFoundActionResult => UserNotFound.ToActionResult();
 
+    public static ErrorDetails DeviceNotFound => Generic(StatusCodes.Status404NotFound, "device_not_found", "Device not found", null, null, new UserNotification(NotificationSeverityLevel.Error, "Device not found"));
+    public static IActionResult DeviceNotFoundActionResult => DeviceNotFound.ToActionResult();
+
     public static ErrorDetails UnverifiedEmail => HttpErrors.Generic(StatusCodes.Status400BadRequest, "Unverified Email", "Email has not been verified", NotificationSeverityLevel.Warning, "Please verify your email address, and then try again");
     public static IActionResult UnverifiedEmailActionResult => UnverifiedEmail.ToActionResult();
 

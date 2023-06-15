@@ -4,7 +4,7 @@ using ZapMe.Database.Models;
 
 namespace ZapMe.DTOs;
 
-public static class SessionMappers
+public static class SessionMapper
 {
     public static ClaimsIdentity ToClaimsIdentity(this SessionEntity session)
     {

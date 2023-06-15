@@ -11,6 +11,7 @@ public sealed class DatabaseContext : DbContext
 
     public required DbSet<UserEntity> Users { get; set; }
     public required DbSet<ImageEntity> Images { get; set; }
+    public required DbSet<DeviceEntity> Devices { get; set; }
     public required DbSet<SessionEntity> Sessions { get; set; }
     public required DbSet<LockOutEntity> LockOuts { get; set; }
     public required DbSet<UserRoleEntity> UserRoles { get; set; }
@@ -26,6 +27,7 @@ public sealed class DatabaseContext : DbContext
     {
         modelBuilder.ApplyConfiguration(new UserEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ImageEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new DeviceEntityConfiguration());
         modelBuilder.ApplyConfiguration(new SessionEntityConfiguration());
         modelBuilder.ApplyConfiguration(new LockOutEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserRoleEntityConfiguration());
