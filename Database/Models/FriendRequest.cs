@@ -5,8 +5,6 @@ namespace ZapMe.Database.Models;
 
 public sealed class FriendRequestEntity
 {
-    public const string TableName = "friendRequests";
-
     public Guid SenderId { get; set; }
 
     public Guid ReceiverId { get; set; }
@@ -21,19 +19,8 @@ public sealed class FriendRequestEntityConfiguration : IEntityTypeConfiguration<
 {
     public void Configure(EntityTypeBuilder<FriendRequestEntity> builder)
     {
-        builder.ToTable(FriendRequestEntity.TableName);
-
         builder.HasKey(fr => new { fr.SenderId, fr.ReceiverId });
-
-        builder.Property(fr => fr.SenderId)
-            .HasColumnName("senderId");
-
-        builder.Property(fr => fr.ReceiverId)
-            .HasColumnName("receiverId");
-
-        builder.Property(fr => fr.CreatedAt)
-            .HasColumnName("createdAt")
-            .HasDefaultValueSql("now()");
+        builder.Property(fr => fr.CreatedAt).HasDefaultValueSql("now()");
 
         builder.HasOne(fr => fr.Sender)
             .WithMany(u => u.FriendRequestsOutgoing)

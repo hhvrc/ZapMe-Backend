@@ -9,8 +9,6 @@ namespace ZapMe.Database.Models;
 /// </summary>
 public class DeletedUserEntity
 {
-    public const string TableName = "deletedUsers";
-
     public Guid Id { get; set; }
 
     /// <summary>
@@ -38,25 +36,8 @@ public sealed class DeletedUserEntityConfiguration : IEntityTypeConfiguration<De
 {
     public void Configure(EntityTypeBuilder<DeletedUserEntity> builder)
     {
-        builder.ToTable(DeletedUserEntity.TableName);
-
         builder.HasKey(du => du.Id);
-
-        builder.Property(ur => ur.Id)
-            .HasColumnName("id");
-
-        builder.Property(ur => ur.DeletedBy)
-            .HasColumnName("deletedBy");
-
-        builder.Property(ur => ur.DeletionReason)
-            .HasColumnName("deletionReason")
-            .HasMaxLength(256);
-
-        builder.Property(du => du.UserCreatedAt)
-            .HasColumnName("userCreatedAt");
-
-        builder.Property(du => du.UserDeletedAt)
-            .HasColumnName("userDeletedAt")
-            .HasDefaultValueSql("now()");
+        builder.Property(ur => ur.DeletionReason).HasMaxLength(256);
+        builder.Property(du => du.UserDeletedAt).HasDefaultValueSql("now()");
     }
 }

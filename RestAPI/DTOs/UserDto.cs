@@ -18,6 +18,12 @@ public readonly struct UserDto
 
     public string StatusText { get; init; }
 
+    public UserRelationType RelationType { get; init; }
+
+    public string? NickName { get; init; }
+
+    public string? Notes { get; init; }
+
     /// <summary>
     /// Date this user was created at
     /// </summary>

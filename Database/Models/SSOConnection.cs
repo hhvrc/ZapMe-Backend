@@ -36,34 +36,15 @@ public sealed class SSOConnectionEntityConfiguration : IEntityTypeConfiguration<
 {
     public void Configure(EntityTypeBuilder<SSOConnectionEntity> builder)
     {
-        builder.ToTable(SSOConnectionEntity.TableName);
-
         // User can have multiple connections to the same provider, but user's can't share the same connection
         builder.HasKey(oac => new { oac.ProviderName, oac.ProviderUserId });
-
-        builder.Property(oac => oac.UserId)
-            .HasColumnName("userId");
-
-        builder.Property(oac => oac.ProviderName)
-            .HasColumnName("providerName")
-            .HasMaxLength(16);
-
-        builder.Property(oac => oac.ProviderUserId)
-            .HasColumnName("providerUserId");
-
-        builder.Property(oac => oac.ProviderUserName)
-            .HasColumnName("providerUserName");
-
-        builder.Property(oac => oac.CreatedAt)
-            .HasColumnName("createdAt")
-            .HasDefaultValueSql("now()");
+        builder.Property(oac => oac.ProviderName).HasMaxLength(16);
+        builder.Property(oac => oac.CreatedAt).HasDefaultValueSql("now()");
+        builder.HasIndex(oac => oac.UserId);
 
         builder.HasOne(oac => oac.User)
             .WithMany(u => u.SSOConnections)
             .HasForeignKey(oac => oac.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        // Fast user lookup, we don't need a index for provider name+id because the key is already indexed
-        builder.HasIndex(oac => oac.UserId);
     }
 }

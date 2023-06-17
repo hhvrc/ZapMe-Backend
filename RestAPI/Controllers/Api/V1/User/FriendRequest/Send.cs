@@ -47,12 +47,12 @@ partial class UserController
             return HttpErrors.UnauthorizedActionResult;
 
         // Check if authenticated user has blocked the target user
-        if (authenticatedUser.Relations.Any(r => r.TargetUserId == userId && r.RelationType == UserRelationType.Blocked))
+        if (authenticatedUser.RelationsOutgoing.Any(r => r.TargetUserId == userId && r.RelationType == UserRelationType.Blocked))
             return BadRequest();
 
         // Check if target user exists and has not blocked the requesting user
         UserEntity? targetUser = users.SingleOrDefault(u => u.Id == userId);
-        if (targetUser is null || targetUser.Relations.Any(r => r.TargetUserId == authenticatedUserId && r.RelationType == UserRelationType.Blocked))
+        if (targetUser is null || targetUser.RelationsOutgoing.Any(r => r.TargetUserId == authenticatedUserId && r.RelationType == UserRelationType.Blocked))
             return HttpErrors.UserNotFoundActionResult;
 
         // Check if friend request has already been sent

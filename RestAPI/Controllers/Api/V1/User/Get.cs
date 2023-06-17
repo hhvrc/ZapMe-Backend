@@ -22,25 +22,24 @@ public partial class UserController
     [ProducesResponseType(StatusCodes.Status404NotFound)]            // User not found
     public async Task<IActionResult> Get([FromRoute] Guid userId, CancellationToken cancellationToken)
     {
-        Guid authenticatedUserId = User.GetUserId();
+        Guid thisUserId = User.GetUserId();
 
-        // Get target user if exists and has not blocked the requesting user
-        UserEntity? targetUser = await _dbContext.Users
-            .SingleOrDefaultAsync(u =>
-                u.Id == userId &&
-                !u.Relations.Any(r => r.TargetUserId == authenticatedUserId && r.RelationType == UserRelationType.Blocked)
-            , cancellationToken);
-        if (targetUser is null)
+        var result = await _dbContext.Users
+            .Where(u => u.Id == userId)
+            .Where(u => !u.RelationsOutgoing.Any(r => r.TargetUserId == thisUserId && r.RelationType == UserRelationType.Blocked))
+            .Join(
+                _dbContext.UserRelations,
+                u => u.Id,
+                r => r.TargetUserId,
+                (u, r) => new { user = u, outgoingRelation = r }
+            )
+            .Where(x => x.outgoingRelation.SourceUserId == thisUserId)
+            .SingleOrDefaultAsync(cancellationToken);
+        if (result is null)
         {
             return HttpErrors.UserNotFoundActionResult;
         }
 
-        // Avoid users to see details of blocked users
-        if (targetUser.Relations.Any(r => r.SourceUserId == authenticatedUserId && r.RelationType == UserRelationType.Blocked))
-        {
-            return Ok(targetUser.ToMinimalUserDto());
-        }
-
-        return Ok(targetUser.ToUserDto());
+        return Ok(result.user.ToUserDto(result.outgoingRelation));
     }
 }

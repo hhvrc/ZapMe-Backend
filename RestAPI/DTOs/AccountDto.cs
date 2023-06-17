@@ -35,7 +35,7 @@ public readonly struct AccountDto
     /// <summary>
     /// Id of friends this account has
     /// </summary>
-    public IEnumerable<Guid> Friends { get; init; }
+    public IEnumerable<FriendDto> Friends { get; init; }
 
     /// <summary>
     /// SSO providers this account is connected to

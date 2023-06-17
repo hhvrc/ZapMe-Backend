@@ -29,6 +29,10 @@ public sealed class CloudflareTurnstileService : ICloudflareTurnstileService
             return new CloudflareTurnstileVerifyResponse { ErrorCodes = new[] { "missing-input-response" } };
         }
 
+#if DEBUG
+        if (responseToken == "dev-bypass") return new CloudflareTurnstileVerifyResponse { Success = true };
+#endif
+
         Dictionary<string, string> formUrlValues = new Dictionary<string, string>
         {
             { "secret", _options.SecretKey },

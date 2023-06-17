@@ -6,8 +6,28 @@ namespace ZapMe.DTOs;
 
 public static class UserMapper
 {
-    public static UserDto ToUserDto(this UserEntity user)
+    public static UserDto ToUserDto(this UserEntity user, UserRelationEntity? outgoingUserRelation)
     {
+        var relationType = outgoingUserRelation?.RelationType ?? UserRelationType.None;
+
+        if (relationType == UserRelationType.Blocked)
+        {
+            return new UserDto
+            {
+                Id = user.Id,
+                Username = user.Name,
+                AvatarUrl = null,
+                BannerUrl = null,
+                Status = UserStatus.Offline,
+                StatusText = String.Empty,
+                RelationType = UserRelationType.Blocked,
+                NickName = outgoingUserRelation?.NickName,
+                Notes = outgoingUserRelation?.Notes,
+                CreatedAt = DateTime.MinValue,
+                LastSeenAt = DateTime.MinValue
+            };
+        }
+
         return new UserDto
         {
             Id = user.Id,
@@ -16,13 +36,16 @@ public static class UserMapper
             BannerUrl = user.ProfileBanner?.PublicUrl,
             Status = user.Status,
             StatusText = user.StatusText,
+            RelationType = relationType,
+            NickName = outgoingUserRelation?.NickName,
+            Notes = outgoingUserRelation?.Notes,
             CreatedAt = user.CreatedAt,
             LastSeenAt = user.LastOnline,
         };
     }
 
     // Exposes minimal information about a user
-    public static UserDto ToMinimalUserDto(this UserEntity user)
+    public static UserDto ToUserDto(this UserEntity user, UserRelationType relation)
     {
         return new UserDto
         {
@@ -32,6 +55,7 @@ public static class UserMapper
             BannerUrl = null,
             Status = UserStatus.Offline,
             StatusText = String.Empty,
+            RelationType = relation,
             CreatedAt = DateTime.MinValue,
             LastSeenAt = DateTime.MinValue
         };
@@ -51,7 +75,7 @@ public static class UserMapper
             BannerUrl = user.ProfileBanner?.PublicUrl,
             Status = user.Status,
             StatusText = user.StatusText,
-            Friends = user.Relations.Select(fs => fs.TargetUserId),
+            Friends = user.RelationsOutgoing.Select(fs => fs.ToFriendDto()),
             SSOConnections = user.SSOConnections.Select(oc => oc.ProviderName),
             CreatedAt = user.CreatedAt,
             UpdatedAt = user.UpdatedAt,

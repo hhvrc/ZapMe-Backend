@@ -6,10 +6,6 @@ namespace ZapMe.Database.Models;
 
 public sealed class UserEmailVerificationRequestEntity
 {
-    public const string TableName = "emailVerificationRequest";
-    public const string TableNewEmailIndex = TableName + "_newEmail_idx";
-    public const string TableTokenIndex = TableName + "_tokenHash_idx";
-
     public Guid UserId { get; set; }
 
     /// <summary>
@@ -33,36 +29,17 @@ public sealed class UserEmailAddressChangeRequestEntityConfiguration : IEntityTy
 {
     public void Configure(EntityTypeBuilder<UserEmailVerificationRequestEntity> builder)
     {
-        builder.ToTable(UserEmailVerificationRequestEntity.TableName);
-
         builder.HasKey(macr => macr.UserId);
-
-        builder.Property(macr => macr.UserId)
-            .HasColumnName("userId");
-
-        builder.Property(macr => macr.NewEmail)
-            .HasColumnName("newEmail")
-            .HasMaxLength(GeneralHardLimits.EmailAddressMaxLength);
-
-        builder.Property(macr => macr.TokenHash)
-            .HasColumnName("tokenHash")
-            .HasMaxLength(HashConstants.Sha256LengthHex);
-
-        builder.Property(macr => macr.CreatedAt)
-            .HasColumnName("createdAt")
-            .HasDefaultValueSql("now()");
+        builder.Property(macr => macr.NewEmail).HasMaxLength(GeneralHardLimits.EmailAddressMaxLength);
+        builder.Property(macr => macr.TokenHash).HasMaxLength(HashConstants.Sha256LengthHex);
+        builder.Property(macr => macr.CreatedAt).HasDefaultValueSql("now()");
+        builder.HasIndex(macr => macr.NewEmail).IsUnique();
+        builder.HasIndex(macr => macr.TokenHash).IsUnique();
 
         builder.HasOne(macr => macr.User)
             .WithOne(u => u.EmailVerificationRequest)
             .HasForeignKey<UserEmailVerificationRequestEntity>(macr => macr.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(macr => macr.NewEmail)
-            .IsUnique()
-            .HasDatabaseName(UserEmailVerificationRequestEntity.TableNewEmailIndex);
-
-        builder.HasIndex(macr => macr.TokenHash)
-            .HasDatabaseName(UserEmailVerificationRequestEntity.TableTokenIndex)
-            .IsUnique();
     }
 }

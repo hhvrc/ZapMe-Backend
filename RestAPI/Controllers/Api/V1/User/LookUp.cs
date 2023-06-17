@@ -23,34 +23,21 @@ public partial class UserController
     [ProducesResponseType(StatusCodes.Status404NotFound)] // User not found
     public async Task<IActionResult> LookUp([FromRoute] string userName, CancellationToken cancellationToken)
     {
-        Guid userId = User.GetUserId();
+        Guid thisUserId = User.GetUserId();
 
-        string cacheKey = "zapme.users.byname:" + userName;
-
-        UserEntity? user = await _cache.GetAsync<UserEntity>(cacheKey, cancellationToken);
-        if (user is null)
-        {
-            user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Name == userName, cancellationToken: cancellationToken);
-            if (user is null)
-            {
-                return HttpErrors.UserNotFoundActionResult;
-            }
-
-            await _cache.SetAsync(cacheKey, user, cancellationToken);
-        }
-
-        // If the target user has blocked the current user, return 404
-        if (user.Relations.Any(r => r.TargetUserId == userId && r.RelationType == UserRelationType.Blocked))
+        var result = await _dbContext.Users
+            .Where(u => u.Name == userName)
+            .Select(u => new {
+                user = u,
+                outgoingRelation = u.RelationsOutgoing.FirstOrDefault(r => r.SourceUserId == thisUserId),
+                incomingRelation = u.RelationsIncoming.FirstOrDefault(r => r.TargetUserId == thisUserId)
+            })
+            .FirstOrDefaultAsync(u => u.incomingRelation == null || u.incomingRelation.RelationType != UserRelationType.Blocked, cancellationToken);
+        if (result is null)
         {
             return HttpErrors.UserNotFoundActionResult;
         }
 
-        // Else if the current user has blocked the target user, return minimal user info
-        if (user.Relations.Any(r => r.SourceUserId == userId && r.RelationType == UserRelationType.Blocked))
-        {
-            return Ok(user.ToMinimalUserDto());
-        }
-
-        return Ok(user.ToUserDto());
+        return Ok(result.user.ToUserDto(result.outgoingRelation));
     }
 }

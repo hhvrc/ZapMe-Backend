@@ -802,8 +802,7 @@ components:
         friends:
           type: array
           items:
-            type: string
-            format: uuid
+            $ref: '#/components/schemas/FriendDto'
           description: Id of friends this account has
         ssoConnections:
           type: array
@@ -1037,6 +1036,25 @@ components:
           nullable: true
       additionalProperties: false
       description: Details about the error
+    FriendDto:
+      required:
+        - friendedAt
+        - friendId
+      type: object
+      properties:
+        friendId:
+          type: string
+          format: uuid
+        nickName:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        friendedAt:
+          type: string
+          format: date-time
+      additionalProperties: false
     FriendRequestList:
       required:
         - incoming
@@ -1237,6 +1255,7 @@ components:
         - createdAt
         - id
         - lastSeenAt
+        - relationType
         - status
         - statusText
         - username
@@ -1261,6 +1280,15 @@ components:
             - $ref: '#/components/schemas/UserStatus'
         statusText:
           type: string
+        relationType:
+          allOf:
+            - $ref: '#/components/schemas/UserRelationType'
+        nickName:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
         createdAt:
           type: string
           description: Date this user was created at
@@ -1285,6 +1313,12 @@ components:
           description: 'Content of the notification, might be HTML'
       additionalProperties: false
       description: "System notification to be displayed to the user, do not confuse with user notifications\r\nThis is a hint and clients can choose to ignore it or implement notifications to be independent of this"
+    UserRelationType:
+      enum:
+        - none
+        - friend
+        - blocked
+      type: string
     UserReport:
       required:
         - explenation
