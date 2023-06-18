@@ -12,7 +12,7 @@ using ZapMe.Database;
 namespace ZapMe.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230617022643_InitialCreate")]
+    [Migration("20230618123619_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

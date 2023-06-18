@@ -43,21 +43,10 @@ public sealed class SessionEntityConfiguration : IEntityTypeConfiguration<Sessio
 {
     public void Configure(EntityTypeBuilder<SessionEntity> builder)
     {
-        builder.HasKey(si => si.Id);
         builder.Property(si => si.Id).HasDefaultValueSql("gen_random_uuid()");
         builder.Property(si => si.NickName).HasMaxLength(32);
         builder.Property(si => si.IpAddress).HasMaxLength(GeneralHardLimits.IPAddressMaxLength);
         builder.Property(si => si.CountryCode).HasMaxLength(2);
         builder.Property(si => si.CreatedAt).HasDefaultValueSql("now()");
-
-        builder.HasOne(si => si.User)
-            .WithMany(u => u.Sessions)
-            .HasForeignKey(si => si.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasOne(si => si.UserAgent)
-            .WithMany(ua => ua.Sessions)
-            .HasForeignKey(si => si.UserAgentId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

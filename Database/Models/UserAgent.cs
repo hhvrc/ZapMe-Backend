@@ -29,7 +29,6 @@ public sealed class UserAgentEntityConfiguration : IEntityTypeConfiguration<User
 {
     public void Configure(EntityTypeBuilder<UserAgentEntity> builder)
     {
-        builder.HasKey(u => u.Id);
         builder.Property(u => u.Id).HasDefaultValueSql("gen_random_uuid()");
         builder.Property(u => u.Sha256).HasMaxLength(HashConstants.Sha256LengthHex);
         builder.Property(u => u.Value).HasMaxLength(UserAgentLimits.StoredValueLength);

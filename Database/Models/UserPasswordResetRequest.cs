@@ -23,10 +23,5 @@ public sealed class UserPasswordResetRequestEntityConfiguration : IEntityTypeCon
         builder.Property(pr => pr.TokenHash).HasMaxLength(HashConstants.Sha256LengthHex);
         builder.Property(pr => pr.CreatedAt).HasDefaultValueSql("now()");
         builder.HasIndex(pr => pr.TokenHash).IsUnique();
-
-        builder.HasOne(pr => pr.User)
-            .WithOne(u => u.PasswordResetRequest)
-            .HasForeignKey<UserPasswordResetRequestEntity>(pr => pr.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

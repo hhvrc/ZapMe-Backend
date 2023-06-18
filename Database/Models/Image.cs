@@ -35,7 +35,6 @@ public sealed class ImageEntityConfiguration : IEntityTypeConfiguration<ImageEnt
 {
     public void Configure(EntityTypeBuilder<ImageEntity> builder)
     {
-        builder.HasKey(i => i.Id);
         builder.Property(i => i.Id).HasDefaultValueSql("gen_random_uuid()");
         builder.Property(i => i.MimeType).HasMaxLength(32);
         builder.Property(i => i.Sha256).HasMaxLength(HashConstants.Sha256LengthHex);

@@ -24,12 +24,6 @@ public sealed class LockOutEntityConfiguration : IEntityTypeConfiguration<LockOu
 {
     public void Configure(EntityTypeBuilder<LockOutEntity> builder)
     {
-        builder.HasKey(lo => lo.Id);
         builder.Property(lo => lo.Id).HasDefaultValueSql("gen_random_uuid()");
-
-        builder.HasOne(lo => lo.User)
-            .WithMany(u => u.LockOuts)
-            .HasForeignKey(lo => lo.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

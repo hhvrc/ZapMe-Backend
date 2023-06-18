@@ -36,7 +36,6 @@ public sealed class DeletedUserEntityConfiguration : IEntityTypeConfiguration<De
 {
     public void Configure(EntityTypeBuilder<DeletedUserEntity> builder)
     {
-        builder.HasKey(du => du.Id);
         builder.Property(ur => ur.DeletionReason).HasMaxLength(256);
         builder.Property(du => du.UserDeletedAt).HasDefaultValueSql("now()");
     }

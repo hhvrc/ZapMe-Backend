@@ -41,10 +41,5 @@ public sealed class SSOConnectionEntityConfiguration : IEntityTypeConfiguration<
         builder.Property(oac => oac.ProviderName).HasMaxLength(16);
         builder.Property(oac => oac.CreatedAt).HasDefaultValueSql("now()");
         builder.HasIndex(oac => oac.UserId);
-
-        builder.HasOne(oac => oac.User)
-            .WithMany(u => u.SSOConnections)
-            .HasForeignKey(oac => oac.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

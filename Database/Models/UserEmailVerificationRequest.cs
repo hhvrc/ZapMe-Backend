@@ -36,10 +36,5 @@ public sealed class UserEmailAddressChangeRequestEntityConfiguration : IEntityTy
         builder.HasIndex(macr => macr.NewEmail).IsUnique();
         builder.HasIndex(macr => macr.TokenHash).IsUnique();
 
-        builder.HasOne(macr => macr.User)
-            .WithOne(u => u.EmailVerificationRequest)
-            .HasForeignKey<UserEmailVerificationRequestEntity>(macr => macr.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
-
     }
 }

@@ -16,7 +16,6 @@ public sealed class DeviceEntityConfiguration : IEntityTypeConfiguration<DeviceE
 {
     public void Configure(EntityTypeBuilder<DeviceEntity> builder)
     {
-        builder.HasKey(i => i.Id);
         builder.Property(i => i.Id).HasDefaultValueSql("gen_random_uuid()");
         builder.Property(i => i.Name).HasMaxLength(64);
         builder.Property(i => i.CreatedAt).HasDefaultValueSql("now()");

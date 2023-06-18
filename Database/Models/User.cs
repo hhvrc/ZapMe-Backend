@@ -65,7 +65,6 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntit
 {
     public void Configure(EntityTypeBuilder<UserEntity> builder)
     {
-        builder.HasKey(u => u.Id);
         builder.Property(u => u.Id).HasDefaultValueSql("gen_random_uuid()");
         builder.Property(u => u.Name).HasMaxLength(GeneralHardLimits.UsernameMaxLength);
         builder.Property(u => u.Email).HasMaxLength(GeneralHardLimits.EmailAddressMaxLength);
@@ -77,14 +76,7 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntit
         builder.HasIndex(u => u.Name).IsUnique();
         builder.HasIndex(u => u.Email).IsUnique();
 
-        builder.HasOne(u => u.ProfileAvatar)
-            .WithMany()
-            .HasForeignKey(u => u.ProfileAvatarId)
-            .OnDelete(DeleteBehavior.SetNull);
-
-        builder.HasOne(u => u.ProfileBanner)
-            .WithMany()
-            .HasForeignKey(u => u.ProfileBannerId)
-            .OnDelete(DeleteBehavior.SetNull);
+        builder.HasOne(u => u.ProfileAvatar).WithMany().OnDelete(DeleteBehavior.SetNull);
+        builder.HasOne(u => u.ProfileBanner).WithMany().OnDelete(DeleteBehavior.SetNull);
     }
 }
