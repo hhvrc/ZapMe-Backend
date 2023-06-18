@@ -20,7 +20,7 @@ public sealed class Config
     /// <summary>
     /// Markdown of the Privacy Policy
     /// </summary>
-    public required string PrivacyPolicyMD { get; set; }
+    public required string PrivacyPolicyMarkdown { get; set; }
 
     /// <summary>
     /// The current Terms of Service version, if the user has not accepted this version, they will be prompted to accept it
@@ -30,7 +30,7 @@ public sealed class Config
     /// <summary>
     /// Markdown of the Terms of Service
     /// </summary>
-    public required string TermsOfServiceMD { get; set; }
+    public required string TermsOfServiceMarkdown { get; set; }
 
     /// <summary>
     /// Api configuration, e.g. version, etc.

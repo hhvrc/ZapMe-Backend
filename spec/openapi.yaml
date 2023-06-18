@@ -886,9 +886,9 @@ components:
         - appVersion
         - contact
         - founderSocials
-        - privacyPolicyText
+        - privacyPolicyMarkdown
         - privacyPolicyVersion
-        - termsOfServiceText
+        - termsOfServiceMarkdown
         - termsOfServiceVersion
       type: object
       properties:
@@ -902,14 +902,16 @@ components:
           type: integer
           description: 'The current Privacy Policy version, if the user has not accepted this version, they will be prompted to accept it'
           format: int32
-        privacyPolicyText:
+        privacyPolicyMarkdown:
           type: string
+          description: Markdown of the Privacy Policy
         termsOfServiceVersion:
           type: integer
           description: 'The current Terms of Service version, if the user has not accepted this version, they will be prompted to accept it'
           format: int32
-        termsOfServiceText:
+        termsOfServiceMarkdown:
           type: string
+          description: Markdown of the Terms of Service
         api:
           allOf:
             - $ref: '#/components/schemas/ApiConfig'

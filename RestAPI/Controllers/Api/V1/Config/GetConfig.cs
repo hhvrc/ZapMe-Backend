@@ -36,9 +36,9 @@ public partial class ConfigController
             AppName = App.AppName,
             AppVersion = App.AppVersion.String,
             PrivacyPolicyVersion = privacyPolicy.Version,
-            PrivacyPolicyMD = privacyPolicy.Markdown,
+            PrivacyPolicyMarkdown = privacyPolicy.Markdown,
             TermsOfServiceVersion = termsOfService.Version,
-            TermsOfServiceMD = termsOfService.Markdown,
+            TermsOfServiceMarkdown = termsOfService.Markdown,
             Api = new Config.Models.ApiConfig
             {
             },
