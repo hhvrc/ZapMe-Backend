@@ -110,7 +110,6 @@ GoogleOAuth2Options.Register(services, configuration);
 TwitterOAuth1Options.Register(services, configuration);
 CloudflareTurnstileOptions.Register(services, configuration);
 GoogleReCaptchaOptions.Register(services, configuration);
-LegalOptions.Register(services, configuration);
 MailGunOptions.Register(services, configuration);
 
 services.AddCloudflareR2(configuration);

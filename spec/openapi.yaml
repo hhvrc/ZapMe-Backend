@@ -826,18 +826,8 @@ components:
     ApiConfig:
       required:
         - disabledFeatures
-        - privacyVersion
-        - tosVersion
       type: object
       properties:
-        tosVersion:
-          type: integer
-          description: 'The current Terms of Service version, if the user has not accepted this version, they will be prompted to accept it'
-          format: int32
-        privacyVersion:
-          type: integer
-          description: 'The current Privacy Policy version, if the user has not accepted this version, they will be prompted to accept it'
-          format: int32
         disabledFeatures:
           allOf:
             - $ref: '#/components/schemas/ApiDisabledFeatures'
@@ -896,6 +886,10 @@ components:
         - appVersion
         - contact
         - founderSocials
+        - privacyPolicyText
+        - privacyPolicyVersion
+        - termsOfServiceText
+        - termsOfServiceVersion
       type: object
       properties:
         appName:
@@ -904,6 +898,18 @@ components:
         appVersion:
           type: string
           description: 'Version of the product, e.g. "1.0.0"'
+        privacyPolicyVersion:
+          type: integer
+          description: 'The current Privacy Policy version, if the user has not accepted this version, they will be prompted to accept it'
+          format: int32
+        privacyPolicyText:
+          type: string
+        termsOfServiceVersion:
+          type: integer
+          description: 'The current Terms of Service version, if the user has not accepted this version, they will be prompted to accept it'
+          format: int32
+        termsOfServiceText:
+          type: string
         api:
           allOf:
             - $ref: '#/components/schemas/ApiConfig'

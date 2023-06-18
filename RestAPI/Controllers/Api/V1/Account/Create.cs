@@ -22,7 +22,6 @@ public partial class AccountController
     /// <param name="body"></param>
     /// <param name="cfTurnstileService"></param>
     /// <param name="debounceService"></param>
-    /// <param name="legalOptions"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <response code="201">Created account</response>
@@ -37,7 +36,6 @@ public partial class AccountController
         [FromBody] CreateAccount body,
         [FromServices] ICloudflareTurnstileService cfTurnstileService,
         [FromServices] IDebounceService debounceService,
-        [FromServices] IOptions<LegalOptions> legalOptions,
         CancellationToken cancellationToken
         )
     {
@@ -95,14 +93,16 @@ public partial class AccountController
             return HttpErrors.InvalidModelState((nameof(body.Email), "Disposable Emails are not allowed")).ToActionResult();
         }
 
-        if (body.AcceptedPrivacyPolicyVersion < legalOptions.Value.PrivacyPolicyVersion)
+        uint privacyPolicyVersion = await _dbContext.PrivacyPolicyDocuments.Where(pp => pp.IsActive).Select(pp => pp.Version).OrderByDescending(pp => pp).FirstAsync(cancellationToken);
+        if (body.AcceptedPrivacyPolicyVersion < privacyPolicyVersion)
         {
-            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "review_privpol", "User needs to accept new Privacy Policy", NotificationSeverityLevel.Error, "Please read and accept the new Privacy Policy before creating an account").ToActionResult();
+            return HttpErrors.ReviewPrivacyPolicyActionResult;
         }
 
-        if (body.AcceptedTermsOfServiceVersion < legalOptions.Value.TermsOfServiceVersion)
+        uint termsOfServiceVersion = await _dbContext.TermsOfServiceDocuments.Where(tos => tos.IsActive).Select(tos => tos.Version).OrderByDescending(tos => tos).FirstAsync(cancellationToken);
+        if (body.AcceptedTermsOfServiceVersion < termsOfServiceVersion)
         {
-            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "review_tos", "User needs to accept new Terms of Service", NotificationSeverityLevel.Error, "Please read and accept the new Terms of Service before creating an account").ToActionResult();
+            return HttpErrors.ReviewTermsOfServiceActionResult;
         }
 
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);

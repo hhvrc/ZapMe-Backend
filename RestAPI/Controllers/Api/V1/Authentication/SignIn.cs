@@ -22,7 +22,6 @@ public partial class AuthController
     /// </summary>
     /// <param name="body"></param>
     /// <param name="lockOutStore"></param>
-    /// <param name="options"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [AnonymousOnly]
@@ -33,7 +32,7 @@ public partial class AuthController
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status413RequestEntityTooLarge)]
-    public async Task<IActionResult> SignIn([FromBody] AuthSignIn body, [FromServices] ILockOutStore lockOutStore, [FromServices] IOptions<LegalOptions> options, CancellationToken cancellationToken)
+    public async Task<IActionResult> SignIn([FromBody] AuthSignIn body, [FromServices] ILockOutStore lockOutStore, CancellationToken cancellationToken)
     {
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);
 
@@ -75,12 +74,14 @@ public partial class AuthController
             return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Account disabled", "Account has been disabled either by moderative or administrative reasons", NotificationSeverityLevel.Error, "Account disabled: " + reason).ToActionResult();
         }
 
-        if (user.AcceptedPrivacyPolicyVersion < options.Value.PrivacyPolicyVersion)
+        uint privacyPolicyVersion = await _dbContext.PrivacyPolicyDocuments.Where(pp => pp.IsActive).Select(pp => pp.Version).OrderByDescending(pp => pp).FirstAsync(cancellationToken);
+        if (user.AcceptedPrivacyPolicyVersion < privacyPolicyVersion)
         {
             return HttpErrors.ReviewPrivacyPolicyActionResult;
         }
 
-        if (user.AcceptedTermsOfServiceVersion < options.Value.TermsOfServiceVersion)
+        uint termsOfServiceVersion = await _dbContext.TermsOfServiceDocuments.Where(tos => tos.IsActive).Select(tos => tos.Version).OrderByDescending(tos => tos).FirstAsync(cancellationToken);
+        if (user.AcceptedTermsOfServiceVersion < termsOfServiceVersion)
         {
             return HttpErrors.ReviewTermsOfServiceActionResult;
         }

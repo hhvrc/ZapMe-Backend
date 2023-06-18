@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ZapMe.Constants;
 
 namespace ZapMe.Controllers.Api.V1;
@@ -14,16 +15,32 @@ public partial class ConfigController
     [HttpGet(Name = "GetConfig")]
     [ProducesResponseType(typeof(Config.Models.Config), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public Config.Models.Config GetConfig()
+    public async Task<Config.Models.Config> GetConfig(CancellationToken cancellationToken)
     {
+        var privacyPolicy = await _dbContext
+            .PrivacyPolicyDocuments
+            .Where(pp => pp.IsActive)
+            .OrderByDescending(pp => pp.Version)
+            .Select(pp => new { pp.Version, pp.Text })
+            .FirstAsync(cancellationToken);
+
+        var termsOfService = await _dbContext
+            .TermsOfServiceDocuments
+            .Where(tos => tos.IsActive)
+            .OrderByDescending(tos => tos.Version)
+            .Select(tos => new { tos.Version, tos.Text })
+            .FirstAsync(cancellationToken);
+
         return new Config.Models.Config
         {
             AppName = App.AppName,
             AppVersion = App.AppVersion.String,
+            PrivacyPolicyVersion = privacyPolicy.Version,
+            PrivacyPolicyText = privacyPolicy.Text,
+            TermsOfServiceVersion = termsOfService.Version,
+            TermsOfServiceText = termsOfService.Text,
             Api = new Config.Models.ApiConfig
             {
-                TosVersion = 1,
-                PrivacyVersion = 1
             },
             Contact = new Config.Models.ContactConfig
             {

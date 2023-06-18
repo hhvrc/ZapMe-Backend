@@ -20,6 +20,8 @@ public sealed class DatabaseContext : DbContext
     public required DbSet<UserRelationEntity> UserRelations { get; set; }
     public required DbSet<FriendRequestEntity> FriendRequests { get; set; }
     public required DbSet<SSOConnectionEntity> SSOConnections { get; set; }
+    public required DbSet<PrivacyPolicyDocumentEntity> PrivacyPolicyDocuments { get; set; }
+    public required DbSet<TermsOfServiceDocumentEntity> TermsOfServiceDocuments { get; set; }
     public required DbSet<UserPasswordResetRequestEntity> UserPasswordResetRequests { get; set; }
     public required DbSet<UserEmailVerificationRequestEntity> UserEmailVerificationRequests { get; set; }
 
@@ -36,6 +38,8 @@ public sealed class DatabaseContext : DbContext
         modelBuilder.ApplyConfiguration(new UserRelationEntityConfiguration());
         modelBuilder.ApplyConfiguration(new FriendRequestEntityConfiguration());
         modelBuilder.ApplyConfiguration(new SSOConnectionEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new PrivacyPolicyDocumentEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new TermsOfServiceDocumentEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserPasswordResetRequestEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserEmailAddressChangeRequestEntityConfiguration());
     }

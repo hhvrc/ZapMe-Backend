@@ -72,7 +72,9 @@ public sealed class PasswordResetManager : IPasswordResetManager
     {
         string tokenHash = HashingUtils.Sha256_Hex(token);
 
-        UserPasswordResetRequestEntity? passwordResetRequest = await _dbContext.UserPasswordResetRequests.FirstOrDefaultAsync(p => p.TokenHash == tokenHash, cancellationToken);
+        UserPasswordResetRequestEntity? passwordResetRequest = await _dbContext
+            .UserPasswordResetRequests
+            .FirstOrDefaultAsync(p => p.TokenHash == tokenHash, cancellationToken);
         if (passwordResetRequest is null) return false;
 
         // Check if token is valid
@@ -110,7 +112,8 @@ public sealed class PasswordResetManager : IPasswordResetManager
     public Task<int> RemoveExpiredRequests(CancellationToken cancellationToken)
     {
         DateTime expiryDate = DateTime.UtcNow.AddHours(-24);
-        return _dbContext.UserPasswordResetRequests
+        return _dbContext
+            .UserPasswordResetRequests
             .Where(x => x.CreatedAt < expiryDate)
             .ExecuteDeleteAsync(cancellationToken);
     }
