@@ -34,7 +34,8 @@ public partial class UserController
                 (u, r) => new { user = u, outgoingRelation = r }
             )
             .Where(x => x.outgoingRelation.SourceUserId == thisUserId)
-            .SingleOrDefaultAsync(cancellationToken);
+            .AsNoTracking()
+            .FirstOrDefaultAsync(cancellationToken);
         if (result is null)
         {
             return HttpErrors.UserNotFoundActionResult;

@@ -68,33 +68,11 @@ public sealed class PasswordResetManager : IPasswordResetManager
         return null;
     }
 
-    public async Task<ErrorDetails?> InitiatePasswordReset(Guid accountId, CancellationToken cancellationToken)
-    {
-        UserEntity? userEntity = await _dbContext.Users.SingleOrDefaultAsync(u => u.Id == accountId && u.Email != null, cancellationToken);
-        if (userEntity is null)
-        {
-            return HttpErrors.Generic(StatusCodes.Status404NotFound, "Account not found", "The account was not found");
-        }
-
-        return await InitiatePasswordReset(userEntity, cancellationToken);
-    }
-
-    public async Task<ErrorDetails?> InitiatePasswordReset(string accountEmail, CancellationToken cancellationToken)
-    {
-        UserEntity? userEntity = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email == accountEmail && u.Email != null, cancellationToken);
-        if (userEntity is null)
-        {
-            return HttpErrors.Generic(StatusCodes.Status404NotFound, "Account not found", "The account associated with that email was not found");
-        }
-
-        return await InitiatePasswordReset(userEntity, cancellationToken);
-    }
-
     public async Task<bool> TryCompletePasswordReset(string token, string newPassword, CancellationToken cancellationToken)
     {
         string tokenHash = HashingUtils.Sha256_Hex(token);
 
-        UserPasswordResetRequestEntity? passwordResetRequest = await _dbContext.UserPasswordResetRequests.SingleOrDefaultAsync(p => p.TokenHash == tokenHash, cancellationToken);
+        UserPasswordResetRequestEntity? passwordResetRequest = await _dbContext.UserPasswordResetRequests.FirstOrDefaultAsync(p => p.TokenHash == tokenHash, cancellationToken);
         if (passwordResetRequest is null) return false;
 
         // Check if token is valid

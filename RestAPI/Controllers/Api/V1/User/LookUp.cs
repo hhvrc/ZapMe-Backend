@@ -32,6 +32,7 @@ public partial class UserController
                 outgoingRelation = u.RelationsOutgoing.FirstOrDefault(r => r.SourceUserId == thisUserId),
                 incomingRelation = u.RelationsIncoming.FirstOrDefault(r => r.TargetUserId == thisUserId)
             })
+            .AsNoTracking()
             .FirstOrDefaultAsync(u => u.incomingRelation == null || u.incomingRelation.RelationType != UserRelationType.Blocked, cancellationToken);
         if (result is null)
         {

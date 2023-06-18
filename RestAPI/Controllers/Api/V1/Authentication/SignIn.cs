@@ -37,7 +37,10 @@ public partial class AuthController
     {
         await using ScopedDelayLock tl = ScopedDelayLock.FromSeconds(2, cancellationToken);
 
-        UserEntity? user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Name == body.UsernameOrEmail || u.Email == body.UsernameOrEmail, cancellationToken);
+        UserEntity? user = await _dbContext
+            .Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Name == body.UsernameOrEmail || u.Email == body.UsernameOrEmail, cancellationToken);
         if (user is null || !PasswordUtils.VerifyPassword(body.Password, user.PasswordHash))
         {
             return HttpErrors.Generic(
@@ -54,8 +57,10 @@ public partial class AuthController
             return HttpErrors.UnverifiedEmailActionResult;
         }
 
-        LockOutEntity[] lockouts = await _dbContext.LockOuts
+        LockOutEntity[] lockouts = await _dbContext
+            .LockOuts
             .Where(u => u.UserId == user.Id)
+            .AsNoTracking()
             .ToArrayAsync(cancellationToken);
         if (lockouts.Any())
         {

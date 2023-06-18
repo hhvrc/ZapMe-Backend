@@ -96,7 +96,7 @@ public sealed class ImageManager : IImageManager
         // Check if image already exists
         ImageEntity? image = await _dbContext
             .Images
-            .SingleOrDefaultAsync(i => i.Sha256 == sha256_hex, cancellationToken);
+            .FirstOrDefaultAsync(i => i.Sha256 == sha256_hex, cancellationToken);
         if (image is not null)
         {
             return image;

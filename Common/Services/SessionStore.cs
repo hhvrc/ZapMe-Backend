@@ -63,7 +63,12 @@ public sealed class SessionStore : ISessionStore
         }
         */
 
-        SessionEntity? session = await _dbContext.Sessions.Include(s => s.User).Include(s => s.UserAgent).SingleOrDefaultAsync(s => s.Id == sessionId, cancellationToken);
+        SessionEntity? session = await _dbContext
+            .Sessions
+            .Include(s => s.User)
+            .Include(s => s.UserAgent)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(s => s.Id == sessionId, cancellationToken);
 
         //await SetCacheAsync(sessionKey, session, cancellationToken);
 

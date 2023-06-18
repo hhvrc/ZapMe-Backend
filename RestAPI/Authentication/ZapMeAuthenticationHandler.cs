@@ -84,7 +84,7 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             SSOConnectionEntity? connectionEntity = await _dbContext.SSOConnections
                 .Include(c => c.User).ThenInclude(u => u.ProfileAvatar)
                 .Include(c => c.User).ThenInclude(u => u.ProfileBanner)
-                .SingleOrDefaultAsync(c => c.ProviderName == ssoProviderData.ProviderName && c.ProviderUserId == ssoProviderData.ProviderUserId, CancellationToken);
+                .FirstOrDefaultAsync(c => c.ProviderName == ssoProviderData.ProviderName && c.ProviderUserId == ssoProviderData.ProviderUserId, CancellationToken);
             if (connectionEntity is null)
             {
                 string token = await ServiceProvider.GetRequiredService<ISSOStateStore>().InsertProviderDataAsync(

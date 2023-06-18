@@ -23,6 +23,7 @@ public partial class UserController
 
         FriendRequestEntity[] friendRequests = await _dbContext.FriendRequests
             .Where(fr => fr.ReceiverId == userId || fr.SenderId == userId)
+            .AsNoTracking()
             .ToArrayAsync(cancellationToken);
 
         return Ok(new FriendRequestList

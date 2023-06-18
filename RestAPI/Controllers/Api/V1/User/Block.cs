@@ -35,7 +35,6 @@ public partial class UserController
         UserRelationEntity[] relations =
             await _dbContext
             .UserRelations
-            .AsTracking()
             .Where(r => (r.SourceUserId == authorizedUserId && r.TargetUserId == userId) || (r.SourceUserId == userId && r.TargetUserId == authorizedUserId))
             .ToArrayAsync(cancellationToken);
 

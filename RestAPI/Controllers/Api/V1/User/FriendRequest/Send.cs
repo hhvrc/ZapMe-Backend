@@ -32,6 +32,7 @@ partial class UserController
 
         UserEntity[] users = await _dbContext.Users
             .Where(u => u.Id == authenticatedUserId || u.Id == userId)
+            .AsNoTracking()
             .ToArrayAsync(cancellationToken);
         if (users.Length < 2)
             return HttpErrors.UserNotFoundActionResult;

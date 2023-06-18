@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ZapMe.DTOs;
 using ZapMe.DTOs.API.User;
 using ZapMe.Helpers;
@@ -50,7 +51,14 @@ public partial class AccountController
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
-        await passwordResetManager.InitiatePasswordReset(body.Email, cancellationToken);
+        var user = await _dbContext
+            .Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Email == body.Email, cancellationToken);
+        if (user is not null)
+        {
+            await passwordResetManager.InitiatePasswordReset(user, cancellationToken);
+        }
 
         // Return 200 OK no matter what happens, this is to prevent email enumeration
         return Ok(new RecoveryRequestOk { Message = "If the email you provided is registered, a recovery email has been sent to it. Please check your inbox." });

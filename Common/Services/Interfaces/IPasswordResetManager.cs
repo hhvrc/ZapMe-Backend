@@ -18,22 +18,6 @@ public interface IPasswordResetManager
     public Task<ErrorDetails?> InitiatePasswordReset(UserEntity user, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Helper method for <see cref="InitiatePasswordReset(UserEntity, CancellationToken)"/>
-    /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public Task<ErrorDetails?> InitiatePasswordReset(Guid userId, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Helper method for <see cref="InitiatePasswordReset(UserEntity, CancellationToken)"/>
-    /// </summary>
-    /// <param name="userEmail"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public Task<ErrorDetails?> InitiatePasswordReset(string userEmail, CancellationToken cancellationToken = default);
-
-    /// <summary>
     /// 
     /// </summary>
     /// <param name="token"></param>

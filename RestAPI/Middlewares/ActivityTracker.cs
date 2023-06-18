@@ -26,7 +26,8 @@ public sealed class ActivityTracker
         Guid? userId = context.User?.TryGetUserId();
         if (userId.HasValue)
         {
-            await dbContext.Users
+            await dbContext
+                .Users
                 .Where(s => s.Id == userId)
                 .ExecuteUpdateAsync(spc => spc
                     .SetProperty(u => u.LastOnline, _ => DateTime.UtcNow)

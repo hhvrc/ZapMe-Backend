@@ -20,7 +20,8 @@ public partial class DeviceController
     {
         DeviceEntity? device = await _dbContext
             .Devices
-            .SingleOrDefaultAsync(d => d.Id == deviceId, cancellationToken);
+            .AsNoTracking()
+            .FirstOrDefaultAsync(d => d.Id == deviceId, cancellationToken);
         if (device is null)
         {
             return HttpErrors.DeviceNotFoundActionResult;

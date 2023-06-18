@@ -26,7 +26,10 @@ public sealed class UserAgentManager : IUserAgentManager
         uint length = (uint)userAgent.Length;
         string sha256 = HashingUtils.Sha256_Hex(userAgent);
 
-        UserAgentEntity? entry = await _dbContext.UserAgents.SingleOrDefaultAsync(u => u.Sha256 == sha256, cancellationToken);
+        UserAgentEntity? entry = await _dbContext
+            .UserAgents
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Sha256 == sha256, cancellationToken);
         if (entry is not null)
         {
             return entry;
