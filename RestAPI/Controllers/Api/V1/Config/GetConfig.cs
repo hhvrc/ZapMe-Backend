@@ -21,14 +21,14 @@ public partial class ConfigController
             .PrivacyPolicyDocuments
             .Where(pp => pp.IsActive)
             .OrderByDescending(pp => pp.Version)
-            .Select(pp => new { pp.Version, pp.Text })
+            .Select(pp => new { pp.Version, pp.Markdown })
             .FirstAsync(cancellationToken);
 
         var termsOfService = await _dbContext
             .TermsOfServiceDocuments
             .Where(tos => tos.IsActive)
             .OrderByDescending(tos => tos.Version)
-            .Select(tos => new { tos.Version, tos.Text })
+            .Select(tos => new { tos.Version, tos.Markdown })
             .FirstAsync(cancellationToken);
 
         return new Config.Models.Config
@@ -36,9 +36,9 @@ public partial class ConfigController
             AppName = App.AppName,
             AppVersion = App.AppVersion.String,
             PrivacyPolicyVersion = privacyPolicy.Version,
-            PrivacyPolicyText = privacyPolicy.Text,
+            PrivacyPolicyMD = privacyPolicy.Markdown,
             TermsOfServiceVersion = termsOfService.Version,
-            TermsOfServiceText = termsOfService.Text,
+            TermsOfServiceMD = termsOfService.Markdown,
             Api = new Config.Models.ApiConfig
             {
             },

@@ -17,14 +17,20 @@ public sealed class Config
     /// </summary>
     public uint PrivacyPolicyVersion { get; set; }
 
-    public required string PrivacyPolicyText { get; set; }
+    /// <summary>
+    /// Markdown of the Privacy Policy
+    /// </summary>
+    public required string PrivacyPolicyMD { get; set; }
 
     /// <summary>
     /// The current Terms of Service version, if the user has not accepted this version, they will be prompted to accept it
     /// </summary>
     public uint TermsOfServiceVersion { get; set; }
 
-    public required string TermsOfServiceText { get; set; }
+    /// <summary>
+    /// Markdown of the Terms of Service
+    /// </summary>
+    public required string TermsOfServiceMD { get; set; }
 
     /// <summary>
     /// Api configuration, e.g. version, etc.

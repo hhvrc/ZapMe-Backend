@@ -7,7 +7,7 @@ public sealed class TermsOfServiceDocumentEntity
 {
     public uint Version { get; set; }
 
-    public required string Text { get; set; }
+    public required string Markdown { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
