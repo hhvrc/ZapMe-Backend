@@ -31,7 +31,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\Events\Events.csproj" />
-    <ProjectReference Include="..\Websocket\Websocket.csproj" />
   </ItemGroup>
 
   <Target Name="openapi" AfterTargets="PostBuildEvent" Condition="Exists('$(OutputPath)$(AssemblyName).dll') And ('$(Configuration)' == 'Release')">

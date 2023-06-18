@@ -15,11 +15,20 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="3.7.104.30" />
+    <PackageReference Include="FlatSharp.Compiler" Version="7.1.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="FlatSharp.Runtime" Version="7.1.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.5" />
     <PackageReference Include="OneOf" Version="3.0.243" />
     <PackageReference Include="Quartz.AspNetCore" Version="3.6.2" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
     <PackageReference Include="UAParser" Version="3.1.47" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FlatSharpSchema Include="Schemas\**\*.fbs"/>
   </ItemGroup>
 
   <ItemGroup>

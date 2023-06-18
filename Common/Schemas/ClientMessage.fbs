@@ -1,0 +1,16 @@
+attribute "fs_serializer";
+
+namespace ZapMe.Realtime.DTOs;
+
+struct ClientHeartbeat {
+  Timestamp:long;
+}
+
+union ClientMessageBody {
+  Heartbeat:ClientHeartbeat
+}
+
+table ClientMessage (fs_serializer) {
+  Timestamp:long;
+  Message:ClientMessageBody;
+}
