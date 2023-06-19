@@ -119,6 +119,7 @@ services.AddDebounceService(configuration);
 //services.AddGoogleReCaptchaService(configuration);
 services.AddMailGunService(configuration);
 
+services.AddTransient<IJwtAuthenticationManager, JwtAuthenticationManager>();
 services.AddTransient<IPasswordResetRequestStore, PasswordResetRequestStore>();
 services.AddTransient<IPasswordResetManager, PasswordResetManager>();
 services.AddTransient<IUserAgentStore, UserAgentStore>();
@@ -218,6 +219,7 @@ app.Map("/api", true, app =>
     app.UseAuthorization();
     app.UseRateLimiter();
     app.UseMiddleware<ActivityTracker>();
+    app.UseWebSockets();
     app.UseEndpoints(endpoints => endpoints.MapControllers());
 });
 app.Map("/swagger", true, app =>

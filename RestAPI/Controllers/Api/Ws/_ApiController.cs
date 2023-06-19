@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ZapMe.DTOs;
 using ZapMe.Services.Interfaces;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace ZapMe.Controllers.Ws;
+namespace ZapMe.Controllers.Api.Ws;
 
 /// <summary>
 /// 
@@ -12,7 +11,7 @@ namespace ZapMe.Controllers.Ws;
 [Consumes(Application.Json)]
 [Produces(Application.Json)]
 [ProducesErrorResponseType(typeof(ErrorDetails))]
-[ApiController, Authorize, Route("ws")]
+[ApiController, Route("api/ws")]
 public sealed partial class WebSocketController : ControllerBase
 {
     private readonly IWebSocketInstanceManager _webSocketInstanceManager;

@@ -24,11 +24,12 @@
     <PackageReference Include="OneOf" Version="3.0.243" />
     <PackageReference Include="Quartz.AspNetCore" Version="3.6.2" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.31.0" />
     <PackageReference Include="UAParser" Version="3.1.47" />
   </ItemGroup>
 
   <ItemGroup>
-    <FlatSharpSchema Include="Schemas\**\*.fbs"/>
+    <FlatSharpSchema Include="Schemas\**\*.fbs" />
   </ItemGroup>
 
   <ItemGroup>

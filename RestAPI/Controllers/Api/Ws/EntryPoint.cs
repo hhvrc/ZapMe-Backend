@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using ZapMe.Database.Models;
+using ZapMe.DTOs;
 using ZapMe.Helpers;
+using ZapMe.Services.Interfaces;
 using ZapMe.Websocket;
 
-namespace ZapMe.Controllers.Ws;
+namespace ZapMe.Controllers.Api.Ws;
 
 public sealed partial class WebSocketController
 {
@@ -13,6 +15,8 @@ public sealed partial class WebSocketController
     /// Documentation:
     /// Yes
     /// </summary>
+    /// <param name="token"></param>
+    /// <param name="authenticationManager"></param>
     /// <param name="logger"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
@@ -21,24 +25,28 @@ public sealed partial class WebSocketController
     [HttpGet(Name = "WebSocket")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> EntryPointAsync([FromServices] ILogger<WebSocketInstance> logger, CancellationToken cancellationToken)
+    public async Task<IActionResult> EntryPointAsync(
+        [FromQuery] string token,
+        [FromServices] IJwtAuthenticationManager authenticationManager,
+        [FromServices] ILogger<WebSocketInstance> logger,
+        CancellationToken cancellationToken
+        )
     {
+        var authenticationResult = await authenticationManager.AuthenticateJwtTokenAsync(token, cancellationToken);
+        if (authenticationResult.TryPickT1(out ErrorDetails errorDetails, out SessionEntity session))
+        {
+            return errorDetails.ToActionResult();
+        }
+
         WebSocketManager wsManager = HttpContext.WebSockets;
 
         if (wsManager.IsWebSocketRequest)
         {
-            Guid? userId = User.GetUserId();
-            if (!userId.HasValue)
-            {
-                return HttpErrors.UnauthorizedActionResult;
-            }
-
-
             // The trace identifier is used to identify the websocket instance, it will be unique for each websocket connection
             string instanceId = HttpContext.TraceIdentifier;
 
             // Create the connection instance
-            using WebSocketInstance? instance = await WebSocketInstance.CreateAsync(wsManager, User, logger);
+            using WebSocketInstance? instance = await WebSocketInstance.CreateAsync(wsManager, session, logger);
             if (instance is null)
             {
                 _logger.LogError("Failed to create websocket instance");
@@ -47,7 +55,7 @@ public sealed partial class WebSocketController
             }
 
             // Register instance globally, the manager will have the ability to kill this connection
-            if (!await _webSocketInstanceManager.RegisterInstanceAsync(userId.Value, instanceId, instance, cancellationToken))
+            if (!await _webSocketInstanceManager.RegisterInstanceAsync(session.UserId, instanceId, instance, cancellationToken))
             {
                 return HttpErrors.InternalServerErrorActionResult;
             }

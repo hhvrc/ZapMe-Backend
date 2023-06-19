@@ -45,6 +45,12 @@ public sealed class SessionStore : ISessionStore
         await _dbContext.Sessions.AddAsync(session, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
+        session = await _dbContext
+            .Sessions
+            .Include(s => s.User)
+            .Include(s => s.UserAgent)
+            .FirstAsync(s => s.Id == session.Id, cancellationToken);
+
         //string sessionKey = RedisCachePrefixes.Session + session.Id.ToString();
         //await SetCacheAsync(sessionKey, session, cancellationToken);
 

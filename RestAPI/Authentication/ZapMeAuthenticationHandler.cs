@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
-using Microsoft.IdentityModel.Tokens;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
@@ -13,9 +12,7 @@ using ZapMe.Database;
 using ZapMe.Database.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
-using ZapMe.Options;
 using ZapMe.Services.Interfaces;
-using ZapMe.Utils;
 
 namespace ZapMe.Authentication;
 
@@ -25,17 +22,15 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
     private HttpContext _context = default!;
     private Task<AuthenticateResult>? _authenticateTask = null;
     private readonly DatabaseContext _dbContext;
-    private readonly ISessionStore _sessionStore;
+    private readonly IJwtAuthenticationManager _authenticationManager;
     private readonly JsonSerializerOptions _jsonSerializerOptions;
-    private readonly JwtOptions _jwtOptions;
     private readonly ILogger<ZapMeAuthenticationHandler> _logger;
 
-    public ZapMeAuthenticationHandler(DatabaseContext dbContext, ISessionStore sessionStore, IOptions<JsonOptions> jsonOptions, IOptions<JwtOptions> jwtOptions, ILogger<ZapMeAuthenticationHandler> logger)
+    public ZapMeAuthenticationHandler(DatabaseContext dbContext, IJwtAuthenticationManager authenticationManager, IOptions<JsonOptions> jsonOptions, ILogger<ZapMeAuthenticationHandler> logger)
     {
         _dbContext = dbContext;
-        _sessionStore = sessionStore;
+        _authenticationManager = authenticationManager;
         _jsonSerializerOptions = jsonOptions.Value.JsonSerializerOptions;
-        _jwtOptions = jwtOptions.Value;
         _logger = logger;
     }
 
@@ -129,7 +124,7 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
         }
 
         Response.StatusCode = StatusCodes.Status200OK;
-        await Response.WriteAsJsonAsync(new AuthenticationResponse(JwtToken: JwtTokenUtils.GenerateJwtToken(claimsIdentity, issuedAt, expiresAt, _jwtOptions.SigningKey)));
+        await Response.WriteAsJsonAsync(new AuthenticationResponse(JwtToken: _authenticationManager.GenerateJwtToken(claimsIdentity, issuedAt, expiresAt)));
     }
 
     public Task SignOutAsync(AuthenticationProperties? properties)
@@ -156,20 +151,11 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
             return AuthenticateResult.Fail("Invalid Authorization header.");
         }
 
-        if (!JwtTokenUtils.ValidateJwtToken(authHeaderValue.Parameter, _jwtOptions.SigningKey, out ClaimsPrincipal claimsPrincipal, out SecurityToken securityToken))
+        var authenticationResult = await _authenticationManager.AuthenticateJwtTokenAsync(authHeaderValue.Parameter, CancellationToken);
+        if (authenticationResult.TryPickT1(out ErrorDetails errorDetails, out SessionEntity session))
         {
+            await errorDetails.Write(Response, _jsonSerializerOptions);
             return AuthenticateResult.Fail("Invalid JWT token.");
-        }
-
-        if (!claimsPrincipal.GetUserEmailVerified())
-        {
-            return AuthenticateResult.Fail("Email is not verified.");
-        }
-
-        var session = await _sessionStore.TryGetAsync(claimsPrincipal.GetSessionId(), CancellationToken);
-        if (session is null)
-        {
-            return AuthenticateResult.Fail("Invalid or Expired Session");
         }
 
         return AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(session.ToClaimsIdentity()), AuthenticationConstants.ZapMeScheme));

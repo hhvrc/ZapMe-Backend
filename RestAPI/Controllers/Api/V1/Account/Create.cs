@@ -7,7 +7,6 @@ using ZapMe.DTOs;
 using ZapMe.DTOs.API.User;
 using ZapMe.Enums;
 using ZapMe.Helpers;
-using ZapMe.Options;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
 
@@ -206,9 +205,9 @@ public partial class AccountController
                 cancellationToken
                 );
 
-            var jwtOptions = HttpContext.RequestServices.GetRequiredService<JwtOptions>();
+            var authenticationManager = HttpContext.RequestServices.GetRequiredService<IJwtAuthenticationManager>();
 
-            jwtToken = JwtTokenUtils.GenerateJwtToken(session, jwtOptions.SigningKey);
+            jwtToken = authenticationManager.GenerateJwtToken(session.ToClaimsIdentity(), session.CreatedAt, session.ExpiresAt);
         }
 
         // Send email verification

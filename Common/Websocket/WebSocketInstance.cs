@@ -2,18 +2,18 @@
 using FlatSharp;
 using System.Buffers;
 using System.Net.WebSockets;
-using System.Security.Claims;
+using ZapMe.Database.Models;
 
 namespace ZapMe.Websocket;
 
 public sealed class WebSocketInstance : IDisposable
 {
-    public static async Task<WebSocketInstance?> CreateAsync(WebSocketManager wsManager, ClaimsPrincipal user, ILogger<WebSocketInstance> logger)
+    public static async Task<WebSocketInstance?> CreateAsync(WebSocketManager wsManager, SessionEntity session, ILogger<WebSocketInstance> logger)
     {
         WebSocket? ws = await wsManager.AcceptWebSocketAsync();
         if (ws is null) return null;
 
-        return new WebSocketInstance(user.GetUserId(), user.GetSessionId(), ws, logger);
+        return new WebSocketInstance(session.UserId, session.Id, ws, logger);
     }
 
     public Guid UserId { get; init; }
