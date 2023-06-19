@@ -1,16 +1,16 @@
 attribute "fs_serializer";
 
-namespace ZapMe.Realtime.DTOs;
+namespace fbs.zapme.realtime;
 
 struct ClientHeartbeat {
-  Timestamp:long;
+  timestamp:long;
 }
 
 union ClientMessageBody {
-  Heartbeat:ClientHeartbeat
+  heartbeat:ClientHeartbeat
 }
 
 table ClientMessage (fs_serializer) {
-  Timestamp:long;
-  Message:ClientMessageBody;
+  timestamp:long;
+  message:ClientMessageBody;
 }

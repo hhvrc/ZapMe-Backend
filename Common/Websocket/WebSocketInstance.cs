@@ -1,8 +1,8 @@
-﻿using FlatSharp;
+﻿using fbs.zapme.realtime;
+using FlatSharp;
 using System.Buffers;
 using System.Net.WebSockets;
 using System.Security.Claims;
-using ZapMe.Realtime.DTOs;
 
 namespace ZapMe.Websocket;
 
@@ -127,7 +127,7 @@ public sealed class WebSocketInstance : IDisposable
     {
         switch (message.Kind)
         {
-            case ClientMessageBody.ItemKind.Heartbeat:
+            case ClientMessageBody.ItemKind.heartbeat:
                 _lastHeartbeat = DateTime.UtcNow;
                 ServerHeartbeat heartbeat = new ServerHeartbeat
                 {

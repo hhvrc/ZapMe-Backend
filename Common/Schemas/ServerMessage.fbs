@@ -1,38 +1,38 @@
 attribute "fs_serializer";
 
-namespace ZapMe.Realtime.DTOs;
+namespace fbs.zapme.realtime;
 
 table ServerHello {
-  Name:string;
+  name:string;
 }
 
 table ServerGoodbye {
-  Reason:string;
+  reason:string;
 }
 
 table ServerHeartbeat {
-  Timestamp:long;
+  timestamp:long;
 }
 
 table ServerReady {
-  HeartbeatIntervalMs:long;
+  heartbeat_interval_ms:long;
 }
 
 table GlobalMessage {
-  Title:string;
-  Body:string;
+  title:string;
+  body:string;
 }
 
 union ServerMessageBody {
-  Hello:ServerHello,
-  Goodbye:ServerGoodbye,
-  Heartbeat:ServerHeartbeat,
-  Ready:ServerReady,
+  hello:ServerHello,
+  goodbye:ServerGoodbye,
+  heartbeat:ServerHeartbeat,
+  ready:ServerReady,
 
-  GlobalMessage:GlobalMessage
+  message_global:GlobalMessage
 }
 
 table ServerMessage (fs_serializer) {
-  Timestamp:long;
-  Message:ServerMessageBody;
+  timestamp:long;
+  message:ServerMessageBody;
 }
