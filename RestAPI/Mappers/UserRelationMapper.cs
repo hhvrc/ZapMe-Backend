@@ -1,6 +1,4 @@
 ﻿using ZapMe.Database.Models;
-using ZapMe.Enums;
-using ZapMe.Utils;
 
 namespace ZapMe.DTOs;
 

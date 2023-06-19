@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
 using System.Security.Claims;
-using ZapMe.Database.Models;
 using ZapMe.DTOs;
 using ZapMe.Enums;
 using ZapMe.Helpers;
@@ -27,7 +25,8 @@ public partial class UserController
 
         var result = await _dbContext.Users
             .Where(u => u.Name == userName)
-            .Select(u => new {
+            .Select(u => new
+            {
                 user = u,
                 outgoingRelation = u.RelationsOutgoing.FirstOrDefault(r => r.SourceUserId == thisUserId),
                 incomingRelation = u.RelationsIncoming.FirstOrDefault(r => r.TargetUserId == thisUserId)

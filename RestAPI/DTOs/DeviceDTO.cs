@@ -1,7 +1,4 @@
-﻿using ZapMe.Attributes;
-using ZapMe.Enums;
-
-namespace ZapMe.DTOs;
+﻿namespace ZapMe.DTOs;
 
 public readonly struct DeviceDto
 {

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
 using ZapMe.Database;
 using ZapMe.DTOs;
 using static System.Net.Mime.MediaTypeNames;

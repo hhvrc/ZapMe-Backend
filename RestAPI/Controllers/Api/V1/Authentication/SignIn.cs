@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using ZapMe.Attributes;
 using ZapMe.Constants;
@@ -9,7 +8,6 @@ using ZapMe.Database.Models;
 using ZapMe.DTOs;
 using ZapMe.DTOs.API.Auth;
 using ZapMe.Helpers;
-using ZapMe.Options;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
 
