@@ -22,8 +22,8 @@ public sealed class CleanupEmailVerificationRequests : IJob
 
     public async Task Execute(IJobExecutionContext context)
     {
-        _logger.LogInformation("Cleaning up expired email verification requests...");
         int nRemoved = await _emailVerificationManager.RemoveExpiredRequestsAsync();
-        _logger.LogInformation("Removed {nRemoved} email verification request entities", nRemoved);
+        if (nRemoved > 0)
+            _logger.LogInformation("Removed {nRemoved} email verification request entities", nRemoved);
     }
 }

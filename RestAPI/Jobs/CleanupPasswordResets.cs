@@ -22,8 +22,8 @@ public sealed class CleanupPasswordResets : IJob
 
     public async Task Execute(IJobExecutionContext context)
     {
-        _logger.LogInformation("Cleaning up expired password reset requests...");
         int nRemoved = await _passwordResetManager.RemoveExpiredRequests();
-        _logger.LogInformation("Removed {nRemoved} reset request entities", nRemoved);
+        if (nRemoved > 0)
+            _logger.LogInformation("Removed {nRemoved} password reset request entities", nRemoved);
     }
 }
