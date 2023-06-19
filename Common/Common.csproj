@@ -36,4 +36,8 @@
     <ProjectReference Include="..\DTOs\DTOs.csproj" />
     <ProjectReference Include="..\Utils\Utils.csproj" />
   </ItemGroup>
+	
+  <Target Name="CopyFlatBuffersSchemas" AfterTargets="Build">
+    <Copy SourceFiles="@(FlatSharpSchema)" DestinationFolder="..\spec\fbs" />
+  </Target>
 </Project>

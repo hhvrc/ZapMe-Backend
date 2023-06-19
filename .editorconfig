@@ -315,3 +315,10 @@ indent_size = 2
 indent_style = space
 end_of_line = crlf
 trim_trailing_whitespace = true
+
+# Project and Solution files
+[*.{sln,csproj,props,targets}]
+indent_size = 2
+indent_style = space
+end_of_line = crlf
+trim_trailing_whitespace = true
