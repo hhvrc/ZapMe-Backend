@@ -2,6 +2,7 @@
 using FlatSharp;
 using server.fbs;
 using System.Buffers;
+using System.Drawing;
 using System.Net.WebSockets;
 using ZapMe.Database.Models;
 
@@ -37,6 +38,8 @@ public sealed partial class WebSocketInstance : IDisposable
 
     public async Task RunAsync(CancellationToken cancellationToken)
     {
+        if (_webSocket.State != WebSocketState.Open) return;
+
         // TODO: mark person as online
 
         try
@@ -121,6 +124,7 @@ public sealed partial class WebSocketInstance : IDisposable
                 ArrayPool<byte>.Shared.Return(bytes);
             }
         }
+
         await CloseAsync(closeStatus, closeMessage, cancellationToken);
     }
 
@@ -148,18 +152,25 @@ public sealed partial class WebSocketInstance : IDisposable
 
     public async Task CloseAsync(WebSocketCloseStatus closeStatus = WebSocketCloseStatus.NormalClosure, string reason = "ByeBye ❤️", CancellationToken cs = default)
     {
-        try
+        if (_webSocket.State is WebSocketState.Open or WebSocketState.CloseReceived)
         {
-            await _webSocket.CloseAsync(closeStatus, reason, cs);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error while closing websocket: {message}", ex.Message);
+            try
+            {
+                await _webSocket.CloseAsync(closeStatus, reason, cs);
+            }
+            catch
+            {
+                _webSocket.Abort();
+            }   
         }
     }
 
     public void Dispose()
     {
-        _webSocket.Dispose();
+        if (_webSocket.State is not WebSocketState.Closed or WebSocketState.Aborted)
+        {
+            try { _webSocket.Abort(); } catch { }
+        }
+        try { _webSocket.Dispose(); } catch {}
     }
 }
