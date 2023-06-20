@@ -7,7 +7,7 @@ using ZapMe.Database.Models;
 
 namespace ZapMe.Websocket;
 
-public sealed class WebSocketInstance : IDisposable
+public sealed partial class WebSocketInstance : IDisposable
 {
     public static async Task<WebSocketInstance?> CreateAsync(WebSocketManager wsManager, SessionEntity session, ILogger<WebSocketInstance> logger)
     {
@@ -109,7 +109,7 @@ public sealed class WebSocketInstance : IDisposable
                     break;
                 }
 
-                if (!await HandleMessageAsync(body.Value, cancellationToken))
+                if (!await RouteClientMessageAsync(body.Value, cancellationToken))
                 {
                     closeStatus = WebSocketCloseStatus.InvalidPayloadData;
                     closeMessage = "Payload invalid!";
@@ -124,42 +124,21 @@ public sealed class WebSocketInstance : IDisposable
         await CloseAsync(closeStatus, closeMessage, cancellationToken);
     }
 
-    private async Task<bool> HandleMessageAsync(ClientMessageBody message, CancellationToken cs)
-    {
-        switch (message.Kind)
-        {
-            case ClientMessageBody.ItemKind.heartbeat:
-                _lastHeartbeat = DateTime.UtcNow;
-                ServerHeartbeat heartbeat = new ServerHeartbeat
-                {
-                    Timestamp = DateTime.UtcNow.Ticks
-                };
-                await SendAsync(new ServerMessageBody(heartbeat), cs);
-                break;
-            case ClientMessageBody.ItemKind.NONE:
-            default:
-                return false;
-        }
-
-        return true;
-    }
-
-    public async Task SendAsync(ServerMessageBody data, CancellationToken cs)
+    public async Task SendMessageAsync(ServerMessageBody messageBody, CancellationToken cancellationToken)
     {
         if (_webSocket.State != WebSocketState.Open) return;
 
-        var message = new ServerMessage
+        ServerMessage message = new ServerMessage
         {
             Timestamp = DateTime.UtcNow.Ticks,
-            Message = data,
+            Message = messageBody,
         };
 
         byte[] bytes = ArrayPool<byte>.Shared.Rent(ServerMessage.Serializer.GetMaxSize(message));
         try
         {
-            var buffer = new ArraySegment<byte>(bytes);
-            ServerMessage.Serializer.Write(buffer, message);
-            await _webSocket.SendAsync(buffer, WebSocketMessageType.Binary, endOfMessage: true, cs);
+            int nWritten = ServerMessage.Serializer.Write(bytes, message);
+            await _webSocket.SendAsync(new ArraySegment<byte>(bytes, 0, nWritten), WebSocketMessageType.Binary, endOfMessage: true, cancellationToken);
         }
         finally
         {
