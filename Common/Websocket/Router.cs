@@ -1,5 +1,4 @@
 ﻿using client.fbs;
-using server.fbs;
 
 namespace ZapMe.Websocket;
 

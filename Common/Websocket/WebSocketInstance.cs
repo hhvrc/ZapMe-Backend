@@ -2,7 +2,6 @@
 using FlatSharp;
 using server.fbs;
 using System.Buffers;
-using System.Drawing;
 using System.Net.WebSockets;
 using ZapMe.Database.Models;
 
@@ -161,7 +160,7 @@ public sealed partial class WebSocketInstance : IDisposable
             catch
             {
                 _webSocket.Abort();
-            }   
+            }
         }
     }
 
@@ -171,6 +170,6 @@ public sealed partial class WebSocketInstance : IDisposable
         {
             try { _webSocket.Abort(); } catch { }
         }
-        try { _webSocket.Dispose(); } catch {}
+        try { _webSocket.Dispose(); } catch { }
     }
 }
