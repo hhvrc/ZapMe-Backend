@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ZapMe.Constants;
+﻿namespace ZapMe.Constants;
 
 public static class WebsocketConstants
 {

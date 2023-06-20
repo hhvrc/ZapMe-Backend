@@ -1,13 +1,10 @@
 ﻿using client.fbs;
 using FlatSharp;
-using Microsoft.AspNetCore.SignalR.Protocol;
-using Newtonsoft.Json.Linq;
 using OneOf;
 using server.fbs;
 using System.Buffers;
 using System.Net.WebSockets;
 using System.Text;
-using System.Threading;
 using ZapMe.Constants;
 using ZapMe.Database.Models;
 using ZapMe.DTOs;
@@ -32,7 +29,7 @@ public sealed partial class WebSocketInstance : IDisposable
         }
     }
 
-    private static async Task<string?> ReceiveStringAsync(WebSocket webSocket, CancellationToken cancellationToken) => 
+    private static async Task<string?> ReceiveStringAsync(WebSocket webSocket, CancellationToken cancellationToken) =>
         await ReceiveAsync(webSocket, static (type, data, _) => Task.FromResult(type == WebSocketMessageType.Text ? Encoding.UTF8.GetString(data) : null), cancellationToken);
 
     public static async Task<OneOf<WebSocketInstance, ErrorDetails>> CreateAsync(WebSocketManager wsManager, IJwtAuthenticationManager authenticationManager, ILogger<WebSocketInstance> logger, CancellationToken cancellationToken)
