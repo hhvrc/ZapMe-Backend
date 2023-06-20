@@ -1,5 +1,6 @@
-﻿using fbs.zapme.realtime;
+﻿using client.fbs;
 using FlatSharp;
+using server.fbs;
 using System.Buffers;
 using System.Net.WebSockets;
 using ZapMe.Database.Models;

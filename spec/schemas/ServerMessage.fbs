@@ -1,4 +1,6 @@
-namespace fbs.zapme.realtime;
+attribute "fs_serializer";
+
+namespace server.fbs;
 
 table ServerHello {
   name:string;
@@ -29,3 +31,10 @@ union ServerMessageBody {
 
   message_global:GlobalMessage
 }
+
+table ServerMessage (fs_serializer) {
+  timestamp:long;
+  message:ServerMessageBody;
+}
+
+root_type ServerMessage;
