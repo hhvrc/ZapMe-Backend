@@ -1,9 +1,0 @@
-namespace fbs.zapme.realtime;
-
-struct ClientHeartbeat {
-  timestamp:long;
-}
-
-union ClientMessageBody {
-  heartbeat:ClientHeartbeat
-}

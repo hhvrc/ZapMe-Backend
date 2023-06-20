@@ -16,6 +16,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		secrets.7z = secrets.7z
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "spec", "spec", "{12B1C49D-7345-428B-9354-AF6A38CFECF0}"
+	ProjectSection(SolutionItems) = preProject
+		spec\openapi.yaml = spec\openapi.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "schemas", "schemas", "{DDB69D7B-8CB9-45FF-9D64-0086737541B6}"
+	ProjectSection(SolutionItems) = preProject
+		spec\schemas\ClientMessage.fbs = spec\schemas\ClientMessage.fbs
+		spec\schemas\Root.fbs = spec\schemas\Root.fbs
+		spec\schemas\ServerMessage.fbs = spec\schemas\ServerMessage.fbs
+	EndProjectSection
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{D4DA567B-FD80-4F03-8E80-7AC5B629CC74}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Constants", "Constants\Constants.csproj", "{93F59FB0-5FD6-47CD-8061-C9342A2EDAF4}"
@@ -85,6 +97,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{12B1C49D-7345-428B-9354-AF6A38CFECF0} = {452F17B1-8BAB-4C6E-AF62-63271AE7FA67}
+		{DDB69D7B-8CB9-45FF-9D64-0086737541B6} = {12B1C49D-7345-428B-9354-AF6A38CFECF0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BFF724E1-6BC5-48B0-8DE1-57C1DAB46ADC}
