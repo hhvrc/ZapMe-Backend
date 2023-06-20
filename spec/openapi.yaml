@@ -741,12 +741,6 @@ paths:
         - WebSocket
       summary: "Websocket endpoint for pub/sub communication (e.g. chat, notifications, events)\r\n\r\nDocumentation:\r\nYes"
       operationId: WebSocket
-      parameters:
-        - name: token
-          in: query
-          description: ''
-          schema:
-            type: string
       responses:
         '200':
           description: Connection closed

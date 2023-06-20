@@ -15,9 +15,6 @@ public sealed partial class WebSocketController
     /// Documentation:
     /// Yes
     /// </summary>
-    /// <param name="token"></param>
-    /// <param name="authenticationManager"></param>
-    /// <param name="logger"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     /// <response code="200">Connection closed</response>
@@ -25,12 +22,7 @@ public sealed partial class WebSocketController
     [HttpGet(Name = "WebSocket")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task EntryPointAsync(
-        [FromQuery] string token,
-        [FromServices] IJwtAuthenticationManager authenticationManager,
-        [FromServices] ILogger<WebSocketInstance> logger,
-        CancellationToken cancellationToken
-        )
+    public async Task EntryPointAsync(CancellationToken cancellationToken)
     {
         ErrorDetails errorDetails;
         WebSocketManager wsManager = HttpContext.WebSockets;
@@ -42,42 +34,41 @@ public sealed partial class WebSocketController
             return;
         }
 
-        var authenticationResult = await authenticationManager.AuthenticateJwtTokenAsync(token, cancellationToken);
-        if (authenticationResult.TryPickT1(out errorDetails, out SessionEntity session))
-        {
-            await errorDetails.Write(Response);
-            return;
-        }
-
         // The trace identifier is used to identify the websocket instance, it will be unique for each websocket connection
         string instanceId = HttpContext.TraceIdentifier;
 
         // Create the connection instance
-        using WebSocketInstance? instance = await WebSocketInstance.CreateAsync(wsManager, session, logger);
-        if (instance is null)
+        var authManager = HttpContext.RequestServices.GetRequiredService<IJwtAuthenticationManager>();
+        var wsLogger = HttpContext.RequestServices.GetRequiredService<ILogger<WebSocketInstance>>();
+        var result = await WebSocketInstance.CreateAsync(wsManager, authManager, wsLogger, cancellationToken);
+        if (result.TryPickT1(out errorDetails, out WebSocketInstance instance))
         {
-            _logger.LogError("Failed to create websocket instance");
-
-            await HttpErrors.InvalidSSOToken.Write(Response);
+            await errorDetails.Write(Response);
             return;
         }
-
-        // Register instance globally, the manager will have the ability to kill this connection
-        if (!await _webSocketInstanceManager.RegisterInstanceAsync(session.UserId, instanceId, instance, cancellationToken))
-        {
-            await HttpErrors.InternalServerError.Write(Response);
-            return;
-        }
-
         try
         {
-            // Start communicating with the client
-            await instance.RunAsync(cancellationToken);
+            // Register instance globally, the manager will have the ability to kill this connection
+            if (!await _webSocketInstanceManager.RegisterInstanceAsync(instance.UserId, instanceId, instance, cancellationToken))
+            {
+                await HttpErrors.InternalServerError.Write(Response);
+                return;
+            }
+
+            try
+            {
+                // Start communicating with the client
+                await instance.RunAsync(cancellationToken);
+            }
+            finally
+            {
+                // Remove instance globally
+                await _webSocketInstanceManager.RemoveInstanceAsync(instanceId, cancellationToken: cancellationToken);
+            }
         }
         finally
         {
-            // Remove instance globally
-            await _webSocketInstanceManager.RemoveInstanceAsync(instanceId, cancellationToken: cancellationToken);
+            instance.Dispose();
         }
     }
 }

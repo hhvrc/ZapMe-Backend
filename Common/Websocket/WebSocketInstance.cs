@@ -1,22 +1,81 @@
 ﻿using client.fbs;
 using FlatSharp;
+using Microsoft.AspNetCore.SignalR.Protocol;
+using Newtonsoft.Json.Linq;
+using OneOf;
 using server.fbs;
 using System.Buffers;
 using System.Net.WebSockets;
+using System.Text;
+using System.Threading;
 using ZapMe.Constants;
 using ZapMe.Database.Models;
+using ZapMe.DTOs;
 using ZapMe.Helpers;
+using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Websocket;
 
 public sealed partial class WebSocketInstance : IDisposable
 {
-    public static async Task<WebSocketInstance?> CreateAsync(WebSocketManager wsManager, SessionEntity session, ILogger<WebSocketInstance> logger)
+    private static async Task<T?> ReceiveAsync<T>(WebSocket webSocket, Func<WebSocketMessageType, ArraySegment<byte>, CancellationToken, Task<T>> handler, CancellationToken cancellationToken)
+    {
+        byte[] bytes = ArrayPool<byte>.Shared.Rent(WebsocketConstants.ClientMessageSizeMax);
+        try
+        {
+            WebSocketReceiveResult msg = await webSocket.ReceiveAsync(bytes, cancellationToken);
+            return await handler(msg.MessageType, new ArraySegment<byte>(bytes, 0, msg.Count), cancellationToken);
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(bytes);
+        }
+    }
+
+    private static async Task<string?> ReceiveStringAsync(WebSocket webSocket, CancellationToken cancellationToken) => 
+        await ReceiveAsync(webSocket, static (type, data, _) => Task.FromResult(type == WebSocketMessageType.Text ? Encoding.UTF8.GetString(data) : null), cancellationToken);
+
+    public static async Task<OneOf<WebSocketInstance, ErrorDetails>> CreateAsync(WebSocketManager wsManager, IJwtAuthenticationManager authenticationManager, ILogger<WebSocketInstance> logger, CancellationToken cancellationToken)
     {
         WebSocket? ws = await wsManager.AcceptWebSocketAsync();
-        if (ws is null) return null;
+        if (ws is null) return HttpErrors.InternalServerError; // TODO: Better error
 
-        return new WebSocketInstance(session.UserId, session.Id, ws, logger);
+        try
+        {
+            // Receive JWT from client
+            string? token = await ReceiveStringAsync(ws, cancellationToken);
+            if (token is null)
+            {
+                logger.LogError("Failed to authenticate websocket connection, received invalid message from client");
+                ws.Dispose();
+                return HttpErrors.InternalServerError; // TODO: Better error
+            }
+
+            // Validate JWT
+            var authenticationResult = await authenticationManager.AuthenticateJwtTokenAsync(token, cancellationToken);
+            if (authenticationResult.TryPickT1(out ErrorDetails errorDetails, out SessionEntity session))
+            {
+                logger.LogError("Failed to authenticate websocket connection, provided JWT was invalid");
+                ws.Dispose();
+                return errorDetails;
+            }
+
+            // Success, create websocket instance
+            var instance = new WebSocketInstance(session.UserId, session.Id, ws, logger);
+
+            // Send hello message to inform client that everything is A-OK
+            var hello = new ServerHello { SessionId = session.Id.ToString(), UserId = session.UserId.ToString() };
+            await instance.SendMessageAsync(new ServerMessageBody(hello), cancellationToken);
+
+            // Finally, return instance
+            return instance;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("Failed to authenticate websocket connection, exception: {Exception}", ex);
+            ws.Dispose();
+            return HttpErrors.InternalServerError;
+        }
     }
 
     public Guid UserId { get; init; }
@@ -71,86 +130,65 @@ public sealed partial class WebSocketInstance : IDisposable
             using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
             cancellationToken = linkedCts.Token;
 
-            byte[] bytes = ArrayPool<byte>.Shared.Rent(WebsocketConstants.ServerMessageSizeMax);
-            try
+
+            var result = await ReceiveAsync(_webSocket, HandleClientMessageAsync, cancellationToken);
+            if (result.HasValue)
             {
-                WebSocketReceiveResult msg = await _webSocket.ReceiveAsync(bytes, cancellationToken);
-
-                if (!_msgsSecondWindow.RequestConforms() || !_msgsMinuteWindow.RequestConforms())
-                {
-                    closeStatus = WebSocketCloseStatus.PolicyViolation;
-                    closeMessage = "Rate limit exceeded!";
-                    break;
-                }
-
-                if (msg.Count <= 0)
-                {
-                    closeStatus = WebSocketCloseStatus.InvalidPayloadData;
-                    closeMessage = "Payload size invalid!";
-                    break;
-                }
-
-                if (msg.MessageType == WebSocketMessageType.Close)
-                {
-                    closeStatus = WebSocketCloseStatus.NormalClosure;
-                    closeMessage = "ByeBye ❤️";
-                    break;
-                }
-
-                if (!_bytesSecondWindow.RequestConforms((ulong)msg.Count) || !_bytesMinuteWindow.RequestConforms((ulong)msg.Count))
-                {
-                    closeStatus = WebSocketCloseStatus.PolicyViolation;
-                    closeMessage = "Rate limit exceeded!";
-                    break;
-                }
-
-                if (msg.MessageType != WebSocketMessageType.Binary)
-                {
-                    closeStatus = WebSocketCloseStatus.InvalidPayloadData;
-                    closeMessage = "Only binary messages are supported!";
-                    break;
-                }
-
-                // TODO: check if message is actually written to all of the buffer, if it then isnt finished, then close connection like this:
-                if (!msg.EndOfMessage)
-                {
-                    closeStatus = WebSocketCloseStatus.MessageTooBig;
-                    closeMessage = "Payload size too big!";
-                    break;
-                }
-
-                ClientMessage flatBufferMsg = ClientMessage.Serializer.Parse(new ArraySegmentInputBuffer(new ArraySegment<byte>(bytes, 0, msg.Count)), FlatBufferDeserializationOption.Lazy);
-
-                if (flatBufferMsg is null)
-                {
-                    closeStatus = WebSocketCloseStatus.InvalidPayloadData;
-                    closeMessage = "Payload invalid!";
-                    break;
-                }
-
-                var body = flatBufferMsg.Message;
-
-                if (!body.HasValue)
-                {
-                    closeStatus = WebSocketCloseStatus.InvalidPayloadData;
-                    closeMessage = "Payload invalid!";
-                    break;
-                }
-
-                if (!await RouteClientMessageAsync(body.Value, cancellationToken))
-                {
-                    closeStatus = WebSocketCloseStatus.InvalidPayloadData;
-                    closeMessage = "Payload invalid!";
-                    break;
-                }
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(bytes);
+                (closeStatus, closeMessage) = result.Value;
+                break;
             }
         }
 
         await CloseAsync(closeStatus, closeMessage, cancellationToken);
+    }
+
+    private async Task<(WebSocketCloseStatus, string)?> HandleClientMessageAsync(WebSocketMessageType type, ArraySegment<byte> data, CancellationToken cancellationToken)
+    {
+        if (!_msgsSecondWindow.RequestConforms() || !_msgsMinuteWindow.RequestConforms())
+        {
+            return (WebSocketCloseStatus.PolicyViolation, "Rate limit exceeded!");
+        }
+
+        if (type == WebSocketMessageType.Close)
+        {
+            return (WebSocketCloseStatus.NormalClosure, "ByeBye ❤️");
+        }
+
+        if (data.Count <= 0)
+        {
+            return (WebSocketCloseStatus.InvalidPayloadData, "Payload size invalid!");
+        }
+
+        if (!_bytesSecondWindow.RequestConforms((ulong)data.Count) || !_bytesMinuteWindow.RequestConforms((ulong)data.Count))
+        {
+            return (WebSocketCloseStatus.PolicyViolation, "Rate limit exceeded!");
+        }
+
+        if (type != WebSocketMessageType.Binary)
+        {
+            return (WebSocketCloseStatus.InvalidPayloadData, "Only binary messages are supported!");
+        }
+
+        ClientMessage flatBufferMsg = ClientMessage.Serializer.Parse(new ArraySegmentInputBuffer(data), FlatBufferDeserializationOption.Lazy);
+
+        if (flatBufferMsg is null)
+        {
+            return (WebSocketCloseStatus.InvalidPayloadData, "Payload invalid!");
+        }
+
+        ClientMessageBody? body = flatBufferMsg.Message;
+
+        if (!body.HasValue)
+        {
+            return (WebSocketCloseStatus.InvalidPayloadData, "Payload invalid!");
+        }
+
+        if (!await RouteClientMessageAsync(body.Value, cancellationToken))
+        {
+            return (WebSocketCloseStatus.InvalidPayloadData, "Payload invalid!");
+        }
+
+        return null;
     }
 
     public async Task SendMessageAsync(ServerMessageBody messageBody, CancellationToken cancellationToken)
