@@ -1,5 +1,3 @@
-attribute "fs_serializer";
-
 namespace fbs.zapme.realtime;
 
 struct ClientHeartbeat {
@@ -8,9 +6,4 @@ struct ClientHeartbeat {
 
 union ClientMessageBody {
   heartbeat:ClientHeartbeat
-}
-
-table ClientMessage (fs_serializer) {
-  timestamp:long;
-  message:ClientMessageBody;
 }

@@ -1,0 +1,16 @@
+include "ClientMessage.fbs";
+include "ServerMessage.fbs";
+
+attribute "fs_serializer";
+
+namespace fbs.zapme.realtime;
+
+table ClientMessage (fs_serializer) {
+  timestamp:long;
+  message:ClientMessageBody;
+}
+
+table ServerMessage (fs_serializer) {
+  timestamp:long;
+  message:ServerMessageBody;
+}
