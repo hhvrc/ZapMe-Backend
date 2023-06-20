@@ -3,7 +3,9 @@ using FlatSharp;
 using server.fbs;
 using System.Buffers;
 using System.Net.WebSockets;
+using ZapMe.Constants;
 using ZapMe.Database.Models;
+using ZapMe.Helpers;
 
 namespace ZapMe.Websocket;
 
@@ -21,6 +23,10 @@ public sealed partial class WebSocketInstance : IDisposable
     public Guid SessionId { get; init; }
 
     private readonly WebSocket _webSocket;
+    private readonly SlidingWindow _msgsSecondWindow;
+    private readonly SlidingWindow _msgsMinuteWindow;
+    private readonly SlidingWindow _bytesSecondWindow;
+    private readonly SlidingWindow _bytesMinuteWindow;
     private readonly ILogger<WebSocketInstance> _logger;
 
     private readonly int _heartbeatIntervalMs = 30 * 1000;
@@ -32,6 +38,10 @@ public sealed partial class WebSocketInstance : IDisposable
         UserId = userId;
         SessionId = sessionId;
         _webSocket = webSocket;
+        _msgsSecondWindow = new SlidingWindow(1000, WebsocketConstants.ClientRateLimitMessagesPerSecond);
+        _msgsMinuteWindow = new SlidingWindow(60 * 1000, WebsocketConstants.ClientRateLimitMessagesPerMinute);
+        _bytesSecondWindow = new SlidingWindow(1000, WebsocketConstants.ClientRateLimitBytesPerSecond);
+        _bytesMinuteWindow = new SlidingWindow(60 * 1000, WebsocketConstants.ClientRateLimitBytesPerMinute);
         _logger = logger;
     }
 
@@ -61,10 +71,17 @@ public sealed partial class WebSocketInstance : IDisposable
             using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
             cancellationToken = linkedCts.Token;
 
-            byte[] bytes = ArrayPool<byte>.Shared.Rent(4096);
+            byte[] bytes = ArrayPool<byte>.Shared.Rent(WebsocketConstants.ServerMessageSizeMax);
             try
             {
                 WebSocketReceiveResult msg = await _webSocket.ReceiveAsync(bytes, cancellationToken);
+
+                if (!_msgsSecondWindow.RequestConforms() || !_msgsMinuteWindow.RequestConforms())
+                {
+                    closeStatus = WebSocketCloseStatus.PolicyViolation;
+                    closeMessage = "Rate limit exceeded!";
+                    break;
+                }
 
                 if (msg.Count <= 0)
                 {
@@ -72,12 +89,21 @@ public sealed partial class WebSocketInstance : IDisposable
                     closeMessage = "Payload size invalid!";
                     break;
                 }
+
                 if (msg.MessageType == WebSocketMessageType.Close)
                 {
                     closeStatus = WebSocketCloseStatus.NormalClosure;
                     closeMessage = "ByeBye ❤️";
                     break;
                 }
+
+                if (!_bytesSecondWindow.RequestConforms((ulong)msg.Count) || !_bytesMinuteWindow.RequestConforms((ulong)msg.Count))
+                {
+                    closeStatus = WebSocketCloseStatus.PolicyViolation;
+                    closeMessage = "Rate limit exceeded!";
+                    break;
+                }
+
                 if (msg.MessageType != WebSocketMessageType.Binary)
                 {
                     closeStatus = WebSocketCloseStatus.InvalidPayloadData;
