@@ -5,14 +5,12 @@ namespace ZapMe.Websocket;
 
 partial class WebSocketInstance
 {
-    private Task<bool> HandleHeartbeatAsync(ClientHeartbeat heartbeat, CancellationToken cancellationToken)
+    private async Task<bool> HandleHeartbeatAsync(ClientHeartbeat heartbeat, CancellationToken cancellationToken)
     {
         _lastHeartbeat = DateTime.UtcNow;
-        ServerHeartbeat response = new ServerHeartbeat
-        {
-            HeartbeatIntervalMs = 10 * 1000, // 10 seconds TODO: make this configurable
-        };
 
-        return Task.FromResult(true);
+        await SendMessageAsync(new ServerMessageBody(new ServerHeartbeat { HeartbeatIntervalMs = _heartbeatIntervalMs }), cancellationToken);
+
+        return true;
     }
 }

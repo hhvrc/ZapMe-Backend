@@ -92,9 +92,9 @@ public sealed partial class WebSocketInstance : IDisposable
     private readonly SlidingWindow _bytesMinuteWindow;
     private readonly ILogger<WebSocketInstance> _logger;
 
-    private readonly int _heartbeatIntervalMs = 30 * 1000;
+    private readonly int _heartbeatIntervalMs = 30 * 1000; // TODO: make this configurable
     private DateTime _lastHeartbeat = DateTime.UtcNow;
-    private int MsUntilTimeout => _heartbeatIntervalMs + 2000 - (int)(DateTime.UtcNow - _lastHeartbeat).TotalMilliseconds;
+    private int MsUntilTimeout => _heartbeatIntervalMs + 2000 - (int)(DateTime.UtcNow - _lastHeartbeat).TotalMilliseconds; // TODO: make the clock skew (2000) configurable
 
     private WebSocketInstance(Guid userId, Guid sessionId, WebSocket webSocket, ILogger<WebSocketInstance> logger)
     {
