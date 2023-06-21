@@ -1,7 +1,7 @@
-﻿using client.fbs;
+﻿using fbs.client;
+using fbs.server;
 using FlatSharp;
 using OneOf;
-using server.fbs;
 using System.Buffers;
 using System.Net.WebSockets;
 using System.Text;
@@ -61,7 +61,14 @@ public sealed partial class WebSocketInstance : IDisposable
             var instance = new WebSocketInstance(session.UserId, session.Id, ws, logger);
 
             // Send hello message to inform client that everything is A-OK
-            var hello = new ServerHello { SessionId = session.Id.ToString(), UserId = session.UserId.ToString() };
+            var hello = new ServerHello
+            {
+                HeartbeatIntervalMs = 10 * 1000, // 10 seconds TODO: make this configurable
+                RatelimitBytesPerSec = WebsocketConstants.ClientRateLimitBytesPerSecond,
+                RatelimitBytesPerMin = WebsocketConstants.ClientRateLimitBytesPerMinute,
+                RatelimitMessagesPerSec = WebsocketConstants.ClientRateLimitMessagesPerSecond,
+                RatelimitMessagesPerMin = WebsocketConstants.ClientRateLimitMessagesPerMinute,
+            };
             await instance.SendMessageAsync(new ServerMessageBody(hello), cancellationToken);
 
             // Finally, return instance

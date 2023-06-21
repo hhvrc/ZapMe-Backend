@@ -1,5 +1,5 @@
-﻿using client.fbs;
-using server.fbs;
+﻿using fbs.client;
+using fbs.server;
 
 namespace ZapMe.Websocket;
 
@@ -10,7 +10,7 @@ partial class WebSocketInstance
         _lastHeartbeat = DateTime.UtcNow;
         ServerHeartbeat response = new ServerHeartbeat
         {
-            Timestamp = DateTime.UtcNow.Ticks
+            HeartbeatIntervalMs = 10 * 1000, // 10 seconds TODO: make this configurable
         };
 
         return Task.FromResult(true);

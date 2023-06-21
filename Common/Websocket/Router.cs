@@ -1,4 +1,4 @@
-﻿using client.fbs;
+﻿using fbs.client;
 
 namespace ZapMe.Websocket;
 
@@ -9,6 +9,7 @@ partial class WebSocketInstance
         return message.Kind switch
         {
             ClientMessageBody.ItemKind.heartbeat => HandleHeartbeatAsync(message.heartbeat, cancellationToken),
+            ClientMessageBody.ItemKind.realtime_session => HandleRealtimeSessionAsync(message.realtime_session, cancellationToken),
             ClientMessageBody.ItemKind.NONE => Task.FromResult(false),
             _ => Task.FromResult(false),
         };

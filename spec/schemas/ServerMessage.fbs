@@ -1,21 +1,19 @@
+include "./RealtimeSession.fbs";
+
 attribute "fs_serializer";
 
-namespace server.fbs;
+namespace fbs.server;
 
 table ServerHello {
-  session_id:string;
-  user_id:string;
-}
+  heartbeat_interval_ms:long;
 
-table ServerGoodbye {
-  reason:string;
+  ratelimit_messages_per_sec:ulong;
+  ratelimit_messages_per_min:ulong;
+  ratelimit_bytes_per_sec:ulong;
+  ratelimit_bytes_per_min:ulong;
 }
 
 table ServerHeartbeat {
-  timestamp:long;
-}
-
-table ServerReady {
   heartbeat_interval_ms:long;
 }
 
@@ -26,9 +24,9 @@ table GlobalMessage {
 
 union ServerMessageBody {
   hello:ServerHello,
-  goodbye:ServerGoodbye,
   heartbeat:ServerHeartbeat,
-  ready:ServerReady,
+
+  realtime_session:realtime.RealtimeSession,
 
   message_global:GlobalMessage
 }

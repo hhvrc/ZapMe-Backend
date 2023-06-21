@@ -1,0 +1,127 @@
+namespace fbs.realtime;
+
+// Sent from client to server, to create a new session.
+table RealtimeSessionCreate {
+  // The user ID(s) to invite.
+  user_ids:[string];
+}
+
+table RealtimeSessionInviteAccept {
+  // The session ID.
+  session_id:string;
+
+  // The user's WebRTC offer, or empty string if user prefers WebSockets.
+  webrtc_offer:string;
+}
+
+table RealtimeSessionInviteReject {
+  // The session ID.
+  session_id:string;
+}
+
+table RealtimeSessionIceCandidateDiscovered {
+  // The ICE candidate.
+  candidate:string;
+}
+
+table RealtimeSessionRejoin {
+  // The session ID.
+  session_id:string;
+
+  // The user's WebRTC offer, or empty string if user prefers WebSockets.
+  webrtc_offer:string;
+}
+
+table RealtimeSessionLeave {
+  // The session ID.
+  session_id:string;
+}
+
+// Sent from client to server, inviting one or more users to a session.
+table RealtimeSessionInviteUser {
+  // The session ID.
+  session_id:string;
+
+  // The user ID(s) to invite.
+  user_ids:[string];
+}
+
+// Can only be sent by client.
+table RealtimeSessionMessage {
+  recepient_user_ids:[string];
+}
+
+// Sent from server to client, informing them that they have joined a session. If the session was just created, there will be no other participants in the response.
+table RealtimeEventSessionJoined {
+  // The session ID.
+  session_id:string;
+
+  // The session's participant IDs.
+  participant_ids:[string];
+}
+
+// Sent from server to client, informing them that they have been invited to a session.
+table RealtimeEventSessionInviteReceived {
+  // The session ID.
+  session_id:string;
+
+  // The session's participant IDs.
+  participant_ids:[string];
+}
+
+// Sent from server to client, informing them a user has joined a session.
+table RealtimeEventSesionUserJoined {
+  // The session ID.
+  session_id:string;
+
+  // The ID of the user who joined.
+  user_id:string;
+
+  // The user's WebRTC offer, or empty string if user prefers WebSockets.
+  webrtc_offer:string;
+}
+
+// Sent from server to client, informing them a user has left a session.
+table RealtimeEventSessionUserLeft {
+  // The session ID.
+  session_id:string;
+
+  // The ID of the user who left.
+  user_id:string;
+}
+
+table RealtimeEventSessionUserIceCandidateDiscovered {
+  // The ID of the user who discovered the ICE candidate.
+  user_id:string;
+
+  // The ICE candidate.
+  candidate:string;
+}
+
+// Can only be sent by server.
+table RealtimeEventSessionUserMessage {
+  user_id:string;
+  recepient_user_ids:[string];
+}
+
+union RealtimeSessionBody {
+  create:RealtimeSessionCreate,
+  invite_accept:RealtimeSessionInviteAccept,
+  invite_reject:RealtimeSessionInviteReject,
+  ice_candidate_discovered:RealtimeSessionIceCandidateDiscovered,
+  rejoin:RealtimeSessionRejoin,
+  leave:RealtimeSessionLeave,
+  invite_user:RealtimeSessionInviteUser,
+  message:RealtimeSessionMessage,
+
+  event_joined:RealtimeEventSessionJoined,
+  event_invited:RealtimeEventSessionInviteReceived,
+  event_user_joined:RealtimeEventSesionUserJoined,
+  event_user_left:RealtimeEventSessionUserLeft,
+  event_user_ice_candidate_discovered:RealtimeEventSessionUserIceCandidateDiscovered,
+  event_user_message:RealtimeEventSessionUserMessage,
+}
+
+table RealtimeSession {
+  body:RealtimeSessionBody;
+}
