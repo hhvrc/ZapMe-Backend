@@ -106,6 +106,7 @@ public sealed partial class WebSocketInstance : IDisposable
         _bytesSecondWindow = new SlidingWindow(1000, WebsocketConstants.ClientRateLimitBytesPerSecond);
         _bytesMinuteWindow = new SlidingWindow(60 * 1000, WebsocketConstants.ClientRateLimitBytesPerMinute);
         _logger = logger;
+        _instances.TryAdd(UserId.ToString(), this);
     }
 
     public async Task RunAsync(CancellationToken cancellationToken)
@@ -234,6 +235,7 @@ public sealed partial class WebSocketInstance : IDisposable
 
     public void Dispose()
     {
+        _instances.Remove(this.UserId.ToString(), out var _);
         if (_webSocket.State is not WebSocketState.Closed or WebSocketState.Aborted)
         {
             try { _webSocket.Abort(); } catch { }

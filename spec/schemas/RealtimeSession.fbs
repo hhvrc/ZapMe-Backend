@@ -49,6 +49,9 @@ table RealtimeSessionInviteUser {
 // Can only be sent by client.
 table RealtimeSessionMessage {
   recepient_user_ids:[string];
+
+  // For testing purposes, replace with a more complex type later.
+  message:string;
 }
 
 // Sent from server to client, informing them that they have joined a session. If the session was just created, there will be no other participants in the response.
