@@ -65,7 +65,7 @@ public sealed class JwtAuthenticationManager : IJwtAuthenticationManager
                 ValidateAudience = true,
                 ValidAudience = AuthenticationConstants.JwtAudience,
                 ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
+                ClockSkew = TimeSpan.FromSeconds(5),
             }, out validatedToken);
         }
         catch (Exception)
