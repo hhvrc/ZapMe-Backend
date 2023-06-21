@@ -1,6 +1,6 @@
 ﻿using ZapMe.Attributes;
 
-namespace ZapMe.Controllers.Api.V1.Config.Models;
+namespace ZapMe.DTOs.Config;
 
 public readonly struct ContactConfig
 {
