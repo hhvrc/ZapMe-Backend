@@ -34,15 +34,13 @@ public partial class AccountController
             return HttpErrors.InvalidSSOTokenActionResult;
         }
 
-        var connectionEntity = new SSOConnectionEntity
+        _dbContext.SSOConnections.Add(new SSOConnectionEntity
         {
             UserId = user.Id,
             ProviderName = oauthVariables.ProviderName,
             ProviderUserId = oauthVariables.ProviderUserId,
             ProviderUserName = oauthVariables.ProviderUserName,
-        };
-
-        await _dbContext.SSOConnections.AddAsync(connectionEntity, cancellationToken);
+        });
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Ok();

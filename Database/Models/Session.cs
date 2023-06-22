@@ -6,9 +6,9 @@ namespace ZapMe.Database.Models;
 
 public sealed class SessionEntity
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; private set; }
 
-    public Guid UserId { get; set; }
+    public Guid UserId { get; init; }
 
     /// <summary>
     /// User provided name for this session
@@ -20,18 +20,18 @@ public sealed class SessionEntity
     /// This is used to prevent session hijacking
     /// The source of this value is fetched from the cloudflare provided headers, forwarded for headers, or the remote ip address
     /// </summary>
-    public required string IpAddress { get; set; }
+    public required string IpAddress { get; init; }
 
     /// <summary>
     /// The country code of the visitor's IP address (in ISO 3166-1 Alpha 2 format)
     /// This is used to prevent session hijacking
     /// If unknown, this value will be set to ZZ
     /// </summary>
-    public required string CountryCode { get; set; }
+    public required string CountryCode { get; init; }
 
-    public Guid UserAgentId { get; set; }
+    public Guid UserAgentId { get; init; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; init; }
 
     public DateTime ExpiresAt { get; set; }
 

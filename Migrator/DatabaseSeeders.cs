@@ -54,7 +54,6 @@ public static class DatabaseSeeders
 
         for (int i = 0; i < accounts.Length; i++)
         {
-            Guid id = Guid.Parse($"00000000-0000-0000-0000-{i + 1:X12}");
             string name = accounts[i];
             string email = $"{name.ToLower()}@{App.Domain}";
             string password = PasswordUtils.GeneratePassword();
@@ -64,9 +63,8 @@ public static class DatabaseSeeders
 
             accountPasswords.Add(name, new { email, password });
 
-            await context.Users.AddAsync(new UserEntity
+            context.Users.Add(new UserEntity
             {
-                Id = id,
                 Name = name,
                 Email = email,
                 PasswordHash = passwordHash,
@@ -77,7 +75,7 @@ public static class DatabaseSeeders
                 CreatedAt = _CreationTime,
                 UpdatedAt = _CreationTime,
                 LastOnline = _CreationTime,
-            }, cancellationToken);
+            });
         }
 
         await context.SaveChangesAsync(cancellationToken);

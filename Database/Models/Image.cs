@@ -7,21 +7,21 @@ namespace ZapMe.Database.Models;
 
 public sealed class ImageEntity
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; private set; }
 
-    public uint Height { get; set; }
+    public uint Height { get; init; }
 
-    public uint Width { get; set; }
+    public uint Width { get; init; }
 
-    public uint FrameCount { get; set; }
+    public uint FrameCount { get; init; }
 
-    public uint SizeBytes { get; set; }
+    public uint SizeBytes { get; init; }
 
-    public required string MimeType { get; set; }
+    public required string MimeType { get; init; }
 
-    public required string Sha256 { get; set; }
+    public required string Sha256 { get; init; }
 
-    public required string R2RegionName { get; set; }
+    public required string R2RegionName { get; init; }
 
     public Guid? UploaderId { get; set; }
 

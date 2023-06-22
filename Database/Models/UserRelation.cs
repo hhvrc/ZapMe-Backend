@@ -7,9 +7,9 @@ namespace ZapMe.Database.Models;
 
 public sealed class UserRelationEntity
 {
-    public Guid SourceUserId { get; set; }
+    public Guid SourceUserId { get; init; }
 
-    public Guid TargetUserId { get; set; }
+    public Guid TargetUserId { get; init; }
 
     public UserRelationType RelationType { get; set; }
 
@@ -17,7 +17,7 @@ public sealed class UserRelationEntity
 
     public string? Notes { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; init; }
 
     public UserEntity SourceUser { get; private set; } = null!;
     public UserEntity TargetUser { get; private set; } = null!;

@@ -10,24 +10,24 @@ public sealed class SSOConnectionEntity
     /// <summary>
     /// The id of the user that owns this connection
     /// </summary>
-    public Guid UserId { get; set; }
+    public Guid UserId { get; init; }
 
     /// <summary>
     /// Lowercase name of the provider
     /// </summary>
-    public required string ProviderName { get; set; }
+    public required string ProviderName { get; init; }
 
     /// <summary>
     /// Id of the user on the provider's platform
     /// </summary>
-    public required string ProviderUserId { get; set; }
+    public required string ProviderUserId { get; init; }
 
     /// <summary>
     /// Name of the user on the provider's platform
     /// </summary>
     public required string ProviderUserName { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; init; }
 
     public UserEntity User { get; private set; } = null!;
 }

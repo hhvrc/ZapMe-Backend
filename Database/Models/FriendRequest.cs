@@ -5,11 +5,11 @@ namespace ZapMe.Database.Models;
 
 public sealed class FriendRequestEntity
 {
-    public Guid SenderId { get; set; }
+    public Guid SenderId { get; init; }
 
-    public Guid ReceiverId { get; set; }
+    public Guid ReceiverId { get; init; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; init; }
 
     public UserEntity Sender { get; private set; } = null!;
     public UserEntity Receiver { get; private set; } = null!;

@@ -38,14 +38,14 @@ public partial class AccountController
             .Where(u => u.Id == user.Id)
             .ExecuteDeleteAsync(cancellationToken);
 
-        await _dbContext.DeletedUsers.AddAsync(new DeletedUserEntity
+        _dbContext.DeletedUsers.Add(new DeletedUserEntity
         {
             Id = user.Id,
             DeletedBy = user.Id,
             DeletionReason = reason,
             UserCreatedAt = user.CreatedAt,
             UserDeletedAt = DateTime.UtcNow,
-        }, cancellationToken);
+        });
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 

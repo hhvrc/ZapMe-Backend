@@ -28,7 +28,7 @@ public sealed class UserAgentStore : IUserAgentStore
             Browser = browser
         };
 
-        await _dbContext.UserAgents.AddAsync(userAgent, cancellationToken);
+        _dbContext.UserAgents.Add(userAgent);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return userAgent;

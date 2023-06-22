@@ -165,7 +165,7 @@ public partial class AccountController
         };
 
         // Create account
-        await _dbContext.Users.AddAsync(user, cancellationToken);
+        _dbContext.Users.Add(user);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         if (avatarImageEntity is not null)
@@ -192,7 +192,7 @@ public partial class AccountController
                 ProviderUserName = providerVariables.ProviderUserName,
             };
 
-            await _dbContext.SSOConnections.AddAsync(connectionEntity, cancellationToken);
+            _dbContext.SSOConnections.Add(connectionEntity);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             var sessionManager = HttpContext.RequestServices.GetRequiredService<ISessionManager>();

@@ -49,9 +49,7 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
         using IDbContextTransaction? transaction = await _dbContext.Database.BeginTransactionIfNotExistsAsync(cancellationToken);
 
         // Save email verification request
-        await _dbContext
-            .UserEmailVerificationRequests
-            .AddAsync(emailVerificationRequest, cancellationToken);
+        _dbContext.UserEmailVerificationRequests.Add(emailVerificationRequest);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         // Send email

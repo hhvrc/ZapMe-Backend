@@ -5,11 +5,11 @@ namespace ZapMe.Database.Models;
 
 public sealed class DeviceEntity
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; private set; }
 
     public required string Name { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; init; }
 }
 
 public sealed class DeviceEntityConfiguration : IEntityTypeConfiguration<DeviceEntity>

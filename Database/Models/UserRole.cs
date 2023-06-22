@@ -5,11 +5,11 @@ namespace ZapMe.Database.Models;
 
 public sealed class UserRoleEntity
 {
-    public Guid UserId { get; set; }
+    public Guid UserId { get; init; }
 
-    public required string RoleName { get; set; }
+    public required string RoleName { get; init; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; init; }
 
     public UserEntity User { get; private set; } = null!;
 }

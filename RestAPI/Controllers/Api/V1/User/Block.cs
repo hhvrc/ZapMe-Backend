@@ -58,18 +58,18 @@ public partial class UserController
             return Ok();
         }
 
-        await _dbContext.UserRelations.AddAsync(new UserRelationEntity()
+        _dbContext.UserRelations.Add(new UserRelationEntity()
         {
             SourceUserId = authorizedUserId,
             TargetUserId = userId,
             RelationType = UserRelationType.Blocked
-        }, cancellationToken);
-        await _dbContext.UserRelations.AddAsync(new UserRelationEntity()
+        });
+        _dbContext.UserRelations.Add(new UserRelationEntity()
         {
             SourceUserId = userId,
             TargetUserId = authorizedUserId,
             RelationType = UserRelationType.Blocked
-        }, cancellationToken);
+        });
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Ok();
