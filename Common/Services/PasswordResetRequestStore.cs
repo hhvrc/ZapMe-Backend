@@ -31,7 +31,7 @@ public sealed class PasswordResetRequestStore : IPasswordResetRequestStore
                 TokenHash = tokenHash
             };
 
-            await _dbContext.UserPasswordResetRequests.AddAsync(request, cancellationToken);
+            _dbContext.UserPasswordResetRequests.Add(request);
         }
         else
         {

@@ -7,7 +7,7 @@ namespace ZapMe.Database.Models;
 
 public sealed class UserEntity
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; private set; }
 
     /// <summary>
     /// Username, also referred to as display name.
@@ -38,7 +38,7 @@ public sealed class UserEntity
     /// <summary>
     /// Date this account was created at
     /// </summary>
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; init; }
 
     public DateTime UpdatedAt { get; set; }
 

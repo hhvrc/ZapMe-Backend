@@ -6,21 +6,21 @@ namespace ZapMe.Database.Models;
 
 public sealed class UserAgentEntity
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; private set; }
 
-    public required string Sha256 { get; set; }
+    public required string Sha256 { get; init; }
 
-    public uint Length { get; set; }
+    public uint Length { get; init; }
 
-    public required string Value { get; set; }
+    public required string Value { get; init; }
 
-    public required string OperatingSystem { get; set; }
+    public required string OperatingSystem { get; init; }
 
-    public required string Device { get; set; }
+    public required string Device { get; init; }
 
-    public required string Browser { get; set; }
+    public required string Browser { get; init; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; init; }
 
     public List<SessionEntity> Sessions { get; private set; } = new List<SessionEntity>();
 }

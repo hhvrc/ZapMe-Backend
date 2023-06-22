@@ -6,7 +6,7 @@ namespace ZapMe.Database.Models;
 
 public sealed class UserPasswordResetRequestEntity
 {
-    public Guid UserId { get; set; }
+    public Guid UserId { get; init; }
 
     public required string TokenHash { get; set; }
 

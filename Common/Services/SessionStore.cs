@@ -42,7 +42,7 @@ public sealed class SessionStore : ISessionStore
             ExpiresAt = expiresAt
         };
 
-        await _dbContext.Sessions.AddAsync(session, cancellationToken);
+        _dbContext.Sessions.Add(session);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         session = await _dbContext

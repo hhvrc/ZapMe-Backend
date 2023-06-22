@@ -5,11 +5,11 @@ namespace ZapMe.Database.Models;
 
 public sealed class PrivacyPolicyDocumentEntity
 {
-    public uint Version { get; set; }
+    public uint Version { get; init; }
 
     public required string Markdown { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; init; }
 
     public bool IsActive { get; set; }
 }

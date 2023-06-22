@@ -25,7 +25,7 @@ public sealed class LockOutStore : ILockOutStore
             ExpiresAt = expiresAt
         };
 
-        await _dbContext.LockOuts.AddAsync(lockout, cancellationToken);
+        _dbContext.LockOuts.Add(lockout);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return lockout;

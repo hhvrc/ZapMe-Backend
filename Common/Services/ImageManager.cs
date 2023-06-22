@@ -107,10 +107,8 @@ public sealed class ImageManager : IImageManager
             return HttpErrors.Generic(StatusCodes.Status413PayloadTooLarge, "Payload too large", "Image too large, max 1024x1024");
         }
 
-        Guid id = Guid.NewGuid();
         image = new ImageEntity()
         {
-            Id = id,
             Height = imageInfo.Height,
             Width = imageInfo.Width,
             FrameCount = imageInfo.FrameCount,
@@ -127,15 +125,13 @@ public sealed class ImageManager : IImageManager
             // Start transaction
             using IDbContextTransaction? transaction = await _dbContext.Database.BeginTransactionIfNotExistsAsync(cancellationToken);
 
-            // Upload to S3 bucket
-            await UploadToS3Async(id, memoryStream, imageInfo.MimeType, sha256, regionName, cancellationToken);
-            uploaded = true;
-
             // Create DB record
-            await _dbContext
-                .Images
-                .AddAsync(image, cancellationToken);
+            _dbContext.Images.Add(image);
             await _dbContext.SaveChangesAsync(cancellationToken);
+
+            // Upload to S3 bucket
+            await UploadToS3Async(image.Id, memoryStream, imageInfo.MimeType, sha256, regionName, cancellationToken);
+            uploaded = true;
 
             // Commit transaction
             if (transaction is not null)

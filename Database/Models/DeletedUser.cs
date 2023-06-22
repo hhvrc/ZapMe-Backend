@@ -9,12 +9,12 @@ namespace ZapMe.Database.Models;
 /// </summary>
 public class DeletedUserEntity
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
     /// <summary>
     /// Represents the identifier of the user who performed the deletion, whether it's a moderator or the user themselves.
     /// </summary>
-    public Guid DeletedBy { get; set; }
+    public Guid DeletedBy { get; init; }
 
     /// <summary>
     /// Indicates the reason provided by the moderator for the deletion, or the reason given by the user for deleting their account.
@@ -24,12 +24,12 @@ public class DeletedUserEntity
     /// <summary>
     /// Represents the timestamp when the user account was created.
     /// </summary>
-    public DateTime UserCreatedAt { get; set; }
+    public DateTime UserCreatedAt { get; init; }
 
     /// <summary>
     /// Represents the timestamp when the user account was deleted.
     /// </summary>
-    public DateTime UserDeletedAt { get; set; }
+    public DateTime UserDeletedAt { get; init; }
 }
 
 public sealed class DeletedUserEntityConfiguration : IEntityTypeConfiguration<DeletedUserEntity>
