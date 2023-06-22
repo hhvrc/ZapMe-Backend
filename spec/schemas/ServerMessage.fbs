@@ -5,16 +5,16 @@ attribute "fs_serializer";
 namespace fbs.server;
 
 table ServerHello {
-  heartbeat_interval_ms:long;
+  heartbeat_interval_ms:uint;
 
-  ratelimit_messages_per_sec:ulong;
-  ratelimit_messages_per_min:ulong;
-  ratelimit_bytes_per_sec:ulong;
-  ratelimit_bytes_per_min:ulong;
+  ratelimit_messages_per_sec:uint;
+  ratelimit_messages_per_min:uint;
+  ratelimit_bytes_per_sec:uint;
+  ratelimit_bytes_per_min:uint;
 }
 
 table ServerHeartbeat {
-  heartbeat_interval_ms:long;
+  heartbeat_interval_ms:uint;
 }
 
 table GlobalMessage {

@@ -5,7 +5,7 @@ attribute "fs_serializer";
 namespace fbs.client;
 
 struct ClientHeartbeat {
-  last_rtt_ms:ulong;
+  last_rtt_ms:uint;
 }
 
 union ClientMessageBody {
