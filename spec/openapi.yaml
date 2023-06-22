@@ -559,14 +559,16 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
-          description: Success
+        '204':
+          description: User blocked
         '404':
-          description: Not Found
+          description: User not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
+        '400':
+          description: Invalid request
   '/api/v1/user/i/{userId}/friendrequest':
     put:
       tags:
