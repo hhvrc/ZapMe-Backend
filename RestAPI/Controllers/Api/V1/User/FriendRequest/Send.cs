@@ -15,7 +15,6 @@ partial class UserController
     /// Send friend request
     /// </summary>
     /// <param name="userId"></param>
-    /// <param name="userManager"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [RequestSizeLimit(1024)]
@@ -23,14 +22,14 @@ partial class UserController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status304NotModified)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> FriendRequestSend([FromRoute] Guid userId, [FromServices] IUserManager userManager, CancellationToken cancellationToken)
+    public async Task<IActionResult> FriendRequestSend([FromRoute] Guid userId, CancellationToken cancellationToken)
     {
         Guid authenticatedUserId = User.GetUserId();
 
         if (authenticatedUserId == userId)
             return BadRequest();
 
-        bool success = await userManager.CreateFriendRequestAsync(userId, authenticatedUserId, cancellationToken);
+        bool success = await _userManager.CreateFriendRequestAsync(authenticatedUserId, userId, cancellationToken);
         if (!success)
             return HttpErrors.Generic(
                 StatusCodes.Status404NotFound,

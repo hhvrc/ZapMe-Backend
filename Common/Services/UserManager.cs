@@ -16,18 +16,61 @@ public sealed class UserManager : IUserManager
         _dbContext = dbContext;
     }
 
-    public async Task<bool> CreateFriendRequestAsync(Guid sourceUserId, Guid targetUserId, CancellationToken cancellationToken)
+    public Task<UserEntity?> GetByIdAsync(Guid requestingUserId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        if (requestingUserId == userId)
+        {
+            // Get the user
+            return _dbContext
+                .Users
+                .AsNoTracking()
+                .Include(u => u.RelationsIncoming)
+                .Include(u => u.RelationsOutgoing)
+                .FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
+        }
+
+        // Get the user
+        return _dbContext
+            .Users
+            .AsNoTracking()
+            .Include(u => u.RelationsIncoming)
+            .Include(u => u.RelationsOutgoing)
+            .FirstOrDefaultAsync(x =>
+                (x.Id == userId) &&
+                (
+                    !x.RelationsOutgoing.Any(r => r.TargetUserId == requestingUserId && r.RelationType == UserRelationType.Blocked) &&
+                    !x.RelationsIncoming.Any(r => r.SourceUserId == requestingUserId && r.RelationType == UserRelationType.Blocked)
+                ), cancellationToken);
+    }
+
+    public Task<UserEntity?> GetByUserNameAsync(Guid requestingUserId, string userName, CancellationToken cancellationToken = default)
+    {
+        // Get the user
+        return _dbContext
+            .Users
+            .AsNoTracking()
+            .Include(u => u.RelationsIncoming)
+            .Include(u => u.RelationsOutgoing)
+            .FirstOrDefaultAsync(x =>
+                (x.Name == userName) &&
+                (
+                    !x.RelationsOutgoing.Any(r => r.TargetUserId == requestingUserId && r.RelationType == UserRelationType.Blocked) &&
+                    !x.RelationsIncoming.Any(r => r.SourceUserId == requestingUserId && r.RelationType == UserRelationType.Blocked)
+                ), cancellationToken);
+    }
+
+    public async Task<bool> CreateFriendRequestAsync(Guid requestingUserId, Guid targetUserId, CancellationToken cancellationToken)
     {
         // You can't send a friend request to yourself, that would be weird
-        if (sourceUserId == targetUserId) return false;
+        if (requestingUserId == targetUserId) return false;
 
         // Check if the users are already friends or blocked, if so, don't create a friend request
         if (await _dbContext
                 .UserRelations
                 .AnyAsync(x =>
                     (
-                        (x.SourceUserId == sourceUserId && x.TargetUserId == targetUserId) ||
-                        (x.SourceUserId == targetUserId && x.TargetUserId == sourceUserId)
+                        (x.SourceUserId == requestingUserId && x.TargetUserId == targetUserId) ||
+                        (x.SourceUserId == targetUserId && x.TargetUserId == requestingUserId)
                     )
                     &&
                     (
@@ -45,14 +88,14 @@ public sealed class UserManager : IUserManager
         FriendRequestEntity[] friendRequests = await _dbContext
             .FriendRequests
             .Where(x => 
-                (x.SenderId == sourceUserId && x.ReceiverId == targetUserId) ||
-                (x.SenderId == targetUserId && x.ReceiverId == sourceUserId)
+                (x.SenderId == requestingUserId && x.ReceiverId == targetUserId) ||
+                (x.SenderId == targetUserId && x.ReceiverId == requestingUserId)
             )   
             .Take(2)
             .ToArrayAsync(cancellationToken);
 
         // If there's already a pending outgoing friend request, don't create a new one
-        if (friendRequests.Any(x => x.SenderId == sourceUserId)) return false;
+        if (friendRequests.Any(x => x.SenderId == requestingUserId)) return false;
 
         // If there's a pending incoming friend request, accept it
         FriendRequestEntity? incomingRequest = friendRequests.FirstOrDefault(x => x.SenderId == targetUserId);
@@ -60,11 +103,11 @@ public sealed class UserManager : IUserManager
         {
             using IDbContextTransaction? transaction = await _dbContext.Database.BeginTransactionIfNotExistsAsync(cancellationToken);
 
-            // Remove the incoming friend request
-            _dbContext.FriendRequests.Remove(incomingRequest);
+            // Remove any pending friend requests
+            await DeleteFriendRequestAsync(targetUserId, requestingUserId, cancellationToken);
 
             // Set the users as friends
-            await SetUserRelationTypeAsync(sourceUserId, targetUserId, UserRelationType.Friend, cancellationToken);
+            await SetUserRelationTypeAsync(requestingUserId, targetUserId, UserRelationType.Friend, cancellationToken);
 
             if (transaction is not null) await transaction.CommitAsync(cancellationToken);
 
@@ -74,7 +117,7 @@ public sealed class UserManager : IUserManager
         // Create a new friend request
         _dbContext.FriendRequests.Add(new FriendRequestEntity()
         {
-            SenderId = sourceUserId,
+            SenderId = requestingUserId,
             ReceiverId = targetUserId
         });
         await _dbContext.SaveChangesAsync(cancellationToken);
@@ -82,43 +125,47 @@ public sealed class UserManager : IUserManager
         return true;
     }
 
-    public async Task<bool> AcceptFriendRequestAsync(Guid sourceUserId, Guid targetUserId, CancellationToken cancellationToken)
+    public async Task<bool> AcceptFriendRequestAsync(Guid requestingUserId, Guid targetUserId, CancellationToken cancellationToken)
     {
         // You can't send a friend request to yourself, that would be weird
-        if (sourceUserId == targetUserId) return false;
+        if (requestingUserId == targetUserId) return false;
 
-        FriendRequestEntity? incomingRequest = await _dbContext
+        bool hasIncoming = await _dbContext
             .FriendRequests
-            .FirstOrDefaultAsync(x => x.SenderId == targetUserId && x.ReceiverId == sourceUserId, cancellationToken);
+            .AnyAsync(x => x.SenderId == targetUserId && x.ReceiverId == requestingUserId, cancellationToken);
 
-        if (incomingRequest is null) return false;
+        if (!hasIncoming) return false;
 
         using IDbContextTransaction? transaction = await _dbContext.Database.BeginTransactionIfNotExistsAsync(cancellationToken);
 
-        _dbContext.FriendRequests.Remove(incomingRequest);
-        await SetUserRelationTypeAsync(sourceUserId, targetUserId, UserRelationType.Friend, cancellationToken);
+        await DeleteFriendRequestAsync(requestingUserId, targetUserId, cancellationToken);
+        await SetUserRelationTypeAsync(requestingUserId, targetUserId, UserRelationType.Friend, cancellationToken);
 
         if (transaction is not null) await transaction.CommitAsync(cancellationToken);
 
         return true;
     }
 
-    public async Task<bool> RejectFriendRequestAsync(Guid sourceUserId, Guid targetUserId, CancellationToken cancellationToken)
+    public async Task<bool> DeleteFriendRequestAsync(Guid requestingUserId, Guid targetUserId, CancellationToken cancellationToken)
     {
         // You can't send a friend request to yourself, that would be weird
-        if (sourceUserId == targetUserId) return false;
+        if (requestingUserId == targetUserId) return false;
 
         int nRemoved = await _dbContext
             .FriendRequests
-            .Where(fr => fr.SenderId == targetUserId && fr.ReceiverId == sourceUserId)
+            .Where(fr => 
+                (fr.SenderId == targetUserId && fr.ReceiverId == requestingUserId) ||
+                (fr.SenderId == requestingUserId && fr.ReceiverId == targetUserId)
+            )
             .ExecuteDeleteAsync(cancellationToken);
+
         return nRemoved > 0;
     }
 
-    public async Task<bool> SetUserRelationTypeAsync(Guid sourceUserId, Guid targetUserId, UserRelationType relationType, CancellationToken cancellationToken)
+    public async Task<bool> SetUserRelationTypeAsync(Guid requestingUserId, Guid targetUserId, UserRelationType relationType, CancellationToken cancellationToken)
     {
         // You can't have a relation with yourself, go love someone :D
-        if (sourceUserId == targetUserId) return false;
+        if (requestingUserId == targetUserId) return false;
 
         using IDbContextTransaction? transaction = await _dbContext.Database.BeginTransactionIfNotExistsAsync(cancellationToken);
 
@@ -127,27 +174,27 @@ public sealed class UserManager : IUserManager
             .UserRelations
             .AsTracking()
             .Where(x =>
-                (x.SourceUserId == sourceUserId && x.TargetUserId == targetUserId) ||
-                (x.SourceUserId == targetUserId && x.TargetUserId == sourceUserId)
+                (x.SourceUserId == requestingUserId && x.TargetUserId == targetUserId) ||
+                (x.SourceUserId == targetUserId && x.TargetUserId == requestingUserId)
             )
             .Take(2)
             .ToArrayAsync(cancellationToken);
 
         // If there's no relation from the source user to the target user, create one
-        UserRelationEntity? sourceUserRelation = relations.FirstOrDefault(x => x.SourceUserId == sourceUserId);
-        if (sourceUserRelation is not null)
+        UserRelationEntity? requestingUserRelation = relations.FirstOrDefault(x => x.SourceUserId == requestingUserId);
+        if (requestingUserRelation is not null)
         {
-            sourceUserRelation.RelationType = relationType;
+            requestingUserRelation.RelationType = relationType;
         }
         else if (relationType is not UserRelationType.None)
         {
-            sourceUserRelation = new()
+            requestingUserRelation = new()
             {
-                SourceUserId = sourceUserId,
+                SourceUserId = requestingUserId,
                 TargetUserId = targetUserId,
                 RelationType = UserRelationType.None
             };
-            _dbContext.UserRelations.Add(sourceUserRelation);
+            _dbContext.UserRelations.Add(requestingUserRelation);
         }
 
         // If there's no relation from the target user to the source user, create one
@@ -161,7 +208,7 @@ public sealed class UserManager : IUserManager
             targetUserRelation = new()
             {
                 SourceUserId = targetUserId,
-                TargetUserId = sourceUserId,
+                TargetUserId = requestingUserId,
                 RelationType = UserRelationType.Friend
             };
             _dbContext.UserRelations.Add(targetUserRelation);

@@ -18,18 +18,14 @@ public partial class UserController
     [ProducesResponseType(typeof(FriendRequestList), StatusCodes.Status200OK)]
     public async Task<IActionResult> ListFriendRequests(CancellationToken cancellationToken)
     {
-        Guid? userId = User.GetUserId();
-        if (!userId.HasValue) return HttpErrors.UnauthorizedActionResult;
+        Guid userId = User.GetUserId();
 
-        FriendRequestEntity[] friendRequests = await _dbContext.FriendRequests
-            .Where(fr => fr.ReceiverId == userId || fr.SenderId == userId)
-            .AsNoTracking()
-            .ToArrayAsync(cancellationToken);
+        UserEntity? user = await _userManager.GetByIdAsync(userId, userId, cancellationToken);
 
         return Ok(new FriendRequestList
         {
-            Incoming = friendRequests.Where(fr => fr.ReceiverId == userId).Select(fr => fr.SenderId),
-            Outgoing = friendRequests.Where(fr => fr.SenderId == userId).Select(fr => fr.ReceiverId)
+            Incoming = user?.RelationsIncoming?.Select(r => r.SourceUserId) ?? Enumerable.Empty<Guid>(),
+            Outgoing = user?.RelationsOutgoing?.Select(r => r.TargetUserId) ?? Enumerable.Empty<Guid>()
         });
     }
 }

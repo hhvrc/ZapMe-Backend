@@ -15,7 +15,6 @@ public partial class UserController
     /// Accept incoming friend request
     /// </summary>
     /// <param name="userId"></param>
-    /// <param name="userManager"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [RequestSizeLimit(1024)]
@@ -23,7 +22,7 @@ public partial class UserController
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]        // Accepted
     [ProducesResponseType(StatusCodes.Status304NotModified)] // Already friends
     [ProducesResponseType(StatusCodes.Status404NotFound)]    // No friendrequest incoming
-    public async Task<IActionResult> FriendRequestAccept([FromRoute] Guid userId, [FromServices] IUserManager userManager, CancellationToken cancellationToken)
+    public async Task<IActionResult> FriendRequestAccept([FromRoute] Guid userId, CancellationToken cancellationToken)
     {
         Guid authenticatedUserId = User.GetUserId();
 
@@ -31,7 +30,7 @@ public partial class UserController
         if (authenticatedUserId == userId)
             return BadRequest();
 
-        bool success = await userManager.AcceptFriendRequestAsync(userId, authenticatedUserId, cancellationToken);
+        bool success = await _userManager.AcceptFriendRequestAsync(authenticatedUserId, userId, cancellationToken);
 
         return success
             ? Ok()

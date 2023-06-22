@@ -5,6 +5,7 @@ using ZapMe.Database.Models;
 using ZapMe.DTOs;
 using ZapMe.Enums;
 using ZapMe.Helpers;
+using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -15,63 +16,24 @@ public partial class UserController
     /// </summary>
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
+    /// <response code="204">User blocked</response>
+    /// <response code="400">Invalid request</response>
+    /// <response code="404">User not found</response>
     /// <returns></returns>
     [HttpPut("block/{userId}", Name = "Block User")]
-    [ProducesResponseType(StatusCodes.Status200OK)] // User blocked
-    [ProducesResponseType(StatusCodes.Status404NotFound)] // User not found
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Block([FromRoute] Guid userId, CancellationToken cancellationToken)
     {
-        Guid authorizedUserId = User.GetUserId();
+        Guid authenticatedUserId = User.GetUserId();
 
-        if (authorizedUserId == userId)
-            return HttpErrors.Generic(
-                StatusCodes.Status400BadRequest,
-                "invalid_action",
-                "You cannot block yourself.",
-                NotificationSeverityLevel.Warning,
-                "You cannot block yourself."
-                ).ToActionResult();
+        if (authenticatedUserId == userId)
+            return BadRequest();
 
-        UserRelationEntity[] relations =
-            await _dbContext
-            .UserRelations
-            .Where(r => (r.SourceUserId == authorizedUserId && r.TargetUserId == userId) || (r.SourceUserId == userId && r.TargetUserId == authorizedUserId))
-            .ToArrayAsync(cancellationToken);
+        bool success = await _userManager.SetUserRelationTypeAsync(authenticatedUserId, userId, UserRelationType.Blocked, cancellationToken);
 
-        bool gotBlocked = false;
-        foreach (UserRelationEntity relation in relations)
-        {
-            if (relation.SourceUserId == authorizedUserId)
-            {
-                relation.RelationType = UserRelationType.Blocked;
-                gotBlocked = true;
-            }
-            else
-            {
-                relation.RelationType = UserRelationType.None;
-            }
-        }
+        // TODO: raise notification
 
-        if (gotBlocked)
-        {
-            await _dbContext.SaveChangesAsync(cancellationToken);
-            return Ok();
-        }
-
-        _dbContext.UserRelations.Add(new UserRelationEntity()
-        {
-            SourceUserId = authorizedUserId,
-            TargetUserId = userId,
-            RelationType = UserRelationType.Blocked
-        });
-        _dbContext.UserRelations.Add(new UserRelationEntity()
-        {
-            SourceUserId = userId,
-            TargetUserId = authorizedUserId,
-            RelationType = UserRelationType.Blocked
-        });
-        await _dbContext.SaveChangesAsync(cancellationToken);
-
-        return Ok();
+        return success ? NoContent() : NotFound();
     }
 }

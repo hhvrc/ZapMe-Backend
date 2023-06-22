@@ -16,14 +16,13 @@ public partial class UserController
     /// Delete outgoing/Reject incoming friend request
     /// </summary>
     /// <param name="userId"></param>
-    /// <param name="userManager"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [RequestSizeLimit(1024)]
     [HttpDelete("i/{userId}/friendrequest", Name = "DenyFriendRequest")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> FriendRequestDeny([FromRoute] Guid userId, [FromServices] IUserManager userManager, CancellationToken cancellationToken)
+    public async Task<IActionResult> FriendRequestDeny([FromRoute] Guid userId, CancellationToken cancellationToken)
     {
         Guid authenticatedUserId = User.GetUserId();
 
@@ -31,7 +30,7 @@ public partial class UserController
         if (authenticatedUserId == userId)
             return BadRequest();
 
-        bool success = await userManager.RejectFriendRequestAsync(userId, authenticatedUserId, cancellationToken);
+        bool success = await _userManager.DeleteFriendRequestAsync(authenticatedUserId, userId, cancellationToken);
 
         return success
             ? Ok()

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using ZapMe.Database.Models;
 using ZapMe.DTOs;
 using ZapMe.Enums;
 using ZapMe.Helpers;
@@ -23,23 +24,14 @@ public partial class UserController
     {
         Guid thisUserId = User.GetUserId();
 
-        var result = await _dbContext.Users
-            .Where(u => u.Id == userId)
-            .Where(u => !u.RelationsOutgoing.Any(r => r.TargetUserId == thisUserId && r.RelationType == UserRelationType.Blocked))
-            .Join(
-                _dbContext.UserRelations,
-                u => u.Id,
-                r => r.TargetUserId,
-                (u, r) => new { user = u, outgoingRelation = r }
-            )
-            .Where(x => x.outgoingRelation.SourceUserId == thisUserId)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(cancellationToken);
-        if (result is null)
+        var user = await _userManager.GetByIdAsync(thisUserId, userId, cancellationToken);
+        if (user is null)
         {
             return HttpErrors.UserNotFoundActionResult;
         }
 
-        return Ok(result.user.ToUserDto(result.outgoingRelation));
+        UserRelationEntity? outgoingRelation = user.RelationsIncoming.Where(r => r.SourceUserId == thisUserId).FirstOrDefault();
+
+        return Ok(user.ToUserDto(outgoingRelation));
     }
 }
