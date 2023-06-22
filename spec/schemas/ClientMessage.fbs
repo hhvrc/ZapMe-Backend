@@ -1,17 +1,19 @@
+include "./RealtimeSession.fbs";
+
 attribute "fs_serializer";
 
-namespace client.fbs;
+namespace fbs.client;
 
 struct ClientHeartbeat {
-  timestamp:long;
+  last_rtt_ms:uint;
 }
 
 union ClientMessageBody {
-  heartbeat:ClientHeartbeat
+  heartbeat:ClientHeartbeat,
+  realtime_session:realtime.RealtimeSession,
 }
 
 table ClientMessage (fs_serializer) {
-  timestamp:long;
   message:ClientMessageBody;
 }
 

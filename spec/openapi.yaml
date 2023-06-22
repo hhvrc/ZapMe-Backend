@@ -419,7 +419,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Config'
+                $ref: '#/components/schemas/ApiConfig'
         '400':
           description: Bad Request
           content:
@@ -825,31 +825,49 @@ components:
       description: 'Account object, this can only retrieved for the user you are logged in as'
     ApiConfig:
       required:
-        - disabledFeatures
+        - appName
+        - appVersion
+        - contact
+        - founderSocials
+        - privacyPolicyMarkdown
+        - privacyPolicyVersion
+        - termsOfServiceMarkdown
+        - termsOfServiceVersion
+        - webRtc
       type: object
       properties:
-        disabledFeatures:
+        appName:
+          type: string
+          description: 'Name of the product, e.g. "ZapMe"'
+        appVersion:
+          type: string
+          description: 'Version of the product, e.g. "1.0.0"'
+        privacyPolicyVersion:
+          type: integer
+          description: 'The current Privacy Policy version, if the user has not accepted this version, they will be prompted to accept it'
+          format: int32
+        privacyPolicyMarkdown:
+          type: string
+          description: Markdown of the Privacy Policy
+        termsOfServiceVersion:
+          type: integer
+          description: 'The current Terms of Service version, if the user has not accepted this version, they will be prompted to accept it'
+          format: int32
+        termsOfServiceMarkdown:
+          type: string
+          description: Markdown of the Terms of Service
+        webRtc:
           allOf:
-            - $ref: '#/components/schemas/ApiDisabledFeatures'
-      additionalProperties: false
-    ApiDisabledFeatures:
-      required:
-        - endpoints
-        - webRTC
-        - webSockets
-      type: object
-      properties:
-        webRTC:
-          type: boolean
-          description: 'If true, WebRTC is disabled'
-        webSockets:
-          type: boolean
-          description: 'If true, WebSockets are disabled'
-        endpoints:
-          type: array
-          items:
-            type: string
-          description: 'List of disabled endpoints, if an endpoint is in this list, it will return a "503 Service Unavailable"'
+            - $ref: '#/components/schemas/WebRtcConfig'
+          description: WebRTC configuration
+        contact:
+          allOf:
+            - $ref: '#/components/schemas/ContactConfig'
+          description: 'Contact information for ZapMe, e.g. email address, discord server, etc.'
+        founderSocials:
+          allOf:
+            - $ref: '#/components/schemas/SocialsConfig'
+          description: The social media accounts of the founder of ZapMe
       additionalProperties: false
     AuthSignIn:
       required:
@@ -878,52 +896,6 @@ components:
       properties:
         jwtToken:
           type: string
-      additionalProperties: false
-    Config:
-      required:
-        - api
-        - appName
-        - appVersion
-        - contact
-        - founderSocials
-        - privacyPolicyMarkdown
-        - privacyPolicyVersion
-        - termsOfServiceMarkdown
-        - termsOfServiceVersion
-      type: object
-      properties:
-        appName:
-          type: string
-          description: 'Name of the product, e.g. "ZapMe"'
-        appVersion:
-          type: string
-          description: 'Version of the product, e.g. "1.0.0"'
-        privacyPolicyVersion:
-          type: integer
-          description: 'The current Privacy Policy version, if the user has not accepted this version, they will be prompted to accept it'
-          format: int32
-        privacyPolicyMarkdown:
-          type: string
-          description: Markdown of the Privacy Policy
-        termsOfServiceVersion:
-          type: integer
-          description: 'The current Terms of Service version, if the user has not accepted this version, they will be prompted to accept it'
-          format: int32
-        termsOfServiceMarkdown:
-          type: string
-          description: Markdown of the Terms of Service
-        api:
-          allOf:
-            - $ref: '#/components/schemas/ApiConfig'
-          description: 'Api configuration, e.g. version, etc.'
-        contact:
-          allOf:
-            - $ref: '#/components/schemas/ContactConfig'
-          description: 'Contact information for ZapMe, e.g. email address, discord server, etc.'
-        founderSocials:
-          allOf:
-            - $ref: '#/components/schemas/SocialsConfig'
-          description: The social media accounts of the founder of ZapMe
       additionalProperties: false
     ContactConfig:
       required:
@@ -1350,6 +1322,19 @@ components:
         - inactive
         - online
       type: string
+    WebRtcConfig:
+      required:
+        - approvedStunServers
+        - enabled
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        approvedStunServers:
+          type: array
+          items:
+            type: string
+      additionalProperties: false
   securitySchemes:
     Bearer:
       type: apiKey

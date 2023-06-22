@@ -83,15 +83,11 @@ fi
 
 # Remove all build artifacts
 rm -rf "build"
-rm -rf "gRPC/bin"
-rm -rf "gRPC/obj"
-rm -rf "gRPC/build"
 rm -rf "RestAPI/bin"
 rm -rf "RestAPI/obj"
 rm -rf "RestAPI/build"
 
 # Build the backend
 echo_cyan "Building backend"
-dotnet publish gRPC/gRPC.csproj /p:PublishProfile=gRPC/Properties/PublishProfiles/Linux-x64.pubxml -c Release
 dotnet publish RestAPI/RestAPI.csproj /p:PublishProfile=RestAPI/Properties/PublishProfiles/Linux-x64.pubxml -c Release
 echo_green "Backend build complete"

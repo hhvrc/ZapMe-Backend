@@ -1,7 +1,7 @@
-﻿using client.fbs;
+﻿using fbs.client;
+using fbs.server;
 using FlatSharp;
 using OneOf;
-using server.fbs;
 using System.Buffers;
 using System.Net.WebSockets;
 using System.Text;
@@ -17,7 +17,7 @@ public sealed partial class WebSocketInstance : IDisposable
 {
     private static async Task<T?> ReceiveAsync<T>(WebSocket webSocket, Func<WebSocketMessageType, ArraySegment<byte>, CancellationToken, Task<T>> handler, CancellationToken cancellationToken)
     {
-        byte[] bytes = ArrayPool<byte>.Shared.Rent(WebsocketConstants.ClientMessageSizeMax);
+        byte[] bytes = ArrayPool<byte>.Shared.Rent((int)WebsocketConstants.ClientMessageSizeMax);
         try
         {
             WebSocketReceiveResult msg = await webSocket.ReceiveAsync(bytes, cancellationToken);
@@ -61,7 +61,14 @@ public sealed partial class WebSocketInstance : IDisposable
             var instance = new WebSocketInstance(session.UserId, session.Id, ws, logger);
 
             // Send hello message to inform client that everything is A-OK
-            var hello = new ServerHello { SessionId = session.Id.ToString(), UserId = session.UserId.ToString() };
+            var hello = new ServerHello
+            {
+                HeartbeatIntervalMs = 10 * 1000, // 10 seconds TODO: make this configurable
+                RatelimitBytesPerSec = WebsocketConstants.ClientRateLimitBytesPerSecond,
+                RatelimitBytesPerMin = WebsocketConstants.ClientRateLimitBytesPerMinute,
+                RatelimitMessagesPerSec = WebsocketConstants.ClientRateLimitMessagesPerSecond,
+                RatelimitMessagesPerMin = WebsocketConstants.ClientRateLimitMessagesPerMinute,
+            };
             await instance.SendMessageAsync(new ServerMessageBody(hello), cancellationToken);
 
             // Finally, return instance
@@ -85,9 +92,9 @@ public sealed partial class WebSocketInstance : IDisposable
     private readonly SlidingWindow _bytesMinuteWindow;
     private readonly ILogger<WebSocketInstance> _logger;
 
-    private readonly int _heartbeatIntervalMs = 30 * 1000;
+    private readonly uint _heartbeatIntervalMs = 30 * 1000; // TODO: make this configurable
     private DateTime _lastHeartbeat = DateTime.UtcNow;
-    private int MsUntilTimeout => _heartbeatIntervalMs + 2000 - (int)(DateTime.UtcNow - _lastHeartbeat).TotalMilliseconds;
+    private int MsUntilTimeout => (int)_heartbeatIntervalMs + 2000 - (int)(DateTime.UtcNow - _lastHeartbeat).TotalMilliseconds; // TODO: make the clock skew (2000) configurable
 
     private WebSocketInstance(Guid userId, Guid sessionId, WebSocket webSocket, ILogger<WebSocketInstance> logger)
     {
@@ -99,6 +106,7 @@ public sealed partial class WebSocketInstance : IDisposable
         _bytesSecondWindow = new SlidingWindow(1000, WebsocketConstants.ClientRateLimitBytesPerSecond);
         _bytesMinuteWindow = new SlidingWindow(60 * 1000, WebsocketConstants.ClientRateLimitBytesPerMinute);
         _logger = logger;
+        _instances.TryAdd(UserId.ToString(), this);
     }
 
     public async Task RunAsync(CancellationToken cancellationToken)
@@ -227,6 +235,7 @@ public sealed partial class WebSocketInstance : IDisposable
 
     public void Dispose()
     {
+        _instances.Remove(this.UserId.ToString(), out var _);
         if (_webSocket.State is not WebSocketState.Closed or WebSocketState.Aborted)
         {
             try { _webSocket.Abort(); } catch { }
