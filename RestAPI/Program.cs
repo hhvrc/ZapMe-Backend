@@ -104,6 +104,7 @@ services.Configure<ApiBehaviorOptions>(opt =>
 // ########################################
 
 JwtOptions.Register(services, configuration);
+DiscordBotOptions.Register(services, configuration);
 DiscordOAuth2Options.Register(services, configuration);
 GitHubOAuth2Options.Register(services, configuration);
 GoogleOAuth2Options.Register(services, configuration);
@@ -132,6 +133,7 @@ services.AddTransient<ILockOutStore, LockOutStore>();
 services.AddTransient<IEmailVerificationManager, EmailVerificationManager>();
 services.AddTransient<IWebSocketInstanceManager, WebSocketInstanceManager>();
 services.AddTransient<ISSOStateStore, SSOStateStore>();
+services.AddSingleton<IDiscordBotService, DiscordBotService>();
 
 services.AddRateLimiting();
 services.AddSwagger(isDevelopment);
