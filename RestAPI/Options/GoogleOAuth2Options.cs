@@ -2,7 +2,7 @@
 
 public sealed class GoogleOAuth2Options
 {
-    public const string SectionName = "Google:OAuth2";
+    public const string SectionName = GoogleOptions.SectionName + ":OAuth2";
 
     public required string ClientId { get; set; }
     public required string ClientSecret { get; set; }

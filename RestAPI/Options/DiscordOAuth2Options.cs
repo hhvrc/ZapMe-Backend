@@ -2,7 +2,7 @@
 
 public sealed class DiscordOAuth2Options
 {
-    public const string SectionName = "Discord:OAuth2";
+    public const string SectionName = DiscordOptions.SectionName + ":OAuth2";
 
     public required string ClientId { get; set; }
     public required string ClientSecret { get; set; }

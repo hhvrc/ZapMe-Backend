@@ -2,7 +2,7 @@
 
 public sealed class TwitterOAuth1Options
 {
-    public const string SectionName = "Twitter:OAuth1";
+    public const string SectionName = TwitterOptions.SectionName + ":OAuth1";
 
     public required string ConsumerKey { get; set; }
     public required string ConsumerSecret { get; set; }

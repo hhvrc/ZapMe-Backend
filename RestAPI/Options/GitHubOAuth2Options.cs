@@ -2,7 +2,7 @@
 
 public sealed class GitHubOAuth2Options
 {
-    public const string SectionName = "Github:OAuth2";
+    public const string SectionName = GitHubOptions.SectionName + ":OAuth2";
 
     public required string ClientId { get; set; }
     public required string ClientSecret { get; set; }
