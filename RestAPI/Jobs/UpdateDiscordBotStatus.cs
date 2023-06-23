@@ -24,7 +24,22 @@ public sealed class UpdateDiscordBotStatus : IJob
 
     public async Task Execute(IJobExecutionContext context)
     {
-        DiscordActivity activity = new DiscordActivity($"with {_webSocketInstanceManager.OnlineCount} users", ActivityType.Playing);
-        await _discordBotService.SetActivityAsync(activity);
+        ulong onlineCount = _webSocketInstanceManager.OnlineCount;
+        string activityText = onlineCount switch
+        {
+            0 => "with noone 😢",
+            1 => "with 1 user 🥺",
+            69 => "with 69 users 😏",
+            420 => "with 420 users 😶",
+            _ => $"with {onlineCount} users"
+        };
+        UserStatus userStatus = onlineCount switch
+        {
+            0 => UserStatus.DoNotDisturb,
+            _ => UserStatus.Online
+        };
+
+        DiscordActivity activity = new DiscordActivity(activityText, ActivityType.Playing);
+        await _discordBotService.SetActivityAsync(activity, userStatus);
     }
 }
