@@ -7,18 +7,18 @@ namespace ZapMe.Services;
 
 public sealed class WebSocketInstanceManager : IWebSocketInstanceManager
 {
-    private static readonly ConcurrentDictionary<string, WebSocketInstance> _Instances = new();
-
     private readonly ILogger<WebSocketInstanceManager> _logger;
+    private readonly ConcurrentDictionary<string, WebSocketInstance> _instances;
 
     public WebSocketInstanceManager(ILogger<WebSocketInstanceManager> logger)
     {
         _logger = logger;
+        _instances = new ConcurrentDictionary<string, WebSocketInstance>();
     }
 
     public async Task<bool> RegisterInstanceAsync(Guid userId, string instanceId, WebSocketInstance instance, CancellationToken cancellationToken)
     {
-        if (!_Instances.TryAdd(instanceId, instance))
+        if (!_instances.TryAdd(instanceId, instance))
         {
             return false;
         }
@@ -31,7 +31,7 @@ public sealed class WebSocketInstanceManager : IWebSocketInstanceManager
         }
         catch
         {
-            _Instances.Remove(instanceId, out _);
+            _instances.Remove(instanceId, out _);
             await instance.CloseAsync(WebSocketCloseStatus.InternalServerError, "Failed to register instance", cancellationToken);
             throw;
         }
@@ -41,7 +41,7 @@ public sealed class WebSocketInstanceManager : IWebSocketInstanceManager
 
     public async Task RemoveInstanceAsync(string instanceId, string reason, CancellationToken cancellationToken)
     {
-        if (_Instances.Remove(instanceId, out var instance) && instance is not null)
+        if (_instances.Remove(instanceId, out var instance) && instance is not null)
         {
             await instance.CloseAsync(WebSocketCloseStatus.NormalClosure, reason, cancellationToken);
 
@@ -51,7 +51,7 @@ public sealed class WebSocketInstanceManager : IWebSocketInstanceManager
 
     public async Task RemoveAllInstancesAsync(Guid userId, string reason, CancellationToken cancellationToken)
     {
-        foreach (var instance in _Instances.Where(x => x.Value.UserId == userId).ToArray()) // ToArray is very important here to avoid collection modified exception
+        foreach (var instance in _instances.Where(x => x.Value.UserId == userId).ToArray()) // ToArray is very important here to avoid collection modified exception
         {
             await RemoveInstanceAsync(instance.Key, reason, cancellationToken);
         }
