@@ -16,6 +16,8 @@ public sealed class WebSocketInstanceManager : IWebSocketInstanceManager
         _instances = new ConcurrentDictionary<string, WebSocketInstance>();
     }
 
+    public ulong OnlineCount => (ulong)_instances.Count;
+
     public async Task<bool> RegisterInstanceAsync(Guid userId, string instanceId, WebSocketInstance instance, CancellationToken cancellationToken)
     {
         if (!_instances.TryAdd(instanceId, instance))

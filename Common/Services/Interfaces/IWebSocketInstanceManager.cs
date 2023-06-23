@@ -9,6 +9,8 @@ public interface IWebSocketInstanceManager
     /// </summary>
     const string DefaultRemovalReason = "Forcefully removed";
 
+    ulong OnlineCount { get; }
+
     /// <summary>
     /// 
     /// </summary>
