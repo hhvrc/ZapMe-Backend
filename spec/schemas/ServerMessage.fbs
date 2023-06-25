@@ -17,8 +17,21 @@ table ServerHeartbeat {
   heartbeat_interval_ms:uint;
 }
 
-table GlobalMessage {
+enum SystemMessageType:byte {
+  TOAST = 0,
+  POPUP = 1,
+}
+enum SystemMessageLevel:byte {
+  INFO = 0,
+  WARNING = 1,
+  ERROR = 2,
+}
+table SystemMessage {
+  type:SystemMessageType;
+  level:SystemMessageLevel;
   title:string;
+
+  // If the message is a toast, this will be empty.
   body:string;
 }
 
@@ -28,7 +41,7 @@ union ServerMessageBody {
 
   realtime_session:realtime.RealtimeSession,
 
-  message_global:GlobalMessage
+  system_message:SystemMessage
 }
 
 table ServerMessage (fs_serializer) {
