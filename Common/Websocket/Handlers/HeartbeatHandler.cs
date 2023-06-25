@@ -1,5 +1,6 @@
-﻿using fbs.client;
-using fbs.server;
+﻿using ClientHeartbeat = fbs.client.Heartbeat;
+using ServerPayload = fbs.server.Payload;
+using ServerHeartbeat = fbs.server.Heartbeat;
 
 namespace ZapMe.Websocket;
 
@@ -9,7 +10,7 @@ partial class WebSocketInstance
     {
         _lastHeartbeat = DateTime.UtcNow;
 
-        await SendMessageAsync(new ServerMessageBody(new ServerHeartbeat { HeartbeatIntervalMs = _heartbeatIntervalMs }), cancellationToken);
+        await SendMessageAsync(new ServerPayload(new ServerHeartbeat { HeartbeatIntervalMs = _heartbeatIntervalMs }), cancellationToken);
 
         return true;
     }

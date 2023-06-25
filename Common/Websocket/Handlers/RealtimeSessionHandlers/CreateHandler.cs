@@ -1,10 +1,10 @@
-﻿using fbs.realtime;
+﻿using Msg = fbs.realtime.SessionCreate;
 
 namespace ZapMe.Websocket;
 
 partial class WebSocketInstance
 {
-    private Task<bool> HandleRealtimeSessionCreateAsync(RealtimeSessionCreate msg, CancellationToken cancellationToken)
+    private Task<bool> HandleRealtimeSessionCreateAsync(Msg msg, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

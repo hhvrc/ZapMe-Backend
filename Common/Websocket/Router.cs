@@ -1,16 +1,17 @@
-﻿using fbs.client;
+﻿using Payload = fbs.client.Payload;
+using PayloadType = fbs.client.Payload.ItemKind;
 
 namespace ZapMe.Websocket;
 
 partial class WebSocketInstance
 {
-    private Task<bool> RouteClientMessageAsync(ClientMessageBody message, CancellationToken cancellationToken)
+    private Task<bool> RouteClientMessageAsync(Payload message, CancellationToken cancellationToken)
     {
         return message.Kind switch
         {
-            ClientMessageBody.ItemKind.heartbeat => HandleHeartbeatAsync(message.heartbeat, cancellationToken),
-            ClientMessageBody.ItemKind.realtime_session => HandleRealtimeSessionAsync(message.realtime_session, cancellationToken),
-            ClientMessageBody.ItemKind.NONE => Task.FromResult(false),
+            PayloadType.heartbeat => HandleHeartbeatAsync(message.heartbeat, cancellationToken),
+            PayloadType.realtime_session => HandleRealtimeSessionAsync(message.realtime_session, cancellationToken),
+            PayloadType.NONE => Task.FromResult(false),
             _ => Task.FromResult(false),
         };
     }

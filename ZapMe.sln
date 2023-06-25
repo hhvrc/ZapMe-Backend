@@ -26,6 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "schemas", "schemas", "{DDB6
 		spec\schemas\ClientMessage.fbs = spec\schemas\ClientMessage.fbs
 		spec\schemas\RealtimeSession.fbs = spec\schemas\RealtimeSession.fbs
 		spec\schemas\ServerMessage.fbs = spec\schemas\ServerMessage.fbs
+		spec\schemas\SystemMessage.fbs = spec\schemas\SystemMessage.fbs
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{D4DA567B-FD80-4F03-8E80-7AC5B629CC74}"

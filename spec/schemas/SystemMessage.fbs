@@ -1,0 +1,19 @@
+namespace fbs.server;
+
+enum SystemMessageType:byte {
+  TOAST = 0,
+  POPUP = 1,
+}
+enum SystemMessageLevel:byte {
+  INFO = 0,
+  WARNING = 1,
+  ERROR = 2,
+}
+table SystemMessage {
+  type:SystemMessageType;
+  level:SystemMessageLevel;
+  title:string;
+
+  // If the message is a toast, this will be empty.
+  body:string;
+}

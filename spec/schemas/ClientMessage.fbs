@@ -4,17 +4,17 @@ attribute "fs_serializer";
 
 namespace fbs.client;
 
-struct ClientHeartbeat {
+struct Heartbeat {
   last_rtt_ms:uint;
 }
 
-union ClientMessageBody {
-  heartbeat:ClientHeartbeat,
-  realtime_session:realtime.RealtimeSession,
+union Payload {
+  heartbeat:Heartbeat,
+  realtime_session:realtime.Message,
 }
 
-table ClientMessage (fs_serializer) {
-  message:ClientMessageBody;
+table Message (fs_serializer) {
+  payload:Payload;
 }
 
-root_type ClientMessage;
+root_type Message;

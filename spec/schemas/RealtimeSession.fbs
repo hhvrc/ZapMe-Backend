@@ -1,12 +1,12 @@
 namespace fbs.realtime;
 
 // Sent from client to server, to create a new session.
-table RealtimeSessionCreate {
+table SessionCreate {
   // The user ID(s) to invite.
   user_ids:[string];
 }
 
-table RealtimeSessionInviteAccept {
+table SessionInviteAccept {
   // The session ID.
   session_id:string;
 
@@ -14,17 +14,17 @@ table RealtimeSessionInviteAccept {
   webrtc_offer:string;
 }
 
-table RealtimeSessionInviteReject {
+table SessionInviteReject {
   // The session ID.
   session_id:string;
 }
 
-table RealtimeSessionIceCandidateDiscovered {
+table SessionIceCandidateDiscovered {
   // The ICE candidate.
   candidate:string;
 }
 
-table RealtimeSessionRejoin {
+table SessionRejoin {
   // The session ID.
   session_id:string;
 
@@ -32,13 +32,13 @@ table RealtimeSessionRejoin {
   webrtc_offer:string;
 }
 
-table RealtimeSessionLeave {
+table SessionLeave {
   // The session ID.
   session_id:string;
 }
 
 // Sent from client to server, inviting one or more users to a session.
-table RealtimeSessionInviteUser {
+table SessionInviteUser {
   // The session ID.
   session_id:string;
 
@@ -47,7 +47,7 @@ table RealtimeSessionInviteUser {
 }
 
 // Can only be sent by client.
-table RealtimeSessionMessage {
+table SessionMessage {
   recepient_user_ids:[string];
 
   // For testing purposes, replace with a more complex type later.
@@ -55,7 +55,7 @@ table RealtimeSessionMessage {
 }
 
 // Sent from server to client, informing them that they have joined a session. If the session was just created, there will be no other participants in the response.
-table RealtimeEventSessionJoined {
+table EventSessionJoined {
   // The session ID.
   session_id:string;
 
@@ -64,7 +64,7 @@ table RealtimeEventSessionJoined {
 }
 
 // Sent from server to client, informing them that they have been invited to a session.
-table RealtimeEventSessionInviteReceived {
+table EventSessionInviteReceived {
   // The session ID.
   session_id:string;
 
@@ -73,7 +73,7 @@ table RealtimeEventSessionInviteReceived {
 }
 
 // Sent from server to client, informing them a user has joined a session.
-table RealtimeEventSesionUserJoined {
+table EventSesionUserJoined {
   // The session ID.
   session_id:string;
 
@@ -85,7 +85,7 @@ table RealtimeEventSesionUserJoined {
 }
 
 // Sent from server to client, informing them a user has left a session.
-table RealtimeEventSessionUserLeft {
+table EventSessionUserLeft {
   // The session ID.
   session_id:string;
 
@@ -93,7 +93,7 @@ table RealtimeEventSessionUserLeft {
   user_id:string;
 }
 
-table RealtimeEventSessionUserIceCandidateDiscovered {
+table EventSessionUserIceCandidateDiscovered {
   // The ID of the user who discovered the ICE candidate.
   user_id:string;
 
@@ -102,29 +102,29 @@ table RealtimeEventSessionUserIceCandidateDiscovered {
 }
 
 // Can only be sent by server.
-table RealtimeEventSessionUserMessage {
+table EventSessionUserMessage {
   user_id:string;
   recepient_user_ids:[string];
 }
 
-union RealtimeSessionBody {
-  create:RealtimeSessionCreate,
-  invite_accept:RealtimeSessionInviteAccept,
-  invite_reject:RealtimeSessionInviteReject,
-  ice_candidate_discovered:RealtimeSessionIceCandidateDiscovered,
-  rejoin:RealtimeSessionRejoin,
-  leave:RealtimeSessionLeave,
-  invite_user:RealtimeSessionInviteUser,
-  message:RealtimeSessionMessage,
+union Payload {
+  create:SessionCreate,
+  invite_accept:SessionInviteAccept,
+  invite_reject:SessionInviteReject,
+  ice_candidate_discovered:SessionIceCandidateDiscovered,
+  rejoin:SessionRejoin,
+  leave:SessionLeave,
+  invite_user:SessionInviteUser,
+  message:SessionMessage,
 
-  event_joined:RealtimeEventSessionJoined,
-  event_invited:RealtimeEventSessionInviteReceived,
-  event_user_joined:RealtimeEventSesionUserJoined,
-  event_user_left:RealtimeEventSessionUserLeft,
-  event_user_ice_candidate_discovered:RealtimeEventSessionUserIceCandidateDiscovered,
-  event_user_message:RealtimeEventSessionUserMessage,
+  event_joined:EventSessionJoined,
+  event_invited:EventSessionInviteReceived,
+  event_user_joined:EventSesionUserJoined,
+  event_user_left:EventSessionUserLeft,
+  event_user_ice_candidate_discovered:EventSessionUserIceCandidateDiscovered,
+  event_user_message:EventSessionUserMessage,
 }
 
-table RealtimeSession {
-  body:RealtimeSessionBody;
+table Message {
+  payload:Payload;
 }
