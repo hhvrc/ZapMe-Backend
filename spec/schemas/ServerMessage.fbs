@@ -1,11 +1,11 @@
-include "./RealtimeSession.fbs";
+include "./Session.fbs";
 include "./SystemMessage.fbs";
 
 attribute "fs_serializer";
 
 namespace fbs.server;
 
-table Ready {
+table ServerReady {
   api_version:uint;
 
   heartbeat_interval_ms:uint;
@@ -15,7 +15,7 @@ table Ready {
   ratelimit_bytes_per_sec:uint;
   ratelimit_bytes_per_min:uint;
 }
-table Heartbeat {
+table ServerHeartbeat {
   heartbeat_interval_ms:uint;
 }
 
@@ -100,9 +100,9 @@ table GroupSessionRequest {
   session_id:string;
 }
 
-union Payload {
-  ready:Ready,
-  heartbeat:Heartbeat,
+union ServerPayload {
+  ready:ServerReady,
+  heartbeat:ServerHeartbeat,
 
   system_message:SystemMessage,
 
@@ -124,12 +124,18 @@ union Payload {
   group_message:GroupMessage,
   group_session_request:GroupSessionRequest,
 
-  realtime_session:realtime.Message,
+  session_joined:session.SessionEventJoined,
+  session_user_joined:session.SessionEventUserJoined,
+  session_user_left:session.SessionEventUserLeft,
+  session_invited:session.SessionEventInvited,
+  session_left:session.SessionEventLeft,
+  session_ended:session.SessionEventEnded,
+  session_ice_candidate_discovered:session.SessionEventIceCandidateDiscovered,
 }
 
-table Message (fs_serializer) {
+table ServerMessage (fs_serializer) {
   timestamp:long;
-  payload:Payload;
+  payload:ServerPayload;
 }
 
-root_type Message;
+root_type ServerMessage;

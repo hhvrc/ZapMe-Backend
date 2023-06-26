@@ -1,0 +1,97 @@
+namespace fbs.session;
+
+table SessionJoin {
+  // The session ID.
+  session_id:string;
+
+  // The user's WebRTC offer, or empty string if user prefers WebSockets.
+  webrtc_offer:string;
+}
+
+table SessionLeave {
+  // The session ID.
+  session_id:string;
+}
+
+table SessionReject {
+  // The session ID.
+  session_id:string;
+}
+
+table SessionRejoin {
+  // The session ID.
+  session_id:string;
+
+  // The user's WebRTC offer, or empty string if user prefers WebSockets.
+  webrtc_offer:string;
+}
+
+table SessionInvite {
+  // The session ID.
+  session_id:string;
+
+  // The user ID(s) to invite.
+  user_ids:[string];
+}
+
+table SessionIceCandidateDiscovered {
+  // The session ID.
+  session_id:string;
+
+  // The ICE candidate.
+  candidate:string;
+}
+
+// Sent from server to client, informing them that they have joined a session. If the session was just created, there will be no other participants in the response.
+table SessionEventJoined {
+  // The session ID.
+  session_id:string;
+
+  // The session's participant IDs.
+  participant_ids:[string];
+}
+
+table SessionEventUserJoined {
+  // The session ID.
+  session_id:string;
+
+  // The ID of the user who joined.
+  user_id:string;
+
+  // The user's WebRTC offer, or empty string if user prefers WebSockets.
+  webrtc_offer:string;
+}
+
+table SessionEventUserLeft {
+  // The session ID.
+  session_id:string;
+
+  // The ID of the user who left.
+  user_id:string;
+}
+
+table SessionEventInvited {
+  // The session ID.
+  session_id:string;
+
+  // The session's participant IDs.
+  participant_ids:[string];
+}
+
+table SessionEventLeft {
+  // The session ID.
+  session_id:string;
+}
+
+table SessionEventEnded {
+  // The session ID.
+  session_id:string;
+}
+
+table SessionEventIceCandidateDiscovered {
+  // The ID of the user who discovered the ICE candidate.
+  user_id:string;
+
+  // The ICE candidate.
+  candidate:string;
+}

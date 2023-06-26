@@ -87,10 +87,10 @@ public sealed class UserManager : IUserManager
         // Get friend requests between the two users (if any)
         FriendRequestEntity[] friendRequests = await _dbContext
             .FriendRequests
-            .Where(x => 
+            .Where(x =>
                 (x.SenderId == requestingUserId && x.ReceiverId == targetUserId) ||
                 (x.SenderId == targetUserId && x.ReceiverId == requestingUserId)
-            )   
+            )
             .Take(2)
             .ToArrayAsync(cancellationToken);
 
@@ -153,7 +153,7 @@ public sealed class UserManager : IUserManager
 
         int nRemoved = await _dbContext
             .FriendRequests
-            .Where(fr => 
+            .Where(fr =>
                 (fr.SenderId == targetUserId && fr.ReceiverId == requestingUserId) ||
                 (fr.SenderId == requestingUserId && fr.ReceiverId == targetUserId)
             )

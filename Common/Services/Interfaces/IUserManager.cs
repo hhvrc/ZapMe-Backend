@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore;
-using ZapMe.Database.Models;
+﻿using ZapMe.Database.Models;
 using ZapMe.Enums;
 
 namespace ZapMe.Services.Interfaces;

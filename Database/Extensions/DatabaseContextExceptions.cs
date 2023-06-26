@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace ZapMe.Database;
+﻿namespace ZapMe.Database;
 
 public static class DatabaseContextExceptions
 {

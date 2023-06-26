@@ -74,7 +74,7 @@ public sealed class MailGunService : IMailGunService
         _logger.LogInformation("Sending mail: {}", await content.ReadAsStringAsync(cancellationToken));
 #else
         HttpClient httpClient = _httpClientFactory.CreateClient(HttpClientKey);
-        
+
         using HttpResponseMessage result = await httpClient.PostAsync(Uri.EscapeDataString(App.Domain) + "/" + SendMailEndpoint, content, cancellationToken);
 
         if (!result.IsSuccessStatusCode)

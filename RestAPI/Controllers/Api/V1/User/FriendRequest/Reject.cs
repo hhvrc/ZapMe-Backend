@@ -1,12 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Net;
 using System.Security.Claims;
-using System.Threading;
-using ZapMe.Database.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
-using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Controllers.Api.V1;
 

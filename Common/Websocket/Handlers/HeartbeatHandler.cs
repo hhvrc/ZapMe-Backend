@@ -1,6 +1,5 @@
-﻿using ClientHeartbeat = fbs.client.Heartbeat;
-using ServerPayload = fbs.server.Payload;
-using ServerHeartbeat = fbs.server.Heartbeat;
+﻿using fbs.client;
+using fbs.server;
 
 namespace ZapMe.Websocket;
 

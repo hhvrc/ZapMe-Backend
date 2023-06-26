@@ -1,20 +1,26 @@
-include "./RealtimeSession.fbs";
+include "./Session.fbs";
 
 attribute "fs_serializer";
 
 namespace fbs.client;
 
-struct Heartbeat {
+struct ClientHeartbeat {
   last_rtt_ms:uint;
 }
 
-union Payload {
-  heartbeat:Heartbeat,
-  realtime_session:realtime.Message,
+union ClientPayload {
+  heartbeat:ClientHeartbeat,
+  
+  session_join:session.SessionJoin,
+  session_leave:session.SessionLeave,
+  session_reject:session.SessionReject,
+  session_rejoin:session.SessionRejoin,
+  session_invite:session.SessionInvite,
+  session_ice_candidate_discovered:session.SessionIceCandidateDiscovered,
 }
 
-table Message (fs_serializer) {
-  payload:Payload;
+table ClientMessage (fs_serializer) {
+  payload:ClientPayload;
 }
 
-root_type Message;
+root_type ClientMessage;

@@ -1,4 +1,6 @@
-﻿using FlatSharp;
+﻿using fbs.client;
+using fbs.server;
+using FlatSharp;
 using OneOf;
 using System.Buffers;
 using System.Net.WebSockets;
@@ -8,13 +10,6 @@ using ZapMe.Database.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
-
-using ClientMsg = fbs.client.Message;
-using ClientPayload = fbs.client.Payload;
-using ClientPayloadType = fbs.client.Payload.ItemKind;
-using ServerMsg = fbs.server.Message;
-using ServerPayload = fbs.server.Payload;
-using ServerPayloadType = fbs.server.Payload.ItemKind;
 
 namespace ZapMe.Websocket;
 
@@ -66,7 +61,7 @@ public sealed partial class WebSocketInstance : IDisposable
             var instance = new WebSocketInstance(session.UserId, session.Id, ws, logger);
 
             // Send hello message to inform client that everything is A-OK
-            fbs.server.Ready ready = new()
+            ServerReady ready = new()
             {
                 HeartbeatIntervalMs = 10 * 1000, // 10 seconds TODO: make this configurable
                 RatelimitBytesPerSec = WebsocketConstants.ClientRateLimitBytesPerSecond,
@@ -178,7 +173,7 @@ public sealed partial class WebSocketInstance : IDisposable
             return (WebSocketCloseStatus.InvalidPayloadData, "Only binary messages are supported!");
         }
 
-        ClientMsg flatBufferMsg = ClientMsg.Serializer.Parse(new ArraySegmentInputBuffer(data), FlatBufferDeserializationOption.Lazy);
+        ClientMessage flatBufferMsg = ClientMessage.Serializer.Parse(new ArraySegmentInputBuffer(data), FlatBufferDeserializationOption.Lazy);
 
         if (flatBufferMsg is null)
         {
@@ -204,13 +199,13 @@ public sealed partial class WebSocketInstance : IDisposable
     {
         if (_webSocket.State != WebSocketState.Open) return;
 
-        ServerMsg message = new ServerMsg
+        ServerMessage message = new ServerMessage
         {
             Timestamp = DateTime.UtcNow.Ticks,
             Payload = payload,
         };
 
-        ISerializer<ServerMsg> serializer = ServerMsg.Serializer;
+        ISerializer<ServerMessage> serializer = ServerMessage.Serializer;
 
         byte[] bytes = ArrayPool<byte>.Shared.Rent(serializer.GetMaxSize(message));
         try
