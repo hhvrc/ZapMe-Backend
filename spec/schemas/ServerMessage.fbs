@@ -32,8 +32,8 @@ enum UserRelationType:byte {
 }
 table UserStatusChanged {
   user_id:string;
-  onlineStatus:UserOnlineStatus;
-  statusMessage:string;
+  online_status:UserOnlineStatus;
+  status_message:string;
 }
 table UserRelationChanged {
   user_id:string;
