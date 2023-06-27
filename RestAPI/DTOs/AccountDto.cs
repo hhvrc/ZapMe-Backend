@@ -33,9 +33,9 @@ public readonly struct AccountDto
     public string StatusText { get; init; }
 
     /// <summary>
-    /// Id of friends this account has
+    /// Ids of users this account has friended
     /// </summary>
-    public IEnumerable<FriendDto> Friends { get; init; }
+    public IEnumerable<Guid> FriendUserIds { get; init; }
 
     /// <summary>
     /// SSO providers this account is connected to

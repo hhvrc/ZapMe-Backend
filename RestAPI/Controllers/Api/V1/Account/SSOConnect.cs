@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using ZapMe.Database.Models;
 using ZapMe.Helpers;
@@ -20,11 +21,7 @@ public partial class AccountController
         CancellationToken cancellationToken
         )
     {
-        UserEntity? user = await User.TryGetUserAsync(_dbContext, cancellationToken);
-        if (user is null)
-        {
-            return HttpErrors.UnauthorizedActionResult;
-        }
+        Guid userId = User.GetUserId();
 
         string requestingIp = this.GetRemoteIP();
 
@@ -36,7 +33,7 @@ public partial class AccountController
 
         _dbContext.SSOConnections.Add(new SSOConnectionEntity
         {
-            UserId = user.Id,
+            UserId = userId,
             ProviderName = oauthVariables.ProviderName,
             ProviderUserId = oauthVariables.ProviderUserId,
             ProviderUserName = oauthVariables.ProviderUserName,

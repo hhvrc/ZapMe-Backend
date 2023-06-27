@@ -192,7 +192,7 @@ public sealed class UserManager : IUserManager
             {
                 SourceUserId = requestingUserId,
                 TargetUserId = targetUserId,
-                RelationType = UserRelationType.None
+                RelationType = relationType
             };
             _dbContext.UserRelations.Add(requestingUserRelation);
         }
@@ -201,7 +201,16 @@ public sealed class UserManager : IUserManager
         UserRelationEntity? targetUserRelation = relations.FirstOrDefault(x => x.SourceUserId == targetUserId);
         if (targetUserRelation is not null)
         {
-            targetUserRelation.RelationType = relationType;
+            // If we are friending the users, set the relation type to friend
+            if (relationType is UserRelationType.Friend)
+            {
+                targetUserRelation.RelationType = UserRelationType.Friend;
+            }
+            // Else if the relation is already friend, set it to none
+            else if (targetUserRelation.RelationType is UserRelationType.Friend)
+            {
+                targetUserRelation.RelationType = UserRelationType.None;
+            }
         }
         else if (relationType is UserRelationType.Friend)
         {

@@ -33,4 +33,9 @@ public readonly struct UserDto
     /// Last time this user was seen online
     /// </summary>
     public DateTime LastSeenAt { get; init; }
+
+    /// <summary>
+    /// The time this user was friended at
+    /// </summary>
+    public DateTime? FriendedAt { get; init; }
 }

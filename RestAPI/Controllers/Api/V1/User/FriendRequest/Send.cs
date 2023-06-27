@@ -15,7 +15,7 @@ partial class UserController
     /// <returns></returns>
     [RequestSizeLimit(1024)]
     [HttpPost("i/{userId}/friendrequest", Name = "SendFriendRequest")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status304NotModified)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> FriendRequestSend([FromRoute] Guid userId, CancellationToken cancellationToken)
@@ -27,6 +27,8 @@ partial class UserController
 
         bool success = await _userManager.CreateFriendRequestAsync(authenticatedUserId, userId, cancellationToken);
         if (!success)
+        {
+            // TODO: better error handling
             return HttpErrors.Generic(
                 StatusCodes.Status404NotFound,
                 "friendrequest_not_found",
@@ -34,9 +36,10 @@ partial class UserController
                 NotificationSeverityLevel.Warning,
                 "Friend request not found"
                ).ToActionResult();
+        }
 
         // TODO: raise notification
 
-        return Ok(userId);
+        return NoContent();
     }
 }

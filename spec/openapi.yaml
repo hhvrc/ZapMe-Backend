@@ -638,8 +638,8 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
-          description: Success
+        '204':
+          description: No Content
         '304':
           description: Not Modified
         '404':
@@ -760,7 +760,7 @@ components:
         - acceptedTermsOfServiceVersion
         - createdAt
         - emailVerified
-        - friends
+        - friendUserIds
         - id
         - lastOnline
         - obscuredEmail
@@ -801,11 +801,12 @@ components:
             - $ref: '#/components/schemas/UserStatus'
         statusText:
           type: string
-        friends:
+        friendUserIds:
           type: array
           items:
-            $ref: '#/components/schemas/FriendDto'
-          description: Id of friends this account has
+            type: string
+            format: uuid
+          description: Ids of users this account has friended
         ssoConnections:
           type: array
           items:
@@ -1018,25 +1019,6 @@ components:
           nullable: true
       additionalProperties: false
       description: Details about the error
-    FriendDto:
-      required:
-        - friendedAt
-        - friendId
-      type: object
-      properties:
-        friendId:
-          type: string
-          format: uuid
-        nickName:
-          type: string
-          nullable: true
-        notes:
-          type: string
-          nullable: true
-        friendedAt:
-          type: string
-          format: date-time
-      additionalProperties: false
     FriendRequestList:
       required:
         - incoming
@@ -1279,6 +1261,11 @@ components:
           type: string
           description: Last time this user was seen online
           format: date-time
+        friendedAt:
+          type: string
+          description: The time this user was friended at
+          format: date-time
+          nullable: true
       additionalProperties: false
     UserNotification:
       required:

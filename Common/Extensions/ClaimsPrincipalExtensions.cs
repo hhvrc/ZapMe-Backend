@@ -47,24 +47,6 @@ public static class ClaimsPrincipalExtensions
         return Boolean.Parse(principal.FindFirst(ZapMeClaimTypes.UserEmailVerified)?.Value ?? throw new NullReferenceException(ZapMeClaimTypes.UserEmailVerified + " claim not found"));
     }
 
-    public static async Task<SessionEntity?> TryGetSessionAsync(this ClaimsPrincipal principal, DatabaseContext dbContext, CancellationToken cancellationToken = default)
-    {
-        Guid? sessionId = TryGetSessionId(principal);
-        if (!sessionId.HasValue) return null;
-
-        return await dbContext.Sessions.SingleOrDefaultAsync(u => u.Id == sessionId, cancellationToken);
-    }
-
-    public static async Task<UserEntity?> TryGetUserAsync(this ClaimsPrincipal principal, DatabaseContext dbContext, CancellationToken cancellationToken = default)
-    {
-        Guid? userId = TryGetUserId(principal);
-        if (!userId.HasValue) return null;
-
-        return await dbContext
-            .Users
-            .SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
-    }
-
     /// <summary>
     /// Will only return a user if the password is correct.
     /// </summary>
@@ -75,7 +57,10 @@ public static class ClaimsPrincipalExtensions
     /// <returns></returns>
     public static async Task<UserEntity?> VerifyUserPasswordAsync(this ClaimsPrincipal principal, string password, DatabaseContext dbContext, CancellationToken cancellationToken = default)
     {
-        var user = await TryGetUserAsync(principal, dbContext, cancellationToken);
+        Guid? userId = principal.TryGetUserId();
+        if (!userId.HasValue) return null;
+
+        var user = await dbContext.Users.Where(u => u.Id == userId.Value).FirstOrDefaultAsync(cancellationToken);
         if (user is null) return null;
 
         return PasswordUtils.VerifyPassword(password, user.PasswordHash) ? user : null;

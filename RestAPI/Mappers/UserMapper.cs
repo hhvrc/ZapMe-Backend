@@ -41,11 +41,12 @@ public static class UserMapper
             Notes = outgoingUserRelation?.Notes,
             CreatedAt = user.CreatedAt,
             LastSeenAt = user.LastOnline,
+            FriendedAt = outgoingUserRelation?.CreatedAt
         };
     }
 
     // Exposes minimal information about a user
-    public static UserDto ToUserDto(this UserEntity user, UserRelationType relation)
+    public static UserDto ToMinimalUserDto(this UserEntity user, UserRelationType relation)
     {
         return new UserDto
         {
@@ -75,7 +76,7 @@ public static class UserMapper
             BannerUrl = user.ProfileBanner?.PublicUrl,
             Status = user.Status,
             StatusText = user.StatusText,
-            Friends = user.RelationsOutgoing.Select(fs => fs.ToFriendDto()),
+            FriendUserIds = user.RelationsOutgoing.Select(fs => fs.TargetUserId),
             SSOConnections = user.SSOConnections.Select(oc => oc.ProviderName),
             CreatedAt = user.CreatedAt,
             UpdatedAt = user.UpdatedAt,
