@@ -7,7 +7,7 @@ using ZapMe.DTOs;
 using ZapMe.Enums;
 using ZapMe.Helpers;
 
-namespace ZapMe.BusinessLogic.Users.Relations;
+namespace ZapMe.BusinessLogic.Users;
 
 public static class BlockingLogic
 {

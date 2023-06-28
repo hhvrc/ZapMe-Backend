@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using ZapMe.BusinessLogic.Users.Relations;
+using ZapMe.BusinessLogic.Users;
 using ZapMe.Database;
 
 namespace ZapMe.Controllers.Api.V1;

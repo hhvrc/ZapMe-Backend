@@ -32,9 +32,6 @@ public partial class AccountController
     [ProducesResponseType(StatusCodes.Status413PayloadTooLarge)]
     public async Task<IActionResult> UpdateAvatar([FromHeader(Name = "Hash-Sha256")] string? sha256Hash, [FromServices] IImageManager imageManager, CancellationToken cancellationToken)
     {
-        Guid? userId = User.GetUserId();
-        if (!userId.HasValue) return HttpErrors.UnauthorizedActionResult;
-
         long length = Request.ContentLength ?? -1;
         if (length is <= 0 or > Int32.MaxValue)
         {
@@ -43,7 +40,7 @@ public partial class AccountController
 
         string cfRegion = CountryRegionLookup.GetCloudflareRegion(this.GetCloudflareIPCountry());
 
-        OneOf<ImageEntity, ErrorDetails> res = await imageManager.GetOrCreateRecordAsync(Request.Body, cfRegion, (int)length, sha256Hash, userId, cancellationToken);
+        OneOf<ImageEntity, ErrorDetails> res = await imageManager.GetOrCreateRecordAsync(Request.Body, cfRegion, (int)length, sha256Hash, User.GetUserId(), cancellationToken);
         if (res.TryPickT1(out ErrorDetails error, out ImageEntity image))
         {
             return error.ToActionResult();
