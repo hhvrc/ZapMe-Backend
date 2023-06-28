@@ -88,6 +88,9 @@ public static class HttpErrors
     public static ErrorDetails UserNotFound => Generic(StatusCodes.Status404NotFound, "user_not_found", "User not found", null, null, new UserNotification(NotificationSeverityLevel.Error, "User not found"));
     public static IActionResult UserNotFoundActionResult => UserNotFound.ToActionResult();
 
+    public static ErrorDetails SelfModerationIllegal => Generic(StatusCodes.Status400BadRequest, "cannot_moderate_self", "You cannot moderate yourself");
+    public static IActionResult SelfModerationIllegalActionResult => SelfModerationIllegal.ToActionResult();
+
     public static ErrorDetails DeviceNotFound => Generic(StatusCodes.Status404NotFound, "device_not_found", "Device not found", null, null, new UserNotification(NotificationSeverityLevel.Error, "Device not found"));
     public static IActionResult DeviceNotFoundActionResult => DeviceNotFound.ToActionResult();
 

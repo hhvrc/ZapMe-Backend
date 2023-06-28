@@ -18,7 +18,7 @@ paths:
       tags:
         - Account
       summary: Create a new account
-      operationId: CreateAccount
+      operationId: AccountCreate
       requestBody:
         description: ''
         content:
@@ -56,7 +56,7 @@ paths:
       tags:
         - Account
       summary: Delete currently logged in account
-      operationId: DeleteAccount
+      operationId: AccountDelete
       parameters:
         - name: password
           in: header
@@ -83,21 +83,14 @@ paths:
     get:
       tags:
         - Account
-      summary: ''
-      operationId: GetAccount
+      operationId: AccountGet
       responses:
         '200':
-          description: Account
+          description: Success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccountDto'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
   /api/v1/account/recover-confirm:
     post:
       tags:
@@ -143,7 +136,7 @@ paths:
       tags:
         - Account
       summary: Add a sso connection to account
-      operationId: Connect SSO Provider
+      operationId: SsoProviderConnect
       parameters:
         - name: ssoToken
           in: query
@@ -162,7 +155,7 @@ paths:
       tags:
         - Account
       summary: Remove a sso connection from account
-      operationId: Disconnect SSO Provider
+      operationId: SsoProviderDisconnect
       parameters:
         - name: providerName
           in: query
@@ -177,78 +170,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-  /api/v1/account/email:
+  /api/v1/account/avatar:
     put:
       tags:
         - Account
-      summary: Updates the account email
-      operationId: UpdateEmail
-      requestBody:
-        description: ''
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/UpdateEmail'
-              description: Request sent to server to update account email address
-      responses:
-        '200':
-          description: Ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UpdateEmailOk'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-  /api/v1/account/password:
-    put:
-      tags:
-        - Account
-      summary: Updates the account password
-      operationId: UpdatePassword
-      requestBody:
-        description: ''
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/UpdatePassword'
-              description: Request sent to server to update account password
-      responses:
-        '200':
-          description: Ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AccountDto'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-  /api/v1/account/pfp:
-    put:
-      tags:
-        - Account
-      summary: Updates the account profile picture
-      operationId: UpdateProfilePicture
+      summary: Updates the account avatar
+      operationId: AccountAvatarUpdate
       parameters:
         - name: Hash-Sha256
           in: header
@@ -303,12 +230,75 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/account/email:
+    put:
+      tags:
+        - Account
+      summary: Updates the account email
+      operationId: AccountEmailUpdate
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/UpdateEmail'
+              description: Request sent to server to update account email address
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateEmailOk'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/account/password:
+    put:
+      tags:
+        - Account
+      summary: Updates the account password
+      operationId: AccountPasswordUpdate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/UpdatePassword'
+              description: Request sent to server to update account password
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '200':
+          description: Ok
   /api/v1/account/username:
     put:
       tags:
         - Account
       summary: Updates the account username
-      operationId: UpdateUserName
+      operationId: AccountUsernameUpdate
       requestBody:
         description: ''
         content:
@@ -337,7 +327,7 @@ paths:
       tags:
         - Account
       summary: Verify the users email address
-      operationId: Verify Email Address
+      operationId: AccountEmailVerify
       parameters:
         - name: token
           in: query
@@ -412,7 +402,7 @@ paths:
       tags:
         - Config
       summary: ''
-      operationId: GetConfig
+      operationId: ConfigGet
       responses:
         '200':
           description: Returns the service config
@@ -426,12 +416,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-  '/api/v1/device/i/{deviceId}':
+  '/api/v1/device/{deviceId}':
     get:
       tags:
         - Device
       summary: ''
-      operationId: Get Device
+      operationId: DeviceGet
       parameters:
         - name: deviceId
           in: path
@@ -445,7 +435,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AccountDto'
+                $ref: '#/components/schemas/DeviceDto'
         '401':
           description: Unauthorized
           content:
@@ -457,7 +447,7 @@ paths:
       tags:
         - Health
       summary: ''
-      operationId: GetHealth
+      operationId: HealthGet
       responses:
         '200':
           description: Health status
@@ -466,7 +456,7 @@ paths:
       tags:
         - Single Sign-On
       summary: "Warning:\r\nThis endpoint is not meant to be called by a 3rd party, it will redirect the request for OAuth authentication with the specified provider.\r\nIt is documented here for transparency, and to automatically generate the OpenAPI client for the frontend."
-      operationId: SSO Authenticate
+      operationId: InternalSsoAuthenticate
       parameters:
         - name: providerName
           in: path
@@ -488,7 +478,7 @@ paths:
       tags:
         - Single Sign-On
       summary: "Warning:\r\nThis endpoint is not meant to be called by a 3rd party, it will redirect the request for OAuth authentication with the specified provider.\r\nIt is documented here for transparency, and to automatically generate the OpenAPI client for the frontend."
-      operationId: SSO Callback
+      operationId: InternalSsoCallback
       parameters:
         - name: providerName
           in: path
@@ -510,7 +500,7 @@ paths:
       tags:
         - Single Sign-On
       summary: Returns the data supplied by the SSO provider
-      operationId: SSO Get Provider Data
+      operationId: SsoProviderdataGet
       parameters:
         - name: ssoToken
           in: query
@@ -534,7 +524,7 @@ paths:
       tags:
         - Single Sign-On
       summary: Returns a list of supported SSO providers
-      operationId: SSO List Providers
+      operationId: SsoProviderlistGet
       responses:
         '200':
           description: Success
@@ -544,12 +534,12 @@ paths:
                 type: array
                 items:
                   type: string
-  '/api/v1/user/block/{userId}':
+  '/api/v1/user/{userId}/block':
     put:
       tags:
         - User
       summary: Block a user
-      operationId: Block User
+      operationId: UserBlockApply
       parameters:
         - name: userId
           in: path
@@ -569,12 +559,37 @@ paths:
                 $ref: '#/components/schemas/ErrorDetails'
         '400':
           description: Invalid request
-  '/api/v1/user/i/{userId}/friendrequest':
+  '/api/v1/user/{userId}/unblock':
+    put:
+      tags:
+        - User
+      summary: UnBlock a user
+      operationId: UserBlockRemove
+      parameters:
+        - name: userId
+          in: path
+          description: ''
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: User blocked
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+        '400':
+          description: Invalid request
+  '/api/v1/user/{userId}/friendrequest':
     put:
       tags:
         - User
       summary: Accept incoming friend request
-      operationId: AcceptFriendRequest
+      operationId: UserFriendrequestAccept
       parameters:
         - name: userId
           in: path
@@ -602,7 +617,7 @@ paths:
       tags:
         - User
       summary: Delete outgoing/Reject incoming friend request
-      operationId: DenyFriendRequest
+      operationId: UserFriendrequestDelete
       parameters:
         - name: userId
           in: path
@@ -628,7 +643,7 @@ paths:
       tags:
         - User
       summary: Send friend request
-      operationId: SendFriendRequest
+      operationId: UserFriendrequestSend
       parameters:
         - name: userId
           in: path
@@ -653,7 +668,7 @@ paths:
       tags:
         - User
       summary: List all incoming and outgoing friend requests
-      operationId: ListFriendRequests
+      operationId: UserFriendrequestList
       responses:
         '200':
           description: Success
@@ -661,12 +676,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FriendRequestList'
-  '/api/v1/user/i/{userId}':
+  '/api/v1/user/{userId}':
     get:
       tags:
         - User
-      summary: Get user
-      operationId: GetUser
+      summary: Get user by Id
+      operationId: UserGetById
       parameters:
         - name: userId
           in: path
@@ -688,17 +703,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-  '/api/v1/user/u/{userName}':
+  /api/v1/user/lookup:
     get:
       tags:
         - User
       summary: Look up user by name
-      operationId: LookUpUser
+      operationId: UserGetByName
       parameters:
-        - name: userName
-          in: path
+        - name: username
+          in: query
           description: ''
-          required: true
           schema:
             type: string
       responses:
@@ -719,7 +733,7 @@ paths:
       tags:
         - User
       summary: Report a user
-      operationId: ReportUser
+      operationId: UserReportCreate
       requestBody:
         description: ''
         content:
@@ -742,7 +756,7 @@ paths:
       tags:
         - WebSocket
       summary: "Websocket endpoint for pub/sub communication (e.g. chat, notifications, events)\r\n\r\nDocumentation:\r\nYes"
-      operationId: WebSocket
+      operationId: WebsocketEndpoint
       responses:
         '200':
           description: Connection closed
@@ -986,6 +1000,19 @@ components:
         emailVerificationRequired:
           type: boolean
           description: If true then the email is already verified by 3rd party
+      additionalProperties: false
+    DeviceDto:
+      required:
+        - id
+        - registeredAt
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        registeredAt:
+          type: string
+          format: date-time
       additionalProperties: false
     ErrorDetails:
       required:

@@ -13,8 +13,8 @@ public partial class DeviceController
     /// </summary>
     /// <returns></returns>
     /// <response code="200">Device</response>
-    [HttpGet("i/{deviceId}", Name = "Get Device")]
-    [ProducesResponseType(typeof(AccountDto), StatusCodes.Status200OK)]
+    [HttpGet("{deviceId}", Name = "DeviceGet")]
+    [ProducesResponseType(typeof(DeviceDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Get(Guid deviceId, CancellationToken cancellationToken)
     {

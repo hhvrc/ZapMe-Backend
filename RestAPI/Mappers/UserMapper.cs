@@ -6,28 +6,8 @@ namespace ZapMe.DTOs;
 
 public static class UserMapper
 {
-    public static UserDto ToUserDto(this UserEntity user, UserRelationEntity? outgoingUserRelation)
+    public static UserDto ToUserDto(this UserEntity user, UserRelationEntity? userRelation)
     {
-        var relationType = outgoingUserRelation?.RelationType ?? UserRelationType.None;
-
-        if (relationType == UserRelationType.Blocked)
-        {
-            return new UserDto
-            {
-                Id = user.Id,
-                Username = user.Name,
-                AvatarUrl = null,
-                BannerUrl = null,
-                Status = UserStatus.Offline,
-                StatusText = String.Empty,
-                RelationType = UserRelationType.Blocked,
-                NickName = outgoingUserRelation?.NickName,
-                Notes = outgoingUserRelation?.Notes,
-                CreatedAt = DateTime.MinValue,
-                LastSeenAt = DateTime.MinValue
-            };
-        }
-
         return new UserDto
         {
             Id = user.Id,
@@ -36,17 +16,16 @@ public static class UserMapper
             BannerUrl = user.ProfileBanner?.PublicUrl,
             Status = user.Status,
             StatusText = user.StatusText,
-            RelationType = relationType,
-            NickName = outgoingUserRelation?.NickName,
-            Notes = outgoingUserRelation?.Notes,
+            RelationType = userRelation?.RelationType ?? UserRelationType.None,
+            NickName = userRelation?.NickName,
+            Notes = userRelation?.Notes,
             CreatedAt = user.CreatedAt,
             LastSeenAt = user.LastOnline,
-            FriendedAt = outgoingUserRelation?.CreatedAt
+            FriendedAt = userRelation?.CreatedAt
         };
     }
 
-    // Exposes minimal information about a user
-    public static UserDto ToMinimalUserDto(this UserEntity user, UserRelationType relation)
+    public static UserDto ToMinimalUserDto(this UserEntity user, UserRelationEntity? userRelation)
     {
         return new UserDto
         {
@@ -56,7 +35,9 @@ public static class UserMapper
             BannerUrl = null,
             Status = UserStatus.Offline,
             StatusText = String.Empty,
-            RelationType = relation,
+            RelationType = userRelation?.RelationType ?? UserRelationType.None,
+            NickName = userRelation?.NickName,
+            Notes = userRelation?.Notes,
             CreatedAt = DateTime.MinValue,
             LastSeenAt = DateTime.MinValue
         };

@@ -14,7 +14,7 @@ public partial class UserController
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [RequestSizeLimit(1024)]
-    [HttpPut("i/{userId}/friendrequest", Name = "AcceptFriendRequest")]
+    [HttpPut("{userId}/friendrequest", Name = "UserFriendrequestAccept")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]        // Accepted
     [ProducesResponseType(StatusCodes.Status304NotModified)] // Already friends
     [ProducesResponseType(StatusCodes.Status404NotFound)]    // No friendrequest incoming

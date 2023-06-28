@@ -12,7 +12,7 @@ public partial class UserController
     /// </summary>
     /// <returns></returns>
     [RequestSizeLimit(1024)]
-    [HttpGet("friendrequests", Name = "ListFriendRequests")]
+    [HttpGet("friendrequests", Name = "UserFriendrequestList")]
     [ProducesResponseType(typeof(FriendRequestList), StatusCodes.Status200OK)]
     public async Task<IActionResult> ListFriendRequests(CancellationToken cancellationToken)
     {

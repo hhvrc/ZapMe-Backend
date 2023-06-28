@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using ZapMe.Database.Models;
 using ZapMe.Helpers;
@@ -12,7 +11,7 @@ public partial class AccountController
     /// <summary>
     /// Add a sso connection to account
     /// </summary>
-    [HttpPost("sso", Name = "Connect SSO Provider")]
+    [HttpPost("sso", Name = "SsoProviderConnect")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)] // SSO ticket not found
     public async Task<IActionResult> SSOConnect(

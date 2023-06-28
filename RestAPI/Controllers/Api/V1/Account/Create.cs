@@ -25,7 +25,7 @@ public partial class AccountController
     /// <response code="201">Created account</response>
     [AnonymousOnly]
     [RequestSizeLimit(1024)]
-    [HttpPost(Name = "CreateAccount")]
+    [HttpPost(Name = "AccountCreate")]
     [ProducesResponseType(typeof(CreateOk), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)] // Invalid SSO token

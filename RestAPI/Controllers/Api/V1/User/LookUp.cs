@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using ZapMe.Database.Models;
+using ZapMe.BusinessLogic.Users;
+using ZapMe.Database;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
 
@@ -11,26 +12,23 @@ public partial class UserController
     /// <summary>
     /// Look up user by name
     /// </summary>
-    /// <param name="userName"></param>
+    /// <param name="dbContext"></param>
+    /// <param name="username"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [RequestSizeLimit(1024)]
-    [HttpGet("u/{userName}", Name = "LookUpUser")]
+    [HttpGet("lookup", Name = "UserGetByName")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]     // Accepted
     [ProducesResponseType(StatusCodes.Status404NotFound)] // User not found
-    public async Task<IActionResult> LookUp([FromRoute] string userName, CancellationToken cancellationToken)
+    public async Task<IActionResult> LookUp([FromServices] DatabaseContext dbContext, [FromQuery] string username, CancellationToken cancellationToken)
     {
-        Guid thisUserId = User.GetUserId();
+        var result = await UserFetchingLogic.FetchUserDto_AsUser_ByName(dbContext, User.GetUserId(), username, cancellationToken);
 
-        var user = await _userManager.GetByUserNameAsync(thisUserId, userName, cancellationToken);
-
-        if (user is null)
+        if (!result.HasValue)
         {
             return HttpErrors.UserNotFoundActionResult;
         }
 
-        UserRelationEntity? outgoingRelation = user.RelationsIncoming.Where(r => r.SourceUserId == thisUserId).FirstOrDefault();
-
-        return Ok(user.ToUserDto(outgoingRelation));
+        return Ok(result.Value);
     }
 }

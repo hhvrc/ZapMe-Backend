@@ -11,7 +11,7 @@ public partial class SSOController
     /// <summary>
     /// Returns the data supplied by the SSO provider
     /// </summary>
-    [HttpGet("providerData", Name = "SSO Get Provider Data")]
+    [HttpGet("providerData", Name = "SsoProviderdataGet")]
     [ProducesResponseType(typeof(ProviderDataDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)] // Invalid SSO token
     public async Task<IActionResult> GetProviderData([FromQuery] string ssoToken, [FromServices] ISSOStateStore stateStore, CancellationToken cancellationToken)

@@ -14,8 +14,8 @@ public partial class SSOController
     /// <param name="providerName">Name of the SSO provider to use, supported providers can be fetched from /api/v1/sso/providers</param>
     /// <status code="406">Not Acceptable, the SSO provider is not supported</status>
     [EnableCors("allow_sso_providers")]
-    [HttpGet("{providerName}", Name = "SSO Authenticate")]
-    [HttpPost("{providerName}/callback", Name = "SSO Callback")]
+    [HttpGet("{providerName}", Name = "InternalSsoAuthenticate")]
+    [HttpPost("{providerName}/callback", Name = "InternalSsoCallback")]
     [ProducesResponseType(StatusCodes.Status302Found)]
     [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
     public async Task<IActionResult> Authenticate([FromRoute] string providerName)

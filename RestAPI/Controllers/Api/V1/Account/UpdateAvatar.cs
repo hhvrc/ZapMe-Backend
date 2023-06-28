@@ -14,7 +14,7 @@ namespace ZapMe.Controllers.Api.V1;
 public partial class AccountController
 {
     /// <summary>
-    /// Updates the account profile picture
+    /// Updates the account avatar
     /// </summary>
     /// <param name="sha256Hash">[Optional] Sha-256 hash of the image bytes to verify the integrity of the image server-side</param>
     /// <param name="imageManager"></param>
@@ -24,13 +24,13 @@ public partial class AccountController
     /// <response code="400">Payload is unsupported/corrupted or the hash (if provided) does not match the payload</response>
     /// <response code="411">Length is required</response>
     /// <response code="413">Image dimensions or byte size is too large</response>
-    [HttpPut("pfp", Name = "UpdateProfilePicture")]
+    [HttpPut("avatar", Name = "AccountAvatarUpdate")]
     [BinaryPayload(true, "image/png", "image/jpeg", "image/webp", "image/gif")]
     [ProducesResponseType(typeof(UpdateProfilePictureOk), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status411LengthRequired)]
     [ProducesResponseType(StatusCodes.Status413PayloadTooLarge)]
-    public async Task<IActionResult> UpdateProfilePicture([FromHeader(Name = "Hash-Sha256")] string? sha256Hash, [FromServices] IImageManager imageManager, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateAvatar([FromHeader(Name = "Hash-Sha256")] string? sha256Hash, [FromServices] IImageManager imageManager, CancellationToken cancellationToken)
     {
         Guid? userId = User.GetUserId();
         if (!userId.HasValue) return HttpErrors.UnauthorizedActionResult;
