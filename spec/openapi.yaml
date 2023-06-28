@@ -589,7 +589,7 @@ paths:
       tags:
         - User
       summary: Accept incoming friend request
-      operationId: AcceptFriendrequest
+      operationId: AcceptFriendRequest
       parameters:
         - name: userId
           in: path
@@ -617,7 +617,7 @@ paths:
       tags:
         - User
       summary: Delete outgoing/Reject incoming friend request
-      operationId: DeleteFriendrequest
+      operationId: DeleteFriendRequest
       parameters:
         - name: userId
           in: path
@@ -643,7 +643,7 @@ paths:
       tags:
         - User
       summary: Send friend request
-      operationId: SendFriendrequest
+      operationId: SendFriendRequest
       parameters:
         - name: userId
           in: path
@@ -668,7 +668,7 @@ paths:
       tags:
         - User
       summary: List all incoming and outgoing friend requests
-      operationId: GetFriendrequests
+      operationId: GetFriendRequests
       responses:
         '200':
           description: Success

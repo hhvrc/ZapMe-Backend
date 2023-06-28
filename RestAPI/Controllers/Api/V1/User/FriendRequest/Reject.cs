@@ -14,7 +14,7 @@ public partial class UserController
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [RequestSizeLimit(1024)]
-    [HttpDelete("{userId}/friendrequest", Name = "DeleteFriendrequest")]
+    [HttpDelete("{userId}/friendrequest", Name = "DeleteFriendRequest")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> FriendRequestDelete([FromRoute] Guid userId, CancellationToken cancellationToken)
