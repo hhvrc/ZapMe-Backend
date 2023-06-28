@@ -27,11 +27,9 @@ public sealed class UpdateDiscordBotStatus : IJob
         ulong onlineCount = _webSocketInstanceManager.OnlineCount;
         string activityText = onlineCount switch
         {
-            0 => "with noone 😢",
-            1 => "with 1 user 🥺",
-            69 => "with 69 users 😏",
-            420 => "with 420 users 😶",
-            _ => $"with {onlineCount} users"
+            0 => "with no online users",
+            1 => "with 1 online user",
+            _ => $"with {onlineCount} online users"
         };
         UserStatus userStatus = onlineCount switch
         {
