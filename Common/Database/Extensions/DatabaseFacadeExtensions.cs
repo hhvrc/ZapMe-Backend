@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace ZapMe.Database;
+namespace ZapMe.Database.Extensions;
 
 public static class DatabaseFacadeExtensions
 {

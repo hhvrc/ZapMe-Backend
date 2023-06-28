@@ -37,6 +37,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RestAPI", "RestAPI\RestAPI.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RestAPI.Tests", "RestAPI.Tests\RestAPI.Tests.csproj", "{BEA98ED9-FD80-48EE-A382-134B5F58FAE4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Tests", "Common.Tests\Common.Tests.csproj", "{A21007F2-815C-4865-85EA-677D6E678675}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -59,6 +61,10 @@ Global
 		{BEA98ED9-FD80-48EE-A382-134B5F58FAE4}.Debug|x64.Build.0 = Debug|x64
 		{BEA98ED9-FD80-48EE-A382-134B5F58FAE4}.Release|x64.ActiveCfg = Release|x64
 		{BEA98ED9-FD80-48EE-A382-134B5F58FAE4}.Release|x64.Build.0 = Release|x64
+		{A21007F2-815C-4865-85EA-677D6E678675}.Debug|x64.ActiveCfg = Debug|x64
+		{A21007F2-815C-4865-85EA-677D6E678675}.Debug|x64.Build.0 = Debug|x64
+		{A21007F2-815C-4865-85EA-677D6E678675}.Release|x64.ActiveCfg = Release|x64
+		{A21007F2-815C-4865-85EA-677D6E678675}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

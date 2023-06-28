@@ -18,7 +18,7 @@ public static class AuthenticationBuilderExtensions
                 scheme.HandlerType = typeof(ZapMeSignInHandler);
                 scheme.DisplayName = null; // TODO: changeme
             });
-        });
+        }).ValidateOnStart();
 
         builder.Services.AddTransient<IAuthenticationSignInHandler, ZapMeSignInHandler>();
         return builder;

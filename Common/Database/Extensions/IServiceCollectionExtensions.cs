@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ZapMe.Database;
+namespace ZapMe.Database.Extensions;
 
 public static class ZapMeDatabaseExtensions
 {

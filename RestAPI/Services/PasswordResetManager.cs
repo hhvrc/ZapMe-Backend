@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using ZapMe.Constants;
 using ZapMe.Database;
+using ZapMe.Database.Extensions;
 using ZapMe.Database.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;

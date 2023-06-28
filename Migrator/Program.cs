@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ZapMe.Database;
+using ZapMe.Database.Extensions;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

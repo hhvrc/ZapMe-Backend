@@ -1,0 +1,4 @@
+[*Tests.cs]
+dotnet_diagnostic.IDE0008.severity = none
+dotnet_diagnostic.IDE0017.severity = none
+dotnet_diagnostic.IDE0022.severity = none

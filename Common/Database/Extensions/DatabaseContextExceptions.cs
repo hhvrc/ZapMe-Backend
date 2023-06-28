@@ -1,4 +1,4 @@
-﻿namespace ZapMe.Database;
+﻿namespace ZapMe.Database.Extensions;
 
 public static class DatabaseContextExceptions
 {

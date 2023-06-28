@@ -5,7 +5,7 @@ using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using ZapMe.Constants;
-using ZapMe.Database;
+using ZapMe.Database.Extensions;
 using ZapMe.Extensions;
 using ZapMe.Middlewares;
 using ZapMe.Options;
