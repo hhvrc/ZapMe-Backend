@@ -1,22 +1,12 @@
 ﻿using Amazon.S3;
 using OneOf;
 using ZapMe.Database.Models;
+using ZapMe.Enums.Errors;
 
 namespace ZapMe.Services.Interfaces;
 
 public interface IImageManager
 {
-    public enum ImageUploadError
-    {
-        PayloadSizeInvalid,
-        PayloadSizeTooLarge,
-        PayloadChecksumMismatch,
-        ImageDimensionsInvalid,
-        ImageDataInvalid,
-        ImageFormatUnsupported,
-        ImageDimensionsTooLarge
-    }
-
     /// <summary>
     /// 
     /// </summary>

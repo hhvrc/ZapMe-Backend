@@ -1,16 +1,11 @@
 ﻿using OneOf;
+using ZapMe.Enums.Errors;
 
 namespace ZapMe.Utils;
 
 public static class ImageUtils
 {
     public readonly record struct ImageParseResult(uint Width, uint Height, uint FrameCount, string MimeType);
-    public enum ImageParseError
-    {
-        ImageDimensionsInvalid,
-        ImageDataInvalid,
-        ImageFormatUnsupported,
-    }
 
     /// <summary>
     /// Parses and rewrites an image from a stream

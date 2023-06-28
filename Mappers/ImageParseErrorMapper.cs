@@ -1,5 +1,4 @@
-﻿using static ZapMe.Services.Interfaces.IImageManager;
-using static ZapMe.Utils.ImageUtils;
+﻿using ZapMe.Enums.Errors;
 
 namespace ZapMe.Mappers;
 

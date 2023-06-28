@@ -2,11 +2,11 @@
 using System.Security.Claims;
 using ZapMe.Attributes;
 using ZapMe.DTOs.API.User;
+using ZapMe.Enums.Errors;
 using ZapMe.Helpers;
 using ZapMe.Mappers;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
-using static ZapMe.Services.Interfaces.IImageManager;
 
 namespace ZapMe.Controllers.Api.V1;
 

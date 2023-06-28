@@ -12,10 +12,10 @@ using ZapMe.Constants;
 using ZapMe.Database;
 using ZapMe.Database.Models;
 using ZapMe.DTOs;
+using ZapMe.Enums.Errors;
 using ZapMe.Helpers;
+using ZapMe.Mappers;
 using ZapMe.Services.Interfaces;
-using static ZapMe.BusinessLogic.OAuth.OAuthClaimsFetchers;
-using static ZapMe.Services.Interfaces.IJwtAuthenticationManager;
 
 namespace ZapMe.Services;
 
@@ -74,9 +74,7 @@ public sealed class ZapMeSignInHandler : IAuthenticationSignInHandler
             var fetchClaimsResult = OAuthClaimsFetchers.FetchClaims(authScheme, claimsPrincipal, _logger);
             if (fetchClaimsResult.TryPickT1(out FetchClaimsError fetchClaimsError, out SSOProviderData? ssoProviderData))
             {
-                ErrorDetails errorDetails = fetchClaimsError == FetchClaimsError.UnsupportedSSOProvider
-                    ? HttpErrors.UnsupportedSSOProvider(authScheme)
-                    : HttpErrors.InternalServerError;
+                ErrorDetails errorDetails = FetchClaimsErrorMapper.MapToErrorDetails(fetchClaimsError);
 
                 await errorDetails.Write(Response, _jsonSerializerOptions);
                 return;
@@ -159,7 +157,7 @@ public sealed class ZapMeSignInHandler : IAuthenticationSignInHandler
         }
 
         var authenticationResult = await _authenticationManager.AuthenticateJwtTokenAsync(authHeaderValue.Parameter, CancellationToken);
-        if (authenticationResult.TryPickT1(out AuthenticationError authenticationError, out SessionEntity session))
+        if (authenticationResult.TryPickT1(out JwtAuthenticationError authenticationError, out SessionEntity session))
         {
             await HttpErrors.Unauthorized.Write(Response, _jsonSerializerOptions);
             return AuthenticateResult.Fail("Invalid JWT token.");

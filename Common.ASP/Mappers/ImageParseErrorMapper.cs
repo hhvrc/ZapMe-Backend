@@ -1,18 +1,18 @@
 ﻿using ZapMe.DTOs;
-using static ZapMe.Utils.ImageUtils;
+using ZapMe.Enums.Errors;
 
 namespace ZapMe.Mappers;
 
 public static class ImageParseErrorMapper
 {
-    public static ErrorDetails MapToErrorDetails(ImageParseError uploadError)
+    public static ErrorDetails MapToErrorDetails(ImageParseError imageParseError)
     {
-        return uploadError switch
+        return imageParseError switch
         {
             ImageParseError.ImageDimensionsInvalid => throw new NotImplementedException(),
             ImageParseError.ImageDataInvalid => throw new NotImplementedException(),
             ImageParseError.ImageFormatUnsupported => throw new NotImplementedException(),
-            _ => throw new ArgumentOutOfRangeException(nameof(uploadError), uploadError, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(imageParseError), imageParseError, null)
         };
     }
 }

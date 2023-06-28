@@ -8,13 +8,14 @@ using System.Net.WebSockets;
 using System.Text;
 using ZapMe.Constants;
 using ZapMe.Database.Models;
+using ZapMe.DTOs;
+using ZapMe.Enums.Errors;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
-using static ZapMe.Services.Interfaces.IJwtAuthenticationManager;
 
 namespace ZapMe.Websocket;
 
-public sealed partial class WebSocketInstance : IDisposable
+public sealed partial class WebSocketInstance
 {
     private static async Task<T?> ReceiveAsync<T>(WebSocket webSocket, Func<WebSocketMessageType, ArraySegment<byte>, CancellationToken, Task<T>> handler, CancellationToken cancellationToken)
     {
@@ -33,65 +34,43 @@ public sealed partial class WebSocketInstance : IDisposable
     private static async Task<string?> ReceiveStringAsync(WebSocket webSocket, CancellationToken cancellationToken) =>
         await ReceiveAsync(webSocket, static (type, data, _) => Task.FromResult(type == WebSocketMessageType.Text ? Encoding.UTF8.GetString(data) : null), cancellationToken);
 
-    public enum CreateError
+    public static async Task<OneOf<WebSocketInstance, CreateWebSocketError>> CreateAsync(WebSocket websocket, IJwtAuthenticationManager authenticationManager, ILogger<WebSocketInstance> logger, CancellationToken cancellationToken)
     {
-        InvalidClientMessage,
-        InvalidClientJwt,
-        ClientEmailUnverified,
-        InvalidClientSession,
-        InternalServerError
-    }
-    public static async Task<OneOf<WebSocketInstance, CreateError>> CreateAsync(WebSocket websocket, IJwtAuthenticationManager authenticationManager, ILogger<WebSocketInstance> logger, CancellationToken cancellationToken)
-    {
-        try
+        // Receive JWT from client
+        string? token = await ReceiveStringAsync(websocket, cancellationToken);
+        if (token is null)
         {
-            // Receive JWT from client
-            string? token = await ReceiveStringAsync(websocket, cancellationToken);
-            if (token is null)
-            {
-                logger.LogError("Failed to authenticate websocket connection, received invalid message from client");
-                websocket.Dispose();
-                return CreateError.InvalidClientMessage;
-            }
-
-            // Validate JWT
-            var authenticationResult = await authenticationManager.AuthenticateJwtTokenAsync(token, cancellationToken);
-            if (authenticationResult.TryPickT1(out AuthenticationError authenticationError, out SessionEntity session))
-            {
-                logger.LogError("Failed to authenticate websocket connection, provided JWT was invalid");
-                websocket.Dispose();
-                return authenticationError switch
-                {
-                    AuthenticationError.InvalidToken => CreateError.InvalidClientJwt,
-                    AuthenticationError.UnverifiedEmail => CreateError.ClientEmailUnverified,
-                    AuthenticationError.InvalidSession => CreateError.InvalidClientSession,
-                    _ => CreateError.InternalServerError
-                };
-            }
-
-            // Success, create websocket instance
-            var instance = new WebSocketInstance(session.UserId, session.Id, websocket, logger);
-
-            // Send hello message to inform client that everything is A-OK
-            ServerReady ready = new()
-            {
-                HeartbeatIntervalMs = 10 * 1000, // 10 seconds TODO: make this configurable
-                RatelimitBytesPerSec = WebsocketConstants.ClientRateLimitBytesPerSecond,
-                RatelimitBytesPerMin = WebsocketConstants.ClientRateLimitBytesPerMinute,
-                RatelimitMessagesPerSec = WebsocketConstants.ClientRateLimitMessagesPerSecond,
-                RatelimitMessagesPerMin = WebsocketConstants.ClientRateLimitMessagesPerMinute,
-            };
-            await instance.SendMessageAsync(new ServerPayload(ready), cancellationToken);
-
-            // Finally, return instance
-            return instance;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError("Failed to authenticate websocket connection, exception: {Exception}", ex);
+            logger.LogError("Failed to authenticate websocket connection, received invalid message from client");
             websocket.Dispose();
-            return CreateError.InternalServerError;
+            return CreateWebSocketError.InvalidClientMessage;
         }
+
+        // Validate JWT
+        var authenticationResult = await authenticationManager.AuthenticateJwtTokenAsync(token, cancellationToken);
+        if (authenticationResult.TryPickT1(out JwtAuthenticationError authenticationError, out SessionEntity session))
+        {
+            logger.LogError("Failed to authenticate websocket connection, provided JWT was invalid");
+            websocket.Dispose();
+
+            return JwtAuthenticationErrorMapper.MapToCreateWebSocketError(authenticationError);
+        }
+
+        // Success, create websocket instance
+        var instance = new WebSocketInstance(session.UserId, session.Id, websocket, logger);
+
+        // Send hello message to inform client that everything is A-OK
+        ServerReady ready = new()
+        {
+            HeartbeatIntervalMs = 10 * 1000, // 10 seconds TODO: make this configurable
+            RatelimitBytesPerSec = WebsocketConstants.ClientRateLimitBytesPerSecond,
+            RatelimitBytesPerMin = WebsocketConstants.ClientRateLimitBytesPerMinute,
+            RatelimitMessagesPerSec = WebsocketConstants.ClientRateLimitMessagesPerSecond,
+            RatelimitMessagesPerMin = WebsocketConstants.ClientRateLimitMessagesPerMinute,
+        };
+        await instance.SendMessageAsync(new ServerPayload(ready), cancellationToken);
+
+        // Finally, return instance
+        return instance;
     }
 
     public Guid UserId { get; init; }
@@ -244,14 +223,5 @@ public sealed partial class WebSocketInstance : IDisposable
                 _webSocket.Abort();
             }
         }
-    }
-
-    public void Dispose()
-    {
-        if (_webSocket.State is not WebSocketState.Closed or WebSocketState.Aborted)
-        {
-            try { _webSocket.Abort(); } catch { }
-        }
-        try { _webSocket.Dispose(); } catch { }
     }
 }

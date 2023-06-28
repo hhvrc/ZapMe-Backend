@@ -6,10 +6,11 @@ using ZapMe.Database.Models;
 using ZapMe.DTOs;
 using ZapMe.DTOs.API.User;
 using ZapMe.Enums;
+using ZapMe.Enums.Errors;
 using ZapMe.Helpers;
+using ZapMe.Mappers;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
-using static ZapMe.Services.Interfaces.IImageManager;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -129,17 +130,7 @@ public partial class AccountController
                     );
                 if (getOrCreateImageResult.TryPickT1(out ImageUploadError uploadImageError, out avatarImageEntity))
                 {
-                    return uploadImageError switch
-                    {
-                        ImageUploadError.PayloadSizeInvalid => throw new NotImplementedException(),
-                        ImageUploadError.PayloadSizeTooLarge => throw new NotImplementedException(),
-                        ImageUploadError.PayloadChecksumMismatch => throw new NotImplementedException(),
-                        ImageUploadError.ImageDimensionsInvalid => throw new NotImplementedException(),
-                        ImageUploadError.ImageDataInvalid => throw new NotImplementedException(),
-                        ImageUploadError.ImageFormatUnsupported => throw new NotImplementedException(),
-                        ImageUploadError.ImageDimensionsTooLarge => throw new NotImplementedException(),
-                        _ => throw new NotImplementedException(),
-                    };
+                    return ImageUploadErrorMapper.MapToErrorDetails(uploadImageError).ToActionResult();
                 }
             }
             if (!String.IsNullOrEmpty(providerVariables.ProviderBannerUrl))

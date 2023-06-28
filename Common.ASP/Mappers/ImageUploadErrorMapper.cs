@@ -1,7 +1,7 @@
 ﻿using ZapMe.Constants;
 using ZapMe.DTOs;
+using ZapMe.Enums.Errors;
 using ZapMe.Helpers;
-using static ZapMe.Services.Interfaces.IImageManager;
 
 namespace ZapMe.Mappers;
 
@@ -16,9 +16,9 @@ public static class ImageUploadErrorMapper
     public static ErrorDetails ImageDimensionsTooLarge => HttpErrors.Generic(StatusCodes.Status413PayloadTooLarge, "Payload too large", "Image too large, max 1024x1024");
     public static ErrorDetails InternalError => throw new NotImplementedException();
 
-    public static ErrorDetails MapToErrorDetails(ImageUploadError uploadError)
+    public static ErrorDetails MapToErrorDetails(ImageUploadError imageUploadError)
     {
-        return uploadError switch
+        return imageUploadError switch
         {
             ImageUploadError.PayloadSizeInvalid => PayloadSizeInvalid,
             ImageUploadError.PayloadSizeTooLarge => PayloadSizeTooLarge,
@@ -27,7 +27,7 @@ public static class ImageUploadErrorMapper
             ImageUploadError.ImageDataInvalid => ImageDataInvalid,
             ImageUploadError.ImageFormatUnsupported => ImageFormatUnsupported,
             ImageUploadError.ImageDimensionsTooLarge => ImageDimensionsTooLarge,
-            _ => throw new ArgumentOutOfRangeException(nameof(uploadError), uploadError, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(imageUploadError), imageUploadError, null)
         };
     }
 }

@@ -3,19 +3,13 @@ using OneOf;
 using System.Security.Claims;
 using ZapMe.Constants;
 using ZapMe.DTOs;
+using ZapMe.Enums.Errors;
 
 namespace ZapMe.BusinessLogic.OAuth;
 
 public static class OAuthClaimsFetchers
 {
-    public enum FetchClaimsError
-    {
-        DiscordClaimsMissing,
-        GithubClaimsMissing,
-        TwitterClaimsMissing,
-        GoogleClaimsMissing,
-        UnsupportedSSOProvider,
-    }
+
     public static OneOf<SSOProviderData, FetchClaimsError> FetchClaims(string authScheme, ClaimsPrincipal claimsPrincipal, ILogger logger)
     {
         return authScheme.ToLower() switch

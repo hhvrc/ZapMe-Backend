@@ -5,10 +5,10 @@ using OneOf;
 using ZapMe.Constants;
 using ZapMe.Database;
 using ZapMe.Database.Models;
+using ZapMe.Enums.Errors;
 using ZapMe.Mappers;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
-using static ZapMe.Services.Interfaces.IImageManager;
 using static ZapMe.Utils.ImageUtils;
 
 namespace ZapMe.Services;
