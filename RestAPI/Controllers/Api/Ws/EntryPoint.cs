@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Net.WebSockets;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
 using ZapMe.Websocket;
+using static ZapMe.Websocket.WebSocketInstance;
 
 namespace ZapMe.Controllers.Api.Ws;
 
@@ -33,16 +35,17 @@ public sealed partial class WebSocketController
             return;
         }
 
+        WebSocket websocket = await wsManager.AcceptWebSocketAsync();
+
         // The trace identifier is used to identify the websocket instance, it will be unique for each websocket connection
         string instanceId = HttpContext.TraceIdentifier;
 
         // Create the connection instance
         var authManager = HttpContext.RequestServices.GetRequiredService<IJwtAuthenticationManager>();
         var wsLogger = HttpContext.RequestServices.GetRequiredService<ILogger<WebSocketInstance>>();
-        var result = await WebSocketInstance.CreateAsync(wsManager, authManager, wsLogger, cancellationToken);
-        if (result.TryPickT1(out errorDetails, out WebSocketInstance instance))
+        var result = await WebSocketInstance.CreateAsync(websocket, authManager, wsLogger, cancellationToken);
+        if (result.TryPickT1(out CreateError createError, out WebSocketInstance instance))
         {
-            await errorDetails.Write(Response);
             return;
         }
         try

@@ -15,6 +15,7 @@ using ZapMe.DTOs;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
 using static ZapMe.BusinessLogic.OAuth.OAuthClaimsFetchers;
+using static ZapMe.Services.Interfaces.IJwtAuthenticationManager;
 
 namespace ZapMe.Services;
 
@@ -158,9 +159,9 @@ public sealed class ZapMeSignInHandler : IAuthenticationSignInHandler
         }
 
         var authenticationResult = await _authenticationManager.AuthenticateJwtTokenAsync(authHeaderValue.Parameter, CancellationToken);
-        if (authenticationResult.TryPickT1(out ErrorDetails errorDetails, out SessionEntity session))
+        if (authenticationResult.TryPickT1(out AuthenticationError authenticationError, out SessionEntity session))
         {
-            await errorDetails.Write(Response, _jsonSerializerOptions);
+            await HttpErrors.Unauthorized.Write(Response, _jsonSerializerOptions);
             return AuthenticateResult.Fail("Invalid JWT token.");
         }
 

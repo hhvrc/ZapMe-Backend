@@ -29,7 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BusinessLogic\BusinessLogic.csproj" />
-    <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Common.ASP\Common.ASP.csproj" />
     <ProjectReference Include="..\Events\Events.csproj" />
   </ItemGroup>
 

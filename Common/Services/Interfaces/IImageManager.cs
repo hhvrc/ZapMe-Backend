@@ -1,12 +1,22 @@
 ﻿using Amazon.S3;
 using OneOf;
 using ZapMe.Database.Models;
-using ZapMe.DTOs;
 
 namespace ZapMe.Services.Interfaces;
 
 public interface IImageManager
 {
+    public enum ImageUploadError
+    {
+        PayloadSizeInvalid,
+        PayloadSizeTooLarge,
+        PayloadChecksumMismatch,
+        ImageDimensionsInvalid,
+        ImageDataInvalid,
+        ImageFormatUnsupported,
+        ImageDimensionsTooLarge
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -40,7 +50,7 @@ public interface IImageManager
     /// <param name="uploaderId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>ImageEntity or ErrorDetails(400/413)</returns>
-    Task<OneOf<ImageEntity, ErrorDetails>> GetOrCreateRecordAsync(string imageUrl, string regionName, string? sha256Hash = null, Guid? uploaderId = null, CancellationToken cancellationToken = default);
+    Task<OneOf<ImageEntity, ImageUploadError>> GetOrCreateRecordAsync(string imageUrl, string regionName, string? sha256Hash = null, Guid? uploaderId = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -52,5 +62,5 @@ public interface IImageManager
     /// <param name="uploaderId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>ImageEntity or ErrorDetails(400/413)</returns>
-    Task<OneOf<ImageEntity, ErrorDetails>> GetOrCreateRecordAsync(Stream imageStream, string regionName, int imageSizeHint = -1, string? sha256Hash = null, Guid? uploaderId = null, CancellationToken cancellationToken = default);
+    Task<OneOf<ImageEntity, ImageUploadError>> GetOrCreateRecordAsync(Stream imageStream, string regionName, int imageSizeHint = -1, string? sha256Hash = null, Guid? uploaderId = null, CancellationToken cancellationToken = default);
 }

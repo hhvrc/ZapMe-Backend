@@ -1,4 +1,5 @@
-﻿using ZapMe.Database.Models;
+﻿using Microsoft.Extensions.Logging;
+using ZapMe.Database.Models;
 using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Services;

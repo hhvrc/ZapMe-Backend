@@ -1,4 +1,7 @@
-﻿namespace ZapMe.Options;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace ZapMe.Options;
 
 public sealed class CloudflareR2Options
 {
@@ -10,6 +13,6 @@ public sealed class CloudflareR2Options
 
     public static void Register(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddOptions<CloudflareR2Options>().Bind(configuration.GetRequiredSection(SectionName)).ValidateOnStart();
+        services.AddOptions<CloudflareR2Options>().Bind(configuration.GetRequiredSection(SectionName));
     }
 }

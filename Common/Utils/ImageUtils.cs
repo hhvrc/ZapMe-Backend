@@ -1,11 +1,16 @@
 ﻿using OneOf;
-using ZapMe.DTOs;
 
 namespace ZapMe.Utils;
 
 public static class ImageUtils
 {
-    public readonly record struct ParseResult(uint Width, uint Height, uint FrameCount, string MimeType);
+    public readonly record struct ImageParseResult(uint Width, uint Height, uint FrameCount, string MimeType);
+    public enum ImageParseError
+    {
+        ImageDimensionsInvalid,
+        ImageDataInvalid,
+        ImageFormatUnsupported,
+    }
 
     /// <summary>
     /// Parses and rewrites an image from a stream
@@ -14,8 +19,13 @@ public static class ImageUtils
     /// <param name="outputStream"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>Parse result or ErrorDetails(400)</returns>
-    public static async Task<OneOf<ParseResult, ErrorDetails>> ParseAndRewriteFromStreamAsync(Stream inputStream, Stream? outputStream, CancellationToken cancellationToken = default)
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="NotSupportedException"></exception>
+    public static async Task<OneOf<ImageParseResult, ImageParseError>> ParseAndRewriteFromStreamAsync(Stream inputStream, Stream? outputStream, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(inputStream);
+        ArgumentNullException.ThrowIfNull(outputStream);
+
         try
         {
             using Image image = await Image.LoadAsync(inputStream, cancellationToken);
@@ -26,7 +36,7 @@ public static class ImageUtils
 
             if (height < 0 || width < 0 || frameCount <= 0)
             {
-                return new ErrorDetails(StatusCodes.Status400BadRequest, "Malformed image", "Image has invalid dimensions");
+                return ImageParseError.ImageDimensionsInvalid;
             }
 
             // Clear metadata
@@ -39,18 +49,21 @@ public static class ImageUtils
             if (frameCount == 1)
             {
                 if (outputStream is not null) await image.SaveAsWebpAsync(outputStream, cancellationToken);
-                return new ParseResult((uint)width, (uint)height, (uint)frameCount, "image/webp");
+                return new ImageParseResult((uint)width, (uint)height, (uint)frameCount, "image/webp");
             }
             else
             {
                 if (outputStream is not null) await image.SaveAsGifAsync(outputStream, cancellationToken);
-                return new ParseResult((uint)width, (uint)height, (uint)frameCount, "image/gif");
+                return new ImageParseResult((uint)width, (uint)height, (uint)frameCount, "image/gif");
             }
         }
-        catch (Exception)
+        catch (InvalidImageContentException)
         {
+            return ImageParseError.ImageDataInvalid;
         }
-
-        return new ErrorDetails(StatusCodes.Status400BadRequest, "Invalid or Unsupported image", "We were unable to parse the iamge, please check its filetype and integrity");
+        catch (UnknownImageFormatException)
+        {
+            return ImageParseError.ImageFormatUnsupported;
+        }
     }
 }

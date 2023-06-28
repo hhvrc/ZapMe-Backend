@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using UAParser;
 using ZapMe.Constants;
 using ZapMe.Database;

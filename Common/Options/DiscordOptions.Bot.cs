@@ -1,4 +1,7 @@
-﻿namespace ZapMe.Options;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace ZapMe.Options;
 
 public sealed class DiscordBotOptions
 {
@@ -8,6 +11,6 @@ public sealed class DiscordBotOptions
 
     public static void Register(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddOptions<DiscordBotOptions>().Bind(configuration.GetRequiredSection(SectionName)).ValidateOnStart();
+        services.AddOptions<DiscordBotOptions>().Bind(configuration.GetRequiredSection(SectionName));
     }
 }

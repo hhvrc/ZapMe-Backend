@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using OneOf;
 using System.Security.Claims;
 using ZapMe.Attributes;
-using ZapMe.Database.Models;
-using ZapMe.DTOs;
 using ZapMe.DTOs.API.User;
 using ZapMe.Helpers;
+using ZapMe.Mappers;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
+using static ZapMe.Services.Interfaces.IImageManager;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -40,10 +39,10 @@ public partial class AccountController
 
         string cfRegion = CountryRegionLookup.GetCloudflareRegion(this.GetCloudflareIPCountry());
 
-        OneOf<ImageEntity, ErrorDetails> res = await imageManager.GetOrCreateRecordAsync(Request.Body, cfRegion, (int)length, sha256Hash, User.GetUserId(), cancellationToken);
-        if (res.TryPickT1(out ErrorDetails error, out ImageEntity image))
+        var res = await imageManager.GetOrCreateRecordAsync(Request.Body, cfRegion, (int)length, sha256Hash, User.GetUserId(), cancellationToken);
+        if (res.TryPickT1(out ImageUploadError createError, out var image))
         {
-            return error.ToActionResult();
+            return ImageUploadErrorMapper.MapToErrorDetails(createError).ToActionResult();
         }
 
         return Created(image.PublicUrl, new UpdateProfilePictureOk

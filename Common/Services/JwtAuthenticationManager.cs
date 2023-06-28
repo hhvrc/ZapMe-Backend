@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using OneOf;
 using System.IdentityModel.Tokens.Jwt;
@@ -6,10 +7,9 @@ using System.Security.Claims;
 using System.Text;
 using ZapMe.Constants;
 using ZapMe.Database.Models;
-using ZapMe.DTOs;
-using ZapMe.Helpers;
 using ZapMe.Options;
 using ZapMe.Services.Interfaces;
+using static ZapMe.Services.Interfaces.IJwtAuthenticationManager;
 
 namespace ZapMe.Services;
 
@@ -26,22 +26,22 @@ public sealed class JwtAuthenticationManager : IJwtAuthenticationManager
         _logger = logger;
     }
 
-    public async Task<OneOf<SessionEntity, ErrorDetails>> AuthenticateJwtTokenAsync(string jwtToken, CancellationToken cancellationToken)
+    public async Task<OneOf<SessionEntity, AuthenticationError>> AuthenticateJwtTokenAsync(string jwtToken, CancellationToken cancellationToken)
     {
         if (!ValidateJwtToken(jwtToken, out ClaimsPrincipal claimsPrincipal, out SecurityToken _))
         {
-            return HttpErrors.Unauthorized;
+            return AuthenticationError.InvalidToken;
         }
 
         if (!claimsPrincipal.GetUserEmailVerified())
         {
-            return HttpErrors.UnverifiedEmail;
+            return AuthenticationError.UnverifiedEmail;
         }
 
         SessionEntity? session = await _sessionStore.TryGetAsync(claimsPrincipal.GetSessionId(), cancellationToken);
         if (session is null)
         {
-            return HttpErrors.Unauthorized;
+            return AuthenticationError.InvalidSession;
         }
 
         return session;

@@ -1,4 +1,7 @@
-﻿namespace ZapMe.Options;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace ZapMe.Options;
 
 public sealed class GoogleReCaptchaOptions
 {
@@ -9,6 +12,6 @@ public sealed class GoogleReCaptchaOptions
 
     public static void Register(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddOptions<GoogleReCaptchaOptions>().Bind(configuration.GetRequiredSection(SectionName)).ValidateOnStart();
+        services.AddOptions<GoogleReCaptchaOptions>().Bind(configuration.GetRequiredSection(SectionName));
     }
 }

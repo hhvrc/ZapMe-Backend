@@ -1,15 +1,16 @@
 ﻿using fbs.client;
 using fbs.server;
 using FlatSharp;
+using Microsoft.Extensions.Logging;
 using OneOf;
 using System.Buffers;
 using System.Net.WebSockets;
 using System.Text;
 using ZapMe.Constants;
 using ZapMe.Database.Models;
-using ZapMe.DTOs;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
+using static ZapMe.Services.Interfaces.IJwtAuthenticationManager;
 
 namespace ZapMe.Websocket;
 
@@ -32,33 +33,44 @@ public sealed partial class WebSocketInstance : IDisposable
     private static async Task<string?> ReceiveStringAsync(WebSocket webSocket, CancellationToken cancellationToken) =>
         await ReceiveAsync(webSocket, static (type, data, _) => Task.FromResult(type == WebSocketMessageType.Text ? Encoding.UTF8.GetString(data) : null), cancellationToken);
 
-    public static async Task<OneOf<WebSocketInstance, ErrorDetails>> CreateAsync(WebSocketManager wsManager, IJwtAuthenticationManager authenticationManager, ILogger<WebSocketInstance> logger, CancellationToken cancellationToken)
+    public enum CreateError
     {
-        WebSocket? ws = await wsManager.AcceptWebSocketAsync();
-        if (ws is null) return HttpErrors.InternalServerError; // TODO: Better error
-
+        InvalidClientMessage,
+        InvalidClientJwt,
+        ClientEmailUnverified,
+        InvalidClientSession,
+        InternalServerError
+    }
+    public static async Task<OneOf<WebSocketInstance, CreateError>> CreateAsync(WebSocket websocket, IJwtAuthenticationManager authenticationManager, ILogger<WebSocketInstance> logger, CancellationToken cancellationToken)
+    {
         try
         {
             // Receive JWT from client
-            string? token = await ReceiveStringAsync(ws, cancellationToken);
+            string? token = await ReceiveStringAsync(websocket, cancellationToken);
             if (token is null)
             {
                 logger.LogError("Failed to authenticate websocket connection, received invalid message from client");
-                ws.Dispose();
-                return HttpErrors.InternalServerError; // TODO: Better error
+                websocket.Dispose();
+                return CreateError.InvalidClientMessage;
             }
 
             // Validate JWT
             var authenticationResult = await authenticationManager.AuthenticateJwtTokenAsync(token, cancellationToken);
-            if (authenticationResult.TryPickT1(out ErrorDetails errorDetails, out SessionEntity session))
+            if (authenticationResult.TryPickT1(out AuthenticationError authenticationError, out SessionEntity session))
             {
                 logger.LogError("Failed to authenticate websocket connection, provided JWT was invalid");
-                ws.Dispose();
-                return errorDetails;
+                websocket.Dispose();
+                return authenticationError switch
+                {
+                    AuthenticationError.InvalidToken => CreateError.InvalidClientJwt,
+                    AuthenticationError.UnverifiedEmail => CreateError.ClientEmailUnverified,
+                    AuthenticationError.InvalidSession => CreateError.InvalidClientSession,
+                    _ => CreateError.InternalServerError
+                };
             }
 
             // Success, create websocket instance
-            var instance = new WebSocketInstance(session.UserId, session.Id, ws, logger);
+            var instance = new WebSocketInstance(session.UserId, session.Id, websocket, logger);
 
             // Send hello message to inform client that everything is A-OK
             ServerReady ready = new()
@@ -77,8 +89,8 @@ public sealed partial class WebSocketInstance : IDisposable
         catch (Exception ex)
         {
             logger.LogError("Failed to authenticate websocket connection, exception: {Exception}", ex);
-            ws.Dispose();
-            return HttpErrors.InternalServerError;
+            websocket.Dispose();
+            return CreateError.InternalServerError;
         }
     }
 

@@ -1,4 +1,7 @@
-﻿namespace ZapMe.Options;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace ZapMe.Options;
 
 public sealed class JwtOptions
 {
@@ -8,6 +11,6 @@ public sealed class JwtOptions
 
     public static void Register(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddOptions<JwtOptions>().Bind(configuration.GetRequiredSection(SectionName)).ValidateOnStart();
+        services.AddOptions<JwtOptions>().Bind(configuration.GetRequiredSection(SectionName));
     }
 }

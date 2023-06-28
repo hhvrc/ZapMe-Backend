@@ -49,9 +49,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utils", "Utils\Utils.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Events", "Events\Events.csproj", "{D2980538-A94F-49F7-ACE4-45EDAD8EC3D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLogic", "BusinessLogic\BusinessLogic.csproj", "{AE7D0053-F9EB-49E0-9DEF-9ABDF08E6661}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessLogic", "BusinessLogic\BusinessLogic.csproj", "{AE7D0053-F9EB-49E0-9DEF-9ABDF08E6661}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mappers", "Mappers\Mappers.csproj", "{C5FF5DB3-77B4-4037-8B52-68A055ECA70B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mappers", "Mappers\Mappers.csproj", "{C5FF5DB3-77B4-4037-8B52-68A055ECA70B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.ASP", "Common.ASP\Common.ASP.csproj", "{922D8CEB-B5C7-4E05-A5E1-FD031BF3DF67}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -107,6 +109,10 @@ Global
 		{C5FF5DB3-77B4-4037-8B52-68A055ECA70B}.Debug|x64.Build.0 = Debug|x64
 		{C5FF5DB3-77B4-4037-8B52-68A055ECA70B}.Release|x64.ActiveCfg = Release|x64
 		{C5FF5DB3-77B4-4037-8B52-68A055ECA70B}.Release|x64.Build.0 = Release|x64
+		{922D8CEB-B5C7-4E05-A5E1-FD031BF3DF67}.Debug|x64.ActiveCfg = Debug|x64
+		{922D8CEB-B5C7-4E05-A5E1-FD031BF3DF67}.Debug|x64.Build.0 = Debug|x64
+		{922D8CEB-B5C7-4E05-A5E1-FD031BF3DF67}.Release|x64.ActiveCfg = Release|x64
+		{922D8CEB-B5C7-4E05-A5E1-FD031BF3DF67}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

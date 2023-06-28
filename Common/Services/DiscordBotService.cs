@@ -1,5 +1,6 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ZapMe.Options;
 using ZapMe.Services.Interfaces;

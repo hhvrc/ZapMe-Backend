@@ -1,13 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Configuration;
 using OneOf;
 using ZapMe.Constants;
 using ZapMe.Database;
 using ZapMe.Database.Models;
-using ZapMe.DTOs;
-using ZapMe.Helpers;
+using ZapMe.Mappers;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
+using static ZapMe.Services.Interfaces.IImageManager;
+using static ZapMe.Utils.ImageUtils;
 
 namespace ZapMe.Services;
 
@@ -44,44 +46,44 @@ public sealed class ImageManager : IImageManager
         }, cancellationToken);
     }
 
-    public async Task<OneOf<ImageEntity, ErrorDetails>> GetOrCreateRecordAsync(string imageUrl, string regionName, string? sha256Hash, Guid? uploaderId, CancellationToken cancellationToken)
+    public async Task<OneOf<ImageEntity, ImageUploadError>> GetOrCreateRecordAsync(string imageUrl, string regionName, string? sha256Hash, Guid? uploaderId, CancellationToken cancellationToken)
     {
         using HttpClient client = new();
         using HttpResponseMessage response = await client.GetAsync(imageUrl, cancellationToken);
         long contentLength = response.Content.Headers.ContentLength ?? -1;
         if (contentLength is <= 0 or > Int32.MaxValue)
         {
-            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Invalid image", "Image size is invalid");
+            return ImageUploadError.PayloadSizeInvalid;
         }
 
         Stream imageStream = await response.Content.ReadAsStreamAsync(cancellationToken);
         return await GetOrCreateRecordAsync(imageStream, regionName, (int)contentLength, null, null, cancellationToken);
     }
 
-    public async Task<OneOf<ImageEntity, ErrorDetails>> GetOrCreateRecordAsync(Stream imageStream, string regionName, int imageSizeBytes, string? sha256Hash, Guid? uploaderId, CancellationToken cancellationToken)
+    public async Task<OneOf<ImageEntity, ImageUploadError>> GetOrCreateRecordAsync(Stream imageStream, string regionName, int imageSizeBytes, string? sha256Hash, Guid? uploaderId, CancellationToken cancellationToken)
     {
         if (imageSizeBytes > ImageConstants.MaxImageSize)
         {
-            return HttpErrors.Generic(StatusCodes.Status413PayloadTooLarge, "Payload too large", "Image too large, max " + ImageConstants.MaxImageSizeString);
+            return ImageUploadError.PayloadSizeTooLarge;
         }
 
         // Create stream that can be read multiple times, imageSizeBytes is initially just a hint
         using MemoryStream memoryStream = imageSizeBytes > 0 ? new MemoryStream(imageSizeBytes) : new MemoryStream();
 
         // Parse image for metadata and rewrite to webp/gif
-        OneOf<ImageUtils.ParseResult, ErrorDetails> result = await ImageUtils.ParseAndRewriteFromStreamAsync(imageStream, memoryStream, cancellationToken);
-        if (result.TryPickT1(out ErrorDetails errorDetails, out ImageUtils.ParseResult imageInfo))
+        OneOf<ImageParseResult, ImageParseError> result = await ImageUtils.ParseAndRewriteFromStreamAsync(imageStream, memoryStream, cancellationToken);
+        if (result.TryPickT1(out ImageParseError parseError, out ImageParseResult imageInfo))
         {
-            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Unsupported or invalid image", errorDetails.Detail);
+            return ImageParseErrorMapper.MapToUploadError(parseError);
         }
         long contentLength = memoryStream.Length;
         if (contentLength > ImageConstants.MaxImageSize)
         {
-            return HttpErrors.Generic(StatusCodes.Status413PayloadTooLarge, "Payload too large", "Image too large, max " + ImageConstants.MaxImageSizeString);
+            return ImageUploadError.PayloadSizeTooLarge;
         }
         if (contentLength <= 0)
         {
-            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Invalid image", "Image size is invalid");
+            return ImageUploadError.PayloadSizeInvalid;
         }
 
         // Hash image data
@@ -90,7 +92,7 @@ public sealed class ImageManager : IImageManager
 
         if (sha256Hash is not null && !sha256_hex.Equals(sha256Hash, StringComparison.OrdinalIgnoreCase))
         {
-            return HttpErrors.Generic(StatusCodes.Status400BadRequest, "Checksum mismatch", "The provided checksum does not match the image data");
+            return ImageUploadError.PayloadChecksumMismatch;
         }
 
         // Check if image already exists
@@ -104,7 +106,7 @@ public sealed class ImageManager : IImageManager
 
         if (imageInfo.Width > 1024 || imageInfo.Height > 1024)
         {
-            return HttpErrors.Generic(StatusCodes.Status413PayloadTooLarge, "Payload too large", "Image too large, max 1024x1024");
+            return ImageUploadError.ImageDimensionsTooLarge;
         }
 
         image = new ImageEntity()

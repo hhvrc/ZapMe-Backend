@@ -9,6 +9,7 @@ using ZapMe.Enums;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
+using static ZapMe.Services.Interfaces.IImageManager;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -126,9 +127,19 @@ public partial class AccountController
                     null,
                     cancellationToken
                     );
-                if (getOrCreateImageResult.TryPickT1(out ErrorDetails errorDetails, out avatarImageEntity))
+                if (getOrCreateImageResult.TryPickT1(out ImageUploadError uploadImageError, out avatarImageEntity))
                 {
-                    return errorDetails.ToActionResult();
+                    return uploadImageError switch
+                    {
+                        ImageUploadError.PayloadSizeInvalid => throw new NotImplementedException(),
+                        ImageUploadError.PayloadSizeTooLarge => throw new NotImplementedException(),
+                        ImageUploadError.PayloadChecksumMismatch => throw new NotImplementedException(),
+                        ImageUploadError.ImageDimensionsInvalid => throw new NotImplementedException(),
+                        ImageUploadError.ImageDataInvalid => throw new NotImplementedException(),
+                        ImageUploadError.ImageFormatUnsupported => throw new NotImplementedException(),
+                        ImageUploadError.ImageDimensionsTooLarge => throw new NotImplementedException(),
+                        _ => throw new NotImplementedException(),
+                    };
                 }
             }
             if (!String.IsNullOrEmpty(providerVariables.ProviderBannerUrl))
@@ -140,9 +151,19 @@ public partial class AccountController
                     null,
                     cancellationToken
                     );
-                if (getOrCreateImageResult.TryPickT1(out ErrorDetails errorDetails, out bannerImageEntity))
+                if (getOrCreateImageResult.TryPickT1(out ImageUploadError uploadImageError, out bannerImageEntity))
                 {
-                    return errorDetails.ToActionResult();
+                    return uploadImageError switch
+                    {
+                        ImageUploadError.PayloadSizeInvalid => throw new NotImplementedException(),
+                        ImageUploadError.PayloadSizeTooLarge => throw new NotImplementedException(),
+                        ImageUploadError.PayloadChecksumMismatch => throw new NotImplementedException(),
+                        ImageUploadError.ImageDimensionsInvalid => throw new NotImplementedException(),
+                        ImageUploadError.ImageDataInvalid => throw new NotImplementedException(),
+                        ImageUploadError.ImageFormatUnsupported => throw new NotImplementedException(),
+                        ImageUploadError.ImageDimensionsTooLarge => throw new NotImplementedException(),
+                        _ => throw new NotImplementedException(),
+                    };
                 }
             }
         }

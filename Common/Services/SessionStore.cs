@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using ZapMe.Database;
 using ZapMe.Database.Models;
 using ZapMe.Services.Interfaces;
