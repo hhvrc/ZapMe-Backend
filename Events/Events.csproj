@@ -6,7 +6,6 @@
     <Nullable>enable</Nullable>
     <AssemblyName>ZapMe.Events</AssemblyName>
     <RootNamespace>ZapMe.Events</RootNamespace>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <PlatformTarget>x64</PlatformTarget>
     <Platforms>x64</Platforms>
   </PropertyGroup>

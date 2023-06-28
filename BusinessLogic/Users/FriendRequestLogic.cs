@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ZapMe.Database;
 using ZapMe.Database.Models;
-using ZapMe.DTOs.API.User;
+using ZapMe.DTOs;
 
 namespace ZapMe.BusinessLogic.Users;
 

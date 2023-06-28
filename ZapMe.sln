@@ -25,8 +25,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "schemas", "schemas", "{DDB6
 	ProjectSection(SolutionItems) = preProject
 		spec\schemas\ClientMessage.fbs = spec\schemas\ClientMessage.fbs
 		spec\schemas\ServerMessage.fbs = spec\schemas\ServerMessage.fbs
-		spec\schemas\SystemMessage.fbs = spec\schemas\SystemMessage.fbs
 		spec\schemas\Session.fbs = spec\schemas\Session.fbs
+		spec\schemas\SystemMessage.fbs = spec\schemas\SystemMessage.fbs
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{D4DA567B-FD80-4F03-8E80-7AC5B629CC74}"
@@ -48,6 +48,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utils", "Utils\Utils.csproj", "{B0FEFCA9-6BDC-4336-A485-6A05632A9CA1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Events", "Events\Events.csproj", "{D2980538-A94F-49F7-ACE4-45EDAD8EC3D9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLogic", "BusinessLogic\BusinessLogic.csproj", "{AE7D0053-F9EB-49E0-9DEF-9ABDF08E6661}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mappers", "Mappers\Mappers.csproj", "{C5FF5DB3-77B4-4037-8B52-68A055ECA70B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -95,6 +99,14 @@ Global
 		{D2980538-A94F-49F7-ACE4-45EDAD8EC3D9}.Debug|x64.Build.0 = Debug|x64
 		{D2980538-A94F-49F7-ACE4-45EDAD8EC3D9}.Release|x64.ActiveCfg = Release|x64
 		{D2980538-A94F-49F7-ACE4-45EDAD8EC3D9}.Release|x64.Build.0 = Release|x64
+		{AE7D0053-F9EB-49E0-9DEF-9ABDF08E6661}.Debug|x64.ActiveCfg = Debug|x64
+		{AE7D0053-F9EB-49E0-9DEF-9ABDF08E6661}.Debug|x64.Build.0 = Debug|x64
+		{AE7D0053-F9EB-49E0-9DEF-9ABDF08E6661}.Release|x64.ActiveCfg = Release|x64
+		{AE7D0053-F9EB-49E0-9DEF-9ABDF08E6661}.Release|x64.Build.0 = Release|x64
+		{C5FF5DB3-77B4-4037-8B52-68A055ECA70B}.Debug|x64.ActiveCfg = Debug|x64
+		{C5FF5DB3-77B4-4037-8B52-68A055ECA70B}.Debug|x64.Build.0 = Debug|x64
+		{C5FF5DB3-77B4-4037-8B52-68A055ECA70B}.Release|x64.ActiveCfg = Release|x64
+		{C5FF5DB3-77B4-4037-8B52-68A055ECA70B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

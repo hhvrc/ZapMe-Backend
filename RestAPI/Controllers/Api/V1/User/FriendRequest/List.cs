@@ -2,8 +2,7 @@
 using System.Security.Claims;
 using ZapMe.BusinessLogic.Users;
 using ZapMe.Database;
-using ZapMe.Database.Models;
-using ZapMe.DTOs.API.User;
+using ZapMe.DTOs;
 
 namespace ZapMe.Controllers.Api.V1;
 

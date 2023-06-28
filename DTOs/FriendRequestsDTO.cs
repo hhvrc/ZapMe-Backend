@@ -1,4 +1,4 @@
-﻿namespace ZapMe.DTOs.API.User;
+﻿namespace ZapMe.DTOs;
 
 /// <summary>
 /// List of incoming and outgoing friendrequests

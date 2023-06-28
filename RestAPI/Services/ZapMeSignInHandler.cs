@@ -14,6 +14,7 @@ using ZapMe.Database.Models;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
+using static ZapMe.BusinessLogic.OAuth.OAuthClaimsFetchers;
 
 namespace ZapMe.Services;
 
@@ -70,8 +71,12 @@ public sealed class ZapMeSignInHandler : IAuthenticationSignInHandler
         {
             // Fetch the claims provided by the OAuth provider
             var fetchClaimsResult = OAuthClaimsFetchers.FetchClaims(authScheme, claimsPrincipal, _logger);
-            if (fetchClaimsResult.TryPickT1(out ErrorDetails errorDetails, out SSOProviderData? ssoProviderData))
+            if (fetchClaimsResult.TryPickT1(out FetchClaimsError fetchClaimsError, out SSOProviderData? ssoProviderData))
             {
+                ErrorDetails errorDetails = fetchClaimsError == FetchClaimsError.UnsupportedSSOProvider
+                    ? HttpErrors.UnsupportedSSOProvider(authScheme)
+                    : HttpErrors.InternalServerError;
+
                 await errorDetails.Write(Response, _jsonSerializerOptions);
                 return;
             }

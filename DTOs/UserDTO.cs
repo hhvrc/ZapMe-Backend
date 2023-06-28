@@ -1,5 +1,4 @@
-﻿using ZapMe.Attributes;
-using ZapMe.Enums;
+﻿using ZapMe.Enums;
 
 namespace ZapMe.DTOs;
 
@@ -7,7 +6,6 @@ public readonly struct UserDto
 {
     public Guid Id { get; init; }
 
-    [Username(false)]
     public string Username { get; init; }
 
     public Uri? AvatarUrl { get; init; }

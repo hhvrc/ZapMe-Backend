@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using ZapMe.BusinessLogic.Users;
 using ZapMe.Database;
+using ZapMe.Helpers;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -10,46 +11,42 @@ public partial class UserController
     /// <summary>
     /// Block a user
     /// </summary>
-    /// <param name="dbContext"></param>
-    /// <param name="userId"></param>
-    /// <param name="cancellationToken"></param>
     /// <response code="204">User blocked</response>
-    /// <response code="400">Invalid request</response>
-    /// <response code="404">User not found</response>
-    /// <returns></returns>
+    /// <response code="400">You can't moderate yourself</response>
     [HttpPut("{userId}/block", Name = "BlockUser")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Block([FromServices] DatabaseContext dbContext, [FromRoute] Guid userId, CancellationToken cancellationToken)
     {
         var result = await BlockingLogic.ApplyUserBlock(dbContext, User.GetUserId(), userId, cancellationToken);
 
-        return result.Match<IActionResult>(
-                updated => updated ? NoContent() : NotFound(),
-                error => error.ToActionResult()
-        );
+        return result switch
+        {
+            BlockingLogic.ActionResult.Ok => NoContent(),
+            BlockingLogic.ActionResult.Unchanged => NoContent(),
+            BlockingLogic.ActionResult.CannotModerateSelf => BadRequest(),
+            _ => HttpErrors.InternalServerErrorActionResult,
+        };
     }
 
     /// <summary>
-    /// UnBlock a user
+    /// Unblock a user
     /// </summary>
-    /// <param name="dbContext"></param>
-    /// <param name="userId"></param>
-    /// <param name="cancellationToken"></param>
-    /// <response code="204">User blocked</response>
-    /// <response code="400">Invalid request</response>
-    /// <response code="404">User not found</response>
-    /// <returns></returns>
+    /// <response code="204">User unblocked</response>
+    /// <response code="400">You can't moderate yourself</response>
     [HttpPut("{userId}/unblock", Name = "UnblockUser")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UnBlock([FromServices] DatabaseContext dbContext, [FromRoute] Guid userId, CancellationToken cancellationToken)
     {
         var result = await BlockingLogic.RemoveUserBlock(dbContext, User.GetUserId(), userId, cancellationToken);
 
-        return result.Match<IActionResult>(
-            updated => updated ? NoContent() : NotFound(),
-            error => error.ToActionResult()
-        );
+        return result switch
+        {
+            BlockingLogic.ActionResult.Ok => NoContent(),
+            BlockingLogic.ActionResult.Unchanged => NoContent(),
+            BlockingLogic.ActionResult.CannotModerateSelf => BadRequest(),
+            _ => HttpErrors.InternalServerErrorActionResult,
+        };
     }
 }

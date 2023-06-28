@@ -1,16 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using OneOf;
 using ZapMe.Database;
 using ZapMe.Database.Models;
-using ZapMe.DTOs;
 using ZapMe.Enums;
-using ZapMe.Helpers;
 
 namespace ZapMe.BusinessLogic.Users;
 
 public static class BlockingLogic
 {
+    public enum ActionResult
+    {
+        Ok,
+        Unchanged,
+        CannotModerateSelf
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -19,9 +23,9 @@ public static class BlockingLogic
     /// <param name="targetUserId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>Boolean inicating if a change has occured, or a ErrorDetails struct containing error</returns>
-    public static async Task<OneOf<bool, ErrorDetails>> ApplyUserBlock(DatabaseContext dbContext, Guid sourceUserId, Guid targetUserId, CancellationToken cancellationToken)
+    public static async Task<ActionResult> ApplyUserBlock(DatabaseContext dbContext, Guid sourceUserId, Guid targetUserId, CancellationToken cancellationToken)
     {
-        if (sourceUserId == targetUserId) return HttpErrors.SelfModerationIllegal;
+        if (sourceUserId == targetUserId) return ActionResult.CannotModerateSelf;
 
         using IDbContextTransaction? transaction = await dbContext.Database.BeginTransactionIfNotExistsAsync(cancellationToken);
 
@@ -58,7 +62,9 @@ public static class BlockingLogic
 
         // TODO: raise notification
 
-        return nChanges > 0;
+        return nChanges > 0
+            ? ActionResult.Ok
+            : ActionResult.Unchanged;
     }
 
     /// <summary>
@@ -69,9 +75,9 @@ public static class BlockingLogic
     /// <param name="targetUserId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>Boolean inicating if a change has occured, or a ErrorDetails struct containing error</returns>
-    public static async Task<OneOf<bool, ErrorDetails>> RemoveUserBlock(DatabaseContext dbContext, Guid sourceUserId, Guid targetUserId, CancellationToken cancellationToken)
+    public static async Task<ActionResult> RemoveUserBlock(DatabaseContext dbContext, Guid sourceUserId, Guid targetUserId, CancellationToken cancellationToken)
     {
-        if (sourceUserId == targetUserId) return HttpErrors.SelfModerationIllegal;
+        if (sourceUserId == targetUserId) return ActionResult.CannotModerateSelf;
 
         // Apply outgoing relation to be none only if it's blocked
         int nChanges = await dbContext
@@ -81,6 +87,8 @@ public static class BlockingLogic
 
         // TODO: raise notification
 
-        return nChanges > 0;
+        return nChanges > 0
+            ? ActionResult.Ok
+            : ActionResult.Unchanged;
     }
 }

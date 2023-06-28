@@ -1,5 +1,4 @@
-﻿using ZapMe.Attributes;
-using ZapMe.Enums;
+﻿using ZapMe.Enums;
 
 namespace ZapMe.DTOs;
 
@@ -10,7 +9,6 @@ public readonly struct AccountDto
 {
     public Guid Id { get; init; }
 
-    [Username(false)]
     public string Username { get; init; }
 
     /// <summary>
