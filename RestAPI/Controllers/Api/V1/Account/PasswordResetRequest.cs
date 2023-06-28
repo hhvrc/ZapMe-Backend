@@ -22,7 +22,7 @@ public partial class AccountController
     /// <response code="200">Ok</response>
     [AllowAnonymous]
     [RequestSizeLimit(1024)]
-    [HttpPost("recover", Name = "AccountRecoveryRequest")]
+    [HttpPost("password-reset/request", Name = "RequestAccountPasswordReset")]
     [Consumes(Application.Json)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> RecoveryRequest([FromBody] RecoveryRequest body, [FromServices] ICloudflareTurnstileService cfTurnstileService, [FromServices] IPasswordResetManager passwordResetManager, CancellationToken cancellationToken)

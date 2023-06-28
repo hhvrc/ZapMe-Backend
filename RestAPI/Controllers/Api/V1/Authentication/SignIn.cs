@@ -24,7 +24,7 @@ public partial class AuthController
     /// <returns></returns>
     [AnonymousOnly]
     [RequestSizeLimit(1024)]
-    [HttpPost("signin", Name = "AuthSignIn")]
+    [HttpPost("signin", Name = "SignIn")]
     [ProducesResponseType(typeof(AuthenticationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

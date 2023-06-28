@@ -9,9 +9,10 @@ namespace ZapMe.Controllers.Api.V1;
 public partial class AccountController
 {
     /// <summary>
+    /// Warning: This endpoint is not meant to be called by API clients, but only by the frontend.
     /// Add a sso connection to account
     /// </summary>
-    [HttpPost("sso", Name = "SsoProviderConnect")]
+    [HttpPost("sso", Name = "InternalConnectSsoProvider")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)] // SSO ticket not found
     public async Task<IActionResult> SSOConnect(

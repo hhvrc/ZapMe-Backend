@@ -19,7 +19,7 @@ public partial class AccountController
     /// <response code="200">Ok</response>
     [AllowAnonymous]
     [RequestSizeLimit(1024)]
-    [HttpPost("recover-confirm", Name = "AccountRecoveryConfirm")]
+    [HttpPost("password-reset/confirm", Name = "CompleteAccountPasswordReset")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)] // Token invalid, expired, or already used
     public async Task<IActionResult> RecoveryConfirm([FromBody] RecoveryConfirm body, [FromServices] IPasswordResetManager passwordResetManager, CancellationToken cancellationToken)

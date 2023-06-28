@@ -15,7 +15,7 @@ public partial class AuthController
     /// <returns></returns>
     /// <response code="200">Ok</response>
     [Authorize]
-    [HttpPost("signout", Name = "AuthSignOut")]
+    [HttpPost("signout", Name = "SignOut")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> SignOut(CancellationToken cancellationToken)
     {

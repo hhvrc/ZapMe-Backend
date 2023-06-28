@@ -17,7 +17,7 @@ public partial class UserController
     /// <response code="400">Invalid request</response>
     /// <response code="404">User not found</response>
     /// <returns></returns>
-    [HttpPut("{userId}/block", Name = "UserBlockApply")]
+    [HttpPut("{userId}/block", Name = "BlockUser")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Block([FromServices] DatabaseContext dbContext, [FromRoute] Guid userId, CancellationToken cancellationToken)
@@ -40,7 +40,7 @@ public partial class UserController
     /// <response code="400">Invalid request</response>
     /// <response code="404">User not found</response>
     /// <returns></returns>
-    [HttpPut("{userId}/unblock", Name = "UserBlockRemove")]
+    [HttpPut("{userId}/unblock", Name = "UnblockUser")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UnBlock([FromServices] DatabaseContext dbContext, [FromRoute] Guid userId, CancellationToken cancellationToken)

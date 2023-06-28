@@ -11,7 +11,7 @@ partial class HealthController
     /// <returns></returns>
     /// <response code="200">Health status</response>
     [AllowAnonymous]
-    [HttpGet(Name = "HealthGet")]
+    [HttpGet(Name = "GetServiceHealth")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult Get()
     {

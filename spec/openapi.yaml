@@ -18,7 +18,7 @@ paths:
       tags:
         - Account
       summary: Create a new account
-      operationId: AccountCreate
+      operationId: CreateAccount
       requestBody:
         description: ''
         content:
@@ -56,7 +56,7 @@ paths:
       tags:
         - Account
       summary: Delete currently logged in account
-      operationId: AccountDelete
+      operationId: DeleteAccount
       parameters:
         - name: password
           in: header
@@ -83,7 +83,7 @@ paths:
     get:
       tags:
         - Account
-      operationId: AccountGet
+      operationId: GetAccount
       responses:
         '200':
           description: Success
@@ -91,12 +91,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccountDto'
-  /api/v1/account/recover-confirm:
+  /api/v1/account/password-reset/confirm:
     post:
       tags:
         - Account
       summary: Complete the password reset request using the token that was received in the users email
-      operationId: AccountRecoveryConfirm
+      operationId: CompleteAccountPasswordReset
       requestBody:
         description: ''
         content:
@@ -114,12 +114,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
-  /api/v1/account/recover:
+  /api/v1/account/password-reset/request:
     post:
       tags:
         - Account
       summary: 'Request password recovery of a account, a recovery email will be sent to the user that makes a call to the /recovery-confirm endpoint'
-      operationId: AccountRecoveryRequest
+      operationId: RequestAccountPasswordReset
       requestBody:
         description: ''
         content:
@@ -135,8 +135,8 @@ paths:
     post:
       tags:
         - Account
-      summary: Add a sso connection to account
-      operationId: SsoProviderConnect
+      summary: "Warning: This endpoint is not meant to be called by API clients, but only by the frontend.\r\nAdd a sso connection to account"
+      operationId: InternalConnectSsoProvider
       parameters:
         - name: ssoToken
           in: query
@@ -154,8 +154,8 @@ paths:
     delete:
       tags:
         - Account
-      summary: Remove a sso connection from account
-      operationId: SsoProviderDisconnect
+      summary: "Warning: This endpoint is not meant to be called by API clients, but only by the frontend.\r\nRemove a sso connection from account"
+      operationId: InternalDisconnectSsoProvider
       parameters:
         - name: providerName
           in: query
@@ -175,7 +175,7 @@ paths:
       tags:
         - Account
       summary: Updates the account avatar
-      operationId: AccountAvatarUpdate
+      operationId: UpdateAccountAvatar
       parameters:
         - name: Hash-Sha256
           in: header
@@ -235,7 +235,7 @@ paths:
       tags:
         - Account
       summary: Updates the account email
-      operationId: AccountEmailUpdate
+      operationId: UpdateAccountEmail
       requestBody:
         description: ''
         content:
@@ -268,7 +268,7 @@ paths:
       tags:
         - Account
       summary: Updates the account password
-      operationId: AccountPasswordUpdate
+      operationId: UpdateAccountPassword
       requestBody:
         content:
           application/json:
@@ -298,7 +298,7 @@ paths:
       tags:
         - Account
       summary: Updates the account username
-      operationId: AccountUsernameUpdate
+      operationId: UpdateAccountUsername
       requestBody:
         description: ''
         content:
@@ -327,7 +327,7 @@ paths:
       tags:
         - Account
       summary: Verify the users email address
-      operationId: AccountEmailVerify
+      operationId: CompleteAccountEmailVerification
       parameters:
         - name: token
           in: query
@@ -348,7 +348,7 @@ paths:
       tags:
         - Auth
       summary: ''
-      operationId: AuthSignIn
+      operationId: SignIn
       requestBody:
         description: ''
         content:
@@ -393,7 +393,7 @@ paths:
       tags:
         - Auth
       summary: ''
-      operationId: AuthSignOut
+      operationId: SignOut
       responses:
         '200':
           description: Ok
@@ -402,7 +402,7 @@ paths:
       tags:
         - Config
       summary: ''
-      operationId: ConfigGet
+      operationId: GetApiConfig
       responses:
         '200':
           description: Returns the service config
@@ -421,7 +421,7 @@ paths:
       tags:
         - Device
       summary: ''
-      operationId: DeviceGet
+      operationId: GetDeviceById
       parameters:
         - name: deviceId
           in: path
@@ -447,7 +447,7 @@ paths:
       tags:
         - Health
       summary: ''
-      operationId: HealthGet
+      operationId: GetServiceHealth
       responses:
         '200':
           description: Health status
@@ -455,7 +455,7 @@ paths:
     get:
       tags:
         - Single Sign-On
-      summary: "Warning:\r\nThis endpoint is not meant to be called by a 3rd party, it will redirect the request for OAuth authentication with the specified provider.\r\nIt is documented here for transparency, and to automatically generate the OpenAPI client for the frontend."
+      summary: "Warning: This endpoint is not meant to be called by API clients, but only by the frontend.\r\nSSO authentication endpoint"
       operationId: InternalSsoAuthenticate
       parameters:
         - name: providerName
@@ -477,7 +477,7 @@ paths:
     post:
       tags:
         - Single Sign-On
-      summary: "Warning:\r\nThis endpoint is not meant to be called by a 3rd party, it will redirect the request for OAuth authentication with the specified provider.\r\nIt is documented here for transparency, and to automatically generate the OpenAPI client for the frontend."
+      summary: "Warning: This endpoint is not meant to be called by API clients, but only by the frontend.\r\nSSO authentication endpoint"
       operationId: InternalSsoCallback
       parameters:
         - name: providerName
@@ -500,7 +500,7 @@ paths:
       tags:
         - Single Sign-On
       summary: Returns the data supplied by the SSO provider
-      operationId: SsoProviderdataGet
+      operationId: GetSsoProviderdata
       parameters:
         - name: ssoToken
           in: query
@@ -524,7 +524,7 @@ paths:
       tags:
         - Single Sign-On
       summary: Returns a list of supported SSO providers
-      operationId: SsoProviderlistGet
+      operationId: GetSsoProviderlist
       responses:
         '200':
           description: Success
@@ -539,7 +539,7 @@ paths:
       tags:
         - User
       summary: Block a user
-      operationId: UserBlockApply
+      operationId: BlockUser
       parameters:
         - name: userId
           in: path
@@ -564,7 +564,7 @@ paths:
       tags:
         - User
       summary: UnBlock a user
-      operationId: UserBlockRemove
+      operationId: UnblockUser
       parameters:
         - name: userId
           in: path
@@ -589,7 +589,7 @@ paths:
       tags:
         - User
       summary: Accept incoming friend request
-      operationId: UserFriendrequestAccept
+      operationId: AcceptFriendrequest
       parameters:
         - name: userId
           in: path
@@ -617,7 +617,7 @@ paths:
       tags:
         - User
       summary: Delete outgoing/Reject incoming friend request
-      operationId: UserFriendrequestDelete
+      operationId: DeleteFriendrequest
       parameters:
         - name: userId
           in: path
@@ -643,7 +643,7 @@ paths:
       tags:
         - User
       summary: Send friend request
-      operationId: UserFriendrequestSend
+      operationId: SendFriendrequest
       parameters:
         - name: userId
           in: path
@@ -668,7 +668,7 @@ paths:
       tags:
         - User
       summary: List all incoming and outgoing friend requests
-      operationId: UserFriendrequestList
+      operationId: GetFriendrequests
       responses:
         '200':
           description: Success
@@ -681,7 +681,7 @@ paths:
       tags:
         - User
       summary: Get user by Id
-      operationId: UserGetById
+      operationId: GetUserById
       parameters:
         - name: userId
           in: path
@@ -708,7 +708,7 @@ paths:
       tags:
         - User
       summary: Look up user by name
-      operationId: UserGetByName
+      operationId: GetUserByName
       parameters:
         - name: username
           in: query
@@ -733,7 +733,7 @@ paths:
       tags:
         - User
       summary: Report a user
-      operationId: UserReportCreate
+      operationId: CreateUserReport
       requestBody:
         description: ''
         content:

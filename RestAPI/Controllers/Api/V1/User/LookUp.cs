@@ -17,7 +17,7 @@ public partial class UserController
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [RequestSizeLimit(1024)]
-    [HttpGet("lookup", Name = "UserGetByName")]
+    [HttpGet("lookup", Name = "GetUserByName")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]     // Accepted
     [ProducesResponseType(StatusCodes.Status404NotFound)] // User not found
     public async Task<IActionResult> LookUp([FromServices] DatabaseContext dbContext, [FromQuery] string username, CancellationToken cancellationToken)

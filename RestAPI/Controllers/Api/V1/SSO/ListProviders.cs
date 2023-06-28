@@ -7,7 +7,7 @@ public partial class SSOController
     /// <summary>
     /// Returns a list of supported SSO providers
     /// </summary>
-    [HttpGet("providers", Name = "SsoProviderlistGet")]
+    [HttpGet("providers", Name = "GetSsoProviderlist")]
     [ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK)]
     public Task<IEnumerable<string>> ListSSOProviders() =>
         HttpContext.GetOAuthSchemeNamesAsync();

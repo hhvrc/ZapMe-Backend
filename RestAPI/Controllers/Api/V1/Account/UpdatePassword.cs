@@ -14,7 +14,7 @@ public partial class AccountController
     /// </summary>
     /// <response code="200">Ok</response>
     [RequestSizeLimit(1024)]
-    [HttpPut("password", Name = "AccountPasswordUpdate")]
+    [HttpPut("password", Name = "UpdateAccountPassword")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

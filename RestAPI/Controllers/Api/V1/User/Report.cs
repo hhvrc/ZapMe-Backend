@@ -10,7 +10,7 @@ public partial class UserController
     /// </summary>
     /// <param name="body"></param>
     /// <returns></returns>
-    [HttpPost("report", Name = "UserReportCreate")]
+    [HttpPost("report", Name = "CreateUserReport")]
     [ProducesResponseType(StatusCodes.Status200OK)] // Report sent
     [ProducesResponseType(StatusCodes.Status404NotFound)] // User not found
     public IActionResult Report([FromBody] UserReport body)

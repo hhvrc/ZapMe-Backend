@@ -14,7 +14,7 @@ partial class UserController
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [RequestSizeLimit(1024)]
-    [HttpPost("{userId}/friendrequest", Name = "UserFriendrequestSend")]
+    [HttpPost("{userId}/friendrequest", Name = "SendFriendrequest")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status304NotModified)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

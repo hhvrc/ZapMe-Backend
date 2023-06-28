@@ -7,6 +7,6 @@ namespace ZapMe.Controllers.Api.V1;
 
 public partial class AccountController
 {
-    [HttpGet(Name = "AccountGet")]
+    [HttpGet(Name = "GetAccount")]
     public Task<AccountDto> Get(CancellationToken cancellationToken) => UserFetchingLogic.FetchAccountDto_ById(_dbContext, User.GetUserId(), cancellationToken);
 }

@@ -18,7 +18,7 @@ public partial class AccountController
     /// <returns></returns>
     /// <response code="200">Ok</response>
     [RequestSizeLimit(1024)]
-    [HttpPut("email", Name = "AccountEmailUpdate")]
+    [HttpPut("email", Name = "UpdateAccountEmail")]
     [ProducesResponseType(typeof(UpdateEmailOk), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

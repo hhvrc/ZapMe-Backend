@@ -13,7 +13,7 @@ public partial class ConfigController
     /// <returns>The config for the service</returns>
     /// <response code="200">Returns the service config</response>
     /// <returns></returns>
-    [HttpGet(Name = "ConfigGet")]
+    [HttpGet(Name = "GetApiConfig")]
     [ProducesResponseType(typeof(ApiConfig), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ApiConfig> GetConfig(CancellationToken cancellationToken)

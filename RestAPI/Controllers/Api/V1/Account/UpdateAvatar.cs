@@ -24,7 +24,7 @@ public partial class AccountController
     /// <response code="400">Payload is unsupported/corrupted or the hash (if provided) does not match the payload</response>
     /// <response code="411">Length is required</response>
     /// <response code="413">Image dimensions or byte size is too large</response>
-    [HttpPut("avatar", Name = "AccountAvatarUpdate")]
+    [HttpPut("avatar", Name = "UpdateAccountAvatar")]
     [BinaryPayload(true, "image/png", "image/jpeg", "image/webp", "image/gif")]
     [ProducesResponseType(typeof(UpdateProfilePictureOk), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
