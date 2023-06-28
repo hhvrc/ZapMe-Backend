@@ -7,6 +7,7 @@ using Microsoft.Extensions.Primitives;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
+using ZapMe.BusinessLogic.OAuth;
 using ZapMe.Constants;
 using ZapMe.Database;
 using ZapMe.Database.Models;
@@ -14,9 +15,9 @@ using ZapMe.DTOs;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
 
-namespace ZapMe.Authentication;
+namespace ZapMe.Services;
 
-public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
+public sealed class ZapMeSignInHandler : IAuthenticationSignInHandler
 {
     private AuthenticationScheme _scheme = default!;
     private HttpContext _context = default!;
@@ -24,9 +25,9 @@ public sealed class ZapMeAuthenticationHandler : IAuthenticationSignInHandler
     private readonly DatabaseContext _dbContext;
     private readonly IJwtAuthenticationManager _authenticationManager;
     private readonly JsonSerializerOptions _jsonSerializerOptions;
-    private readonly ILogger<ZapMeAuthenticationHandler> _logger;
+    private readonly ILogger<ZapMeSignInHandler> _logger;
 
-    public ZapMeAuthenticationHandler(DatabaseContext dbContext, IJwtAuthenticationManager authenticationManager, IOptions<JsonOptions> jsonOptions, ILogger<ZapMeAuthenticationHandler> logger)
+    public ZapMeSignInHandler(DatabaseContext dbContext, IJwtAuthenticationManager authenticationManager, IOptions<JsonOptions> jsonOptions, ILogger<ZapMeSignInHandler> logger)
     {
         _dbContext = dbContext;
         _authenticationManager = authenticationManager;

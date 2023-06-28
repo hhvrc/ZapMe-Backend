@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Twitter;
-using ZapMe.Authentication;
 using ZapMe.Constants;
 using ZapMe.Helpers;
 using ZapMe.Options.OAuth;
+using ZapMe.Services;
 
 namespace ZapMe.Extensions;
 
@@ -15,12 +15,12 @@ public static class AuthenticationBuilderExtensions
         {
             o.AddScheme(AuthenticationConstants.ZapMeScheme, scheme =>
             {
-                scheme.HandlerType = typeof(ZapMeAuthenticationHandler);
+                scheme.HandlerType = typeof(ZapMeSignInHandler);
                 scheme.DisplayName = null; // TODO: changeme
             });
         });
 
-        builder.Services.AddTransient<IAuthenticationSignInHandler, ZapMeAuthenticationHandler>();
+        builder.Services.AddTransient<IAuthenticationSignInHandler, ZapMeSignInHandler>();
         return builder;
     }
 

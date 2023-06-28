@@ -4,7 +4,7 @@ using ZapMe.Constants;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
 
-namespace ZapMe.Authentication;
+namespace ZapMe.BusinessLogic.OAuth;
 
 public static class OAuthClaimsFetchers
 {
