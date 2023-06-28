@@ -5,11 +5,11 @@ using OneOf;
 using ZapMe.Constants;
 using ZapMe.Database;
 using ZapMe.Database.Models;
+using ZapMe.DTOs;
 using ZapMe.Enums.Errors;
 using ZapMe.Mappers;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
-using static ZapMe.Utils.ImageUtils;
 
 namespace ZapMe.Services;
 
@@ -71,8 +71,8 @@ public sealed class ImageManager : IImageManager
         using MemoryStream memoryStream = imageSizeBytes > 0 ? new MemoryStream(imageSizeBytes) : new MemoryStream();
 
         // Parse image for metadata and rewrite to webp/gif
-        OneOf<ImageParseResult, ImageParseError> result = await ImageUtils.ParseAndRewriteFromStreamAsync(imageStream, memoryStream, cancellationToken);
-        if (result.TryPickT1(out ImageParseError parseError, out ImageParseResult imageInfo))
+        var result = await ImageParsing.ParseAndRewriteFromStreamAsync(imageStream, memoryStream, cancellationToken);
+        if (result.TryPickT1(out ImageParseError parseError, out ImageMetaData imageInfo))
         {
             return ImageParseErrorMapper.MapToUploadError(parseError);
         }

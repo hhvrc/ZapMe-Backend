@@ -1,4 +1,6 @@
-﻿namespace ZapMe.DTOs;
+﻿using System.Text.Json.Serialization;
+
+namespace ZapMe.DTOs;
 
 /// <summary>
 /// Details about the error

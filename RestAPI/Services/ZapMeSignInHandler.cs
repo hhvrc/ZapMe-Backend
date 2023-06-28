@@ -118,7 +118,7 @@ public sealed class ZapMeSignInHandler : IAuthenticationSignInHandler
 
             issuedAt = session.CreatedAt;
             expiresAt = session.ExpiresAt;
-            claimsIdentity = session.ToClaimsIdentity();
+            claimsIdentity = SessionMapper.MapToClaimsIdentity(session);
         }
         else
         {
@@ -163,7 +163,9 @@ public sealed class ZapMeSignInHandler : IAuthenticationSignInHandler
             return AuthenticateResult.Fail("Invalid JWT token.");
         }
 
-        return AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(session.ToClaimsIdentity()), AuthenticationConstants.ZapMeScheme));
+        ClaimsPrincipal claimsPrincipal = SessionMapper.MapToClaimsPrincipal(session);
+
+        return AuthenticateResult.Success(new AuthenticationTicket(claimsPrincipal, AuthenticationConstants.ZapMeScheme));
     }
 
     // Calling Authenticate more than once should always return the original value.

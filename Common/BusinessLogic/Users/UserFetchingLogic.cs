@@ -40,7 +40,7 @@ public static class UserFetchingLogic
     {
         var user = await DatabaseQueryForAccountDto(dbContext).FirstAsync(x => x.Id == userId, cancellationToken);
 
-        return UserMapper.ToAccountDto(user);
+        return UserMapper.MapToAccountDto(user);
     }
 
     public static async Task<UserDto?> FetchUserDto_AsUser_ById(DatabaseContext dbContext, Guid requestingUserId, Guid userId, CancellationToken cancellationToken = default)
@@ -58,8 +58,8 @@ public static class UserFetchingLogic
 
         // Return the user (minimal if a block is active)
         return blockActive ?
-            UserMapper.ToMinimalUserDto(user, relation) :
-            UserMapper.ToUserDto(user, relation);
+            UserMapper.MapToMinimalDto(user, relation) :
+            UserMapper.MapToDto(user, relation);
     }
 
     public static async Task<UserDto?> FetchUserDto_AsUser_ByName(DatabaseContext dbContext, Guid requestingUserId, string userName, CancellationToken cancellationToken = default)
@@ -77,7 +77,7 @@ public static class UserFetchingLogic
 
         // Return the user (minimal if a block is active)
         return blockActive ?
-            UserMapper.ToMinimalUserDto(user, relation) :
-            UserMapper.ToUserDto(user, relation);
+            UserMapper.MapToMinimalDto(user, relation) :
+            UserMapper.MapToDto(user, relation);
     }
 }

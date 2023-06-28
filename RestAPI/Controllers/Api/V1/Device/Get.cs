@@ -27,6 +27,6 @@ public partial class DeviceController
             return HttpErrors.DeviceNotFoundActionResult;
         }
 
-        return Ok(device.ToDeviceDto());
+        return Ok(DeviceMapper.MapToDeviceDto(device));
     }
 }

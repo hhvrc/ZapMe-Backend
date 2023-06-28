@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using System.Security.Claims;
 using ZapMe.Attributes;
 using ZapMe.Database.Models;
 using ZapMe.DTOs;
@@ -219,7 +220,9 @@ public partial class AccountController
 
             var authenticationManager = HttpContext.RequestServices.GetRequiredService<IJwtAuthenticationManager>();
 
-            jwtToken = authenticationManager.GenerateJwtToken(session.ToClaimsIdentity(), session.CreatedAt, session.ExpiresAt);
+            ClaimsIdentity claimsIdentity = SessionMapper.MapToClaimsIdentity(session);
+
+            jwtToken = authenticationManager.GenerateJwtToken(claimsIdentity, session.CreatedAt, session.ExpiresAt);
         }
 
         // Send email verification

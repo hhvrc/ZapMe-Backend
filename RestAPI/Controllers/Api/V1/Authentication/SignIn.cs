@@ -99,6 +99,8 @@ public partial class AuthController
             ExpiresUtc = session.ExpiresAt
         };
 
-        return SignIn(new ClaimsPrincipal(session.ToClaimsIdentity()), props);
+        ClaimsPrincipal principal = SessionMapper.MapToClaimsPrincipal(session);
+
+        return SignIn(principal, props);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Quartz;
+using Quartz.AspNetCore;
 using System.Reflection;
 using ZapMe.Attributes;
 

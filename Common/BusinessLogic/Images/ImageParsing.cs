@@ -1,22 +1,17 @@
 ﻿using OneOf;
+using ZapMe.DTOs;
 using ZapMe.Enums.Errors;
 
 namespace ZapMe.Utils;
 
-public static class ImageUtils
+public static class ImageParsing
 {
-    public readonly record struct ImageParseResult(uint Width, uint Height, uint FrameCount, string MimeType);
-
     /// <summary>
     /// Parses and rewrites an image from a stream
     /// </summary>
-    /// <param name="inputStream"></param>
-    /// <param name="outputStream"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>Parse result or ErrorDetails(400)</returns>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="NotSupportedException"></exception>
-    public static async Task<OneOf<ImageParseResult, ImageParseError>> ParseAndRewriteFromStreamAsync(Stream inputStream, Stream? outputStream, CancellationToken cancellationToken = default)
+    public static async Task<OneOf<ImageMetaData, ImageParseError>> ParseAndRewriteFromStreamAsync(Stream inputStream, Stream? outputStream, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(inputStream);
         ArgumentNullException.ThrowIfNull(outputStream);
@@ -29,7 +24,7 @@ public static class ImageUtils
             int height = image.Height;
             int frameCount = image.Frames.Count;
 
-            if (height < 0 || width < 0 || frameCount <= 0)
+            if (width < 0 || height < 0 || frameCount <= 0)
             {
                 return ImageParseError.ImageDimensionsInvalid;
             }
@@ -44,12 +39,12 @@ public static class ImageUtils
             if (frameCount == 1)
             {
                 if (outputStream is not null) await image.SaveAsWebpAsync(outputStream, cancellationToken);
-                return new ImageParseResult((uint)width, (uint)height, (uint)frameCount, "image/webp");
+                return new ImageMetaData((uint)width, (uint)height, (uint)frameCount, "image/webp");
             }
             else
             {
                 if (outputStream is not null) await image.SaveAsGifAsync(outputStream, cancellationToken);
-                return new ImageParseResult((uint)width, (uint)height, (uint)frameCount, "image/gif");
+                return new ImageMetaData((uint)width, (uint)height, (uint)frameCount, "image/gif");
             }
         }
         catch (InvalidImageContentException)

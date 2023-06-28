@@ -4,7 +4,7 @@ namespace ZapMe.DTOs;
 
 public static class DeviceMapper
 {
-    public static DeviceDto ToDeviceDto(this DeviceEntity user)
+    public static DeviceDto MapToDeviceDto(DeviceEntity user)
     {
         return new DeviceDto
         {

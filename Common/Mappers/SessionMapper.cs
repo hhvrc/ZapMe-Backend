@@ -6,7 +6,7 @@ namespace ZapMe.DTOs;
 
 public static class SessionMapper
 {
-    public static ClaimsIdentity ToClaimsIdentity(this SessionEntity session)
+    public static ClaimsIdentity MapToClaimsIdentity(SessionEntity session)
     {
         ArgumentNullException.ThrowIfNull(session);
         ArgumentNullException.ThrowIfNull(session.User);
@@ -33,5 +33,9 @@ public static class SessionMapper
         }
 
         return claimsIdentity;
+    }
+    public static ClaimsPrincipal MapToClaimsPrincipal(SessionEntity session)
+    {
+        return new ClaimsPrincipal(MapToClaimsIdentity(session));
     }
 }

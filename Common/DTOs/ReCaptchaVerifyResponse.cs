@@ -1,6 +1,8 @@
-﻿namespace ZapMe.DTOs;
+﻿using System.Text.Json.Serialization;
 
-public struct CloudflareTurnstileVerifyResponse
+namespace ZapMe.DTOs;
+
+public struct GoogleReCaptchaVerifyResponse
 {
     [JsonPropertyName("success")]
     public bool Success { get; set; }
@@ -11,12 +13,9 @@ public struct CloudflareTurnstileVerifyResponse
     [JsonPropertyName("hostname")]
     public string? Hostname { get; set; }
 
+    [JsonPropertyName("apk_package_name")]
+    public string? ApkPackageName { get; set; }
+
     [JsonPropertyName("error-codes")]
     public string[]? ErrorCodes { get; set; }
-
-    [JsonPropertyName("action")]
-    public string? Action { get; set; }
-
-    [JsonPropertyName("cdata")]
-    public string? CData { get; set; }
 }

@@ -6,7 +6,7 @@ namespace ZapMe.DTOs;
 
 public static class UserMapper
 {
-    public static UserDto ToUserDto(this UserEntity user, UserRelationEntity? userRelation)
+    public static UserDto MapToDto(UserEntity user, UserRelationEntity? userRelation)
     {
         return new UserDto
         {
@@ -25,7 +25,7 @@ public static class UserMapper
         };
     }
 
-    public static UserDto ToMinimalUserDto(this UserEntity user, UserRelationEntity? userRelation)
+    public static UserDto MapToMinimalDto(UserEntity user, UserRelationEntity? userRelation)
     {
         return new UserDto
         {
@@ -43,7 +43,7 @@ public static class UserMapper
         };
     }
 
-    public static AccountDto ToAccountDto(this UserEntity user)
+    public static AccountDto MapToAccountDto(UserEntity user)
     {
         return new AccountDto
         {
