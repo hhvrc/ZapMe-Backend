@@ -28,7 +28,7 @@ public partial class UserController
         var userRelation = user.RelationsIncoming.FirstOrDefault(r => r.FromUserId == User.GetUserId());
 
         return UserRelationRules.IsEitherUserBlocking(user, User.GetUserId())
-            ? Ok(UserMapper.MapToDto(user, userRelation))
-            : Ok(UserMapper.MapToMinimalDto(user, userRelation));
+            ? Ok(UserMapper.MapToMinimalDto(user, userRelation))
+            : Ok(UserMapper.MapToDto(user, userRelation));
     }
 }

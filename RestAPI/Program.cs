@@ -120,10 +120,11 @@ services.AddDebounceService(configuration);
 //services.AddGoogleReCaptchaService(configuration);
 services.AddMailGunService(configuration);
 
+services.AddTransient<IUserRepository, UserRepository>();
+services.AddTransient<IUserRelationManager, UserRelationManager>();
 services.AddTransient<IJwtAuthenticationManager, JwtAuthenticationManager>();
 services.AddTransient<IPasswordResetRequestStore, PasswordResetRequestStore>();
 services.AddTransient<IPasswordResetManager, PasswordResetManager>();
-services.AddTransient<IUserRelationManager, UserRelationManager>();
 services.AddTransient<IUserAgentStore, UserAgentStore>();
 services.AddTransient<IUserAgentManager, UserAgentManager>();
 services.AddTransient<ISessionStore, SessionStore>();

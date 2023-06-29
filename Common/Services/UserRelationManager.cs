@@ -47,9 +47,9 @@ public sealed class UserRelationManager : IUserRelationManager
         await SetFriendStatus(fromUserId, toUserId, friendStatus, trackedEntity, cancellationToken);
     }
 
-    public async Task<UpdateUserRelationResult> CreateOrAcceptFriendRequestAsync(Guid fromUserId, Guid toUserId, CancellationToken cancellationToken)
+    public async Task<CreateOrAcceptFriendRequestResult> CreateOrAcceptFriendRequestAsync(Guid fromUserId, Guid toUserId, CancellationToken cancellationToken)
     {
-        if (fromUserId == toUserId) return UpdateUserRelationResult.CannotApplyToSelf;
+        if (fromUserId == toUserId) return CreateOrAcceptFriendRequestResult.CannotApplyToSelf;
 
         // Get all relations between the two users (if any)
         var relations = await _dbContext.UserRelations.AsTracking()
@@ -57,7 +57,8 @@ public sealed class UserRelationManager : IUserRelationManager
             .Take(2).ToArrayAsync(cancellationToken);
 
         // Check if the users are already friends or blocked, if so, don't create a friend request
-        if (relations.Any(x => x.FriendStatus is UserFriendStatus.Accepted or UserFriendStatus.Blocked)) return UpdateUserRelationResult.AlreadyFriends;
+        if (relations.Any(x => x.FriendStatus == UserFriendStatus.Blocked)) return CreateOrAcceptFriendRequestResult.NotAllowed;
+        if (relations.Any(x => x.FriendStatus == UserFriendStatus.Accepted)) return CreateOrAcceptFriendRequestResult.AlreadyFriends;
 
         // Seperate the relations into incoming and outgoing
         var outgoingRelation = relations.FirstOrDefault(x => x.FromUserId == fromUserId);
@@ -77,16 +78,16 @@ public sealed class UserRelationManager : IUserRelationManager
                 await transaction.CommitAsync(cancellationToken);
             }
 
-            return UpdateUserRelationResult.FriendshipCreated;
+            return CreateOrAcceptFriendRequestResult.FriendshipCreated;
         }
 
         // If there's a pending outgoing friend request, do nothing
-        if (outgoingRelation is not null && outgoingRelation.FriendStatus == UserFriendStatus.Pending) return UpdateUserRelationResult.NoChanges;
+        if (outgoingRelation is not null && outgoingRelation.FriendStatus == UserFriendStatus.Pending) return CreateOrAcceptFriendRequestResult.NoChanges;
 
         // Set the friend status to pending
         await SetFriendStatus(fromUserId, toUserId, UserFriendStatus.Pending, outgoingRelation, cancellationToken);
 
-        return UpdateUserRelationResult.Success;
+        return CreateOrAcceptFriendRequestResult.Success;
     }
 
     public async Task<UpdateUserRelationResult> DeleteOrRejectFriendRequestAsync(Guid fromUserId, Guid toUserId, CancellationToken cancellationToken)

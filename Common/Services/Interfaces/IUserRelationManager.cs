@@ -8,7 +8,7 @@ public interface IUserRelationManager
     /// <summary>
     /// Will create a friend request to the target user if one does not already exist, or accept the friend request from the target user if one does exist.
     /// </summary>
-    Task<UpdateUserRelationResult> CreateOrAcceptFriendRequestAsync(Guid fromUserId, Guid toUserId, CancellationToken cancellationToken = default);
+    Task<CreateOrAcceptFriendRequestResult> CreateOrAcceptFriendRequestAsync(Guid fromUserId, Guid toUserId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Will delete a friend request to the target user if one exists, or reject the friend request from the target user if one exist.

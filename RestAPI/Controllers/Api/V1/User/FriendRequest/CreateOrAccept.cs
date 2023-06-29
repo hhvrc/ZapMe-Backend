@@ -1,23 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using ZapMe.DTOs;
+using ZapMe.Enums;
+using ZapMe.Helpers;
 
 namespace ZapMe.Controllers.Api.V1;
 
 public partial class UserController
 {
     /// <summary>
-    /// Accept incoming friend request
+    /// Create a new friend request or accept an incoming friend request to this user
     /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
     [RequestSizeLimit(1024)]
-    [HttpPut("{userId}/friendrequest", Name = "AcceptFriendRequest")]
+    [HttpPut("{userId}/friendrequest", Name = "CreateOrAcceptFriendRequest")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]        // Accepted
     [ProducesResponseType(StatusCodes.Status304NotModified)] // Already friends
     [ProducesResponseType(StatusCodes.Status404NotFound)]    // No friendrequest incoming
-    public async Task<IActionResult> FriendRequestAccept([FromRoute] Guid userId, CancellationToken cancellationToken)
+    public async Task<IActionResult> FriendRequestCreateOrAccept([FromRoute] Guid userId, CancellationToken cancellationToken)
     {
         Guid fromUserId = User.GetUserId();
 
@@ -29,12 +28,12 @@ public partial class UserController
 
         return result switch
         {
-            Enums.UpdateUserRelationResult.NoChanges => throw new NotImplementedException(),
-            Enums.UpdateUserRelationResult.NotAllowed => throw new NotImplementedException(),
-            Enums.UpdateUserRelationResult.AlreadyFriends => throw new NotImplementedException(),
-            Enums.UpdateUserRelationResult.FriendshipCreated => throw new NotImplementedException(),
-            Enums.UpdateUserRelationResult.CannotApplyToSelf => throw new NotImplementedException(),
-            _ => throw new NotImplementedException()
+            CreateOrAcceptFriendRequestResult.NoChanges => NoContent(), // TODO: Create a response DTO for this
+            CreateOrAcceptFriendRequestResult.NotAllowed => BadRequest(), // TODO: Create a response DTO for this
+            CreateOrAcceptFriendRequestResult.AlreadyFriends => NoContent(), // TODO: Create a response DTO for this
+            CreateOrAcceptFriendRequestResult.FriendshipCreated => NoContent(), // TODO: Create a response DTO for this
+            CreateOrAcceptFriendRequestResult.CannotApplyToSelf => BadRequest(), // TODO: Create a response DTO for this
+            _ => HttpErrors.InternalServerErrorActionResult,
         };
         /*
             ? Ok()

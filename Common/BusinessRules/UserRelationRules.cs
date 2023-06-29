@@ -5,9 +5,9 @@ namespace ZapMe.BusinessRules;
 
 public static class UserRelationRules
 {
-    public static bool IsEitherUserBlocking(UserEntity userA, Guid userBId)
+    public static bool IsEitherUserBlocking(UserEntity fromUser, Guid toUserId)
     {
-        return userA.RelationsOutgoing.Any(fs => fs.ToUserId == userBId && fs.FriendStatus == UserFriendStatus.Blocked)
-            || userA.RelationsIncoming.Any(fs => fs.FromUserId == userBId && fs.FriendStatus == UserFriendStatus.Blocked);
+        return fromUser.RelationsOutgoing.Any(r => r.ToUserId == toUserId && r.FriendStatus == UserFriendStatus.Blocked)
+            || fromUser.RelationsIncoming.Any(r => r.FromUserId == toUserId && r.FriendStatus == UserFriendStatus.Blocked);
     }
 }

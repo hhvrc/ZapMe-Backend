@@ -11,7 +11,7 @@ public static class FriendRequestLogic
     public static async Task<FriendRequestsDto> GetFriendRequestsDTO(this DatabaseContext dbContext, Guid userId, CancellationToken cancellationToken)
     {
         UserRelationEntity[] relevantUserRelations = await dbContext.UserRelations
-            .Where(x => ((x.FromUserId == userId && x.ToUserId == userId) || (x.FromUserId == userId && x.ToUserId == userId)) && x.FriendStatus == UserFriendStatus.Pending)
+            .Where(x => (x.FromUserId == userId || x.ToUserId == userId) && x.FriendStatus == UserFriendStatus.Pending)
             .ToArrayAsync(cancellationToken);
 
         return new FriendRequestsDto

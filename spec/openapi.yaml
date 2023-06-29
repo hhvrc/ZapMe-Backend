@@ -25,7 +25,7 @@ paths:
           application/json:
             schema:
               allOf:
-                - $ref: '#/components/schemas/CreateAccount'
+                - $ref: '#/components/schemas/AccountCreateRequestDto'
               description: Message sent to server to create a new account
       responses:
         '201':
@@ -33,7 +33,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateOk'
+                $ref: '#/components/schemas/AccountCreateOkResponseDto'
         '400':
           description: Bad Request
           content:
@@ -91,6 +91,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccountDto'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
   /api/v1/account/password-reset/confirm:
     post:
       tags:
@@ -582,12 +588,11 @@ paths:
     put:
       tags:
         - User
-      summary: Accept incoming friend request
-      operationId: AcceptFriendRequest
+      summary: Create a new friend request or accept an incoming friend request to this user
+      operationId: CreateOrAcceptFriendRequest
       parameters:
         - name: userId
           in: path
-          description: ''
           required: true
           schema:
             type: string
@@ -610,38 +615,11 @@ paths:
     delete:
       tags:
         - User
-      summary: Delete outgoing/Reject incoming friend request
+      summary: Delete incoming/outgoing friend request
       operationId: DeleteFriendRequest
       parameters:
         - name: userId
           in: path
-          description: ''
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserDto'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-    post:
-      tags:
-        - User
-      summary: Send friend request
-      operationId: SendFriendRequest
-      parameters:
-        - name: userId
-          in: path
-          description: ''
           required: true
           schema:
             type: string
@@ -649,8 +627,10 @@ paths:
       responses:
         '204':
           description: No Content
-        '304':
-          description: Not Modified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
         '404':
           description: Not Found
           content:
@@ -679,7 +659,6 @@ paths:
       parameters:
         - name: userId
           in: path
-          description: ''
           required: true
           schema:
             type: string
@@ -706,7 +685,6 @@ paths:
       parameters:
         - name: username
           in: query
-          description: ''
           schema:
             type: string
       responses:
@@ -760,6 +738,67 @@ paths:
                 $ref: '#/components/schemas/ErrorDetails'
 components:
   schemas:
+    AccountCreateOkResponseDto:
+      required:
+        - accountId
+        - emailVerificationRequired
+      type: object
+      properties:
+        accountId:
+          type: string
+          description: The account id of the newly created account
+          format: uuid
+        session:
+          allOf:
+            - $ref: '#/components/schemas/AuthenticationResponse'
+          description: 'If the account was created using OAuth and in a way that ensures the email address is valid, a session will be created and returned here'
+          nullable: true
+        emailVerificationRequired:
+          type: boolean
+          description: If true then the email is already verified by 3rd party
+      additionalProperties: false
+    AccountCreateRequestDto:
+      required:
+        - acceptedPrivacyPolicyVersion
+        - acceptedTermsOfServiceVersion
+        - email
+        - password
+        - turnstileResponse
+        - username
+      type: object
+      properties:
+        username:
+          maxLength: 32
+          minLength: 3
+          pattern: '^[^\s].*[^\s]$'
+          type: string
+          example: MyUsername
+        password:
+          maxLength: 256
+          minLength: 10
+          type: string
+          example: Hq2yP1B^Fho&zRHxHkEu
+        email:
+          maxLength: 320
+          minLength: 5
+          type: string
+          format: email
+          example: user.name@example.com
+        acceptedPrivacyPolicyVersion:
+          type: integer
+          format: int32
+        acceptedTermsOfServiceVersion:
+          type: integer
+          format: int32
+        turnstileResponse:
+          type: string
+          description: Response from cloudflare turnstile request
+        ssoToken:
+          type: string
+          description: 'SSO token from OAuth flow, this is optional and only used when creating an account from the OAuth flow'
+          nullable: true
+      additionalProperties: false
+      description: Message sent to server to create a new account
     AccountDto:
       required:
         - acceptedPrivacyPolicyVersion
@@ -930,67 +969,6 @@ components:
           type: string
           description: Invite URL to the Discord server where users can get support
           format: uri
-      additionalProperties: false
-    CreateAccount:
-      required:
-        - acceptedPrivacyPolicyVersion
-        - acceptedTermsOfServiceVersion
-        - email
-        - password
-        - turnstileResponse
-        - username
-      type: object
-      properties:
-        username:
-          maxLength: 32
-          minLength: 3
-          pattern: '^[^\s].*[^\s]$'
-          type: string
-          example: MyUsername
-        password:
-          maxLength: 256
-          minLength: 10
-          type: string
-          example: Hq2yP1B^Fho&zRHxHkEu
-        email:
-          maxLength: 320
-          minLength: 5
-          type: string
-          format: email
-          example: user.name@example.com
-        acceptedPrivacyPolicyVersion:
-          type: integer
-          format: int32
-        acceptedTermsOfServiceVersion:
-          type: integer
-          format: int32
-        turnstileResponse:
-          type: string
-          description: Response from cloudflare turnstile request
-        ssoToken:
-          type: string
-          description: 'SSO token from OAuth flow, this is optional and only used when creating an account from the OAuth flow'
-          nullable: true
-      additionalProperties: false
-      description: Message sent to server to create a new account
-    CreateOk:
-      required:
-        - accountId
-        - emailVerificationRequired
-      type: object
-      properties:
-        accountId:
-          type: string
-          description: The account id of the newly created account
-          format: uuid
-        session:
-          allOf:
-            - $ref: '#/components/schemas/AuthenticationResponse'
-          description: 'If the account was created using OAuth and in a way that ensures the email address is valid, a session will be created and returned here'
-          nullable: true
-        emailVerificationRequired:
-          type: boolean
-          description: If true then the email is already verified by 3rd party
       additionalProperties: false
     DeviceDto:
       required:
@@ -1235,9 +1213,11 @@ components:
     UserDto:
       required:
         - createdAt
+        - friendStatus
         - id
+        - isFavorite
+        - isMuted
         - lastSeenAt
-        - relationType
         - status
         - statusText
         - username
@@ -1261,9 +1241,13 @@ components:
             - $ref: '#/components/schemas/UserStatus'
         statusText:
           type: string
-        relationType:
+        friendStatus:
           allOf:
-            - $ref: '#/components/schemas/UserRelationType'
+            - $ref: '#/components/schemas/UserFriendStatus'
+        isFavorite:
+          type: boolean
+        isMuted:
+          type: boolean
         nickName:
           type: string
           nullable: true
@@ -1284,6 +1268,13 @@ components:
           format: date-time
           nullable: true
       additionalProperties: false
+    UserFriendStatus:
+      enum:
+        - none
+        - pending
+        - accepted
+        - blocked
+      type: string
     UserNotification:
       required:
         - content
@@ -1299,12 +1290,6 @@ components:
           description: 'Content of the notification, might be HTML'
       additionalProperties: false
       description: "System notification to be displayed to the user, do not confuse with user notifications\r\nThis is a hint and clients can choose to ignore it or implement notifications to be independent of this"
-    UserRelationType:
-      enum:
-        - none
-        - friend
-        - blocked
-      type: string
     UserReport:
       required:
         - explenation

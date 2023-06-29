@@ -4,8 +4,5 @@ public enum UpdateUserRelationResult
 {
     Success,
     NoChanges,
-    NotAllowed,
-    AlreadyFriends,
-    FriendshipCreated,
     CannotApplyToSelf,
 }
