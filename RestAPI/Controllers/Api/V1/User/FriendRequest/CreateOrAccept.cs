@@ -13,7 +13,7 @@ public partial class UserController
     /// Create a new friend request or accept an incoming friend request to this user
     /// </summary>
     /// <response code="200">Created/Accepted request</response>
-    /// <response code="304">Already sent</response>
+    /// <response code="304">Friend request already exists</response>
     /// <response code="400">Bad request/Not allowed/Already friends</response>
     [HttpPut("{userId}/friendrequest", Name = "CreateOrAcceptFriendRequest")]
     [ProducesResponseType(typeof(FriendRequestCreateOrAccept200OkDto), StatusCodes.Status200OK)]
@@ -25,7 +25,8 @@ public partial class UserController
 
         return result switch
         {
-            CreateOrAcceptFriendRequestResult.NoChanges => new StatusCodeResult(StatusCodes.Status304NotModified),
+            CreateOrAcceptFriendRequestResult.Success => Ok(), // TODO: Create a response DTO for this
+            CreateOrAcceptFriendRequestResult.NoChanges => StatusCode(StatusCodes.Status304NotModified),
             CreateOrAcceptFriendRequestResult.NotAllowed => BadRequest(), // TODO: Create a response DTO for this
             CreateOrAcceptFriendRequestResult.AlreadyFriends => BadRequest(), // TODO: Create a response DTO for this
             CreateOrAcceptFriendRequestResult.FriendshipCreated => Ok(), // TODO: Create a response DTO for this

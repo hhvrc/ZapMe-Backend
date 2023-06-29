@@ -13,6 +13,7 @@ public partial class UserController
     /// Delete incoming/outgoing friend request
     /// </summary>
     /// <response code="200">Deleted/Rejected request</response>
+    /// <response code="404">No friend request found</response>
     [HttpDelete("{userId}/friendrequest", Name = "DeleteFriendRequest")]
     [ProducesResponseType(typeof(FriendRequestDelete200OkDto), StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

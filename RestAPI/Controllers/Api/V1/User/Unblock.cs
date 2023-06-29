@@ -9,18 +9,18 @@ namespace ZapMe.Controllers.Api.V1;
 public partial class UserController
 {
     /// <summary>
-    /// Block a user
+    /// Unblock a user
     /// </summary>
-    /// <response code="204">User blocked</response>
-    /// <response code="304">User already blocked</response>
+    /// <response code="204">User unblocked</response>
+    /// <response code="304">User was already unblocked</response>
     /// <response code="400">You can't moderate yourself</response>
-    [HttpPut("{userId}/block", Name = "BlockUser")]
+    [HttpPut("{userId}/unblock", Name = "UnblockUser")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status304NotModified)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Block([FromRoute] Guid userId, [FromServices] IUserRelationManager userRelationManager, CancellationToken cancellationToken)
+    public async Task<IActionResult> UnBlock([FromRoute] Guid userId, [FromServices] IUserRelationManager userRelationManager, CancellationToken cancellationToken)
     {
-        var result = await userRelationManager.BlockUserAsync(User.GetUserId(), userId, cancellationToken);
+        var result = await userRelationManager.UnblockUserAsync(User.GetUserId(), userId, cancellationToken);
 
         return result switch
         {

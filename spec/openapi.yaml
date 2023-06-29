@@ -556,28 +556,8 @@ paths:
       responses:
         '204':
           description: User blocked
-        '400':
-          description: You can't moderate yourself
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetails'
-  '/api/v1/user/{userId}/unblock':
-    put:
-      tags:
-        - User
-      summary: Unblock a user
-      operationId: UnblockUser
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '204':
-          description: User unblocked
+        '304':
+          description: User already blocked
         '400':
           description: You can't moderate yourself
           content:
@@ -605,7 +585,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/FriendRequestCreateOrAccept200OkDto'
         '304':
-          description: Already sent
+          description: Friend request already exists
         '400':
           description: Bad request/Not allowed/Already friends
           content:
@@ -638,7 +618,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
         '404':
-          description: Not Found
+          description: No friend request found
         '200':
           description: Deleted/Rejected request
   /api/v1/user/friendrequests:
@@ -719,6 +699,30 @@ paths:
           description: Success
         '404':
           description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  '/api/v1/user/{userId}/unblock':
+    put:
+      tags:
+        - User
+      summary: Unblock a user
+      operationId: UnblockUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: User unblocked
+        '304':
+          description: User was already unblocked
+        '400':
+          description: You can't moderate yourself
           content:
             application/json:
               schema:
