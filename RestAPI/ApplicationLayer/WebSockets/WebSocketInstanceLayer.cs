@@ -49,7 +49,7 @@ public static class WebSocketInstanceLayer
     public static async Task HandleWebSocketAsync(HttpResponse httpResponse, HttpContext httpContext, CancellationToken cancellationToken)
     {
         WebSocketManager wsManager = httpContext.WebSockets;
-        if (wsManager.IsWebSocketRequest)
+        if (!wsManager.IsWebSocketRequest)
         {
             await HttpErrors.Generic(StatusCodes.Status400BadRequest, "Bad request", "This endpoint is purely just a websocket endpoint", "Try to connect with a websocket client instead").Write(httpResponse);
             return;
