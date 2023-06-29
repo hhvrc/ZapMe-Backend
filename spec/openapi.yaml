@@ -674,6 +674,10 @@ paths:
       responses:
         '302':
           description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
         '404':
           description: User not found
           content:

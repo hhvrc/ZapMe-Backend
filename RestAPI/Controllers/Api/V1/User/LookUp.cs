@@ -15,7 +15,7 @@ public partial class UserController
     /// <response code="302">User found</response>
     /// <response code="404">User not found</response>
     [HttpGet("lookup", Name = "GetUserByName")]
-    [ProducesResponseType(StatusCodes.Status302Found)]
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status302Found)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> LookUp([FromQuery] string username, [FromServices] IUserRepository userRepository, CancellationToken cancellationToken)
     {
