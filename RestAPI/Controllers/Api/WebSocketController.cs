@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ZapMe.BusinessLogic.WebSockets;
+using ZapMe.ApplicationLayer.WebSockets;
 using ZapMe.DTOs;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -15,12 +15,6 @@ public sealed class WebSocketController : ControllerBase
     [HttpGet("api/ws", Name = "WebsocketEndpoint")]
     [Produces(Application.Json)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
-    public async Task EntryPointAsync(CancellationToken cancellationToken)
-    {
-        ErrorDetails? errorDetails = await WebSocketInstanceLogic.HandleWebSocketAsync(HttpContext, cancellationToken);
-        if (errorDetails.HasValue)
-        {
-            await errorDetails.Value.Write(Response);
-        }
-    }
+    public async Task EntryPointAsync(CancellationToken cancellationToken) =>
+        await WebSocketInstanceLayer.HandleWebSocketAsync(Response, HttpContext, cancellationToken);
 }

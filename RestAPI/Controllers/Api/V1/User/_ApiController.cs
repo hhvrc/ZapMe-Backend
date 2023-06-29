@@ -14,9 +14,9 @@ namespace ZapMe.Controllers.Api.V1;
 [ApiController, Authorize, Route("api/v1/[Controller]/")]
 public sealed partial class UserController : ControllerBase
 {
-    private readonly IUserManager _userManager;
+    private readonly IUserRelationManager _userManager;
 
-    public UserController(IUserManager userManager)
+    public UserController(IUserRelationManager userManager)
     {
         _userManager = userManager;
     }

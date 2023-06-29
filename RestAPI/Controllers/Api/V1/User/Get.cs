@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using ZapMe.BusinessLogic.Users;
-using ZapMe.Database;
+using ZapMe.BusinessRules;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
+using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -12,23 +12,23 @@ public partial class UserController
     /// <summary>
     /// Get user by Id
     /// </summary>
-    /// <param name="dbContext"></param>
-    /// <param name="userId"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    [RequestSizeLimit(1024)]
+    /// <response code="404">User not found</response>
     [HttpGet("{userId}", Name = "GetUserById")]
-    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)] // Accepted
-    [ProducesResponseType(StatusCodes.Status404NotFound)]            // User not found
-    public async Task<IActionResult> Get([FromServices] DatabaseContext dbContext, [FromRoute] Guid userId, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Get([FromRoute] Guid userId, [FromServices] IUserRepository userRepository, CancellationToken cancellationToken)
     {
-        var result = await UserFetchingLogic.FetchUserDto_AsUser_ById(dbContext, User.GetUserId(), userId, cancellationToken);
+        var user = await userRepository.GetUserByIdAsync(userId, cancellationToken);
 
-        if (!result.HasValue)
+        if (user is null)
         {
             return HttpErrors.UserNotFoundActionResult;
         }
 
-        return Ok(result.Value);
+        var userRelation = user.RelationsIncoming.FirstOrDefault(r => r.FromUserId == User.GetUserId());
+
+        return UserRelationRules.IsEitherUserBlocking(user, User.GetUserId())
+            ? Ok(UserMapper.MapToMinimalDto(user, userRelation))
+            : Ok(UserMapper.MapToDto(user, userRelation));
     }
 }

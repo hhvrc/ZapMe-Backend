@@ -22,15 +22,15 @@ public sealed class CloudflareTurnstileService : ICloudflareTurnstileService
         _logger = logger;
     }
 
-    public async Task<CloudflareTurnstileVerifyResponse> VerifyUserResponseTokenAsync(string responseToken, string? remoteIpAddress, CancellationToken cancellationToken)
+    public async Task<CloudflareTurnstileVerifyResponseDto> VerifyUserResponseTokenAsync(string responseToken, string? remoteIpAddress, CancellationToken cancellationToken)
     {
         if (String.IsNullOrEmpty(responseToken))
         {
-            return new CloudflareTurnstileVerifyResponse { ErrorCodes = new[] { "missing-input-response" } };
+            return new CloudflareTurnstileVerifyResponseDto { ErrorCodes = new[] { "missing-input-response" } };
         }
 
 #if DEBUG
-        if (responseToken == "dev-bypass") return new CloudflareTurnstileVerifyResponse { Success = true };
+        if (responseToken == "dev-bypass") return new CloudflareTurnstileVerifyResponseDto { Success = true };
 #endif
 
         Dictionary<string, string> formUrlValues = new Dictionary<string, string>
@@ -45,7 +45,7 @@ public sealed class CloudflareTurnstileService : ICloudflareTurnstileService
         }
 
         int retryCount = 0;
-        CloudflareTurnstileVerifyResponse response;
+        CloudflareTurnstileVerifyResponseDto response;
         do
         {
             FormUrlEncodedContent httpContent = new FormUrlEncodedContent(formUrlValues);
@@ -54,7 +54,7 @@ public sealed class CloudflareTurnstileService : ICloudflareTurnstileService
 
             using HttpResponseMessage httpResponse = await httpClient.PostAsync(SiteVerifyEndpoint, httpContent, cancellationToken);
 
-            response = await httpResponse.Content.ReadFromJsonAsync<CloudflareTurnstileVerifyResponse>(cancellationToken: cancellationToken);
+            response = await httpResponse.Content.ReadFromJsonAsync<CloudflareTurnstileVerifyResponseDto>(cancellationToken: cancellationToken);
         }
         while (response.ErrorCodes is not null && response.ErrorCodes.Contains("internal-error") && retryCount++ < 3);
 

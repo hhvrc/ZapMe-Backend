@@ -7,15 +7,19 @@ namespace ZapMe.Database.Models;
 
 public sealed class UserRelationEntity
 {
-    public Guid SourceUserId { get; init; }
+    public Guid FromUserId { get; init; }
 
-    public Guid TargetUserId { get; init; }
+    public Guid ToUserId { get; init; }
 
-    public UserRelationType RelationType { get; set; }
+    public UserFriendStatus FriendStatus { get; set; }
 
-    public string? NickName { get; set; }
+    public bool IsFavorite { get; set; }
 
-    public string? Notes { get; set; }
+    public bool IsMuted { get; set; }
+
+    public string NickName { get; set; } = String.Empty;
+
+    public string Notes { get; set; } = String.Empty;
 
     public DateTime CreatedAt { get; init; }
 
@@ -27,19 +31,19 @@ public sealed class UserRelationEntityConfiguration : IEntityTypeConfiguration<U
 {
     public void Configure(EntityTypeBuilder<UserRelationEntity> builder)
     {
-        builder.HasKey(ur => new { ur.SourceUserId, ur.TargetUserId });
+        builder.HasKey(ur => new { ur.FromUserId, ur.ToUserId });
         builder.Property(ur => ur.NickName).HasMaxLength(GeneralHardLimits.NickNameMaxLength);
         builder.Property(ur => ur.Notes).HasMaxLength(GeneralHardLimits.NotesMaxLength);
         builder.Property(ur => ur.CreatedAt).HasDefaultValueSql("now()");
 
         builder.HasOne(ur => ur.SourceUser)
             .WithMany(u => u.RelationsOutgoing)
-            .HasForeignKey(ur => ur.SourceUserId)
+            .HasForeignKey(ur => ur.FromUserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(ur => ur.TargetUser)
             .WithMany(u => u.RelationsIncoming)
-            .HasForeignKey(ur => ur.TargetUserId)
+            .HasForeignKey(ur => ur.ToUserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

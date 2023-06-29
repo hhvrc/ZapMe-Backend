@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using ZapMe.BusinessLogic.Users;
-using ZapMe.Database;
+using ZapMe.BusinessRules;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
+using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -12,23 +12,20 @@ public partial class UserController
     /// <summary>
     /// Look up user by name
     /// </summary>
-    /// <param name="dbContext"></param>
-    /// <param name="username"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    [RequestSizeLimit(1024)]
+    /// <response code="302">User found</response>
+    /// <response code="404">User not found</response>
     [HttpGet("lookup", Name = "GetUserByName")]
-    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]     // Accepted
-    [ProducesResponseType(StatusCodes.Status404NotFound)] // User not found
-    public async Task<IActionResult> LookUp([FromServices] DatabaseContext dbContext, [FromQuery] string username, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status302Found)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> LookUp([FromQuery] string username, [FromServices] IUserRepository userRepository, CancellationToken cancellationToken)
     {
-        var result = await UserFetchingLogic.FetchUserDto_AsUser_ByName(dbContext, User.GetUserId(), username, cancellationToken);
+        var user = await userRepository.GetUserByUserNameAsync(username, cancellationToken);
 
-        if (!result.HasValue)
+        if (user is null)
         {
             return HttpErrors.UserNotFoundActionResult;
         }
 
-        return Ok(result.Value);
+        return RedirectToAction(nameof(Get), new { userId = user.Id });
     }
 }
