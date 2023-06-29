@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using ZapMe.DTOs;
-using ZapMe.Helpers;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -20,12 +18,13 @@ partial class UserController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> FriendRequestSend([FromRoute] Guid userId, CancellationToken cancellationToken)
     {
-        Guid authenticatedUserId = User.GetUserId();
+        Guid fromUserId = User.GetUserId();
 
-        if (authenticatedUserId == userId)
+        if (fromUserId == userId)
             return BadRequest();
 
-        bool success = await _userManager.CreateFriendRequestAsync(authenticatedUserId, userId, cancellationToken);
+        var result = await _userManager.CreateOrAcceptFriendRequestAsync(fromUserId, userId, cancellationToken);
+        /*
         if (!success)
         {
             // TODO: better error handling
@@ -39,7 +38,7 @@ partial class UserController
         }
 
         // TODO: raise notification
-
+        */
         return NoContent();
     }
 }

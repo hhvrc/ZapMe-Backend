@@ -5,7 +5,7 @@ namespace ZapMe.DTOs.API.User;
 /// <summary>
 /// Message sent to server to create a new account
 /// </summary>
-public readonly struct CreateAccount
+public readonly struct AccountCreateRequestDto
 {
     [Username(true)]
     public string Username { get; init; }

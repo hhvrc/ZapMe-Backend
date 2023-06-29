@@ -56,8 +56,6 @@ public sealed class UserEntity
     public List<UserRoleEntity> UserRoles { get; private set; } = new List<UserRoleEntity>();
     public List<UserRelationEntity> RelationsOutgoing { get; private set; } = new List<UserRelationEntity>();
     public List<UserRelationEntity> RelationsIncoming { get; private set; } = new List<UserRelationEntity>();
-    public List<FriendRequestEntity> FriendRequestsOutgoing { get; private set; } = new List<FriendRequestEntity>();
-    public List<FriendRequestEntity> FriendRequestsIncoming { get; private set; } = new List<FriendRequestEntity>();
     public List<SSOConnectionEntity> SSOConnections { get; private set; } = new List<SSOConnectionEntity>();
 }
 

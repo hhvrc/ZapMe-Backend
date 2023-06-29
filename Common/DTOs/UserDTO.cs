@@ -16,7 +16,11 @@ public readonly struct UserDto
 
     public string StatusText { get; init; }
 
-    public UserRelationType RelationType { get; init; }
+    public UserFriendStatus FriendStatus { get; init; }
+
+    public bool IsFavorite { get; init; }
+
+    public bool IsMuted { get; init; }
 
     public string? NickName { get; init; }
 

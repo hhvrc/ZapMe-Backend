@@ -14,5 +14,5 @@ public interface ICloudflareTurnstileService
     /// <param name="remoteIpAddress"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<CloudflareTurnstileVerifyResponse> VerifyUserResponseTokenAsync(string responseToken, string? remoteIpAddress, CancellationToken cancellationToken = default);
+    Task<CloudflareTurnstileVerifyResponseDto> VerifyUserResponseTokenAsync(string responseToken, string? remoteIpAddress, CancellationToken cancellationToken = default);
 }

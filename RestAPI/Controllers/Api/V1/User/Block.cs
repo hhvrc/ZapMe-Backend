@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using ZapMe.BusinessLogic.Users;
-using ZapMe.Database;
+using ZapMe.Enums;
 using ZapMe.Helpers;
+using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -16,15 +16,15 @@ public partial class UserController
     [HttpPut("{userId}/block", Name = "BlockUser")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Block([FromServices] DatabaseContext dbContext, [FromRoute] Guid userId, CancellationToken cancellationToken)
+    public async Task<IActionResult> Block([FromRoute] Guid userId, [FromServices] IUserRelationManager userRelationManager, CancellationToken cancellationToken)
     {
-        var result = await BlockingLogic.ApplyUserBlock(dbContext, User.GetUserId(), userId, cancellationToken);
+        var result = await userRelationManager.BlockUserAsync(User.GetUserId(), userId, cancellationToken);
 
         return result switch
         {
-            BlockingLogic.ActionResult.Ok => NoContent(),
-            BlockingLogic.ActionResult.Unchanged => NoContent(),
-            BlockingLogic.ActionResult.CannotModerateSelf => BadRequest(),
+            UpdateUserRelationResult.Success => NoContent(),
+            UpdateUserRelationResult.NoChanges => NoContent(),
+            UpdateUserRelationResult.CannotApplyToSelf => BadRequest(),
             _ => HttpErrors.InternalServerErrorActionResult,
         };
     }
@@ -37,15 +37,15 @@ public partial class UserController
     [HttpPut("{userId}/unblock", Name = "UnblockUser")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UnBlock([FromServices] DatabaseContext dbContext, [FromRoute] Guid userId, CancellationToken cancellationToken)
+    public async Task<IActionResult> UnBlock([FromRoute] Guid userId, [FromServices] IUserRelationManager userRelationManager, CancellationToken cancellationToken)
     {
-        var result = await BlockingLogic.RemoveUserBlock(dbContext, User.GetUserId(), userId, cancellationToken);
+        var result = await userRelationManager.UnblockUserAsync(User.GetUserId(), userId, cancellationToken);
 
         return result switch
         {
-            BlockingLogic.ActionResult.Ok => NoContent(),
-            BlockingLogic.ActionResult.Unchanged => NoContent(),
-            BlockingLogic.ActionResult.CannotModerateSelf => BadRequest(),
+            UpdateUserRelationResult.Success => NoContent(),
+            UpdateUserRelationResult.NoChanges => NoContent(),
+            UpdateUserRelationResult.CannotApplyToSelf => BadRequest(),
             _ => HttpErrors.InternalServerErrorActionResult,
         };
     }

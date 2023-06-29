@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using ZapMe.DTOs;
-using ZapMe.Helpers;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -20,15 +19,24 @@ public partial class UserController
     [ProducesResponseType(StatusCodes.Status404NotFound)]    // No friendrequest incoming
     public async Task<IActionResult> FriendRequestAccept([FromRoute] Guid userId, CancellationToken cancellationToken)
     {
-        Guid authenticatedUserId = User.GetUserId();
+        Guid fromUserId = User.GetUserId();
 
         // You can't reject a friend request from yourself, that would be weird
-        if (authenticatedUserId == userId)
+        if (fromUserId == userId)
             return BadRequest();
 
-        bool success = await _userManager.AcceptFriendRequestAsync(authenticatedUserId, userId, cancellationToken);
+        var result = await _userManager.CreateOrAcceptFriendRequestAsync(fromUserId, userId, cancellationToken);
 
-        return success
+        return result switch
+        {
+            Enums.UpdateUserRelationResult.NoChanges => throw new NotImplementedException(),
+            Enums.UpdateUserRelationResult.NotAllowed => throw new NotImplementedException(),
+            Enums.UpdateUserRelationResult.AlreadyFriends => throw new NotImplementedException(),
+            Enums.UpdateUserRelationResult.FriendshipCreated => throw new NotImplementedException(),
+            Enums.UpdateUserRelationResult.CannotApplyToSelf => throw new NotImplementedException(),
+            _ => throw new NotImplementedException()
+        };
+        /*
             ? Ok()
             : HttpErrors.Generic(
                 StatusCodes.Status404NotFound,
@@ -37,5 +45,6 @@ public partial class UserController
                 NotificationSeverityLevel.Warning,
                 "Friend request not found"
               ).ToActionResult();
+        */
     }
 }

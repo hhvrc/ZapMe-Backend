@@ -2,7 +2,7 @@
 
 namespace ZapMe.DTOs;
 
-public struct CloudflareTurnstileVerifyResponse
+public struct CloudflareTurnstileVerifyResponseDto
 {
     [JsonPropertyName("success")]
     public bool Success { get; set; }

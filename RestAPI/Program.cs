@@ -123,7 +123,7 @@ services.AddMailGunService(configuration);
 services.AddTransient<IJwtAuthenticationManager, JwtAuthenticationManager>();
 services.AddTransient<IPasswordResetRequestStore, PasswordResetRequestStore>();
 services.AddTransient<IPasswordResetManager, PasswordResetManager>();
-services.AddTransient<IUserManager, UserManager>();
+services.AddTransient<IUserRelationManager, UserRelationManager>();
 services.AddTransient<IUserAgentStore, UserAgentStore>();
 services.AddTransient<IUserAgentManager, UserAgentManager>();
 services.AddTransient<ISessionStore, SessionStore>();

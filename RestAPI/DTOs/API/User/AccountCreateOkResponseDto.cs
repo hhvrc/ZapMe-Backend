@@ -1,6 +1,6 @@
 ﻿namespace ZapMe.DTOs.API.User;
 
-public readonly struct CreateOk
+public readonly struct AccountCreateOkResponseDto
 {
     /// <summary>
     /// The account id of the newly created account

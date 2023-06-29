@@ -6,7 +6,6 @@ using ZapMe.Attributes;
 using ZapMe.Database.Models;
 using ZapMe.DTOs;
 using ZapMe.DTOs.API.User;
-using ZapMe.Enums;
 using ZapMe.Enums.Errors;
 using ZapMe.Helpers;
 using ZapMe.Mappers;
@@ -29,12 +28,12 @@ public partial class AccountController
     [AnonymousOnly]
     [RequestSizeLimit(1024)]
     [HttpPost(Name = "CreateAccount")]
-    [ProducesResponseType(typeof(CreateOk), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(AccountCreateOkResponseDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)] // Invalid SSO token
     [ProducesResponseType(StatusCodes.Status409Conflict)] // Username/email already taken
     public async Task<IActionResult> Create(
-        [FromBody] CreateAccount body,
+        [FromBody] AccountCreateRequestDto body,
         [FromServices] ICloudflareTurnstileService cfTurnstileService,
         [FromServices] IDebounceService debounceService,
         CancellationToken cancellationToken
@@ -52,7 +51,7 @@ public partial class AccountController
         }
 
         // Verify turnstile token
-        CloudflareTurnstileVerifyResponse reCaptchaResponse = await cfTurnstileService.VerifyUserResponseTokenAsync(body.TurnstileResponse, this.GetRemoteIP(), cancellationToken);
+        CloudflareTurnstileVerifyResponseDto reCaptchaResponse = await cfTurnstileService.VerifyUserResponseTokenAsync(body.TurnstileResponse, this.GetRemoteIP(), cancellationToken);
         if (!reCaptchaResponse.Success)
         {
             if (reCaptchaResponse.ErrorCodes is not null)
@@ -85,7 +84,7 @@ public partial class AccountController
                 }
             }
 
-            return StatusCode(StatusCodes.Status500InternalServerError);
+            return HttpErrors.InternalServerErrorActionResult;
         }
 
         // Attempt to check against debounce if the email is a throwaway email
@@ -145,17 +144,7 @@ public partial class AccountController
                     );
                 if (getOrCreateImageResult.TryPickT1(out ImageUploadError uploadImageError, out bannerImageEntity))
                 {
-                    return uploadImageError switch
-                    {
-                        ImageUploadError.PayloadSizeInvalid => throw new NotImplementedException(),
-                        ImageUploadError.PayloadSizeTooLarge => throw new NotImplementedException(),
-                        ImageUploadError.PayloadChecksumMismatch => throw new NotImplementedException(),
-                        ImageUploadError.ImageDimensionsInvalid => throw new NotImplementedException(),
-                        ImageUploadError.ImageDataInvalid => throw new NotImplementedException(),
-                        ImageUploadError.ImageFormatUnsupported => throw new NotImplementedException(),
-                        ImageUploadError.ImageDimensionsTooLarge => throw new NotImplementedException(),
-                        _ => throw new NotImplementedException(),
-                    };
+                    return ImageUploadErrorMapper.MapToErrorDetails(uploadImageError).ToActionResult();
                 }
             }
         }
@@ -163,23 +152,21 @@ public partial class AccountController
         // If a OAuth provider has verified the email, and the user has not changed it, then we can mark the email as verified
         bool emailVerified = providerVariables?.ProviderUserEmail == body.Email && providerVariables.ProviderUserEmailVerified;
 
-        UserEntity user = new UserEntity
-        {
-            Name = body.Username,
-            Email = body.Email,
-            EmailVerified = emailVerified,
-            PasswordHash = PasswordUtils.HashPassword(body.Password),
-            AcceptedPrivacyPolicyVersion = body.AcceptedPrivacyPolicyVersion,
-            AcceptedTermsOfServiceVersion = body.AcceptedTermsOfServiceVersion,
-            ProfileAvatarId = avatarImageEntity?.Id,
-            ProfileBannerId = bannerImageEntity?.Id,
-            Status = UserStatus.Online,
-            StatusText = String.Empty
-        };
+        var userRepo = HttpContext.RequestServices.GetRequiredService<IUserRepository>();
 
-        // Create account
-        _dbContext.Users.Add(user);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        UserEntity user = await userRepo.CreateUserAsync(
+            new(
+                Username: body.Username,
+                Email: body.Email,
+                EmailVerified: emailVerified,
+                Password: body.Password,
+                AcceptedPrivacyPolicyVersion: body.AcceptedPrivacyPolicyVersion,
+                AcceptedTermsOfServiceVersion: body.AcceptedTermsOfServiceVersion,
+                ProfileAvatarImageId: avatarImageEntity?.Id,
+                ProfileBannerImageId: bannerImageEntity?.Id
+            ),
+            cancellationToken
+            );
 
         if (avatarImageEntity is not null)
         {
@@ -239,7 +226,7 @@ public partial class AccountController
         // Commit transaction
         await transaction.CommitAsync(cancellationToken);
 
-        return CreatedAtAction(nameof(Get), new CreateOk
+        return CreatedAtAction(nameof(Get), new AccountCreateOkResponseDto
         {
             AccountId = user.Id,
             Session = jwtToken is null ? null : new AuthenticationResponse(jwtToken),
