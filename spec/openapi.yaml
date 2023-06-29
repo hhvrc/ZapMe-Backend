@@ -669,7 +669,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FriendRequestsDTO'
+                $ref: '#/components/schemas/FriendRequestsDto'
   '/api/v1/user/{userId}':
     get:
       tags:
@@ -1037,7 +1037,7 @@ components:
           nullable: true
       additionalProperties: false
       description: Details about the error
-    FriendRequestsDTO:
+    FriendRequestsDto:
       required:
         - incoming
         - outgoing

@@ -3,7 +3,7 @@
 /// <summary>
 /// List of incoming and outgoing friendrequests
 /// </summary>
-public readonly struct FriendRequestsDTO
+public readonly struct FriendRequestsDto
 {
     /// <summary>
     /// UserId's of users that has sent friend requests to this user
