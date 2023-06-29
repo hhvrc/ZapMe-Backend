@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using ZapMe.DTOs;
+using ZapMe.DTOs.API.User;
 using ZapMe.Enums;
 using ZapMe.Helpers;
 
@@ -11,39 +12,25 @@ public partial class UserController
     /// <summary>
     /// Create a new friend request or accept an incoming friend request to this user
     /// </summary>
-    [RequestSizeLimit(1024)]
+    /// <response code="200">Created/Accepted request</response>
+    /// <response code="304">Already sent</response>
+    /// <response code="400">Bad request/Not allowed/Already friends</response>
     [HttpPut("{userId}/friendrequest", Name = "CreateOrAcceptFriendRequest")]
-    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]        // Accepted
-    [ProducesResponseType(StatusCodes.Status304NotModified)] // Already friends
-    [ProducesResponseType(StatusCodes.Status404NotFound)]    // No friendrequest incoming
+    [ProducesResponseType(typeof(FriendRequestCreateOrAccept200OkDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status304NotModified)]
+    [ProducesResponseType(typeof(FriendRequestCreateOrAccept400BadRequestDto), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> FriendRequestCreateOrAccept([FromRoute] Guid userId, CancellationToken cancellationToken)
     {
-        Guid fromUserId = User.GetUserId();
-
-        // You can't reject a friend request from yourself, that would be weird
-        if (fromUserId == userId)
-            return BadRequest();
-
-        var result = await _userManager.CreateOrAcceptFriendRequestAsync(fromUserId, userId, cancellationToken);
+        var result = await _userManager.CreateOrAcceptFriendRequestAsync(User.GetUserId(), userId, cancellationToken);
 
         return result switch
         {
-            CreateOrAcceptFriendRequestResult.NoChanges => NoContent(), // TODO: Create a response DTO for this
+            CreateOrAcceptFriendRequestResult.NoChanges => new StatusCodeResult(StatusCodes.Status304NotModified),
             CreateOrAcceptFriendRequestResult.NotAllowed => BadRequest(), // TODO: Create a response DTO for this
-            CreateOrAcceptFriendRequestResult.AlreadyFriends => NoContent(), // TODO: Create a response DTO for this
-            CreateOrAcceptFriendRequestResult.FriendshipCreated => NoContent(), // TODO: Create a response DTO for this
+            CreateOrAcceptFriendRequestResult.AlreadyFriends => BadRequest(), // TODO: Create a response DTO for this
+            CreateOrAcceptFriendRequestResult.FriendshipCreated => Ok(), // TODO: Create a response DTO for this
             CreateOrAcceptFriendRequestResult.CannotApplyToSelf => BadRequest(), // TODO: Create a response DTO for this
             _ => HttpErrors.InternalServerErrorActionResult,
         };
-        /*
-            ? Ok()
-            : HttpErrors.Generic(
-                StatusCodes.Status404NotFound,
-                "friendrequest_not_found",
-                "Friend request not found",
-                NotificationSeverityLevel.Warning,
-                "Friend request not found"
-              ).ToActionResult();
-        */
     }
 }

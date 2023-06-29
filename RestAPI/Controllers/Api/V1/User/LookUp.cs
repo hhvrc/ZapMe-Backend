@@ -12,11 +12,12 @@ public partial class UserController
     /// <summary>
     /// Look up user by name
     /// </summary>
-    [RequestSizeLimit(1024)]
+    /// <response code="302">User found</response>
+    /// <response code="404">User not found</response>
     [HttpGet("lookup", Name = "GetUserByName")]
-    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]     // Accepted
-    [ProducesResponseType(StatusCodes.Status404NotFound)] // User not found
-    public async Task<IActionResult> LookUp([FromServices] IUserRepository userRepository, [FromQuery] string username, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status302Found)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> LookUp([FromQuery] string username, [FromServices] IUserRepository userRepository, CancellationToken cancellationToken)
     {
         var user = await userRepository.GetUserByUserNameAsync(username, cancellationToken);
 
@@ -25,10 +26,6 @@ public partial class UserController
             return HttpErrors.UserNotFoundActionResult;
         }
 
-        var userRelation = user.RelationsIncoming.FirstOrDefault(r => r.FromUserId == User.GetUserId());
-
-        return UserRelationRules.IsEitherUserBlocking(user, User.GetUserId())
-            ? Ok(UserMapper.MapToMinimalDto(user, userRelation))
-            : Ok(UserMapper.MapToDto(user, userRelation));
+        return RedirectToAction(nameof(Get), new { userId = user.Id });
     }
 }
