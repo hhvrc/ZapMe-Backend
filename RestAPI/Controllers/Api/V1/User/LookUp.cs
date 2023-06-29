@@ -12,10 +12,12 @@ public partial class UserController
     /// <summary>
     /// Look up user by name
     /// </summary>
-    /// <response code="302">User found</response>
+    /// <!-- <response code="302">User found</response> TODO: OpenAPI doesn't support 302 responses -->
+    /// <response code="200">User found</response>
     /// <response code="404">User not found</response>
     [HttpGet("lookup", Name = "GetUserByName")]
-    [ProducesResponseType(typeof(UserDto), StatusCodes.Status302Found)]
+    //[ProducesResponseType(typeof(UserDto), StatusCodes.Status302Found)] // TODO: OpenAPI doesn't support 302 responses
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> LookUp([FromQuery] string username, [FromServices] IUserRepository userRepository, CancellationToken cancellationToken)
     {
@@ -26,6 +28,11 @@ public partial class UserController
             return HttpErrors.UserNotFoundActionResult;
         }
 
-        return RedirectToAction(nameof(Get), new { userId = user.Id });
+        //return RedirectToAction(nameof(Get), new { userId = user.Id }); // TODO: OpenAPI doesn't support 302 responses
+        var userRelation = user.RelationsIncoming.FirstOrDefault(r => r.FromUserId == User.GetUserId());
+
+        return UserRelationRules.IsEitherUserBlocking(user, User.GetUserId())
+            ? Ok(UserMapper.MapToMinimalDto(user, userRelation))
+            : Ok(UserMapper.MapToDto(user, userRelation));
     }
 }
