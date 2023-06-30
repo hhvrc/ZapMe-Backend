@@ -25,7 +25,7 @@ public partial class UserController
         return result switch
         {
             CreateOrAcceptFriendRequestResult.Success => Ok(new FriendRequestCreateOrAccept200OkDto()),
-            CreateOrAcceptFriendRequestResult.NoChanges => StatusCode(StatusCodes.Status304NotModified, new FriendRequestCreateOrAccept304NotModifiedDto()),
+            CreateOrAcceptFriendRequestResult.NoChanges => StatusCode(StatusCodes.Status304NotModified),
             CreateOrAcceptFriendRequestResult.NotAllowed => BadRequest(), // TODO: Create a response DTO for this
             CreateOrAcceptFriendRequestResult.AlreadyFriends => BadRequest(), // TODO: Create a response DTO for this
             CreateOrAcceptFriendRequestResult.FriendshipCreated => Ok(new FriendRequestCreateOrAccept200OkDto()),
