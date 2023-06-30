@@ -725,6 +725,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
+  '/api/v1/user/{userId}/unfriend':
+    put:
+      tags:
+        - User
+      summary: Unfriend a user
+      operationId: UnfriendUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: User unfriended
+        '304':
+          description: User wasn't friended
+        '400':
+          description: You can't moderate yourself
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
   /api/ws:
     get:
       tags:
