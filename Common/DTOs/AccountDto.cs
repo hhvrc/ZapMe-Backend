@@ -7,51 +7,51 @@ namespace ZapMe.DTOs;
 /// </summary>
 public readonly struct AccountDto
 {
-    public Guid Id { get; init; }
+    public required Guid Id { get; init; }
 
-    public string Username { get; init; }
+    public required string Username { get; init; }
 
     /// <summary>
     /// Obfuscated email of your account
     /// </summary>
-    public string ObscuredEmail { get; init; }
+    public required string ObscuredEmail { get; init; }
 
-    public bool EmailVerified { get; init; }
+    public required bool EmailVerified { get; init; }
 
-    public uint AcceptedPrivacyPolicyVersion { get; init; }
+    public required uint AcceptedPrivacyPolicyVersion { get; init; }
 
-    public uint AcceptedTermsOfServiceVersion { get; init; }
+    public required uint AcceptedTermsOfServiceVersion { get; init; }
 
-    public Uri? AvatarUrl { get; init; }
+    public required Uri? AvatarUrl { get; init; }
 
-    public Uri? BannerUrl { get; init; }
+    public required Uri? BannerUrl { get; init; }
 
-    public UserStatus Status { get; init; }
+    public required UserStatus Status { get; init; }
 
-    public string StatusText { get; init; }
+    public required string StatusText { get; init; }
 
     /// <summary>
     /// Ids of users this account has friended
     /// </summary>
-    public IEnumerable<Guid> FriendUserIds { get; init; }
+    public required IEnumerable<Guid> FriendUserIds { get; init; }
 
     /// <summary>
     /// SSO providers this account is connected to
     /// </summary>
-    public IEnumerable<string> SSOConnections { get; init; }
+    public required IEnumerable<string> SSOConnections { get; init; }
 
     /// <summary>
     /// Date this user was created at
     /// </summary>
-    public DateTime CreatedAt { get; init; }
+    public required DateTime CreatedAt { get; init; }
 
     /// <summary>
     /// Last time this user was updated
     /// </summary>
-    public DateTime UpdatedAt { get; init; }
+    public required DateTime UpdatedAt { get; init; }
 
     /// <summary>
     /// Last time this user was online
     /// </summary>
-    public DateTime LastOnline { get; init; }
+    public required DateTime LastOnline { get; init; }
 }

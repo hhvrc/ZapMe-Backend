@@ -6,7 +6,7 @@ namespace ZapMe.DTOs;
 
 public static class UserMapper
 {
-    public static UserDto MapToDto(UserEntity user, UserRelationEntity? userRelation)
+    public static UserDto MapToDto(UserEntity user, UserRelationDto userRelation)
     {
         return new UserDto
         {
@@ -16,16 +16,18 @@ public static class UserMapper
             BannerUrl = user.ProfileBanner?.PublicUrl,
             Status = user.Status,
             StatusText = user.StatusText,
-            FriendStatus = userRelation?.FriendStatus ?? UserFriendStatus.None,
-            NickName = userRelation?.NickName,
-            Notes = userRelation?.Notes,
+            FriendStatus = userRelation.FriendStatus,
+            IsFavorite = userRelation.IsFavorite,
+            IsMuted = userRelation.IsMuted,
+            NickName = userRelation.NickName,
+            Notes = userRelation.Notes,
             CreatedAt = user.CreatedAt,
             LastSeenAt = user.LastOnline,
-            FriendedAt = userRelation?.CreatedAt
+            FriendedAt = userRelation.FriendedAt,
         };
     }
 
-    public static UserDto MapToMinimalDto(UserEntity user, UserRelationEntity? userRelation)
+    public static UserDto MapToMinimalDto(UserEntity user, UserRelationDto userRelation)
     {
         return new UserDto
         {
@@ -35,11 +37,14 @@ public static class UserMapper
             BannerUrl = null,
             Status = UserStatus.Offline,
             StatusText = String.Empty,
-            FriendStatus = userRelation?.FriendStatus ?? UserFriendStatus.None,
-            NickName = userRelation?.NickName,
-            Notes = userRelation?.Notes,
+            FriendStatus = userRelation.FriendStatus,
+            IsFavorite = userRelation.IsFavorite,
+            IsMuted = userRelation.IsMuted,
+            NickName = userRelation.NickName,
+            Notes = userRelation.Notes,
             CreatedAt = DateTime.MinValue,
-            LastSeenAt = DateTime.MinValue
+            LastSeenAt = DateTime.MinValue,
+            FriendedAt = userRelation.FriendedAt,
         };
     }
 
@@ -57,7 +62,7 @@ public static class UserMapper
             BannerUrl = user.ProfileBanner?.PublicUrl,
             Status = user.Status,
             StatusText = user.StatusText,
-            FriendUserIds = user.RelationsOutgoing.Where(r => r.FriendStatus == UserFriendStatus.Accepted).Select(r => r.ToUserId),
+            FriendUserIds = user.RelationsOutgoing.Where(r => r.FriendStatus == UserPartialFriendStatus.Accepted).Select(r => r.ToUserId),
             SSOConnections = user.SSOConnections.Select(oc => oc.ProviderName),
             CreatedAt = user.CreatedAt,
             UpdatedAt = user.UpdatedAt,

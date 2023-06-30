@@ -3,7 +3,8 @@
 public enum UserFriendStatus
 {
     None,
-    Pending,
-    Accepted,
+    FriendRequestOutgoing,
+    FriendRequestIncoming,
+    Friends,
     Blocked
 }

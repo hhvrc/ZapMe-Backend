@@ -14,6 +14,6 @@ public partial class UserController
     [HttpGet("friendrequests", Name = "GetFriendRequests")]
     public Task<FriendRequestsDto> ListFriendRequests([FromServices] DatabaseContext dbContext, CancellationToken cancellationToken)
     {
-        return FriendRequestLogic.GetFriendRequestsDTO(dbContext, User.GetUserId(), cancellationToken);
+        return UserRelationLogic.GetFriendRequestsDTO(dbContext, User.GetUserId(), cancellationToken);
     }
 }

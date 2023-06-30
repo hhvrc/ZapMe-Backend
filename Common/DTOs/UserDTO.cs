@@ -4,40 +4,40 @@ namespace ZapMe.DTOs;
 
 public readonly struct UserDto
 {
-    public Guid Id { get; init; }
+    public required Guid Id { get; init; }
 
-    public string Username { get; init; }
+    public required string Username { get; init; }
 
-    public Uri? AvatarUrl { get; init; }
+    public required Uri? AvatarUrl { get; init; }
 
-    public Uri? BannerUrl { get; init; }
+    public required Uri? BannerUrl { get; init; }
 
-    public UserStatus Status { get; init; }
+    public required UserStatus Status { get; init; }
 
-    public string StatusText { get; init; }
+    public required string StatusText { get; init; }
 
-    public UserFriendStatus FriendStatus { get; init; }
+    public required UserFriendStatus FriendStatus { get; init; }
 
-    public bool IsFavorite { get; init; }
+    public required bool IsFavorite { get; init; }
 
-    public bool IsMuted { get; init; }
+    public required bool IsMuted { get; init; }
 
-    public string? NickName { get; init; }
+    public required string? NickName { get; init; }
 
-    public string? Notes { get; init; }
+    public required string? Notes { get; init; }
 
     /// <summary>
     /// Date this user was created at
     /// </summary>
-    public DateTime CreatedAt { get; init; }
+    public required DateTime CreatedAt { get; init; }
 
     /// <summary>
     /// Last time this user was seen online
     /// </summary>
-    public DateTime LastSeenAt { get; init; }
+    public required DateTime LastSeenAt { get; init; }
 
     /// <summary>
     /// The time this user was friended at
     /// </summary>
-    public DateTime? FriendedAt { get; init; }
+    public required DateTime? FriendedAt { get; init; }
 }

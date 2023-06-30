@@ -1279,8 +1279,9 @@ components:
     UserFriendStatus:
       enum:
         - none
-        - pending
-        - accepted
+        - friendRequestOutgoing
+        - friendRequestIncoming
+        - friends
         - blocked
       type: string
     UserNotification:

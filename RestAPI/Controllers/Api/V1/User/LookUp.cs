@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using ZapMe.BusinessLogic.Users;
 using ZapMe.BusinessRules;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
@@ -29,10 +30,10 @@ public partial class UserController
         }
 
         //return RedirectToAction(nameof(Get), new { userId = user.Id }); // TODO: OpenAPI doesn't support 302 responses
-        var userRelation = user.RelationsIncoming.FirstOrDefault(r => r.FromUserId == User.GetUserId());
-
-        return UserRelationRules.IsEitherUserBlocking(user, User.GetUserId())
-            ? Ok(UserMapper.MapToMinimalDto(user, userRelation))
-            : Ok(UserMapper.MapToDto(user, userRelation));
+        Guid selfUserId = User.GetUserId();
+        var relation = UserRelationLogic.GetUserRelationDto(selfUserId, user);
+        return UserRelationRules.IsEitherUserBlocking(user, selfUserId)
+            ? Ok(UserMapper.MapToMinimalDto(user, relation))
+            : Ok(UserMapper.MapToDto(user, relation));
     }
 }
