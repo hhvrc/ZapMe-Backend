@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using ZapMe.DTOs;
 using ZapMe.DTOs.API.User;
 using ZapMe.Enums;
 using ZapMe.Helpers;
@@ -25,11 +24,11 @@ public partial class UserController
 
         return result switch
         {
-            CreateOrAcceptFriendRequestResult.Success => Ok(), // TODO: Create a response DTO for this
-            CreateOrAcceptFriendRequestResult.NoChanges => StatusCode(StatusCodes.Status304NotModified),
+            CreateOrAcceptFriendRequestResult.Success => Ok(new FriendRequestCreateOrAccept200OkDto()),
+            CreateOrAcceptFriendRequestResult.NoChanges => StatusCode(StatusCodes.Status304NotModified, new FriendRequestCreateOrAccept304NotModifiedDto()),
             CreateOrAcceptFriendRequestResult.NotAllowed => BadRequest(), // TODO: Create a response DTO for this
             CreateOrAcceptFriendRequestResult.AlreadyFriends => BadRequest(), // TODO: Create a response DTO for this
-            CreateOrAcceptFriendRequestResult.FriendshipCreated => Ok(), // TODO: Create a response DTO for this
+            CreateOrAcceptFriendRequestResult.FriendshipCreated => Ok(new FriendRequestCreateOrAccept200OkDto()),
             CreateOrAcceptFriendRequestResult.CannotApplyToSelf => BadRequest(), // TODO: Create a response DTO for this
             _ => HttpErrors.InternalServerErrorActionResult,
         };

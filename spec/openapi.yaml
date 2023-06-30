@@ -605,12 +605,8 @@ paths:
             type: string
             format: uuid
       responses:
-        '204':
-          description: No Content
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FriendRequestDelete200OkDto'
+        '200':
+          description: Deleted/Rejected request
         '400':
           description: Bad Request
           content:
@@ -619,8 +615,6 @@ paths:
                 $ref: '#/components/schemas/ErrorDetails'
         '404':
           description: No friend request found
-        '200':
-          description: Deleted/Rejected request
   /api/v1/user/friendrequests:
     get:
       tags:
@@ -1027,9 +1021,6 @@ components:
       type: object
       additionalProperties: false
     FriendRequestCreateOrAccept400BadRequestDto:
-      type: object
-      additionalProperties: false
-    FriendRequestDelete200OkDto:
       type: object
       additionalProperties: false
     FriendRequestsDto:
