@@ -1249,7 +1249,7 @@ components:
         - id
         - isFavorite
         - isMuted
-        - lastSeenAt
+        - lastOnline
         - status
         - statusText
         - username
@@ -1290,7 +1290,7 @@ components:
           type: string
           description: Date this user was created at
           format: date-time
-        lastSeenAt:
+        lastOnline:
           type: string
           description: Last time this user was seen online
           format: date-time

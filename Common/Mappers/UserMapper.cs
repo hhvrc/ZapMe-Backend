@@ -22,7 +22,7 @@ public static class UserMapper
             NickName = userRelation.NickName,
             Notes = userRelation.Notes,
             CreatedAt = user.CreatedAt,
-            LastSeenAt = user.LastOnline,
+            LastOnline = user.LastOnline,
             FriendedAt = userRelation.FriendedAt,
         };
     }
@@ -43,7 +43,7 @@ public static class UserMapper
             NickName = userRelation.NickName,
             Notes = userRelation.Notes,
             CreatedAt = DateTime.MinValue,
-            LastSeenAt = DateTime.MinValue,
+            LastOnline = DateTime.MinValue,
             FriendedAt = userRelation.FriendedAt,
         };
     }

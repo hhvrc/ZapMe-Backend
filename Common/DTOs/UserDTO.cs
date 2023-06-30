@@ -1,8 +1,9 @@
-﻿using ZapMe.Enums;
+﻿using ZapMe.DTOs.Interfaces;
+using ZapMe.Enums;
 
 namespace ZapMe.DTOs;
 
-public readonly struct UserDto
+public readonly struct UserDto : IUserDto
 {
     public required Guid Id { get; init; }
 
@@ -34,7 +35,7 @@ public readonly struct UserDto
     /// <summary>
     /// Last time this user was seen online
     /// </summary>
-    public required DateTime LastSeenAt { get; init; }
+    public required DateTime LastOnline { get; init; }
 
     /// <summary>
     /// The time this user was friended at

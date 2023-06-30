@@ -1,11 +1,12 @@
-﻿using ZapMe.Enums;
+﻿using ZapMe.DTOs.Interfaces;
+using ZapMe.Enums;
 
 namespace ZapMe.DTOs;
 
 /// <summary>
 /// Account object, this can only retrieved for the user you are logged in as
 /// </summary>
-public readonly struct AccountDto
+public readonly struct AccountDto : IUserDto
 {
     public required Guid Id { get; init; }
 
