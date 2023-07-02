@@ -9,20 +9,64 @@ namespace ZapMe.Services;
 public sealed class WebSocketInstanceManager : IWebSocketInstanceManager
 {
     private readonly ILogger<WebSocketInstanceManager> _logger;
-    private readonly ConcurrentDictionary<string, WebSocketInstance> _instances;
+    private readonly ConcurrentDictionary<Guid, WebSocketClient> _clients = new();
+    private readonly ConcurrentDictionary<Guid, ConcurrentDictionary<Guid, WebSocketClient>> _users = new();
 
     public WebSocketInstanceManager(ILogger<WebSocketInstanceManager> logger)
     {
         _logger = logger;
-        _instances = new ConcurrentDictionary<string, WebSocketInstance>();
     }
 
-    public ulong OnlineCount => (ulong)_instances.Count;
+    public ulong OnlineCount => (ulong)_users.Count;
 
-    public async Task<bool> RegisterInstanceAsync(Guid userId, string instanceId, WebSocketInstance instance, CancellationToken cancellationToken)
+    private Task RemoveClientBySessionId(Guid sessionId)
     {
-        if (!_instances.TryAdd(instanceId, instance))
+        if (_clients.TryRemove(sessionId, out var client) && client is not null)
         {
+            Guid userId = client.UserId;
+
+            if (_users.TryGetValue(userId, out var userClients) && userClients is not null)
+            {
+                userClients.TryRemove(sessionId, out _);
+                if (userClients.Count == 0)
+                {
+                    _users.TryRemove(userId, out _);
+
+                    // Mark user as offline
+                }
+
+                // Remove from redis
+
+                // Publish event
+
+                return Task.CompletedTask;
+            }
+        }
+    }
+
+    public async Task<bool> RegisterClientAsync(WebSocketClient client, CancellationToken cancellationToken)
+    {
+        Guid userId = client.UserId;
+
+        // Get user clients
+        if (_users.TryGetValue(userId, out var userClients) || userClients == null)
+        {
+            userClients = new ConcurrentDictionary<Guid, WebSocketClient>();
+            if (!_users.TryAdd(userId, userClients))
+            {
+                await client.CloseAsync(WebSocketCloseStatus.InternalServerError, "Failed to register user", cancellationToken);
+                return false;
+            }
+
+            // Mark user as online
+        }
+
+        Guid sessionId = client.SessionId;
+
+        // Add client
+        if (!userClients.TryAdd(sessionId, client))
+        {
+            await client.CloseAsync(WebSocketCloseStatus.PolicyViolation, "You are already connected on this authentication session", cancellationToken);
             return false;
         }
 
@@ -34,29 +78,34 @@ public sealed class WebSocketInstanceManager : IWebSocketInstanceManager
         }
         catch
         {
-            _instances.Remove(instanceId, out _);
-            await instance.CloseAsync(WebSocketCloseStatus.InternalServerError, "Failed to register instance", cancellationToken);
+            await RemoveClientBySessionId(sessionId);
+            await client.CloseAsync(WebSocketCloseStatus.InternalServerError, "Failed to register client", cancellationToken);
             throw;
         }
 
         return true;
     }
 
-    public async Task RemoveInstanceAsync(string instanceId, string reason, CancellationToken cancellationToken)
+    public Task RemoveClientAsync(Guid clientSessionId, string reason, CancellationToken cancellationToken)
     {
-        if (_instances.Remove(instanceId, out var instance) && instance is not null)
-        {
-            await instance.CloseAsync(WebSocketCloseStatus.NormalClosure, reason, cancellationToken);
-
-            // Remove from redis
-        }
+        return RemoveClientBySessionId(clientSessionId);
     }
 
-    public async Task RemoveAllInstancesAsync(Guid userId, string reason, CancellationToken cancellationToken)
+    public async Task DisconnectAllClientsAsync(Guid userId, string reason, CancellationToken cancellationToken)
     {
-        foreach (var instance in _instances.Where(x => x.Value.UserId == userId).ToArray()) // ToArray is very important here to avoid collection modified exception
+        foreach (var instance in _users.Where(x => x.Value.UserId == userId).ToArray()) // ToArray is very important here to avoid collection modified exception
         {
             await RemoveInstanceAsync(instance.Key, reason, cancellationToken);
         }
     }
+
+    public async Task RunActionOnInstanceAsync(Guid userId, Func<WebSocketClient, Task> action, CancellationToken cancellationToken)
+    {
+        if (_users.TryGetValue(instanceId, out var instance) && instance is not null)
+        {
+            await action(instance);
+        }
+    }
+
+    public Task DisconnectEveryoneAsync(string reason = "Forcefully removed", CancellationToken cancellationToken = default) => throw new NotImplementedException();
 }

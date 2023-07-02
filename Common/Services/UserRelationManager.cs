@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Mediator;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using ZapMe.Database;
 using ZapMe.Database.Extensions;
 using ZapMe.Database.Models;
 using ZapMe.DTOs;
+using ZapMe.DTOs.Mediator;
 using ZapMe.Enums;
 using ZapMe.Services.Interfaces;
 
@@ -12,10 +14,12 @@ namespace ZapMe.Services;
 public sealed class UserRelationManager : IUserRelationManager
 {
     private readonly DatabaseContext _dbContext;
+    private readonly IMediator _mediator;
 
-    public UserRelationManager(DatabaseContext dbContext)
+    public UserRelationManager(DatabaseContext dbContext, IMediator mediator)
     {
         _dbContext = dbContext;
+        _mediator = mediator;
     }
 
     private async Task SetFriendStatus(Guid fromUserId, Guid toUserId, UserPartialFriendStatus friendStatus, UserRelationEntity? trackedEntity, CancellationToken cancellationToken)
@@ -78,6 +82,9 @@ public sealed class UserRelationManager : IUserRelationManager
                 await transaction.CommitAsync(cancellationToken);
             }
 
+            // Publish the friendship created event
+            await _mediator.Publish(new UserFriendshipCreatedEvent(fromUserId, toUserId), cancellationToken);
+
             return CreateOrAcceptFriendRequestResult.FriendshipCreated;
         }
 
@@ -86,6 +93,9 @@ public sealed class UserRelationManager : IUserRelationManager
 
         // Set the friend status to pending
         await SetFriendStatus(fromUserId, toUserId, UserPartialFriendStatus.Pending, outgoingRelation, cancellationToken);
+
+        // Publish the friend request created event
+        await _mediator.Publish(new UserFriendRequestCreatedEvent(fromUserId, toUserId), cancellationToken);
 
         return CreateOrAcceptFriendRequestResult.Success;
     }
@@ -105,9 +115,14 @@ public sealed class UserRelationManager : IUserRelationManager
             )
             .ExecuteUpdateAsync(spc => spc.SetProperty(x => x.FriendStatus, UserPartialFriendStatus.None), cancellationToken);
 
-        return nRemoved > 0
-            ? UpdateUserRelationResult.Success
-            : UpdateUserRelationResult.NoChanges;
+        if (nRemoved <= 0)
+        {
+            return UpdateUserRelationResult.NoChanges;
+        }
+
+        await _mediator.Publish(new UserFriendRequestDeletedEvent(fromUserId, toUserId), cancellationToken);
+
+        return UpdateUserRelationResult.Success;
     }
 
     public async Task<UpdateUserRelationResult> RemoveFriendshipAsync(Guid fromUserId, Guid toUserId, CancellationToken cancellationToken)
@@ -125,9 +140,14 @@ public sealed class UserRelationManager : IUserRelationManager
             )
             .ExecuteUpdateAsync(spc => spc.SetProperty(x => x.FriendStatus, UserPartialFriendStatus.None), cancellationToken);
 
-        return nRemoved > 0
-            ? UpdateUserRelationResult.Success
-            : UpdateUserRelationResult.NoChanges;
+        if (nRemoved <= 0)
+        {
+              return UpdateUserRelationResult.NoChanges;
+        }
+
+        await _mediator.Publish(new UserFriendshipDeletedEvent(fromUserId, toUserId), cancellationToken);
+
+        return UpdateUserRelationResult.Success;
     }
 
     public async Task<UpdateUserRelationResult> BlockUserAsync(Guid fromUserId, Guid toUserId, CancellationToken cancellationToken)
@@ -148,6 +168,8 @@ public sealed class UserRelationManager : IUserRelationManager
             await transaction.CommitAsync(cancellationToken);
         }
 
+        await _mediator.Publish(new UserBlockedEvent(fromUserId, toUserId), cancellationToken);
+
         return UpdateUserRelationResult.Success;
     }
 
@@ -159,9 +181,14 @@ public sealed class UserRelationManager : IUserRelationManager
         int numUpdates = await _dbContext.UserRelations.Where(x => x.FromUserId == fromUserId && x.ToUserId == toUserId && x.FriendStatus == UserPartialFriendStatus.Blocked)
             .ExecuteUpdateAsync(spc => spc.SetProperty(x => x.FriendStatus, UserPartialFriendStatus.None), cancellationToken);
 
-        return numUpdates > 0
-            ? UpdateUserRelationResult.Success
-            : UpdateUserRelationResult.NoChanges;
+        if (numUpdates <= 0)
+        {
+            return UpdateUserRelationResult.NoChanges;
+        }
+
+        await _mediator.Publish(new UserUnblockedEvent(fromUserId, toUserId), cancellationToken);
+
+        return UpdateUserRelationResult.Success;
     }
 
     public async Task<UpdateUserRelationResult> SetUserRelationDetailsAsync(Guid fromUserId, Guid toUserId, SetUserRelationDto relationUpdate, CancellationToken cancellationToken)
@@ -205,6 +232,8 @@ public sealed class UserRelationManager : IUserRelationManager
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        await _mediator.Publish(new UserRelationDetailsUpdatedEvent(fromUserId, toUserId));
 
         return UpdateUserRelationResult.Success;
     }

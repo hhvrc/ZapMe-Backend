@@ -33,5 +33,8 @@ public interface IUserRepository
     /// </summary>
     Task<UserEntity?> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default);
 
-
+    /// <summary>
+    /// Deletes a user by their id, returns true if the user was deleted, false if the user did not exist.
+    /// </summary>
+    Task<bool> DeleteUserById(Guid userId, CancellationToken cancellationToken = default);
 }

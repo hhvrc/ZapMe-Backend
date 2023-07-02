@@ -14,20 +14,17 @@ public static class WebSocketInstanceLayer
         // Services
         IWebSocketInstanceManager wsInstanceManager = httpContext.RequestServices.GetRequiredService<IWebSocketInstanceManager>();
         IJwtAuthenticationManager jwtAuthenticationManager = httpContext.RequestServices.GetRequiredService<IJwtAuthenticationManager>();
-        ILogger<Websocket.WebSocketInstance> wsLogger = httpContext.RequestServices.GetRequiredService<ILogger<Websocket.WebSocketInstance>>();
+        ILogger<Websocket.WebSocketClient> wsLogger = httpContext.RequestServices.GetRequiredService<ILogger<Websocket.WebSocketClient>>();
 
         // Create the connection instance
-        var result = await Websocket.WebSocketInstance.CreateAsync(websocket, jwtAuthenticationManager, wsLogger, cancellationToken);
-        if (result.TryPickT1(out CreateWebSocketError createError, out Websocket.WebSocketInstance instance))
+        var result = await Websocket.WebSocketClient.CreateAsync(websocket, jwtAuthenticationManager, wsLogger, cancellationToken);
+        if (result.TryPickT1(out CreateWebSocketError createError, out Websocket.WebSocketClient instance))
         {
             return CreateWebSocketErrorMapper.MapToErrorDetails(createError);
         }
 
-        // The trace identifier is used to identify the websocket instance, it will be unique for each websocket connection
-        string instanceId = httpContext.TraceIdentifier;
-
         // Register instance globally, the manager will have the ability to kill this connection
-        if (!await wsInstanceManager.RegisterInstanceAsync(instance.UserId, instanceId, instance, cancellationToken))
+        if (!await wsInstanceManager.RegisterClientAsync(instance, cancellationToken))
         {
             return HttpErrors.InternalServerError;
         }
@@ -40,7 +37,7 @@ public static class WebSocketInstanceLayer
         finally
         {
             // Remove instance globally
-            await wsInstanceManager.RemoveInstanceAsync(instanceId, cancellationToken: cancellationToken);
+            await wsInstanceManager.RemoveClientAsync(instance, cancellationToken: cancellationToken);
         }
 
         return null;

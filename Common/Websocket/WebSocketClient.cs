@@ -15,7 +15,7 @@ using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Websocket;
 
-public sealed partial class WebSocketInstance
+public sealed partial class WebSocketClient
 {
     private static async Task<T?> ReceiveAsync<T>(WebSocket webSocket, Func<WebSocketMessageType, ArraySegment<byte>, CancellationToken, Task<T>> handler, CancellationToken cancellationToken)
     {
@@ -34,7 +34,7 @@ public sealed partial class WebSocketInstance
     private static async Task<string?> ReceiveStringAsync(WebSocket webSocket, CancellationToken cancellationToken) =>
         await ReceiveAsync(webSocket, static (type, data, _) => Task.FromResult(type == WebSocketMessageType.Text ? Encoding.UTF8.GetString(data) : null), cancellationToken);
 
-    public static async Task<OneOf<WebSocketInstance, CreateWebSocketError>> CreateAsync(WebSocket websocket, IJwtAuthenticationManager authenticationManager, ILogger<WebSocketInstance> logger, CancellationToken cancellationToken)
+    public static async Task<OneOf<WebSocketClient, CreateWebSocketError>> CreateAsync(WebSocket websocket, IJwtAuthenticationManager authenticationManager, ILogger<WebSocketClient> logger, CancellationToken cancellationToken)
     {
         // Receive JWT from client
         string? token = await ReceiveStringAsync(websocket, cancellationToken);
@@ -56,7 +56,7 @@ public sealed partial class WebSocketInstance
         }
 
         // Success, create websocket instance
-        var instance = new WebSocketInstance(session.UserId, session.Id, websocket, logger);
+        var instance = new WebSocketClient(session.UserId, session.Id, websocket, logger);
 
         // Send hello message to inform client that everything is A-OK
         ServerReady ready = new()
@@ -81,13 +81,13 @@ public sealed partial class WebSocketInstance
     private readonly SlidingWindow _msgsMinuteWindow;
     private readonly SlidingWindow _bytesSecondWindow;
     private readonly SlidingWindow _bytesMinuteWindow;
-    private readonly ILogger<WebSocketInstance> _logger;
+    private readonly ILogger<WebSocketClient> _logger;
 
     private readonly uint _heartbeatIntervalMs = 30 * 1000; // TODO: make this configurable
     private DateTime _lastHeartbeat = DateTime.UtcNow;
     private int MsUntilTimeout => (int)_heartbeatIntervalMs + 2000 - (int)(DateTime.UtcNow - _lastHeartbeat).TotalMilliseconds; // TODO: make the clock skew (2000) configurable
 
-    private WebSocketInstance(Guid userId, Guid sessionId, WebSocket webSocket, ILogger<WebSocketInstance> logger)
+    private WebSocketClient(Guid userId, Guid sessionId, WebSocket webSocket, ILogger<WebSocketClient> logger)
     {
         UserId = userId;
         SessionId = sessionId;

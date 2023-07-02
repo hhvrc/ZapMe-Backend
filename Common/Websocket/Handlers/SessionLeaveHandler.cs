@@ -2,7 +2,7 @@
 
 namespace ZapMe.Websocket;
 
-partial class WebSocketInstance
+partial class WebSocketClient
 {
     private Task<bool> HandleSessionLeaveAsync(SessionLeave msg, CancellationToken cancellationToken)
     {

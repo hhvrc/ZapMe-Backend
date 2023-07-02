@@ -14,21 +14,19 @@ public interface IWebSocketInstanceManager
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="instanceId"></param>
-    /// <param name="instance"></param>
+    /// <param name="client"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> RegisterInstanceAsync(Guid userId, string instanceId, WebSocketInstance instance, CancellationToken cancellationToken = default);
+    Task<bool> RegisterClientAsync(WebSocketClient client, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="instanceId"></param>
+    /// <param name="clientSessionId"></param>
     /// <param name="reason"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task RemoveInstanceAsync(string instanceId, string reason = DefaultRemovalReason, CancellationToken cancellationToken = default);
+    Task RemoveClientAsync(Guid clientSessionId, string reason = DefaultRemovalReason, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 
@@ -37,5 +35,13 @@ public interface IWebSocketInstanceManager
     /// <param name="reason"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task RemoveAllInstancesAsync(Guid userId, string reason = DefaultRemovalReason, CancellationToken cancellationToken = default);
+    Task DisconnectAllClientsAsync(Guid userId, string reason = DefaultRemovalReason, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="reason"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task DisconnectEveryoneAsync(string reason = DefaultRemovalReason, CancellationToken cancellationToken = default);
 }
