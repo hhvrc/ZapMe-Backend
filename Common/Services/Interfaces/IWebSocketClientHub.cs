@@ -3,7 +3,7 @@ using ZapMe.Websocket;
 
 namespace ZapMe.Services.Interfaces;
 
-public interface IWebSocketInstanceManager
+public interface IWebSocketClientHub
 {
     /// <summary>
     /// 

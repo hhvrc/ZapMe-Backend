@@ -12,19 +12,19 @@ namespace ZapMe.Jobs;
 public sealed class UpdateDiscordBotStatus : IJob
 {
     private readonly IDiscordBotService _discordBotService;
-    private readonly IWebSocketInstanceManager _webSocketInstanceManager;
+    private readonly IWebSocketClientHub _wsClientHub;
     private readonly ILogger<UpdateDiscordBotStatus> _logger;
 
-    public UpdateDiscordBotStatus(IDiscordBotService discordBotService, IWebSocketInstanceManager webSocketInstanceManager, ILogger<UpdateDiscordBotStatus> logger)
+    public UpdateDiscordBotStatus(IDiscordBotService discordBotService, IWebSocketClientHub webSocketInstanceManager, ILogger<UpdateDiscordBotStatus> logger)
     {
         _discordBotService = discordBotService;
-        _webSocketInstanceManager = webSocketInstanceManager;
+        _wsClientHub = webSocketInstanceManager;
         _logger = logger;
     }
 
     public async Task Execute(IJobExecutionContext context)
     {
-        uint onlineCount = _webSocketInstanceManager.OnlineCount;
+        uint onlineCount = _wsClientHub.OnlineCount;
         string activityText = onlineCount switch
         {
             0 => "with no online users",

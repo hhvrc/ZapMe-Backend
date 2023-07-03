@@ -39,8 +39,4 @@
   <ItemGroup>
     <FlatSharpSchema Include="..\spec\schemas\**\*.fbs" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="BusinessLogic\CQRS\Handlers\" />
-  </ItemGroup>
 </Project>

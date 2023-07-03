@@ -12,7 +12,7 @@ public static class WebSocketInstanceLayer
     private static async Task<ErrorDetails?> RunWebSocketAsync(HttpContext httpContext, WebSocket websocket, CancellationToken cancellationToken)
     {
         // Services
-        IWebSocketInstanceManager wsInstanceManager = httpContext.RequestServices.GetRequiredService<IWebSocketInstanceManager>();
+        IWebSocketClientHub wsClientHub = httpContext.RequestServices.GetRequiredService<IWebSocketClientHub>();
         IJwtAuthenticationManager jwtAuthenticationManager = httpContext.RequestServices.GetRequiredService<IJwtAuthenticationManager>();
         ILogger<Websocket.WebSocketClient> wsLogger = httpContext.RequestServices.GetRequiredService<ILogger<Websocket.WebSocketClient>>();
 
@@ -24,7 +24,7 @@ public static class WebSocketInstanceLayer
         }
 
         // Register instance globally, the manager will have the ability to kill this connection
-        if (!await wsInstanceManager.RegisterClientAsync(instance, cancellationToken))
+        if (!await wsClientHub.RegisterClientAsync(instance, cancellationToken))
         {
             return HttpErrors.InternalServerError;
         }
@@ -37,7 +37,7 @@ public static class WebSocketInstanceLayer
         finally
         {
             // Remove instance globally
-            await wsInstanceManager.RemoveClientAsync(instance.SessionId, cancellationToken);
+            await wsClientHub.RemoveClientAsync(instance.SessionId, cancellationToken);
         }
 
         return null;

@@ -1,11 +1,11 @@
 ﻿using fbs.client;
-using fbs.server;
 using FlatSharp;
 using Microsoft.Extensions.Logging;
 using OneOf;
 using System.Buffers;
 using System.Net.WebSockets;
 using System.Text;
+using ZapMe.BusinessLogic.Serialization.Flatbuffers;
 using ZapMe.Constants;
 using ZapMe.Database.Models;
 using ZapMe.DTOs;
@@ -59,15 +59,14 @@ public sealed partial class WebSocketClient
         var instance = new WebSocketClient(session.UserId, session.Id, websocket, logger);
 
         // Send hello message to inform client that everything is A-OK
-        ServerReady ready = new()
-        {
-            HeartbeatIntervalMs = 10 * 1000, // 10 seconds TODO: make this configurable
-            RatelimitBytesPerSec = WebsocketConstants.ClientRateLimitBytesPerSecond,
-            RatelimitBytesPerMin = WebsocketConstants.ClientRateLimitBytesPerMinute,
-            RatelimitMessagesPerSec = WebsocketConstants.ClientRateLimitMessagesPerSecond,
-            RatelimitMessagesPerMin = WebsocketConstants.ClientRateLimitMessagesPerMinute,
-        };
-        await instance.SendMessageAsync(new ServerPayload(ready), cancellationToken);
+        await ServerReadySerializer.Serialize(
+            heartbeatIntervalMs: 10 * 1000, // 10 seconds TODO: make this configurable
+            ratelimitBytesPerSec: WebsocketConstants.ClientRateLimitBytesPerSecond,
+            ratelimitBytesPerMin: WebsocketConstants.ClientRateLimitBytesPerMinute,
+            ratelimitMessagesPerSec: WebsocketConstants.ClientRateLimitMessagesPerSecond,
+            ratelimitMessagesPerMin: WebsocketConstants.ClientRateLimitMessagesPerMinute,
+            (bytes) => instance.SendMessageAsync(bytes, cancellationToken)
+            );
 
         // Finally, return instance
         return instance;
@@ -186,28 +185,11 @@ public sealed partial class WebSocketClient
         return null;
     }
 
-    public async Task SendMessageAsync(ServerPayload payload, CancellationToken cancellationToken)
+    public async Task SendMessageAsync(ArraySegment<byte> bytes, CancellationToken cancellationToken)
     {
         if (_webSocket.State != WebSocketState.Open) return;
 
-        ServerMessage message = new ServerMessage
-        {
-            Timestamp = DateTime.UtcNow.Ticks,
-            Payload = payload,
-        };
-
-        ISerializer<ServerMessage> serializer = ServerMessage.Serializer;
-
-        byte[] bytes = ArrayPool<byte>.Shared.Rent(serializer.GetMaxSize(message));
-        try
-        {
-            int nWritten = serializer.Write(bytes, message);
-            await _webSocket.SendAsync(new ArraySegment<byte>(bytes, 0, nWritten), WebSocketMessageType.Binary, endOfMessage: true, cancellationToken);
-        }
-        finally
-        {
-            ArrayPool<byte>.Shared.Return(bytes);
-        }
+        await _webSocket.SendAsync(bytes, WebSocketMessageType.Binary, endOfMessage: true, cancellationToken);
     }
 
     public async Task CloseAsync(WebSocketCloseStatus closeStatus = WebSocketCloseStatus.NormalClosure, string reason = "ByeBye ❤️", CancellationToken cs = default)

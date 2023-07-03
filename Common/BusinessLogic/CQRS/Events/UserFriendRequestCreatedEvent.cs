@@ -1,3 +1,5 @@
-﻿namespace ZapMe.BusinessLogic.CQRS.Events;
+﻿using Mediator;
 
-public record struct UserFriendRequestCreatedEvent(Guid FromUserId, Guid ToUserId);
+namespace ZapMe.BusinessLogic.CQRS.Events;
+
+public record struct UserFriendRequestCreatedEvent(Guid FromUserId, Guid ToUserId) : INotification;

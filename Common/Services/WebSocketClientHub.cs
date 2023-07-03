@@ -6,13 +6,13 @@ using ZapMe.Websocket;
 
 namespace ZapMe.Services;
 
-public sealed class WebSocketInstanceManager : IWebSocketInstanceManager
+public sealed class WebSocketClientHub : IWebSocketClientHub
 {
-    private readonly ILogger<WebSocketInstanceManager> _logger;
+    private readonly ILogger<WebSocketClientHub> _logger;
     private readonly ConcurrentDictionary<Guid, WebSocketClient> _clients = new();
     private readonly ConcurrentDictionary<Guid, ConcurrentDictionary<Guid, WebSocketClient>> _users = new();
 
-    public WebSocketInstanceManager(ILogger<WebSocketInstanceManager> logger)
+    public WebSocketClientHub(ILogger<WebSocketClientHub> logger)
     {
         _logger = logger;
     }

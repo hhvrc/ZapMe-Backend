@@ -50,12 +50,12 @@ table UserSessionRequest {
 }
 
 table FriendRequestAdded {
-  user_id:string;
-  incoming:bool;
+  sender_user_id:string;
+  receiver_user_id:string;
 }
 table FriendRequestRemoved {
-  user_id:string;
-  incoming:bool;
+  sender_user_id:string;
+  receiver_user_id:string;
 }
 
 table GroupInvite {
