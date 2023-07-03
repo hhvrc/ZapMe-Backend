@@ -2,4 +2,4 @@
 
 namespace ZapMe.BusinessLogic.CQRS.Events;
 
-public record struct UserFriendRequestRemovedEvent(Guid FromUserId, Guid ToUserId) : INotification;
+public readonly record struct UserFriendRequestRemovedEvent(Guid FromUserId, Guid ToUserId) : INotification;

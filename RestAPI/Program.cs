@@ -134,7 +134,6 @@ services.AddTransient<ILockOutStore, LockOutStore>();
 services.AddTransient<IEmailVerificationManager, EmailVerificationManager>();
 services.AddTransient<ISSOStateStore, SSOStateStore>();
 services.AddSingleton<IDiscordBotService, DiscordBotService>();
-services.AddSingleton<IWebSocketClientHub, WebSocketClientHub>();
 
 services.AddRateLimiting();
 services.AddSwagger(isDevelopment);

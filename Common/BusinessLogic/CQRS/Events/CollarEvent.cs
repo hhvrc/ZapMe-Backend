@@ -2,4 +2,4 @@
 
 namespace ZapMe.BusinessLogic.CQRS.Events;
 
-public record struct CollarEvent(Guid FromUserId, Guid ToUserId) : INotification;
+public readonly record struct CollarEvent(Guid FromUserId, Guid ToUserId) : INotification;

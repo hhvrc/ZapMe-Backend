@@ -1,77 +1,14 @@
 ﻿using fbs.client;
 using FlatSharp;
 using Microsoft.Extensions.Logging;
-using OneOf;
-using System.Buffers;
 using System.Net.WebSockets;
-using System.Text;
-using ZapMe.BusinessLogic.Serialization.Flatbuffers;
 using ZapMe.Constants;
-using ZapMe.Database.Models;
-using ZapMe.DTOs;
-using ZapMe.Enums.Errors;
 using ZapMe.Helpers;
-using ZapMe.Services.Interfaces;
 
 namespace ZapMe.Websocket;
 
 public sealed partial class WebSocketClient
 {
-    private static async Task<T?> ReceiveAsync<T>(WebSocket webSocket, Func<WebSocketMessageType, ArraySegment<byte>, CancellationToken, Task<T>> handler, CancellationToken cancellationToken)
-    {
-        byte[] bytes = ArrayPool<byte>.Shared.Rent((int)WebsocketConstants.ClientMessageSizeMax);
-        try
-        {
-            WebSocketReceiveResult msg = await webSocket.ReceiveAsync(bytes, cancellationToken);
-            return await handler(msg.MessageType, new ArraySegment<byte>(bytes, 0, msg.Count), cancellationToken);
-        }
-        finally
-        {
-            ArrayPool<byte>.Shared.Return(bytes);
-        }
-    }
-
-    private static async Task<string?> ReceiveStringAsync(WebSocket webSocket, CancellationToken cancellationToken) =>
-        await ReceiveAsync(webSocket, static (type, data, _) => Task.FromResult(type == WebSocketMessageType.Text ? Encoding.UTF8.GetString(data) : null), cancellationToken);
-
-    public static async Task<OneOf<WebSocketClient, CreateWebSocketError>> CreateAsync(WebSocket websocket, IJwtAuthenticationManager authenticationManager, ILogger<WebSocketClient> logger, CancellationToken cancellationToken)
-    {
-        // Receive JWT from client
-        string? token = await ReceiveStringAsync(websocket, cancellationToken);
-        if (token is null)
-        {
-            logger.LogError("Failed to authenticate websocket connection, received invalid message from client");
-            websocket.Dispose();
-            return CreateWebSocketError.InvalidClientMessage;
-        }
-
-        // Validate JWT
-        var authenticationResult = await authenticationManager.AuthenticateJwtTokenAsync(token, cancellationToken);
-        if (authenticationResult.TryPickT1(out JwtAuthenticationError authenticationError, out SessionEntity session))
-        {
-            logger.LogError("Failed to authenticate websocket connection, provided JWT was invalid");
-            websocket.Dispose();
-
-            return JwtAuthenticationErrorMapper.MapToCreateWebSocketError(authenticationError);
-        }
-
-        // Success, create websocket instance
-        var instance = new WebSocketClient(session.UserId, session.Id, websocket, logger);
-
-        // Send hello message to inform client that everything is A-OK
-        await ServerReadySerializer.Serialize(
-            heartbeatIntervalMs: 10 * 1000, // 10 seconds TODO: make this configurable
-            ratelimitBytesPerSec: WebsocketConstants.ClientRateLimitBytesPerSecond,
-            ratelimitBytesPerMin: WebsocketConstants.ClientRateLimitBytesPerMinute,
-            ratelimitMessagesPerSec: WebsocketConstants.ClientRateLimitMessagesPerSecond,
-            ratelimitMessagesPerMin: WebsocketConstants.ClientRateLimitMessagesPerMinute,
-            (bytes) => instance.SendMessageAsync(bytes, cancellationToken)
-            );
-
-        // Finally, return instance
-        return instance;
-    }
-
     public Guid UserId { get; init; }
     public Guid SessionId { get; init; }
 
@@ -82,11 +19,11 @@ public sealed partial class WebSocketClient
     private readonly SlidingWindow _bytesMinuteWindow;
     private readonly ILogger<WebSocketClient> _logger;
 
-    private readonly uint _heartbeatIntervalMs = 30 * 1000; // TODO: make this configurable
+    private readonly uint _heartbeatIntervalMs = 20 * 1000; // TODO: make this configurable
     private DateTime _lastHeartbeat = DateTime.UtcNow;
     private int MsUntilTimeout => (int)_heartbeatIntervalMs + 2000 - (int)(DateTime.UtcNow - _lastHeartbeat).TotalMilliseconds; // TODO: make the clock skew (2000) configurable
 
-    private WebSocketClient(Guid userId, Guid sessionId, WebSocket webSocket, ILogger<WebSocketClient> logger)
+    public WebSocketClient(Guid userId, Guid sessionId, WebSocket webSocket, ILogger<WebSocketClient> logger)
     {
         UserId = userId;
         SessionId = sessionId;
@@ -98,23 +35,7 @@ public sealed partial class WebSocketClient
         _logger = logger;
     }
 
-    public async Task RunAsync(CancellationToken cancellationToken)
-    {
-        if (_webSocket.State != WebSocketState.Open) return;
-
-        // TODO: mark person as online
-
-        try
-        {
-            await RunWebSocketAsync(cancellationToken);
-        }
-        finally
-        {
-            // TODO: mark person as offline
-        }
-    }
-
-    private async Task RunWebSocketAsync(CancellationToken cancellationToken)
+    public async Task RunWebSocketAsync(CancellationToken cancellationToken)
     {
         WebSocketCloseStatus closeStatus = WebSocketCloseStatus.NormalClosure;
         string closeMessage = "ByeBye ❤️";
@@ -125,7 +46,7 @@ public sealed partial class WebSocketClient
             cancellationToken = linkedCts.Token;
 
 
-            var result = await ReceiveAsync(_webSocket, HandleClientMessageAsync, cancellationToken);
+            var result = await _webSocket.ReceiveAsync(HandleClientMessageAsync, cancellationToken);
             if (result.HasValue)
             {
                 (closeStatus, closeMessage) = result.Value;

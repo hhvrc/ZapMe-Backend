@@ -2,6 +2,7 @@
 using Quartz;
 using ZapMe.Attributes;
 using ZapMe.Services.Interfaces;
+using ZapMe.Websocket;
 
 namespace ZapMe.Jobs;
 
@@ -12,19 +13,17 @@ namespace ZapMe.Jobs;
 public sealed class UpdateDiscordBotStatus : IJob
 {
     private readonly IDiscordBotService _discordBotService;
-    private readonly IWebSocketClientHub _wsClientHub;
     private readonly ILogger<UpdateDiscordBotStatus> _logger;
 
-    public UpdateDiscordBotStatus(IDiscordBotService discordBotService, IWebSocketClientHub webSocketInstanceManager, ILogger<UpdateDiscordBotStatus> logger)
+    public UpdateDiscordBotStatus(IDiscordBotService discordBotService, ILogger<UpdateDiscordBotStatus> logger)
     {
         _discordBotService = discordBotService;
-        _wsClientHub = webSocketInstanceManager;
         _logger = logger;
     }
 
     public async Task Execute(IJobExecutionContext context)
     {
-        uint onlineCount = _wsClientHub.OnlineCount;
+        int onlineCount = WebSocketHub.Users.Count;
         string activityText = onlineCount switch
         {
             0 => "with no online users",
