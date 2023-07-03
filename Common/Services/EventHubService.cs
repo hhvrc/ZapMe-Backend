@@ -1,26 +1,16 @@
-﻿namespace ZapMe.Services;
+﻿using Microsoft.Extensions.Logging;
+using ZapMe.Services.Interfaces;
+
+namespace ZapMe.Services;
 
 public sealed class EventHubService
 {
-    public EventHubService(IHubContext<NotificationHub> hubContext, ILogger<EventHubService> logger)
-    {
-        HubContext = hubContext;
-        Logger = logger;
-    }
+    private readonly IWebSocketInstanceManager _webSocketManager;
+    private readonly ILogger<EventHubService> _logger;
 
-    /// <summary>
-    /// Sends an event to a specific user.
-    /// </summary>
-    public Task SendUserEventAsync(Guid userId, string message, CancellationToken cancellationToken = default)
+    public EventHubService(IWebSocketInstanceManager websocketManager, ILogger<EventHubService> logger)
     {
-
-    }
-
-    /// <summary>
-    /// Sends an event to all friends of a specific user.
-    /// </summary>
-    public Task SendUserFriendsEventAsync(Guid userId, string message, CancellationToken cancellationToken = default)
-    {
-        return Task.CompletedTask;
+        _webSocketManager = websocketManager;
+        _logger = logger;
     }
 }

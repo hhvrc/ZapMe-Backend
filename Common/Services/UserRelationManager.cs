@@ -1,11 +1,11 @@
 ﻿using Mediator;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using ZapMe.BusinessLogic.CQRS.Events;
 using ZapMe.Database;
 using ZapMe.Database.Extensions;
 using ZapMe.Database.Models;
 using ZapMe.DTOs;
-using ZapMe.DTOs.Mediator;
 using ZapMe.Enums;
 using ZapMe.Services.Interfaces;
 
@@ -142,7 +142,7 @@ public sealed class UserRelationManager : IUserRelationManager
 
         if (nRemoved <= 0)
         {
-              return UpdateUserRelationResult.NoChanges;
+            return UpdateUserRelationResult.NoChanges;
         }
 
         await _mediator.Publish(new UserFriendshipDeletedEvent(fromUserId, toUserId), cancellationToken);

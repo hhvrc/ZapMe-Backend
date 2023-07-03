@@ -24,7 +24,7 @@ public sealed class UpdateDiscordBotStatus : IJob
 
     public async Task Execute(IJobExecutionContext context)
     {
-        ulong onlineCount = _webSocketInstanceManager.OnlineCount;
+        uint onlineCount = _webSocketInstanceManager.OnlineCount;
         string activityText = onlineCount switch
         {
             0 => "with no online users",

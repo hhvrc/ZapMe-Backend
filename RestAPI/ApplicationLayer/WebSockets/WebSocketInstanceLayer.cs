@@ -37,7 +37,7 @@ public static class WebSocketInstanceLayer
         finally
         {
             // Remove instance globally
-            await wsInstanceManager.RemoveClientAsync(instance, cancellationToken: cancellationToken);
+            await wsInstanceManager.RemoveClientAsync(instance.SessionId, cancellationToken);
         }
 
         return null;
