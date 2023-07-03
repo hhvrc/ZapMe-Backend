@@ -24,12 +24,12 @@ public sealed class WebSocketClientHub : IWebSocketClientHub
         Guid userId = client.UserId;
 
         // Get user clients
-        if (_users.TryGetValue(userId, out var userClients) || userClients == null)
+        if (!_users.TryGetValue(userId, out var userClients) || userClients == null)
         {
             userClients = new ConcurrentDictionary<Guid, WebSocketClient>();
             if (!_users.TryAdd(userId, userClients))
             {
-                if (_users.TryGetValue(userId, out userClients) || userClients == null)
+                if (!_users.TryGetValue(userId, out userClients) || userClients == null)
                 {
                     await client.CloseAsync(WebSocketCloseStatus.InternalServerError, "Failed to register user", cancellationToken);
                     return false;
@@ -44,8 +44,15 @@ public sealed class WebSocketClientHub : IWebSocketClientHub
         // Add client
         if (!userClients.TryAdd(sessionId, client))
         {
-            await client.CloseAsync(WebSocketCloseStatus.PolicyViolation, "You are already connected on this authentication session", cancellationToken);
-            return false;
+            if (userClients.TryGetValue(sessionId, out var existingClient) && existingClient is not null)
+            {
+                await existingClient.CloseAsync(WebSocketCloseStatus.PolicyViolation, "Disconnected by another client", cancellationToken);
+            }
+            if (!userClients.TryAdd(sessionId, client))
+            {
+                await client.CloseAsync(WebSocketCloseStatus.InternalServerError, "Failed to register client", cancellationToken);
+                return false;
+            }
         }
 
         try

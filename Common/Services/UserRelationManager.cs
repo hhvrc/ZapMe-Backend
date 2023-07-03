@@ -120,7 +120,7 @@ public sealed class UserRelationManager : IUserRelationManager
             return UpdateUserRelationResult.NoChanges;
         }
 
-        await _mediator.Publish(new UserFriendRequestDeletedEvent(fromUserId, toUserId), cancellationToken);
+        await _mediator.Publish(new UserFriendRequestRemovedEvent(fromUserId, toUserId), cancellationToken);
 
         return UpdateUserRelationResult.Success;
     }
