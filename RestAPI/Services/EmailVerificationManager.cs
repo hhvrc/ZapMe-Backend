@@ -54,7 +54,7 @@ public sealed class EmailVerificationManager : IEmailVerificationManager
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         // Send email
-        bool success = await _mailGunService.SendEmailAsync("System", user.Name, newEmail, "Account Created", "account-created", mailgunValues, cancellationToken);
+        bool success = await _mailGunService.SendEmailAsync(App.AppName, "hello", user.Name, newEmail, "Account Created", "account-created", mailgunValues, cancellationToken);
         if (!success)
         {
             return HttpErrors.InternalServerError;
