@@ -6,8 +6,12 @@ namespace ZapMe.Websocket;
 public sealed class WebSocketUser
 {
     private readonly ConcurrentDictionary<Guid, WebSocketClient> _clients = new();
-    private readonly object _deadLock = new(); // This is a horrible name LOL
-    private bool _dead = false;
+
+    private const int _STATE_ALIVE = 0;
+    private const int _STATE_ACCEPTING_CONNECTION = 1;
+    private const int _STATE_DISCONNECTING = 2;
+    private const int _STATE_DEAD = 3;
+    private int _state = _STATE_ALIVE;
 
     public Guid UserId { get; }
     public bool IsOnline => !_clients.IsEmpty;
@@ -25,19 +29,16 @@ public sealed class WebSocketUser
         Guid sessionId = client.SessionId;
         Task? closeTask = null;
 
-        // Try-finally to ensure the close task is awaited
+        // If the user is being removed, don't add the client
+        int state = Interlocked.CompareExchange(ref _state, _STATE_ACCEPTING_CONNECTION, _STATE_ALIVE);
+        if (state != _STATE_ALIVE)
+        {
+            return false;
+        }
+
+        // Try-finally to ensure the close task is awaited, and the state is set back to alive
         try
         {
-            // Lock to ensure only one client is added at a time, this only applies to adding clients
-            // If the user is being disconnected, we don't want clients added during the disconnect
-            lock (_deadLock)
-            {
-                // If the user is being removed, don't add the client
-                if (_dead)
-                {
-                    return false;
-                }
-
                 // Try to add the client
                 if (_clients.TryAdd(sessionId, client))
                 {
@@ -58,10 +59,12 @@ public sealed class WebSocketUser
 
                 // Add failed again, give up
                 return false;
-            }
         }
         finally
         {
+            // Set the state back to alive if it still is _STATE_ACCEPTING_CONNECTION
+            Interlocked.CompareExchange(ref _state, _STATE_ALIVE, _STATE_ACCEPTING_CONNECTION);
+
             // If there was a existing client, await the close task
             if (closeTask is not null)
             {
@@ -86,20 +89,35 @@ public sealed class WebSocketUser
         return false;
     }
 
-    public Task DisconnectAllAsync(WebSocketCloseStatus closeStatus, string closeReason, CancellationToken cancellationToken = default)
+    public async Task DisconnectAllAsync(WebSocketCloseStatus closeStatus, string closeReason, CancellationToken cancellationToken = default)
     {
-        List<Task> tasks = new();
-
-        lock (_deadLock)
+        if (_state is _STATE_DISCONNECTING or _STATE_DEAD)
         {
-            _dead = true;
-            foreach (WebSocketClient client in _clients.Values)
-            {
-                tasks.Add(client.CloseAsync(closeStatus, closeReason, cancellationToken));
-            }
+            return;
         }
 
-        return Task.WhenAll(tasks);
+        // TODO: review this concurrency logic
+        int retries = 0;
+        while (Interlocked.CompareExchange(ref _state, _STATE_DISCONNECTING, _STATE_ALIVE) != _STATE_ALIVE && retries++ < 10)
+        {
+            await Task.Delay(10, cancellationToken);
+        }
+        if (_state == _STATE_ALIVE)
+        {
+            // We tried to wait for the state to be _STATE_ALIVE, but it never happened, force it to _STATE_DISCONNECTING
+            _state = _STATE_DISCONNECTING;
+        }
+
+        List<Task> tasks = new();
+
+        foreach (WebSocketClient client in _clients.Values)
+        {
+            tasks.Add(client.CloseAsync(closeStatus, closeReason, cancellationToken));
+        }
+
+        await Task.WhenAll(tasks);
+
+        _state = _STATE_DEAD;
     }
 
     public Task RunActionOnClientAsync(Guid clientSessionId, Func<WebSocketClient, Task> action)
