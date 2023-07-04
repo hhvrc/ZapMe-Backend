@@ -10,4 +10,6 @@ public static class WebsocketConstants
 
     public static uint ClientRateLimitBytesPerSecond => 1024 * 1024 * 1; // 1 MiB/s
     public static uint ClientRateLimitBytesPerMinute => 1024 * 1024 * 60; // 60 MiB/m
+
+    internal static int ClientTxChannelCapacity => 1000; // 1000 messages queued for sending
 }

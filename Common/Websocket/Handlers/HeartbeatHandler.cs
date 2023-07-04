@@ -1,5 +1,5 @@
 ﻿using fbs.client;
-using ZapMe.BusinessLogic.Serialization.Flatbuffers;
+using fbs.server;
 
 namespace ZapMe.Websocket;
 
@@ -7,9 +7,12 @@ partial class WebSocketClient
 {
     private async Task<bool> HandleHeartbeatAsync(ClientHeartbeat heartbeat, CancellationToken cancellationToken)
     {
-        _lastHeartbeat = DateTime.UtcNow;
+        Interlocked.Exchange(ref _lastHeartbeatTicks, DateTimeOffset.UtcNow.Ticks);
 
-        await ServerHeartbeatSerializer.Serialize(_heartbeatIntervalMs, (bytes) => SendMessageAsync(bytes, cancellationToken));
+        await SendPayloadAsync(new ServerPayload(new ServerHeartbeat
+        {
+            HeartbeatIntervalMs = _heartbeatIntervalMs
+        }), cancellationToken);
 
         return true;
     }

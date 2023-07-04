@@ -27,49 +27,40 @@ public sealed class WebSocketUser
     public async Task<bool> TryAddClientAsync(WebSocketClient client, CancellationToken cancellationToken = default)
     {
         Guid sessionId = client.SessionId;
-        Task? closeTask = null;
 
-        // If the user is being removed, don't add the client
-        int state = Interlocked.CompareExchange(ref _state, _STATE_ACCEPTING_CONNECTION, _STATE_ALIVE);
-        if (state != _STATE_ALIVE)
-        {
-            return false;
-        }
-
-        // Try-finally to ensure the close task is awaited, and the state is set back to alive
         try
         {
-                // Try to add the client
-                if (_clients.TryAdd(sessionId, client))
-                {
-                    return true;
-                }
-
-                // Add failed, close the existing client
-                if (_clients.TryRemove(sessionId, out WebSocketClient? existingClient) && existingClient is not null)
-                {
-                    closeTask = existingClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "Disconnected by another client", cancellationToken);
-                }
-
-                // Now try to add again
-                if (_clients.TryAdd(sessionId, client))
-                {
-                    return true;
-                }
-
-                // Add failed again, give up
+            // Try to set the state to accepting connection, if it is already accepting a connection or if it is disconnecting or dead, return false
+            if (Interlocked.CompareExchange(ref _state, _STATE_ACCEPTING_CONNECTION, _STATE_ALIVE) != _STATE_ALIVE)
+            {
                 return false;
+            }
+
+            // Try to add the client
+            if (_clients.TryAdd(sessionId, client))
+            {
+                return true;
+            }
+
+            // Add failed, close the existing client
+            if (_clients.TryRemove(sessionId, out WebSocketClient? existingClient) && existingClient is not null)
+            {
+                await existingClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "Disconnected by another client", cancellationToken);
+            }
+
+            // Now try to add again
+            if (_clients.TryAdd(sessionId, client))
+            {
+                return true;
+            }
+
+            // Add failed again, give up
+            return false;
         }
         finally
         {
-            // Set the state back to alive if it still is _STATE_ACCEPTING_CONNECTION
+            // Set the state back to alive if it was untouched during the acceptance process
             Interlocked.CompareExchange(ref _state, _STATE_ALIVE, _STATE_ACCEPTING_CONNECTION);
-
-            // If there was a existing client, await the close task
-            if (closeTask is not null)
-            {
-                await closeTask;
-            }
         }
     }
 
@@ -89,23 +80,31 @@ public sealed class WebSocketUser
         return false;
     }
 
-    public async Task DisconnectAllAsync(WebSocketCloseStatus closeStatus, string closeReason, CancellationToken cancellationToken = default)
+    public async Task<bool> DisconnectAllAsync(WebSocketCloseStatus closeStatus, string closeReason, CancellationToken cancellationToken = default)
     {
-        if (_state is _STATE_DISCONNECTING or _STATE_DEAD)
-        {
-            return;
-        }
-
-        // TODO: review this concurrency logic
+        // Try to set the state to disconnecting if it is alive, if it is already disconnecting or dead, return true
+        // This loop will try to set the state to disconnecting for 200ms, if it fails, it will return false
+        int value;
         int retries = 0;
-        while (Interlocked.CompareExchange(ref _state, _STATE_DISCONNECTING, _STATE_ALIVE) != _STATE_ALIVE && retries++ < 10)
+        do
         {
+            value = Interlocked.CompareExchange(ref _state, _STATE_DISCONNECTING, _STATE_ALIVE);
+            if (value is _STATE_DISCONNECTING or _STATE_DEAD)
+            {
+                return true;
+            }
+
+            if (value == _STATE_ALIVE)
+            {
+                break;
+            }
+
             await Task.Delay(10, cancellationToken);
         }
-        if (_state == _STATE_ALIVE)
+        while (++retries <= 20);
+        if (value != _STATE_DISCONNECTING)
         {
-            // We tried to wait for the state to be _STATE_ALIVE, but it never happened, force it to _STATE_DISCONNECTING
-            _state = _STATE_DISCONNECTING;
+            return false;
         }
 
         List<Task> tasks = new();
@@ -118,6 +117,8 @@ public sealed class WebSocketUser
         await Task.WhenAll(tasks);
 
         _state = _STATE_DEAD;
+
+        return true;
     }
 
     public Task RunActionOnClientAsync(Guid clientSessionId, Func<WebSocketClient, Task> action)

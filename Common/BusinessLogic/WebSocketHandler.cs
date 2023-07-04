@@ -1,9 +1,9 @@
-﻿using Mediator;
+﻿using fbs.server;
+using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Net.WebSockets;
 using ZapMe.BusinessLogic.CQRS.Events;
-using ZapMe.BusinessLogic.Serialization.Flatbuffers;
 using ZapMe.Constants;
 using ZapMe.Database.Models;
 using ZapMe.Enums.Errors;
@@ -40,17 +40,18 @@ public static class WebSocketHandler
         }
 
         // Success, create websocket instance
-        var instance = new WebSocketClient(session.UserId, session.Id, webSocket, logger);
+        using var instance = new WebSocketClient(session.UserId, session.Id, webSocket);
 
         // Send hello message to inform client that everything is A-OK
-        await ServerReadySerializer.Serialize(
-            heartbeatIntervalMs: 10 * 1000, // 10 seconds TODO: make this configurable
-            ratelimitBytesPerSec: WebsocketConstants.ClientRateLimitBytesPerSecond,
-            ratelimitBytesPerMin: WebsocketConstants.ClientRateLimitBytesPerMinute,
-            ratelimitMessagesPerSec: WebsocketConstants.ClientRateLimitMessagesPerSecond,
-            ratelimitMessagesPerMin: WebsocketConstants.ClientRateLimitMessagesPerMinute,
-            (bytes) => instance.SendMessageAsync(bytes, cancellationToken)
-            );
+
+        await instance.SendPayloadAsync(new ServerPayload(new ServerReady
+        {
+            HeartbeatIntervalMs = 10 * 1000, // 10 seconds TODO: make this configurable
+            RatelimitBytesPerSec = WebsocketConstants.ClientRateLimitBytesPerSecond,
+            RatelimitBytesPerMin = WebsocketConstants.ClientRateLimitBytesPerMinute,
+            RatelimitMessagesPerSec = WebsocketConstants.ClientRateLimitMessagesPerSecond,
+            RatelimitMessagesPerMin = WebsocketConstants.ClientRateLimitMessagesPerMinute,
+        }), cancellationToken);
 
         // Get mediator to send userOnline/userOffline events
         IMediator mediator = serviceProvider.GetRequiredService<IMediator>();
