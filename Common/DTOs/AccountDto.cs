@@ -12,10 +12,7 @@ public readonly struct AccountDto : IUserDto
 
     public required string Username { get; init; }
 
-    /// <summary>
-    /// Obfuscated email of your account
-    /// </summary>
-    public required string ObscuredEmail { get; init; }
+    public required string Email { get; init; }
 
     public required bool EmailVerified { get; init; }
 

@@ -54,7 +54,7 @@ public static class UserMapper
         {
             Id = user.Id,
             Username = user.Name,
-            ObscuredEmail = Transformers.ObscureEmail(user.Email),
+            Email = user.Email,
             EmailVerified = user.EmailVerified,
             AcceptedPrivacyPolicyVersion = user.AcceptedPrivacyPolicyVersion,
             AcceptedTermsOfServiceVersion = user.AcceptedTermsOfServiceVersion,

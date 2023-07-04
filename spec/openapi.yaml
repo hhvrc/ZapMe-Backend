@@ -830,11 +830,11 @@ components:
         - acceptedPrivacyPolicyVersion
         - acceptedTermsOfServiceVersion
         - createdAt
+        - email
         - emailVerified
         - friendUserIds
         - id
         - lastOnline
-        - obscuredEmail
         - ssoConnections
         - status
         - statusText
@@ -847,9 +847,8 @@ components:
           format: uuid
         username:
           type: string
-        obscuredEmail:
+        email:
           type: string
-          description: Obfuscated email of your account
         emailVerified:
           type: boolean
         acceptedPrivacyPolicyVersion:
