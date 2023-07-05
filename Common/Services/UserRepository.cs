@@ -91,4 +91,9 @@ public class UserRepository : IUserRepository
     {
         return QueryBase.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
     }
+
+    public async Task<bool> DeleteUserById(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return (await _dbContext.Users.Where(u => u.Id == userId).ExecuteDeleteAsync(cancellationToken)) > 0;
+    }
 }

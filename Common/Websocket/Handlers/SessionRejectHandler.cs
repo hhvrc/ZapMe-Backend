@@ -2,7 +2,7 @@
 
 namespace ZapMe.Websocket;
 
-partial class WebSocketInstance
+partial class WebSocketClient
 {
     private Task<bool> HandleSessionRejectAsync(SessionReject msg, CancellationToken cancellationToken)
     {

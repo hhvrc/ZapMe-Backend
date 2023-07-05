@@ -33,5 +33,5 @@ public interface IUserRelationManager
     /// <summary>
     /// Sets the relation type from one user to another, and sets the opposite relation if needed.
     /// </summary>
-    Task<UpdateUserRelationResult> SetUserRelationDetailsAsync(Guid fromUserId, Guid toUserId, SetUserRelationDto relationUpdate, CancellationToken cancellationToken = default);
+    Task<UpdateUserRelationResult> SetUserRelationDetailsAsync(Guid fromUserId, Guid toUserId, UserRelationUpdateDto relationUpdate, CancellationToken cancellationToken = default);
 }

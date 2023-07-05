@@ -11,7 +11,7 @@ public static class UserRelationLogic
     public static async Task<FriendRequestsDto> GetFriendRequestsDTO(this DatabaseContext dbContext, Guid userId, CancellationToken cancellationToken)
     {
         UserRelationEntity[] relevantUserRelations = await dbContext.UserRelations
-            .Where(x => (x.FromUserId == userId || x.ToUserId == userId) && x.FriendStatus == UserPartialFriendStatus.Pending)
+            .Where(x => (x.FromUserId == userId || x.ToUserId == userId) && x.FriendStatus == UserPartialRelationType.Pending)
             .ToArrayAsync(cancellationToken);
 
         return new FriendRequestsDto
@@ -21,18 +21,18 @@ public static class UserRelationLogic
         };
     }
 
-    public static UserFriendStatus GetUserFriendStatus(UserRelationEntity? outgoingRelation, UserRelationEntity? incomingRelation)
+    public static UserRelationType GetUserRelationType(UserRelationEntity? outgoingRelation, UserRelationEntity? incomingRelation)
     {
-        var incomingStatus = incomingRelation?.FriendStatus == UserPartialFriendStatus.Pending ? UserFriendStatus.FriendRequestIncoming : UserFriendStatus.None;
+        var incomingStatus = incomingRelation?.FriendStatus == UserPartialRelationType.Pending ? UserRelationType.FriendRequestReceived : UserRelationType.None;
 
         if (outgoingRelation == null) return incomingStatus;
 
         return outgoingRelation.FriendStatus switch
         {
-            UserPartialFriendStatus.None => incomingStatus,
-            UserPartialFriendStatus.Pending => UserFriendStatus.FriendRequestOutgoing,
-            UserPartialFriendStatus.Accepted => UserFriendStatus.Friends,
-            UserPartialFriendStatus.Blocked => UserFriendStatus.Blocked,
+            UserPartialRelationType.None => incomingStatus,
+            UserPartialRelationType.Pending => UserRelationType.FriendRequestSent,
+            UserPartialRelationType.Accepted => UserRelationType.Friends,
+            UserPartialRelationType.Blocked => UserRelationType.Blocked,
             _ => throw new ArgumentOutOfRangeException(nameof(outgoingRelation.FriendStatus), outgoingRelation.FriendStatus, null)
         };
     }
@@ -44,7 +44,7 @@ public static class UserRelationLogic
 
         return new UserRelationDto
         {
-            FriendStatus = GetUserFriendStatus(outgoingRelation, incomingRelation),
+            Type = GetUserRelationType(outgoingRelation, incomingRelation),
             IsFavorite = outgoingRelation?.IsFavorite ?? false,
             IsMuted = outgoingRelation?.IsMuted ?? false,
             NickName = outgoingRelation?.NickName,

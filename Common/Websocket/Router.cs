@@ -3,7 +3,7 @@ using PayloadType = fbs.client.ClientPayload.ItemKind;
 
 namespace ZapMe.Websocket;
 
-partial class WebSocketInstance
+partial class WebSocketClient
 {
     private Task<bool> RouteClientMessageAsync(ClientPayload message, CancellationToken cancellationToken)
     {

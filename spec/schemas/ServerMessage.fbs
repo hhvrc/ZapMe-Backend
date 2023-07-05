@@ -19,26 +19,41 @@ table ServerHeartbeat {
   heartbeat_interval_ms:uint;
 }
 
+enum UserRelationType:byte {
+  none = 0,
+  friend_request_sent = 1,
+  friend_request_received = 2,
+  friend = 3,
+  blocked = 4,
+}
+table UserRelationTypeChanged {
+  user_id:string;
+  relation_type:UserRelationType;
+}
+
+table UserRelationDetailsUpdated {
+  user_id:string;
+  is_favorite:bool;
+  is_muted:bool;
+  nickname:string;
+  notes:string;
+}
+
 enum UserOnlineStatus:byte {
   offline = 0,
   do_not_disturb = 1,
   inactive = 2,
   online = 3,
 }
-enum UserRelationType:byte {
-  none = 0,
-  friend = 1,
-  blocked = 2,
-}
-table UserStatusChanged {
+table UserOnlineStatusChanged {
   user_id:string;
   online_status:UserOnlineStatus;
+}
+table UserStatusMessageChanged {
+  user_id:string;
   status_message:string;
 }
-table UserRelationChanged {
-  user_id:string;
-  relation_type:UserRelationType;
-}
+
 table UserMessage {
   user_id:string;
   message:string;
@@ -50,12 +65,12 @@ table UserSessionRequest {
 }
 
 table FriendRequestAdded {
-  user_id:string;
-  incoming:bool;
+  sender_user_id:string;
+  receiver_user_id:string;
 }
 table FriendRequestRemoved {
-  user_id:string;
-  incoming:bool;
+  sender_user_id:string;
+  receiver_user_id:string;
 }
 
 table GroupInvite {
@@ -106,8 +121,10 @@ union ServerPayload {
 
   system_message:SystemMessage,
 
-  user_status_changed:UserStatusChanged,
-  user_relation_changed:UserRelationChanged,
+  user_online_status_changed:UserOnlineStatusChanged,
+  user_status_message_changed:UserStatusMessageChanged,
+  user_relation_type_changed:UserRelationTypeChanged,
+user_relation_details_updated:UserRelationDetailsUpdated,
   user_message:UserMessage,
   user_session_request:UserSessionRequest,
 

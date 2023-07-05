@@ -3,13 +3,16 @@ using fbs.server;
 
 namespace ZapMe.Websocket;
 
-partial class WebSocketInstance
+partial class WebSocketClient
 {
     private async Task<bool> HandleHeartbeatAsync(ClientHeartbeat heartbeat, CancellationToken cancellationToken)
     {
-        _lastHeartbeat = DateTime.UtcNow;
+        Interlocked.Exchange(ref _lastHeartbeatTicks, DateTimeOffset.UtcNow.Ticks);
 
-        await SendMessageAsync(new ServerPayload(new ServerHeartbeat { HeartbeatIntervalMs = _heartbeatIntervalMs }), cancellationToken);
+        await SendPayloadAsync(new ServerPayload(new ServerHeartbeat
+        {
+            HeartbeatIntervalMs = _heartbeatIntervalMs
+        }), cancellationToken);
 
         return true;
     }

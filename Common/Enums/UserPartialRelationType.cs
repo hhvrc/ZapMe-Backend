@@ -1,6 +1,6 @@
 ﻿namespace ZapMe.Enums;
 
-public enum UserPartialFriendStatus
+public enum UserPartialRelationType
 {
     None,
     Pending,

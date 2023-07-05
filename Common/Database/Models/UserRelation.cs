@@ -11,7 +11,7 @@ public sealed class UserRelationEntity
 
     public Guid ToUserId { get; init; }
 
-    public UserPartialFriendStatus FriendStatus { get; set; }
+    public UserPartialRelationType FriendStatus { get; set; }
 
     public bool IsFavorite { get; set; }
 
