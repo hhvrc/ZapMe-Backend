@@ -17,7 +17,7 @@ public readonly struct UserDto : IUserDto
 
     public required string StatusText { get; init; }
 
-    public required UserFriendStatus FriendStatus { get; init; }
+    public required UserRelationType Relation { get; init; }
 
     public required bool IsFavorite { get; init; }
 

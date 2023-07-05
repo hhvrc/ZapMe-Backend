@@ -4,7 +4,7 @@ namespace ZapMe.DTOs;
 
 public readonly struct UserRelationDto
 {
-    public required UserFriendStatus FriendStatus { get; init; }
+    public required UserRelationType Type { get; init; }
 
     public required bool IsFavorite { get; init; }
 

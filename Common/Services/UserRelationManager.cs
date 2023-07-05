@@ -22,7 +22,7 @@ public sealed class UserRelationManager : IUserRelationManager
         _mediator = mediator;
     }
 
-    private async Task SetFriendStatus(Guid fromUserId, Guid toUserId, UserPartialFriendStatus friendStatus, UserRelationEntity? trackedEntity, CancellationToken cancellationToken)
+    private Task<int> SetFriendStatus(Guid fromUserId, Guid toUserId, UserPartialRelationType friendStatus, UserRelationEntity? trackedEntity, CancellationToken cancellationToken)
     {
         if (trackedEntity is null)
         {
@@ -33,22 +33,22 @@ public sealed class UserRelationManager : IUserRelationManager
                 FriendStatus = friendStatus,
             };
 
-            await _dbContext.UserRelations.AddAsync(trackedEntity, cancellationToken);
+            _dbContext.UserRelations.Add(trackedEntity);
         }
         else
         {
             trackedEntity.FriendStatus = friendStatus;
         }
 
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        return _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task SetFriendStatus(Guid fromUserId, Guid toUserId, UserPartialFriendStatus friendStatus, CancellationToken cancellationToken)
+    private async Task<int> SetFriendStatus(Guid fromUserId, Guid toUserId, UserPartialRelationType friendStatus, CancellationToken cancellationToken)
     {
         var trackedEntity = await _dbContext.UserRelations.AsTracking()
             .FirstOrDefaultAsync(x => x.FromUserId == fromUserId && x.ToUserId == toUserId, cancellationToken);
 
-        await SetFriendStatus(fromUserId, toUserId, friendStatus, trackedEntity, cancellationToken);
+        return await SetFriendStatus(fromUserId, toUserId, friendStatus, trackedEntity, cancellationToken);
     }
 
     public async Task<CreateOrAcceptFriendRequestResult> CreateOrAcceptFriendRequestAsync(Guid fromUserId, Guid toUserId, CancellationToken cancellationToken)
@@ -61,21 +61,21 @@ public sealed class UserRelationManager : IUserRelationManager
             .Take(2).ToArrayAsync(cancellationToken);
 
         // Check if the users are already friends or blocked, if so, don't create a friend request
-        if (relations.Any(x => x.FriendStatus == UserPartialFriendStatus.Blocked)) return CreateOrAcceptFriendRequestResult.NotAllowed;
-        if (relations.Any(x => x.FriendStatus == UserPartialFriendStatus.Accepted)) return CreateOrAcceptFriendRequestResult.AlreadyFriends;
+        if (relations.Any(x => x.FriendStatus == UserPartialRelationType.Blocked)) return CreateOrAcceptFriendRequestResult.NotAllowed;
+        if (relations.Any(x => x.FriendStatus == UserPartialRelationType.Accepted)) return CreateOrAcceptFriendRequestResult.AlreadyFriends;
 
         // Seperate the relations into incoming and outgoing
         var outgoingRelation = relations.FirstOrDefault(x => x.FromUserId == fromUserId);
         var incomingRelation = relations.FirstOrDefault(x => x.FromUserId == toUserId);
 
         // If there's a pending incoming friend request, make the two users friends
-        if (incomingRelation is not null && incomingRelation.FriendStatus == UserPartialFriendStatus.Pending)
+        if (incomingRelation is not null && incomingRelation.FriendStatus == UserPartialRelationType.Pending)
         {
             using IDbContextTransaction? transaction = await _dbContext.Database.BeginTransactionIfNotExistsAsync(cancellationToken);
 
             // Force the friend status to accepted
-            incomingRelation.FriendStatus = UserPartialFriendStatus.Accepted;
-            await SetFriendStatus(fromUserId, toUserId, UserPartialFriendStatus.Accepted, outgoingRelation, cancellationToken);
+            incomingRelation.FriendStatus = UserPartialRelationType.Accepted;
+            await SetFriendStatus(fromUserId, toUserId, UserPartialRelationType.Accepted, outgoingRelation, cancellationToken);
 
             if (transaction is not null)
             {
@@ -83,19 +83,21 @@ public sealed class UserRelationManager : IUserRelationManager
             }
 
             // Publish the friendship created event
-            await _mediator.Publish(new UserFriendshipCreatedEvent(fromUserId, toUserId), cancellationToken);
+            await _mediator.Publish(new UserRelationTypeChangedEvent(fromUserId, toUserId, UserRelationType.Friends), cancellationToken);
+            await _mediator.Publish(new UserRelationTypeChangedEvent(toUserId, fromUserId, UserRelationType.Friends), cancellationToken);
 
             return CreateOrAcceptFriendRequestResult.FriendshipCreated;
         }
 
         // If there's a pending outgoing friend request, do nothing
-        if (outgoingRelation is not null && outgoingRelation.FriendStatus == UserPartialFriendStatus.Pending) return CreateOrAcceptFriendRequestResult.NoChanges;
+        if (outgoingRelation is not null && outgoingRelation.FriendStatus == UserPartialRelationType.Pending) return CreateOrAcceptFriendRequestResult.NoChanges;
 
         // Set the friend status to pending
-        await SetFriendStatus(fromUserId, toUserId, UserPartialFriendStatus.Pending, outgoingRelation, cancellationToken);
+        await SetFriendStatus(fromUserId, toUserId, UserPartialRelationType.Pending, outgoingRelation, cancellationToken);
 
         // Publish the friend request created event
-        await _mediator.Publish(new UserFriendRequestCreatedEvent(fromUserId, toUserId), cancellationToken);
+        await _mediator.Publish(new UserRelationTypeChangedEvent(fromUserId, toUserId, UserRelationType.FriendRequestSent), cancellationToken);
+        await _mediator.Publish(new UserRelationTypeChangedEvent(toUserId, fromUserId, UserRelationType.FriendRequestReceived), cancellationToken);
 
         return CreateOrAcceptFriendRequestResult.Success;
     }
@@ -111,16 +113,17 @@ public sealed class UserRelationManager : IUserRelationManager
                     (fr.FromUserId == fromUserId && fr.ToUserId == toUserId) ||
                     (fr.FromUserId == toUserId && fr.ToUserId == fromUserId)
                 )
-                && fr.FriendStatus == UserPartialFriendStatus.Pending
+                && fr.FriendStatus == UserPartialRelationType.Pending
             )
-            .ExecuteUpdateAsync(spc => spc.SetProperty(x => x.FriendStatus, UserPartialFriendStatus.None), cancellationToken);
+            .ExecuteUpdateAsync(spc => spc.SetProperty(x => x.FriendStatus, UserPartialRelationType.None), cancellationToken);
 
         if (nRemoved <= 0)
         {
             return UpdateUserRelationResult.NoChanges;
         }
 
-        await _mediator.Publish(new UserFriendRequestRemovedEvent(fromUserId, toUserId), cancellationToken);
+        await _mediator.Publish(new UserRelationTypeChangedEvent(fromUserId, toUserId, UserRelationType.None), cancellationToken);
+        await _mediator.Publish(new UserRelationTypeChangedEvent(toUserId, fromUserId, UserRelationType.None), cancellationToken);
 
         return UpdateUserRelationResult.Success;
     }
@@ -136,16 +139,17 @@ public sealed class UserRelationManager : IUserRelationManager
                     (fr.FromUserId == fromUserId && fr.ToUserId == toUserId) ||
                     (fr.FromUserId == toUserId && fr.ToUserId == fromUserId)
                 )
-                && (fr.FriendStatus == UserPartialFriendStatus.Pending || fr.FriendStatus == UserPartialFriendStatus.Accepted)
+                && (fr.FriendStatus == UserPartialRelationType.Pending || fr.FriendStatus == UserPartialRelationType.Accepted)
             )
-            .ExecuteUpdateAsync(spc => spc.SetProperty(x => x.FriendStatus, UserPartialFriendStatus.None), cancellationToken);
+            .ExecuteUpdateAsync(spc => spc.SetProperty(x => x.FriendStatus, UserPartialRelationType.None), cancellationToken);
 
         if (nRemoved <= 0)
         {
             return UpdateUserRelationResult.NoChanges;
         }
 
-        await _mediator.Publish(new UserFriendshipDeletedEvent(fromUserId, toUserId), cancellationToken);
+        await _mediator.Publish(new UserRelationTypeChangedEvent(fromUserId, toUserId, UserRelationType.None), cancellationToken);
+        await _mediator.Publish(new UserRelationTypeChangedEvent(toUserId, fromUserId, UserRelationType.None), cancellationToken);
 
         return UpdateUserRelationResult.Success;
     }
@@ -157,18 +161,34 @@ public sealed class UserRelationManager : IUserRelationManager
         using IDbContextTransaction? transaction = await _dbContext.Database.BeginTransactionIfNotExistsAsync(cancellationToken);
 
         // Apply the block to the user
-        await SetFriendStatus(fromUserId, toUserId, UserPartialFriendStatus.Blocked, cancellationToken);
+        int outChanges = await SetFriendStatus(fromUserId, toUserId, UserPartialRelationType.Blocked, cancellationToken);
 
         // Remove any pending or accepted friend requests from the other user
-        await _dbContext.UserRelations.Where(x => x.FromUserId == toUserId && x.ToUserId == fromUserId && x.FriendStatus != UserPartialFriendStatus.Blocked)
-            .ExecuteUpdateAsync(spc => spc.SetProperty(x => x.FriendStatus, UserPartialFriendStatus.None), cancellationToken);
+        int inChanges = await _dbContext.UserRelations
+            .Where(x => x.FromUserId == toUserId && x.ToUserId == fromUserId && x.FriendStatus != UserPartialRelationType.Blocked)
+            .ExecuteUpdateAsync(spc => spc.SetProperty(x => x.FriendStatus, UserPartialRelationType.None), cancellationToken);
 
         if (transaction is not null)
         {
             await transaction.CommitAsync(cancellationToken);
         }
 
-        await _mediator.Publish(new UserBlockedEvent(fromUserId, toUserId), cancellationToken);
+        if (outChanges <= 0 && inChanges <= 0)
+        {
+            return UpdateUserRelationResult.NoChanges;
+        }
+
+        // Send user blocked event if the user was blocked
+        if (outChanges > 0)
+        {
+            await _mediator.Publish(new UserRelationTypeChangedEvent(fromUserId, toUserId, UserRelationType.Blocked), cancellationToken);
+        }
+
+        // Send user no longer friend event if the user was a friend
+        if (inChanges > 0)
+        {
+            await _mediator.Publish(new UserRelationTypeChangedEvent(toUserId, fromUserId, UserRelationType.None), cancellationToken);
+        }
 
         return UpdateUserRelationResult.Success;
     }
@@ -178,20 +198,20 @@ public sealed class UserRelationManager : IUserRelationManager
         if (fromUserId == toUserId) return UpdateUserRelationResult.CannotApplyToSelf;
 
         // Apply the unblock to the user only if the user is blocked
-        int numUpdates = await _dbContext.UserRelations.Where(x => x.FromUserId == fromUserId && x.ToUserId == toUserId && x.FriendStatus == UserPartialFriendStatus.Blocked)
-            .ExecuteUpdateAsync(spc => spc.SetProperty(x => x.FriendStatus, UserPartialFriendStatus.None), cancellationToken);
+        int numUpdates = await _dbContext.UserRelations.Where(x => x.FromUserId == fromUserId && x.ToUserId == toUserId && x.FriendStatus == UserPartialRelationType.Blocked)
+            .ExecuteUpdateAsync(spc => spc.SetProperty(x => x.FriendStatus, UserPartialRelationType.None), cancellationToken);
 
         if (numUpdates <= 0)
         {
             return UpdateUserRelationResult.NoChanges;
         }
 
-        await _mediator.Publish(new UserUnblockedEvent(fromUserId, toUserId), cancellationToken);
+        await _mediator.Publish(new UserRelationTypeChangedEvent(fromUserId, toUserId, UserRelationType.None), cancellationToken);
 
         return UpdateUserRelationResult.Success;
     }
 
-    public async Task<UpdateUserRelationResult> SetUserRelationDetailsAsync(Guid fromUserId, Guid toUserId, SetUserRelationDto relationUpdate, CancellationToken cancellationToken)
+    public async Task<UpdateUserRelationResult> SetUserRelationDetailsAsync(Guid fromUserId, Guid toUserId, UserRelationUpdateDto relationUpdate, CancellationToken cancellationToken)
     {
         if (fromUserId == toUserId) return UpdateUserRelationResult.CannotApplyToSelf;
 
@@ -231,9 +251,14 @@ public sealed class UserRelationManager : IUserRelationManager
             await _dbContext.UserRelations.AddAsync(relation, cancellationToken);
         }
 
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        int nChanges = await _dbContext.SaveChangesAsync(cancellationToken);
 
-        await _mediator.Publish(new UserRelationDetailsUpdatedEvent(fromUserId, toUserId));
+        if (nChanges <= 0)
+        {
+            return UpdateUserRelationResult.NoChanges;
+        }
+
+        await _mediator.Publish(new UserRelationDetailsUpdatedEvent(fromUserId, toUserId, relation.IsFavorite, relation.IsMuted, relationUpdate.NickName, relationUpdate.Notes));
 
         return UpdateUserRelationResult.Success;
     }

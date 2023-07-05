@@ -1244,11 +1244,11 @@ components:
     UserDto:
       required:
         - createdAt
-        - friendStatus
         - id
         - isFavorite
         - isMuted
         - lastOnline
+        - relation
         - status
         - statusText
         - username
@@ -1272,9 +1272,9 @@ components:
             - $ref: '#/components/schemas/UserStatus'
         statusText:
           type: string
-        friendStatus:
+        relation:
           allOf:
-            - $ref: '#/components/schemas/UserFriendStatus'
+            - $ref: '#/components/schemas/UserRelationType'
         isFavorite:
           type: boolean
         isMuted:
@@ -1299,14 +1299,6 @@ components:
           format: date-time
           nullable: true
       additionalProperties: false
-    UserFriendStatus:
-      enum:
-        - none
-        - friendRequestOutgoing
-        - friendRequestIncoming
-        - friends
-        - blocked
-      type: string
     UserNotification:
       required:
         - content
@@ -1322,6 +1314,14 @@ components:
           description: 'Content of the notification, might be HTML'
       additionalProperties: false
       description: "System notification to be displayed to the user, do not confuse with user notifications\r\nThis is a hint and clients can choose to ignore it or implement notifications to be independent of this"
+    UserRelationType:
+      enum:
+        - none
+        - friendRequestSent
+        - friendRequestReceived
+        - friends
+        - blocked
+      type: string
     UserReport:
       required:
         - explenation
