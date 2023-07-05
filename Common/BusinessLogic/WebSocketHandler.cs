@@ -58,8 +58,9 @@ public static class WebSocketHandler
 
         // Register instance globally, the hub will have the ability to kill this connection
         var result = await RegisterClientAsync(instance, cancellationToken);
-        if (result is not RegistrationResult.Ok or RegistrationResult.OkUserOnline)
+        if (result is not (RegistrationResult.Ok or RegistrationResult.OkUserOnline))
         {
+             await instance.CloseAsync(WebSocketCloseStatus.InternalServerError, "Failed to register websocket connection", cancellationToken);
             logger.LogError("Failed to register websocket connection, the hub was unable to register the client");
             return;
         }
@@ -67,25 +68,23 @@ public static class WebSocketHandler
         // Finally, run set the user as online and run the websocket, with some cleanup logic at the end
         try
         {
-            await mediator.Publish(new UserOnlineEvent(session.UserId), cancellationToken);
+            if (result == RegistrationResult.OkUserOnline)
+            {
+                await mediator.Publish(new UserOnlineEvent(session.UserId), cancellationToken);
+            }
 
             await instance.RunWebSocketAsync(cancellationToken);
         }
         finally
         {
-            try
+            // Remove instance globally
+            var removeResult = RemoveClient(instance.SessionId);
+
+            if (removeResult == RemoveClientResult.OkUserOffline)
             {
                 CancellationToken ct = new CancellationTokenSource(1000).Token;
                 await mediator.Publish(new UserOfflineEvent(session.UserId), ct);
             }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Failed to publish UserOfflineEvent");
-            }
-
-
-            // Remove instance globally
-            RemoveClientAsync(instance.SessionId);
         }
     }
 }

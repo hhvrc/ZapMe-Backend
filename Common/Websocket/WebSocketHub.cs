@@ -20,8 +20,12 @@ public static class WebSocketHub
     }
     public static async Task<RegistrationResult> RegisterClientAsync(WebSocketClient client, CancellationToken cancellationToken = default)
     {
+        Guid clientId = client.SessionId;
         Guid userId = client.UserId;
         bool userAdded = false;
+
+        // Set clients in global list
+        Clients[clientId] = client;
 
         // Get user clients
         if (!Users.TryGetValue(userId, out WebSocketUser? user) || user == null)
@@ -31,7 +35,7 @@ public static class WebSocketHub
             {
                 if (!Users.TryGetValue(userId, out user) || user == null)
                 {
-                    await client.CloseAsync(WebSocketCloseStatus.InternalServerError, "Failed to register user", cancellationToken);
+                    RemoveClient(clientId);
                     return RegistrationResult.UserRegistrationFailed;
                 }
             }
@@ -42,7 +46,7 @@ public static class WebSocketHub
         // Try to add client to user
         if (!await user.TryAddClientAsync(client, cancellationToken))
         {
-            await client.CloseAsync(WebSocketCloseStatus.InternalServerError, "Failed to register client", cancellationToken);
+            RemoveClient(clientId);
             return RegistrationResult.ClientRegistrationFailed;
         }
 
@@ -56,7 +60,7 @@ public static class WebSocketHub
         OkUserNotFound,
         ClientNotFound
     }
-    public static RemoveClientResult RemoveClientAsync(Guid clientSessionId)
+    public static RemoveClientResult RemoveClient(Guid clientSessionId, CancellationToken cancellationToken = default)
     {
         if (Clients.TryRemove(clientSessionId, out WebSocketClient? client) && client is not null)
         {
@@ -64,7 +68,7 @@ public static class WebSocketHub
 
             if (Users.TryGetValue(userId, out WebSocketUser? user) && user is not null)
             {
-                user.TryDisconnectClientAsync(clientSessionId, WebSocketCloseStatus.NormalClosure, "Disconnected by another client");
+                user.TryRemoveClient(clientSessionId, out _);
                 if (!user.IsOnline)
                 {
                     Users.TryRemove(userId, out _);
