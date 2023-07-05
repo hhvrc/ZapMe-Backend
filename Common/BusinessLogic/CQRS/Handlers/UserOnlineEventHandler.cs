@@ -8,14 +8,13 @@ using ZapMe.Websocket;
 
 namespace ZapMe.BusinessLogic.CQRS.Handlers;
 
-/*
 public sealed class UserOnlineEventHandler : INotificationHandler<UserOnlineEvent>
 {
     private readonly DatabaseContext _dbContext;
 
-    public UserOnlineEventHandler(IServiceProvider serviceProvider)
+    public UserOnlineEventHandler(DatabaseContext dbContext)
     {
-        _dbContext = serviceProvider.GetRequiredService<DatabaseContext>();
+        _dbContext = dbContext;
     }
 
     public async ValueTask Handle(UserOnlineEvent notification, CancellationToken cancellationToken)
@@ -42,4 +41,3 @@ public sealed class UserOnlineEventHandler : INotificationHandler<UserOnlineEven
         }
     }
 }
-*/

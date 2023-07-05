@@ -152,7 +152,7 @@ services.AddStackExchangeRedisCache(opt =>
 });
 services.AddZapMeDatabase(configuration);
 services.AddScheduledJobs();
-services.AddMediator();
+services.AddMediator(opt => opt.ServiceLifetime = ServiceLifetime.Scoped);
 
 // ########################################
 // ######## CORS CONFIGURATION ############
