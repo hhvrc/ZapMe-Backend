@@ -23,7 +23,6 @@ public partial class UserController
     public async Task<IActionResult> LookUp([FromQuery] string username, [FromServices] IUserRepository userRepository, CancellationToken cancellationToken)
     {
         var user = await userRepository.GetUserByUserNameAsync(username, cancellationToken);
-
         if (user is null)
         {
             return HttpErrors.UserNotFoundActionResult;

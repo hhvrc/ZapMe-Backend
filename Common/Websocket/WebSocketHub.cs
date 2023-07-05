@@ -11,6 +11,8 @@ public static class WebSocketHub
     public static ConcurrentDictionary<Guid, WebSocketClient> Clients { get; } = new();
     public static ConcurrentDictionary<Guid, WebSocketUser> Users { get; } = new();
 
+    public static bool IsUserOnline(Guid id) => Users.TryGetValue(id, out WebSocketUser? user) && user.IsOnline;
+
     public enum RegistrationResult
     {
         Ok,

@@ -60,7 +60,7 @@ public static class WebSocketHandler
         var result = await RegisterClientAsync(instance, cancellationToken);
         if (result is not (RegistrationResult.Ok or RegistrationResult.OkUserOnline))
         {
-             await instance.CloseAsync(WebSocketCloseStatus.InternalServerError, "Failed to register websocket connection", cancellationToken);
+            await instance.CloseAsync(WebSocketCloseStatus.InternalServerError, "Failed to register websocket connection", cancellationToken);
             logger.LogError("Failed to register websocket connection, the hub was unable to register the client");
             return;
         }
