@@ -1,8 +1,8 @@
 ﻿using System.Text;
 
-namespace ZapMe.Utils;
+namespace ZapMe.BusinessRules;
 
-public static class Verifiers
+public static class UIStringValidator
 {
 
     /// <summary>

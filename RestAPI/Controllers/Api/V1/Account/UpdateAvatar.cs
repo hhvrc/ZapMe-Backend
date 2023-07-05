@@ -6,7 +6,6 @@ using ZapMe.Enums.Errors;
 using ZapMe.Helpers;
 using ZapMe.Mappers;
 using ZapMe.Services.Interfaces;
-using ZapMe.Utils;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -37,7 +36,7 @@ public partial class AccountController
             return HttpErrors.Generic(StatusCodes.Status411LengthRequired, "Length is required", "Missing or invalid Content-Length header").ToActionResult();
         }
 
-        string cfRegion = CountryRegionLookup.GetCloudflareRegion(this.GetCloudflareIPCountry());
+        string cfRegion = CountryCodeMapper.GetCloudflareRegion(this.GetCloudflareIPCountry());
 
         var res = await imageManager.GetOrCreateRecordAsync(Request.Body, cfRegion, (int)length, sha256Hash, User.GetUserId(), cancellationToken);
         if (res.TryPickT1(out ImageUploadError createError, out var image))

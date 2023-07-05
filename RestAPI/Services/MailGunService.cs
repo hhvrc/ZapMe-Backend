@@ -2,10 +2,10 @@
 using System.Net.Mail;
 using System.Text;
 using System.Text.Json;
+using ZapMe.BusinessRules;
 using ZapMe.Constants;
 using ZapMe.Options;
 using ZapMe.Services.Interfaces;
-using ZapMe.Utils;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Services;
@@ -45,14 +45,14 @@ public sealed class MailGunService : IMailGunService
 
     private async Task<bool> SendEmailAsync(string senderName, string senderExtension, string recepient, string subject, CancellationToken cancellationToken, params (string nmae, string value)[] additionalContent)
     {
-        if (!EmailUtils.IsValid(recepient))
+        if (!EmailValidator.IsValid(recepient))
         {
             _logger.LogError("Failed to parse recepient email");
             return false;
         }
 
         string sender = $"{senderName} <{senderExtension}@{App.Domain}>";
-        if (!EmailUtils.IsValid(sender))
+        if (!EmailValidator.IsValid(sender))
         {
             _logger.LogError("Failed to parse sender email");
             return false;

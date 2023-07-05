@@ -1,8 +1,8 @@
 ﻿using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using System.ComponentModel.DataAnnotations;
+using ZapMe.BusinessRules;
 using ZapMe.Constants;
-using ZapMe.Utils;
 
 namespace ZapMe.Attributes;
 
@@ -61,7 +61,7 @@ public class EmailAddressAttribute : ValidationAttribute, IParameterAttribute
             return new ValidationResult(_ErrMsgTooLong);
         }
 
-        EmailUtils.ParsedResult parsed = EmailUtils.Parse(email);
+        EmailValidator.ParsedResult parsed = EmailValidator.Parse(email);
         if (!parsed.Success)
         {
             return new ValidationResult(_ErrMsgInvalid);

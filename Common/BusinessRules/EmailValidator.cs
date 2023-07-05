@@ -1,8 +1,9 @@
 ﻿using System.Runtime.CompilerServices;
+using ZapMe.Constants;
 
-namespace ZapMe.Utils;
+namespace ZapMe.BusinessRules;
 
-public static class EmailUtils
+public static class EmailValidator
 {
     public readonly struct ParsedResult
     {
@@ -135,8 +136,7 @@ public static class EmailUtils
 
         ReadOnlySpan<char> email = str.AsSpan();
 
-        // "a@b.c" (5 chars)
-        if (email.Length < 5)
+        if (email.Length < GeneralHardLimits.EmailAddressMinLength)
             return ParsedResult.Invalid;
 
         // @ cannot be the first character
@@ -158,6 +158,10 @@ public static class EmailUtils
 
             addrStop -= 1;
         }
+
+        int addrLen = addrStop - addrStart;
+        if (addrLen > GeneralHardLimits.EmailAddressMaxLength)
+            return ParsedResult.Invalid;
 
         ReadOnlySpan<char> userPart = email[addrStart..atPos];
         if (!IsValidUser(userPart))

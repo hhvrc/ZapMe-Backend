@@ -1,8 +1,8 @@
 ﻿using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using System.ComponentModel.DataAnnotations;
+using ZapMe.BusinessRules;
 using ZapMe.Constants;
-using ZapMe.Utils;
 
 namespace ZapMe.Attributes;
 
@@ -26,11 +26,6 @@ public class UsernameAttribute : ValidationAttribute, IParameterAttribute
     public const string ExampleUsername = "MyUsername";
 
     private const string _ErrMsgMustBeString = "Username must be a string";
-    private static readonly string _ErrMsgTooShort = $"Username must be at least {GeneralHardLimits.UsernameMinLength} characters long";
-    private static readonly string _ErrMsgTooLong = $"Username must be at most {GeneralHardLimits.UsernameMaxLength} characters long";
-    private const string _ErrMsgNoWhiteSpaceAtEnds = "Username cannot start or end with whitespace";
-    private const string _ErrMsgNoObnoxiousChars = "Username must not contain obnoxious characters";
-    private const string _ErrMsgCannotBeEmailAddress = "Username cannot be an email address";
 
     /// <summary>
     /// Indicates whether validation should be performed.
@@ -61,29 +56,10 @@ public class UsernameAttribute : ValidationAttribute, IParameterAttribute
             return new ValidationResult(_ErrMsgMustBeString);
         }
 
-        if (username.Length < GeneralHardLimits.UsernameMinLength)
+        var result = UsernameValidator.Validate(username);
+        if (!result.Ok)
         {
-            return new ValidationResult(_ErrMsgTooShort);
-        }
-
-        if (username.Length > GeneralHardLimits.UsernameMaxLength)
-        {
-            return new ValidationResult(_ErrMsgTooLong);
-        }
-
-        if (Char.IsWhiteSpace(username[0]) || Char.IsWhiteSpace(username[^1]))
-        {
-            return new ValidationResult(_ErrMsgNoWhiteSpaceAtEnds);
-        }
-
-        if (Verifiers.IsBadUiString(username))
-        {
-            return new ValidationResult(_ErrMsgNoObnoxiousChars);
-        }
-
-        if (EmailUtils.Parse(username).Success)
-        {
-            return new ValidationResult(_ErrMsgCannotBeEmailAddress);
+            return new ValidationResult(result.ErrorMessage);
         }
 
         return ValidationResult.Success;

@@ -1,7 +1,7 @@
 ﻿using System.Net.Http.Headers;
+using ZapMe.BusinessRules;
 using ZapMe.Constants;
 using ZapMe.Services.Interfaces;
-using ZapMe.Utils;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Services;
@@ -45,7 +45,7 @@ public sealed class DebounceService : IDebounceService
 
     public async Task<bool> IsDisposableEmailAsync(string emailAddress, CancellationToken cancellationToken)
     {
-        EmailUtils.ParsedResult parsed = EmailUtils.Parse(emailAddress);
+        EmailValidator.ParsedResult parsed = EmailValidator.Parse(emailAddress);
         if (!parsed.Success)
         {
             _logger.LogError("Failed to parse email, aborting");

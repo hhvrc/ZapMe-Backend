@@ -10,7 +10,6 @@ using ZapMe.Enums.Errors;
 using ZapMe.Helpers;
 using ZapMe.Mappers;
 using ZapMe.Services.Interfaces;
-using ZapMe.Utils;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -123,7 +122,7 @@ public partial class AccountController
             {
                 var getOrCreateImageResult = await imageManager.GetOrCreateRecordAsync(
                     providerVariables.ProviderAvatarUrl,
-                    CountryRegionLookup.GetCloudflareRegion(this.GetCloudflareIPCountry()),
+                    CountryCodeMapper.GetCloudflareRegion(this.GetCloudflareIPCountry()),
                     null,
                     null,
                     cancellationToken
@@ -137,7 +136,7 @@ public partial class AccountController
             {
                 var getOrCreateImageResult = await imageManager.GetOrCreateRecordAsync(
                     providerVariables.ProviderBannerUrl,
-                    CountryRegionLookup.GetCloudflareRegion(this.GetCloudflareIPCountry()),
+                    CountryCodeMapper.GetCloudflareRegion(this.GetCloudflareIPCountry()),
                     null,
                     null,
                     cancellationToken

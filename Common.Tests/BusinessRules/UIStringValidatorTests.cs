@@ -1,9 +1,9 @@
 ﻿using System.Text.Json;
-using ZapMe.Utils;
+using ZapMe.BusinessRules;
 
-namespace ZapMe.Tests.Utils;
+namespace ZapMe.Common.Tests.BusinessRules;
 
-public sealed class VerifiersTests
+public sealed class UIStringValidatorTests
 {
     private delegate void HandleLineFunc(ReadOnlySpan<char> line);
     private static void GetAllLines(ReadOnlySpan<char> text, HandleLineFunc handleLine)
@@ -50,26 +50,26 @@ public sealed class VerifiersTests
     }
 
     [Fact]
-    public void IsBadUiString_WhiteListed_Charsets() => Assert_Lines_In_Files("DataSet/Text/WhiteList/Charsets/", "*.txt", line => !Verifiers.IsBadUiString(line));
+    public void IsBadUiString_WhiteListed_Charsets() => Assert_Lines_In_Files("DataSet/Text/WhiteList/Charsets/", "*.txt", line => !UIStringValidator.IsBadUiString(line));
 
     [Fact]
     public void IsBadUiString_WhiteListed_Texts()
     {
         foreach ((string fileName, string text) in ReadAllFiles("DataSet/Text/WhiteList/Text/", "*.txt"))
         {
-            Assert.False(Verifiers.IsBadUiString(text), $"File {fileName} should pass, but does not.");
+            Assert.False(UIStringValidator.IsBadUiString(text), $"File {fileName} should pass, but does not.");
         }
     }
 
     [Fact]
-    public void IsBadUiString_BlackListed_Charsets() => Assert_Lines_In_Files("DataSet/Text/BlackList/Charsets/", "*.txt", Verifiers.IsBadUiString);
+    public void IsBadUiString_BlackListed_Charsets() => Assert_Lines_In_Files("DataSet/Text/BlackList/Charsets/", "*.txt", UIStringValidator.IsBadUiString);
 
     [Fact]
     public void IsBadUiString_BlackListed_Texts()
     {
         foreach ((string fileName, string text) in ReadAllFiles("DataSet/Text/BlackList/Text/", "*.txt"))
         {
-            Assert.True(Verifiers.IsBadUiString(text), $"File {fileName} should fail, but does not.");
+            Assert.True(UIStringValidator.IsBadUiString(text), $"File {fileName} should fail, but does not.");
         }
     }
 
@@ -86,14 +86,14 @@ public sealed class VerifiersTests
         {
             ReadOnlySpan<char> lorem = new Bogus.DataSets.Lorem(locale).Sentence(8192).AsSpan().Trim();
 
-            Assert.False(Verifiers.IsBadUiString(lorem), $"Failed on locale[{locale}]: {lorem}");
+            Assert.False(UIStringValidator.IsBadUiString(lorem), $"Failed on locale[{locale}]: {lorem}");
         }
     }
 
     [Fact]
     public void IsBadUiString_NullAndEmpty()
     {
-        Assert.True(Verifiers.IsBadUiString(String.Empty));
-        Assert.True(Verifiers.IsBadUiString(null!));
+        Assert.True(UIStringValidator.IsBadUiString(String.Empty));
+        Assert.True(UIStringValidator.IsBadUiString(null!));
     }
 }
