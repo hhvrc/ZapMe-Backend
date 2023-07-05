@@ -1,7 +1,6 @@
 ﻿using fbs.server;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using ZapMe.BusinessLogic.CQRS.Events;
 using ZapMe.Database;
 using ZapMe.Websocket;

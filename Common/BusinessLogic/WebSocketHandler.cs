@@ -73,7 +73,15 @@ public static class WebSocketHandler
         }
         finally
         {
-            try { await mediator.Publish(new UserOfflineEvent(session.UserId), cancellationToken); } catch { }
+            try
+            {
+                CancellationToken ct = new CancellationTokenSource(1000).Token;
+                await mediator.Publish(new UserOfflineEvent(session.UserId), ct);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to publish UserOfflineEvent");
+            }
 
 
             // Remove instance globally
