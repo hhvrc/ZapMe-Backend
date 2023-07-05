@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace ZapMe.Utils;
+namespace ZapMe.BusinessRules;
 
 /// <summary>
 /// <para>Specialized character set matchers that match strings by unicode codepoints</para>

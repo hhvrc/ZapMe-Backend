@@ -64,7 +64,7 @@ public partial class ConfigController
                 TwitterUri = new Uri("https://twitter.com/hhvrc"),
                 RedditUri = new Uri("https://reddit.com/u/hhvrc"),
                 WebsiteUri = new Uri("https://heavenvr.tech"),
-                DiscordUsername = "HentaiHeaven#0001"
+                DiscordUsername = "hhvr"
             }
         };
     }

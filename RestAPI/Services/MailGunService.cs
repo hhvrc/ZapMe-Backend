@@ -2,10 +2,10 @@
 using System.Net.Mail;
 using System.Text;
 using System.Text.Json;
+using ZapMe.BusinessRules;
 using ZapMe.Constants;
 using ZapMe.Options;
 using ZapMe.Services.Interfaces;
-using ZapMe.Utils;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Services;
@@ -43,16 +43,16 @@ public sealed class MailGunService : IMailGunService
         _logger = logger;
     }
 
-    private async Task<bool> SendEmailAsync(string senderName, string recepient, string subject, CancellationToken cancellationToken, params (string nmae, string value)[] additionalContent)
+    private async Task<bool> SendEmailAsync(string senderName, string senderExtension, string recepient, string subject, CancellationToken cancellationToken, params (string nmae, string value)[] additionalContent)
     {
-        if (!EmailUtils.IsValid(recepient))
+        if (!EmailValidator.IsValid(recepient))
         {
             _logger.LogError("Failed to parse recepient email");
             return false;
         }
 
-        string sender = $"{senderName} <{senderName.ToLower()}@{App.Domain}>";
-        if (!EmailUtils.IsValid(sender))
+        string sender = $"{senderName} <{senderExtension}@{App.Domain}>";
+        if (!EmailValidator.IsValid(sender))
         {
             _logger.LogError("Failed to parse sender email");
             return false;
@@ -87,10 +87,11 @@ public sealed class MailGunService : IMailGunService
         return true;
     }
 
-    private Task<bool> SendEmailAsync(string senderName, string recepient, string subject, string htmlbody, CancellationToken cancellationToken)
+    private Task<bool> SendEmailAsync(string senderName, string senderExtension, string recepient, string subject, string htmlbody, CancellationToken cancellationToken)
     {
         return SendEmailAsync(
             senderName,
+            senderExtension,
             recepient,
             subject,
             cancellationToken,
@@ -98,10 +99,11 @@ public sealed class MailGunService : IMailGunService
         );
     }
 
-    private Task<bool> SendEmailAsync(string senderName, string recepient, string subject, string templateName, Dictionary<string, string> variables, CancellationToken cancellationToken)
+    private Task<bool> SendEmailAsync(string senderName, string senderExtension, string recepient, string subject, string templateName, Dictionary<string, string> variables, CancellationToken cancellationToken)
     {
         return SendEmailAsync(
             senderName,
+            senderExtension,
             recepient,
             subject,
             cancellationToken,
@@ -110,7 +112,7 @@ public sealed class MailGunService : IMailGunService
         );
     }
 
-    public Task<bool> SendEmailAsync(string senderName, string recepientName, string recepientEmail, string subject, string htmlBody, CancellationToken cancellationToken)
+    public Task<bool> SendEmailAsync(string senderName, string senderExtension, string recepientName, string recepientEmail, string subject, string htmlBody, CancellationToken cancellationToken)
     {
         return SendEmailAsync(
             senderName,
@@ -121,10 +123,11 @@ public sealed class MailGunService : IMailGunService
         );
     }
 
-    public Task<bool> SendEmailAsync(string senderName, string recepientName, string recepientEmail, string subject, string templateName, Dictionary<string, string> variables, CancellationToken cancellationToken)
+    public Task<bool> SendEmailAsync(string senderName, string senderExtension, string recepientName, string recepientEmail, string subject, string templateName, Dictionary<string, string> variables, CancellationToken cancellationToken)
     {
         return SendEmailAsync(
             senderName,
+            senderExtension,
             $"{recepientName} <{recepientEmail}>",
             subject,
             templateName,
@@ -133,10 +136,11 @@ public sealed class MailGunService : IMailGunService
         );
     }
 
-    public Task<bool> SendEmailAsync(string senderName, MailAddress recepient, string subject, string htmlbody, CancellationToken cancellationToken)
+    public Task<bool> SendEmailAsync(string senderName, string senderExtension, MailAddress recepient, string subject, string htmlbody, CancellationToken cancellationToken)
     {
         return SendEmailAsync(
             senderName,
+            senderExtension,
             recepient.ToString(),
             subject,
             htmlbody,
@@ -144,10 +148,11 @@ public sealed class MailGunService : IMailGunService
         );
     }
 
-    public Task<bool> SendEmailAsync(string senderName, MailAddress recepient, string subject, string templateName, Dictionary<string, string> variables, CancellationToken cancellationToken)
+    public Task<bool> SendEmailAsync(string senderName, string senderExtension, MailAddress recepient, string subject, string templateName, Dictionary<string, string> variables, CancellationToken cancellationToken)
     {
         return SendEmailAsync(
             senderName,
+            senderExtension,
             recepient.ToString(),
             subject,
             templateName,

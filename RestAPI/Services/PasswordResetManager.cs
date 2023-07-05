@@ -53,7 +53,7 @@ public sealed class PasswordResetManager : IPasswordResetManager
         await _passwordResetRequestStore.UpsertAsync(user.Id, tokenHash, cancellationToken);
 
         // Send recovery secret to email
-        bool success = await _mailGunService.SendEmailAsync("Hello", user.Name, user.Email, "Password recovery", "password-reset", mailgunValues, cancellationToken);
+        bool success = await _mailGunService.SendEmailAsync(App.AppName, "support", user.Name, user.Email, "Password recovery", "password-reset", mailgunValues, cancellationToken);
         if (!success)
         {
             _logger.LogError("Failed to send password reset email to {Email}", user.Email);

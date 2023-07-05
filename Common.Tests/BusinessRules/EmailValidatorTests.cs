@@ -1,8 +1,8 @@
-﻿using ZapMe.Utils;
+﻿using ZapMe.BusinessRules;
 
-namespace ZapMe.Tests.Utils;
+namespace ZapMe.Common.Tests.BusinessRules;
 
-public sealed class EmailUtilsTests
+public sealed class EmailValidatorTests
 {
     [Theory]
     [InlineData("email")]
@@ -14,7 +14,7 @@ public sealed class EmailUtilsTests
     public void IsValidUser_ValidUser_ReturnsSuccess(string user)
     {
         // Act
-        var result = EmailUtils.IsValidUser(user);
+        var result = EmailValidator.IsValidUser(user);
 
         // Assert
         Assert.True(result);
@@ -33,7 +33,7 @@ public sealed class EmailUtilsTests
     public void IsValidUser_InvalidUser_ReturnsFailure(string user)
     {
         // Act
-        var result = EmailUtils.IsValidUser(user);
+        var result = EmailValidator.IsValidUser(user);
 
         // Assert
         Assert.False(result);
@@ -45,7 +45,7 @@ public sealed class EmailUtilsTests
     public void IsValidHost_ValidHost_ReturnsSuccess(string host)
     {
         // Act
-        var result = EmailUtils.IsValidHost(host);
+        var result = EmailValidator.IsValidHost(host);
 
         // Assert
         Assert.True(result);
@@ -59,7 +59,7 @@ public sealed class EmailUtilsTests
     public void IsValidHost_InvalidHost_ReturnsFailure(string host)
     {
         // Act
-        var result = EmailUtils.IsValidHost(host);
+        var result = EmailValidator.IsValidHost(host);
 
         // Assert
         Assert.False(result);
@@ -72,7 +72,7 @@ public sealed class EmailUtilsTests
         const string email = "Display name <alias+user.example@domain-name.com>";
 
         // Act
-        var result = EmailUtils.Parse(email);
+        var result = EmailValidator.Parse(email);
 
         // Assert
         Assert.True(result.Success, "Parse failed");

@@ -1,6 +1,6 @@
-namespace ZapMe.Utils;
+namespace ZapMe.Mappers;
 
-public static class CountryRegionLookup
+public static class CountryCodeMapper
 {
     public static readonly Dictionary<string, string> CountryRegionDict = new Dictionary<string, string>
     {
