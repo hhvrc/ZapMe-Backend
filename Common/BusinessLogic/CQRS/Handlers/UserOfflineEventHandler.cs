@@ -1,6 +1,7 @@
 ﻿using fbs.server;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using ZapMe.BusinessLogic.CQRS.Events;
 using ZapMe.Database;
 using ZapMe.Websocket;
@@ -11,9 +12,9 @@ public sealed class UserOfflineEventHandler : INotificationHandler<UserOfflineEv
 {
     private readonly DatabaseContext _dbContext;
 
-    public UserOfflineEventHandler(DatabaseContext dbContext)
+    public UserOfflineEventHandler(IServiceProvider serviceProvider)
     {
-        _dbContext = dbContext;
+        _dbContext = serviceProvider.GetRequiredService<DatabaseContext>();
     }
 
     public async ValueTask Handle(UserOfflineEvent notification, CancellationToken cancellationToken)
