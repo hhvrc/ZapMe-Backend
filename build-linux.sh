@@ -29,12 +29,12 @@ if hash dotnet 2>/dev/null; then
     DOTNET_VERSIONS=$(dotnet --list-sdks)
 
     # Check if dotnet 6 is installed
-    if [[ $DOTNET_VERSIONS == *"6.0.309"* ]]; then
+    if [[ $DOTNET_VERSIONS == *"6.0.314"* ]]; then
         DOTNET_6_INSTALLED=true
     fi
 
     # Check if dotnet 7 is installed
-    if [[ $DOTNET_VERSIONS == *"7.0.102"* ]]; then
+    if [[ $DOTNET_VERSIONS == *"7.0.305"* ]]; then
         DOTNET_7_INSTALLED=true
     fi
 fi
@@ -57,12 +57,12 @@ if [[ $DOTNET_INSTALLED = false ]] || [[ $DOTNET_6_INSTALLED = false ]] || [[ $D
 
     # Install dotnet 6 if not already installed
     if [[ $DOTNET_6_INSTALLED = false ]]; then
-        ./dotnet-install.sh --version 6.0.309
+        ./dotnet-install.sh --version 6.0.314
     fi
 
     # Install dotnet 7 if not already installed
     if [[ $DOTNET_7_INSTALLED = false ]]; then
-        ./dotnet-install.sh --version 7.0.102
+        ./dotnet-install.sh --version 7.0.305
     fi
 
     # Remove dotnet install script
