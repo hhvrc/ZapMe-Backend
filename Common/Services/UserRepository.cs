@@ -77,31 +77,19 @@ public class UserRepository : IUserRepository
             .Include(u => u.RelationsIncoming)
             .Include(u => u.SSOConnections);
 
-    private async Task<UserEntity?> SetOnlineStatus(Task<UserEntity?> userTask)
-    {
-        var user = await userTask;
-
-        if (user is not null)
-        {
-            user.Status = Websocket.WebSocketHub.IsUserOnline(user.Id) ? user.Status : UserStatus.Offline;
-        }
-
-        return user;
-    }
-
     public Task<UserEntity?> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        return SetOnlineStatus(QueryBase.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken));
+        return QueryBase.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
     }
 
     public Task<UserEntity?> GetUserByUserNameAsync(string userName, CancellationToken cancellationToken = default)
     {
-        return SetOnlineStatus(QueryBase.FirstOrDefaultAsync(u => u.Name == userName, cancellationToken));
+        return QueryBase.FirstOrDefaultAsync(u => u.Name == userName, cancellationToken);
     }
 
     public Task<UserEntity?> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
-        return SetOnlineStatus(QueryBase.FirstOrDefaultAsync(u => u.Email == email, cancellationToken));
+        return QueryBase.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
     }
 
     public async Task<bool> DeleteUserById(Guid userId, CancellationToken cancellationToken = default)
