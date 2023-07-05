@@ -3,8 +3,10 @@ using System.Security.Claims;
 using ZapMe.BusinessLogic.Users;
 using ZapMe.BusinessRules;
 using ZapMe.DTOs;
+using ZapMe.Enums;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
+using ZapMe.Websocket;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -20,11 +22,12 @@ public partial class UserController
     public async Task<IActionResult> Get([FromRoute] Guid userId, [FromServices] IUserRepository userRepository, CancellationToken cancellationToken)
     {
         var user = await userRepository.GetUserByIdAsync(userId, cancellationToken);
-
         if (user is null)
         {
             return HttpErrors.UserNotFoundActionResult;
         }
+
+        user.Status = WebSocketHub.IsUserOnline(user.Id) ? user.Status : UserStatus.Offline;
 
         Guid selfUserId = User.GetUserId();
         var relation = UserRelationLogic.GetUserRelationDto(selfUserId, user);

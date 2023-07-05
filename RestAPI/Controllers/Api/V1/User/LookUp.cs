@@ -3,8 +3,10 @@ using System.Security.Claims;
 using ZapMe.BusinessLogic.Users;
 using ZapMe.BusinessRules;
 using ZapMe.DTOs;
+using ZapMe.Enums;
 using ZapMe.Helpers;
 using ZapMe.Services.Interfaces;
+using ZapMe.Websocket;
 
 namespace ZapMe.Controllers.Api.V1;
 
@@ -27,6 +29,8 @@ public partial class UserController
         {
             return HttpErrors.UserNotFoundActionResult;
         }
+
+        user.Status = WebSocketHub.IsUserOnline(user.Id) ? user.Status : UserStatus.Offline;
 
         //return RedirectToAction(nameof(Get), new { userId = user.Id }); // TODO: OpenAPI doesn't support 302 responses
         Guid selfUserId = User.GetUserId();
