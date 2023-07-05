@@ -8,6 +8,7 @@ using ZapMe.Websocket;
 
 namespace ZapMe.BusinessLogic.CQRS.Handlers;
 
+/*
 public sealed class UserOfflineEventHandler : INotificationHandler<UserOfflineEvent>
 {
     private readonly DatabaseContext _dbContext;
@@ -31,3 +32,4 @@ public sealed class UserOfflineEventHandler : INotificationHandler<UserOfflineEv
         }
     }
 }
+*/

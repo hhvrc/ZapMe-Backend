@@ -73,7 +73,8 @@ public static class WebSocketHandler
         }
         finally
         {
-            await mediator.Publish(new UserOfflineEvent(session.UserId), cancellationToken);
+            try { await mediator.Publish(new UserOfflineEvent(session.UserId), cancellationToken); } catch { }
+
 
             // Remove instance globally
             RemoveClientAsync(instance.SessionId);
