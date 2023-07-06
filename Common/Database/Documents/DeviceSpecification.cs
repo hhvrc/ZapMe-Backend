@@ -5,20 +5,13 @@ namespace ZapMe.Database.Documents;
 // Carrier wave modulation schemes
 public enum RfRawModulation
 {
-    OOK,   // On-Off Keying
     ASK,   // Amplitude Shift Keying
-    FSK,   // Frequency Shift Keying
+    OOK,   // On-Off Keying
     GFSK,  // Gaussian Frequency Shift Keying
-    PSK,   // Phase Shift Keying
-    QPSK,  // Quadrature Phase Shift Keying
-    BPSK,  // Binary Phase Shift Keying
-    QAM,   // Quadrature Amplitude Modulation
-    DSSS,  // Direct Sequence Spread Spectrum
+    FSK,   // Frequency Shift Keying
+    FSK2,  // Frequency Shift Keying 2
+    FSK4,  // Frequency Shift Keying 4
     MSK,   // Minimum Shift Keying
-    OFDM,  // Orthogonal Frequency Division Multiplexing
-    DCPM,  // Differential Continuous Phase Modulation
-    ADPCM, // Adaptive Differential Pulse Code Modulation
-    PCM,   // Pulse Code Modulation
 }
 
 // Bit-level encoding schemes
@@ -26,44 +19,7 @@ public enum RfRawEncoding
 {
     None,
     Proprietary,
-
     Manchester,
-    ManchesterInverted, // aka IEEE 802.3
-    ManchesterDifferential, // aka Bi-Phase Mark, Bi-Phase Manchester, F2F, Aiken Bi-Phase, Conditioned Diphase
-
-    BipolarRz,
-    BipolarNrz,
-    UnipolarRz,
-    UnipolarNrz,
-
-    // Non Return to Zero
-    Rz,
-    Nrz,
-    NrzL, // Level
-    NrzI, // Inverted
-    NrzM, // Mark
-    NrzS, // Space
-    NrzC, // Change
-
-    // Bi-Phase
-    BiPhaseL, // Level
-    BiPhaseI, // Inverted
-    BiPhaseS, // Space
-
-    // Bi-Polar
-    Bipolar,
-    BipolarPseudoternary,
-
-    // Uni-Polar
-    UniPolar,
-    UniPolarRz,
-
-    // Alternate Mark Inversion
-    Ami,
-    AmiB8ZS, // Bipolar with 8-Zero Substitution
-
-    Block4B5B,
-    Block8B6T,
 }
 
 public enum RfMessagePartRole
@@ -99,6 +55,8 @@ public sealed class RfRawSpec
     public ulong PacketSize { get; init; }
 
     public RfRawEncoding Encoding { get; init; }
+
+    public bool Inverted { get; init; }
 
     public required MessagePart[] MessageSpec { get; init; }
 }
