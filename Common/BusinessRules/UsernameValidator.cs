@@ -29,7 +29,7 @@ public static class UsernameValidator
 
         if (EmailValidator.Parse(username).Success)
         {
-            return new ValidationResult(false, "Username cannot be an email address.");
+            return new ValidationResult(false, "Username must not be an email address.");
         }
 
         return new ValidationResult(true, String.Empty);
