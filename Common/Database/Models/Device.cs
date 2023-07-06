@@ -9,7 +9,11 @@ public sealed class DeviceEntity
 
     public required string Name { get; set; }
 
+    public Guid ModelId { get; init; }
+
     public DateTime CreatedAt { get; init; }
+
+    public DeviceModelEntity? Model { get; private set; } = null;
 }
 
 public sealed class DeviceEntityConfiguration : IEntityTypeConfiguration<DeviceEntity>

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Marten;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,12 +15,23 @@ public static class ZapMeDatabaseExtensions
 
         DatabaseOptions options = section.Get<DatabaseOptions>()!;
 
-        return services.AddDbContextPool<DatabaseContext>(dbOpt =>
+        services.AddDbContextPool<DatabaseContext>(opt =>
+        {
+            opt.UseNpgsql(options.ConnectionString, npgSqlOpt =>
             {
-                dbOpt.UseNpgsql(options.ConnectionString, npgSqlOpt =>
-                {
-                    npgSqlOpt.SetPostgresVersion(options.ServerVersionMajor, options.ServerVersionMinor);
-                });
+                npgSqlOpt.SetPostgresVersion(options.ServerVersionMajor, options.ServerVersionMinor);
             });
+        });
+
+        services.AddMarten(opt =>
+        {
+            opt.Connection(options.ConnectionString);
+
+#if DEBUG
+            opt.AutoCreateSchemaObjects = Weasel.Core.AutoCreate.All;
+#endif
+        });
+
+        return services;
     }
 }
