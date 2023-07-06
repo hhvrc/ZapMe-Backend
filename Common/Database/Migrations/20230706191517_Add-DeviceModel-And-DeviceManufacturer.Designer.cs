@@ -12,7 +12,7 @@ using ZapMe.Database;
 namespace ZapMe.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20230706160113_Add-DeviceModel-And-DeviceManufacturer")]
+    [Migration("20230706191517_Add-DeviceModel-And-DeviceManufacturer")]
     partial class AddDeviceModelAndDeviceManufacturer
     {
         /// <inheritdoc />
@@ -125,12 +125,12 @@ namespace ZapMe.Database.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
 
+                    b.Property<string>("DocumentationUrl")
+                        .HasColumnType("text");
+
                     b.Property<string>("FccId")
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)");
-
-                    b.Property<bool>("HasDocumentation")
-                        .HasColumnType("boolean");
 
                     b.Property<Guid>("IconId")
                         .HasColumnType("uuid");

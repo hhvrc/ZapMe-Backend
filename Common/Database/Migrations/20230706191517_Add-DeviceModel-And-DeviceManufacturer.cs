@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -50,7 +49,7 @@ namespace ZapMe.Database.Migrations
                     IconId = table.Column<Guid>(type: "uuid", nullable: false),
                     ManufacturerId = table.Column<Guid>(type: "uuid", nullable: false),
                     FccId = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
-                    HasDocumentation = table.Column<bool>(type: "boolean", nullable: false),
+                    DocumentationUrl = table.Column<string>(type: "text", nullable: true),
                     Protocol = table.Column<string>(type: "text", nullable: false),
                     SpecificationId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")

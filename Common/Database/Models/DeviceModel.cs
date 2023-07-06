@@ -35,19 +35,19 @@ public sealed class DeviceModelEntity
     public string? FccId { get; init; }
 
     /// <summary>
-    /// Indicates whether this device model has documentation available.
-    /// <para>If <see langword="true"/>, the documentation is available at /docs/{id} where {id} is the ID of this device model.</para>
+    /// Optional URL to documentation for this device model. (most likely going to a a .md file in a GitHub repo)
     /// </summary>
-    public bool HasDocumentation { get; set; }
+    public string? DocumentationUrl { get; set; }
 
     /// <summary>
-    /// The protocol used by this device model, this might be Raw RF, Bluetooth Low Energy, WiFi, etc.
+    /// The protocol used by this device model, this might be Proprietary, Bluetooth Low Energy, WiFi, etc.
     /// </summary>
     public RfProtocol Protocol { get; set; }
 
     /// <summary>
-    /// Use Marten to access highly dynamic JSONB data for device specifications stored in <see cref="Documents.DeviceSpecification"/>, the document ID is the same as this property.
+    /// Id of highly dynamic JSONB data for device specifications stored using MartenDB, the document ID is the same as this property.
     /// <para>Use <see cref="Protocol"/> to determine which document type to use.</para>
+    /// <para><see cref="RfProtocol.Proprietary"/>: <see cref="Documents.DeviceProprietarySpecification"/></para>
     /// </summary>
     public Guid? SpecificationId { get; init; }
 

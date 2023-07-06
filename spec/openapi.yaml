@@ -997,13 +997,47 @@ components:
       additionalProperties: false
     DeviceDto:
       required:
+        - iconUrl
         - id
+        - manufacturerId
+        - manufacturerName
+        - manufacturerWebsiteUrl
+        - modelId
+        - modelName
+        - modelNumber
+        - modelWebsiteUrl
+        - name
+        - protocol
         - registeredAt
       type: object
       properties:
         id:
           type: string
           format: uuid
+        name:
+          type: string
+        modelId:
+          type: string
+          format: uuid
+        modelName:
+          type: string
+        modelNumber:
+          type: string
+        modelWebsiteUrl:
+          type: string
+        iconUrl:
+          type: string
+          format: uri
+        protocol:
+          allOf:
+            - $ref: '#/components/schemas/RfProtocol'
+        manufacturerId:
+          type: string
+          format: uuid
+        manufacturerName:
+          type: string
+        manufacturerWebsiteUrl:
+          type: string
         registeredAt:
           type: string
           format: date-time
@@ -1128,6 +1162,13 @@ components:
           description: Response from cloudflare turnstile request
       additionalProperties: false
       description: Request sent to server to request a password reset token
+    RfProtocol:
+      enum:
+        - proprietary
+        - ble
+        - wiFi
+        - zigBee
+      type: string
     SocialsConfig:
       type: object
       properties:
