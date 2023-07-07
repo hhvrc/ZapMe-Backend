@@ -18,7 +18,7 @@ public static class WebSocketHandler
     public static async Task Run(WebSocket webSocket, IServiceProvider serviceProvider, CancellationToken cancellationToken)
     {
         // Get logger that will be passed to the websocket instance
-        var logger = serviceProvider.GetRequiredService<ILogger<WebSocketClient>>();
+        var logger = serviceProvider.GetRequiredService<ILogger<UserWebSocket>>();
 
         // Receive JWT from client
         string? token = await webSocket.ReceiveStringAsync(cancellationToken);
@@ -40,7 +40,7 @@ public static class WebSocketHandler
         }
 
         // Success, create websocket instance
-        using var instance = new WebSocketClient(session.UserId, session.Id, webSocket);
+        using var instance = new UserWebSocket(session.UserId, session.Id, webSocket);
 
         // Send hello message to inform client that everything is A-OK
 

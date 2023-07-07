@@ -5,7 +5,7 @@ namespace ZapMe.Websocket;
 
 public sealed class WebSocketUser
 {
-    private readonly ConcurrentDictionary<Guid, WebSocketClient> _clients = new();
+    private readonly ConcurrentDictionary<Guid, UserWebSocket> _clients = new();
 
     private const int _STATE_ALIVE = 0;
     private const int _STATE_ACCEPTING_CONNECTION = 1;
@@ -24,7 +24,7 @@ public sealed class WebSocketUser
     /// <summary>
     /// Adds a client to the user, will disconnect any existing client with the same session ID
     /// </summary>
-    public async Task<bool> TryAddClientAsync(WebSocketClient client, CancellationToken cancellationToken = default)
+    public async Task<bool> TryAddClientAsync(UserWebSocket client, CancellationToken cancellationToken = default)
     {
         Guid sessionId = client.SessionId;
 
@@ -43,7 +43,7 @@ public sealed class WebSocketUser
             }
 
             // Add failed, close the existing client
-            if (_clients.TryRemove(sessionId, out WebSocketClient? existingClient) && existingClient is not null)
+            if (_clients.TryRemove(sessionId, out UserWebSocket? existingClient) && existingClient is not null)
             {
                 await existingClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "Disconnected by another client", cancellationToken);
             }
@@ -64,14 +64,14 @@ public sealed class WebSocketUser
         }
     }
 
-    public bool TryRemoveClient(Guid clientSessionId, out WebSocketClient? client)
+    public bool TryRemoveClient(Guid clientSessionId, out UserWebSocket? client)
     {
         return _clients.TryRemove(clientSessionId, out client);
     }
 
     public async Task<bool> TryDisconnectClientAsync(Guid clientSessionId, WebSocketCloseStatus closeStatus, string closeReason, CancellationToken cancellationToken = default)
     {
-        if (_clients.TryRemove(clientSessionId, out WebSocketClient? client) && client is not null)
+        if (_clients.TryRemove(clientSessionId, out UserWebSocket? client) && client is not null)
         {
             await client.CloseAsync(closeStatus, closeReason, cancellationToken);
             return true;
@@ -109,7 +109,7 @@ public sealed class WebSocketUser
 
         List<Task> tasks = new();
 
-        foreach (WebSocketClient client in _clients.Values)
+        foreach (UserWebSocket client in _clients.Values)
         {
             tasks.Add(client.CloseAsync(closeStatus, closeReason, cancellationToken));
         }
@@ -121,9 +121,9 @@ public sealed class WebSocketUser
         return true;
     }
 
-    public Task RunActionOnClientAsync(Guid clientSessionId, Func<WebSocketClient, Task> action)
+    public Task RunActionOnClientAsync(Guid clientSessionId, Func<UserWebSocket, Task> action)
     {
-        if (_clients.TryGetValue(clientSessionId, out WebSocketClient? client) && client is not null)
+        if (_clients.TryGetValue(clientSessionId, out UserWebSocket? client) && client is not null)
         {
             return action(client);
         }
@@ -131,9 +131,9 @@ public sealed class WebSocketUser
         return Task.CompletedTask;
     }
 
-    public async Task RunActionOnAllClientsAsync(Func<WebSocketClient, Task> action)
+    public async Task RunActionOnAllClientsAsync(Func<UserWebSocket, Task> action)
     {
-        foreach (WebSocketClient client in _clients.Values)
+        foreach (UserWebSocket client in _clients.Values)
         {
             await action(client);
         }
