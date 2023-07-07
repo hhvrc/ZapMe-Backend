@@ -9,7 +9,7 @@ public sealed class UserRoleEntity
 
     public required string RoleName { get; init; }
 
-    public DateTime CreatedAt { get; init; }
+    public DateTime CreatedAt { get; private set; }
 
     public UserEntity User { get; private set; } = null!;
 }

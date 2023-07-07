@@ -20,12 +20,12 @@ public sealed class UserEmailVerificationRequestEntity
     /// </summary>
     public required string TokenHash { get; init; }
 
-    public DateTime CreatedAt { get; init; }
+    public DateTime CreatedAt { get; private set; }
 
     public UserEntity User { get; private set; } = null!;
 }
 
-public sealed class UserEmailAddressChangeRequestEntityConfiguration : IEntityTypeConfiguration<UserEmailVerificationRequestEntity>
+public sealed class UserEmailVerificationRequestEntityConfiguration : IEntityTypeConfiguration<UserEmailVerificationRequestEntity>
 {
     public void Configure(EntityTypeBuilder<UserEmailVerificationRequestEntity> builder)
     {

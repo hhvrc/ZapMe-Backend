@@ -13,7 +13,7 @@ public sealed class LockOutEntity
 
     public required string Flags { get; set; }
 
-    public DateTime CreatedAt { get; init; }
+    public DateTime CreatedAt { get; private set; }
 
     public DateTime? ExpiresAt { get; set; }
 

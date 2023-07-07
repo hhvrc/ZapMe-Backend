@@ -29,7 +29,7 @@ public class DeletedUserEntity
     /// <summary>
     /// Represents the timestamp when the user account was deleted.
     /// </summary>
-    public DateTime UserDeletedAt { get; init; }
+    public DateTime UserDeletedAt { get; private set; }
 }
 
 public sealed class DeletedUserEntityConfiguration : IEntityTypeConfiguration<DeletedUserEntity>

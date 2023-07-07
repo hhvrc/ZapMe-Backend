@@ -38,7 +38,7 @@ public sealed class UserEntity
     /// <summary>
     /// Date this account was created at
     /// </summary>
-    public DateTime CreatedAt { get; init; }
+    public DateTime CreatedAt { get; private set; }
 
     public DateTime UpdatedAt { get; set; }
 

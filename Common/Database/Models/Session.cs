@@ -31,7 +31,7 @@ public sealed class SessionEntity
 
     public Guid UserAgentId { get; init; }
 
-    public DateTime CreatedAt { get; init; }
+    public DateTime CreatedAt { get; private set; }
 
     public DateTime ExpiresAt { get; set; }
 

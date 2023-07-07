@@ -20,7 +20,7 @@ public sealed class UserAgentEntity
 
     public required string Browser { get; init; }
 
-    public DateTime CreatedAt { get; init; }
+    public DateTime CreatedAt { get; private set; }
 
     public List<SessionEntity> Sessions { get; private set; } = new List<SessionEntity>();
 }

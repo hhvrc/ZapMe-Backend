@@ -21,7 +21,7 @@ public sealed class UserRelationEntity
 
     public string Notes { get; set; } = String.Empty;
 
-    public DateTime CreatedAt { get; init; }
+    public DateTime CreatedAt { get; private set; }
 
     public UserEntity SourceUser { get; private set; } = null!;
     public UserEntity TargetUser { get; private set; } = null!;

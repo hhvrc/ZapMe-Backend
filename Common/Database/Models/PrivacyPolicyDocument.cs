@@ -9,7 +9,7 @@ public sealed class PrivacyPolicyDocumentEntity
 
     public required string Markdown { get; set; }
 
-    public DateTime CreatedAt { get; init; }
+    public DateTime CreatedAt { get; private set; }
 
     public bool IsActive { get; set; }
 }

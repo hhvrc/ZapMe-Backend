@@ -44,7 +44,6 @@ public partial class AccountController
             DeletedBy = user.Id,
             DeletionReason = reason,
             UserCreatedAt = user.CreatedAt,
-            UserDeletedAt = DateTime.UtcNow,
         });
 
         await _dbContext.SaveChangesAsync(cancellationToken);

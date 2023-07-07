@@ -19,7 +19,7 @@ public sealed class DeviceManufacturerEntity
 
     public Guid IconId { get; init; }
 
-    public DateTime CreatedAt { get; init; }
+    public DateTime CreatedAt { get; private set; }
 
     public ImageEntity? Icon { get; private set; } = null;
 }
