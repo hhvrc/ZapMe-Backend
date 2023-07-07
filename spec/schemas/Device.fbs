@@ -1,0 +1,61 @@
+namespace fbs.device;
+
+table DeviceCapability {
+  // The name of the capability.
+  name:string;
+
+  // The value of the capability.
+  value:string;
+}
+
+enum DeviceParameterValueType: ushort {
+  // Signed integers.
+  INT8 = 0,
+  INT16 = 1,
+  INT32 = 2,
+  INT64 = 3,
+
+  // Unsigned integers.
+  UINT8 = 4,
+  UINT16 = 5,
+  UINT32 = 6,
+  UINT64 = 7,
+
+  // Floating point numbers.
+  FLOAT32 = 8,
+  FLOAT64 = 9,
+
+  // Complex types.
+  STRING = 10,
+}
+
+table DeviceParameter {
+  // The name of the parameter.
+  name:string;
+
+  // The type of the parameter.
+  type:DeviceParameterValueType;
+
+  // Command Code
+  command_code:ushort;
+}
+
+table DeviceDescriptor {
+  // The ID of the user who owns the device that connected.
+  owner_user_id:string;
+
+  // The ID of the device that connected.
+  device_id:string;
+
+  // The ID of the model of the device that connected.
+  model_id:string;
+
+  // The name of the device that connected.
+  name:string;
+
+  // The icon URL of the device that connected.
+  icon_url:string;
+
+  // The parameters of the device that connected.
+  parameters:[DeviceParameter];
+}

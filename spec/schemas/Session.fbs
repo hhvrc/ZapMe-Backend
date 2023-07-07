@@ -1,3 +1,5 @@
+include "./Device.fbs";
+
 namespace fbs.session;
 
 table SessionJoin {
@@ -94,4 +96,17 @@ table SessionEventIceCandidateDiscovered {
 
   // The ICE candidate.
   candidate:string;
+}
+
+table SessionDeviceConnected {
+  // The ID of the user who owns the device.
+  user_id:string;
+
+  // The descriptor of the device that connected.
+  device_descriptor:device.DeviceDescriptor;
+}
+
+table SessionDeviceDisconnected {
+  // The ID of the device that disconnected.
+  device_id:string;
 }

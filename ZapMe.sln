@@ -24,6 +24,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "schemas", "schemas", "{DDB69D7B-8CB9-45FF-9D64-0086737541B6}"
 	ProjectSection(SolutionItems) = preProject
 		spec\schemas\ClientMessage.fbs = spec\schemas\ClientMessage.fbs
+		spec\schemas\Device.fbs = spec\schemas\Device.fbs
 		spec\schemas\ServerMessage.fbs = spec\schemas\ServerMessage.fbs
 		spec\schemas\Session.fbs = spec\schemas\Session.fbs
 		spec\schemas\SystemMessage.fbs = spec\schemas\SystemMessage.fbs

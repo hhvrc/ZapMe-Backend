@@ -9,11 +9,15 @@ public sealed class DeviceEntity
 
     public required string Name { get; set; }
 
+    public Guid IconId { get; set; }
+
     public Guid ModelId { get; init; }
 
-    public DateTime CreatedAt { get; init; }
+    public DateTime CreatedAt { get; private set; }
 
-    public DeviceModelEntity? Model { get; private set; } = null;
+    public ImageEntity? Icon { get; private set; }
+
+    public DeviceModelEntity? Model { get; private set; }
 }
 
 public sealed class DeviceEntityConfiguration : IEntityTypeConfiguration<DeviceEntity>
