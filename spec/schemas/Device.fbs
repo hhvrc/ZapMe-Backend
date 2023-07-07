@@ -8,7 +8,7 @@ table DeviceCapability {
   value:string;
 }
 
-enum DeviceParameterValueType: ushort {
+enum DeviceParameterValueType:byte {
   // Signed integers.
   INT8 = 0,
   INT16 = 1,
