@@ -1,16 +1,17 @@
 ﻿using fbs.client;
+using fbs.common;
 using fbs.server;
 using System.Net.WebSockets;
 using ZapMe.Constants;
 using ZapMe.Helpers;
-using PayloadType = fbs.client.ClientPayload.ItemKind;
+using PayloadType = fbs.client.ClientDevicePayload.ItemKind;
 
 namespace ZapMe.Websocket;
 
-public sealed class DeviceWebSocket : FlatbufferWebSocketBase<ClientMessage, ServerMessage>, IDisposable
+public sealed class DeviceWebSocket : FlatbufferWebSocketBase<ClientDeviceMessage, ServerMessage>, IDisposable
 {
     public Guid UserId { get; init; }
-    public Guid SessionId { get; init; }
+    public Guid DeviceId { get; init; }
 
     private readonly SlidingWindow _msgsSecondWindow;
     private readonly SlidingWindow _msgsMinuteWindow;
@@ -23,10 +24,10 @@ public sealed class DeviceWebSocket : FlatbufferWebSocketBase<ClientMessage, Ser
     private long _lastHeartbeatTicks = DateTimeOffset.UtcNow.Ticks;
     public long MsUntilTimeout => _heartbeatIntervalMs + _heartbeatAllowableSkewMs - ((DateTimeOffset.UtcNow.Ticks - Interlocked.Read(ref _lastHeartbeatTicks)) / TimeSpan.TicksPerMillisecond);
 
-    public DeviceWebSocket(Guid userId, Guid sessionId, WebSocket webSocket) : base(webSocket, ClientMessage.Serializer, ServerMessage.Serializer)
+    public DeviceWebSocket(Guid userId, Guid deviceId, WebSocket webSocket) : base(webSocket, ClientDeviceMessage.Serializer, ServerMessage.Serializer)
     {
         UserId = userId;
-        SessionId = sessionId;
+        DeviceId = deviceId;
         _msgsSecondWindow = new SlidingWindow(1000, WebsocketConstants.ClientRateLimitMessagesPerSecond);
         _msgsMinuteWindow = new SlidingWindow(60 * 1000, WebsocketConstants.ClientRateLimitMessagesPerMinute);
         _bytesSecondWindow = new SlidingWindow(1000, WebsocketConstants.ClientRateLimitBytesPerSecond);
@@ -34,9 +35,9 @@ public sealed class DeviceWebSocket : FlatbufferWebSocketBase<ClientMessage, Ser
         _heartbeatTimer = new Timer(HeartbeatTimerCallback, this, _heartbeatAllowableSkewMs, _heartbeatAllowableSkewMs); // TODO: this is probably not the best way to do this
     }
 
-    public Task<bool> SendPayloadAsync(ServerPayload payload, CancellationToken cancellationToken)
+    public ValueTask SendPayloadAsync(ServerPayload payload, CancellationToken cancellationToken)
     {
-        return SendMessageAsync(new ServerMessage
+        return TxChannel.Writer.WriteAsync(new ServerMessage
         {
             Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             Payload = payload
@@ -60,7 +61,7 @@ public sealed class DeviceWebSocket : FlatbufferWebSocketBase<ClientMessage, Ser
         return true;
     }
 
-    protected override async Task HandleMessageAsync(ClientMessage message, CancellationToken cancellationToken)
+    protected override async Task HandleMessageAsync(ClientDeviceMessage message, CancellationToken cancellationToken)
     {
         if (!message.Payload.HasValue)
         {
@@ -68,7 +69,7 @@ public sealed class DeviceWebSocket : FlatbufferWebSocketBase<ClientMessage, Ser
             return;
         }
 
-        ClientPayload payload = message.Payload.Value;
+        ClientDevicePayload payload = message.Payload.Value;
 
         // If this switch is not returned from, the connection will be closed
         switch (payload.Kind)
@@ -76,16 +77,6 @@ public sealed class DeviceWebSocket : FlatbufferWebSocketBase<ClientMessage, Ser
             case PayloadType.heartbeat:
                 await HandleHeartbeatAsync(payload.heartbeat, cancellationToken);
                 return;
-            case PayloadType.session_join:
-                throw new NotImplementedException();
-            case PayloadType.session_leave:
-                throw new NotImplementedException();
-            case PayloadType.session_rejoin:
-                throw new NotImplementedException();
-            case PayloadType.session_invite:
-                throw new NotImplementedException();
-            case PayloadType.session_ice_candidate_discovered:
-                throw new NotImplementedException();
             case PayloadType.NONE:
             default:
                 break;

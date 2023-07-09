@@ -1,0 +1,5 @@
+namespace fbs.common;
+
+struct ClientHeartbeat {
+  last_rtt_ms:uint;
+}

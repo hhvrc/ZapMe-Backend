@@ -6,6 +6,7 @@ namespace ZapMe.Websocket;
 public sealed class WebSocketUser
 {
     private readonly ConcurrentDictionary<Guid, UserWebSocket> _clients = new();
+    private readonly ConcurrentDictionary<Guid, DeviceWebSocket> _devices = new();
 
     private const int _STATE_ALIVE = 0;
     private const int _STATE_ACCEPTING_CONNECTION = 1;
@@ -131,7 +132,7 @@ public sealed class WebSocketUser
         return Task.CompletedTask;
     }
 
-    public async Task RunActionOnAllClientsAsync(Func<UserWebSocket, Task> action)
+    public async Task RunActionOnAllClientsAsync(Func<UserWebSocket, ValueTask> action)
     {
         foreach (UserWebSocket client in _clients.Values)
         {

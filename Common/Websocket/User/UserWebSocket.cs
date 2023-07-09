@@ -1,13 +1,14 @@
 ﻿using fbs.client;
+using fbs.common;
 using fbs.server;
 using System.Net.WebSockets;
 using ZapMe.Constants;
 using ZapMe.Helpers;
-using PayloadType = fbs.client.ClientPayload.ItemKind;
+using PayloadType = fbs.client.ClientUserPayload.ItemKind;
 
 namespace ZapMe.Websocket;
 
-public sealed class UserWebSocket : FlatbufferWebSocketBase<ClientMessage, ServerMessage>, IDisposable
+public sealed class UserWebSocket : FlatbufferWebSocketBase<ClientUserMessage, ServerMessage>, IDisposable
 {
     public Guid UserId { get; init; }
     public Guid SessionId { get; init; }
@@ -23,7 +24,7 @@ public sealed class UserWebSocket : FlatbufferWebSocketBase<ClientMessage, Serve
     private long _lastHeartbeatTicks = DateTimeOffset.UtcNow.Ticks;
     public long MsUntilTimeout => _heartbeatIntervalMs + _heartbeatAllowableSkewMs - ((DateTimeOffset.UtcNow.Ticks - Interlocked.Read(ref _lastHeartbeatTicks)) / TimeSpan.TicksPerMillisecond);
 
-    public UserWebSocket(Guid userId, Guid sessionId, WebSocket webSocket) : base(webSocket, ClientMessage.Serializer, ServerMessage.Serializer)
+    public UserWebSocket(Guid userId, Guid sessionId, WebSocket webSocket) : base(webSocket, ClientUserMessage.Serializer, ServerMessage.Serializer)
     {
         UserId = userId;
         SessionId = sessionId;
@@ -34,9 +35,9 @@ public sealed class UserWebSocket : FlatbufferWebSocketBase<ClientMessage, Serve
         _heartbeatTimer = new Timer(HeartbeatTimerCallback, this, _heartbeatAllowableSkewMs, _heartbeatAllowableSkewMs); // TODO: this is probably not the best way to do this
     }
 
-    public Task<bool> SendPayloadAsync(ServerPayload payload, CancellationToken cancellationToken)
+    public ValueTask SendPayloadAsync(ServerPayload payload, CancellationToken cancellationToken)
     {
-        return SendMessageAsync(new ServerMessage
+        return TxChannel.Writer.WriteAsync(new ServerMessage
         {
             Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             Payload = payload
@@ -60,7 +61,7 @@ public sealed class UserWebSocket : FlatbufferWebSocketBase<ClientMessage, Serve
         return true;
     }
 
-    protected override async Task HandleMessageAsync(ClientMessage message, CancellationToken cancellationToken)
+    protected override async Task HandleMessageAsync(ClientUserMessage message, CancellationToken cancellationToken)
     {
         if (!message.Payload.HasValue)
         {
@@ -68,7 +69,7 @@ public sealed class UserWebSocket : FlatbufferWebSocketBase<ClientMessage, Serve
             return;
         }
 
-        ClientPayload payload = message.Payload.Value;
+        ClientUserPayload payload = message.Payload.Value;
 
         // If this switch is not returned from, the connection will be closed
         switch (payload.Kind)

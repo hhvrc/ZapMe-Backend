@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Net.WebSockets;
-using ZapMe.BusinessLogic;
 using ZapMe.DTOs;
 using ZapMe.Helpers;
+using ZapMe.Websocket;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ZapMe.Controllers.Api;
@@ -17,19 +16,17 @@ public sealed class WebSocketController : ControllerBase
     [HttpGet("api/ws", Name = "WebsocketEndpoint")]
     [Produces(Application.Json)]
     [ProducesResponseType(typeof(ErrorDetails), StatusCodes.Status400BadRequest)]
-    public async Task EntryPointAsync(CancellationToken cancellationToken)
+    public async Task EntryPointAsync([FromServices] IWebSocketHandler webSocketHandler, CancellationToken cancellationToken)
     {
         WebSocketManager wsManager = HttpContext.WebSockets;
-        IServiceProvider serviceProvider = HttpContext.RequestServices;
 
         if (!wsManager.IsWebSocketRequest)
         {
-            await HttpErrors.Generic(StatusCodes.Status400BadRequest, "Bad request", "This endpoint is purely just a websocket endpoint", "Try to connect with a websocket client instead").Write(Response);
+            ErrorDetails error = HttpErrors.Generic(StatusCodes.Status400BadRequest, "Bad request", "This endpoint is purely just a websocket endpoint", "Try to connect with a websocket client instead");
+            await error.Write(Response);
             return;
         }
 
-        using WebSocket websocket = await wsManager.AcceptWebSocketAsync();
-
-        await WebSocketHandler.Run(websocket, serviceProvider, cancellationToken);
+        await webSocketHandler.RunAsync(wsManager.AcceptWebSocketAsync, wsManager.WebSocketRequestedProtocols, cancellationToken);
     }
 }

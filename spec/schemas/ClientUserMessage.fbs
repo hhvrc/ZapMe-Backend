@@ -1,15 +1,12 @@
+include "./ClientHeartbeat.fbs";
 include "./Session.fbs";
 
 attribute "fs_serializer";
 
 namespace fbs.client;
 
-struct ClientHeartbeat {
-  last_rtt_ms:uint;
-}
-
-union ClientPayload {
-  heartbeat:ClientHeartbeat,
+union ClientUserPayload {
+  heartbeat:common.ClientHeartbeat,
   
   session_join:session.SessionJoin,
   session_leave:session.SessionLeave,
@@ -19,8 +16,8 @@ union ClientPayload {
   session_ice_candidate_discovered:session.SessionIceCandidateDiscovered,
 }
 
-table ClientMessage (fs_serializer) {
-  payload:ClientPayload;
+table ClientUserMessage (fs_serializer) {
+  payload:ClientUserPayload;
 }
 
-root_type ClientMessage;
+root_type ClientUserMessage;

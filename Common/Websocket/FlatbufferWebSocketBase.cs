@@ -15,7 +15,8 @@ public abstract class FlatbufferWebSocketBase<TRX, TTX>
     private readonly WebSocket _webSocket;
     private readonly ISerializer<TRX> _rxSerializer;
     private readonly ISerializer<TTX> _txSerializer;
-    private readonly Channel<TTX> _txChannel;
+
+    protected Channel<TTX> TxChannel { get; init; }
 
     private const int _CLIENT_STATE_INITIAL = 0;
     private const int _CLIENT_STATE_CONNECTED = 1;
@@ -28,16 +29,7 @@ public abstract class FlatbufferWebSocketBase<TRX, TTX>
         _webSocket = webSocket;
         _rxSerializer = rxSerializer;
         _txSerializer = txSerializer;
-        _txChannel = Channel.CreateBounded<TTX>(new BoundedChannelOptions(WebsocketConstants.ClientTxChannelCapacity) { FullMode = BoundedChannelFullMode.Wait });
-    }
-
-    protected async Task<bool> SendMessageAsync(TTX message, CancellationToken cancellationToken)
-    {
-        if (!IsConnnected) return false;
-
-        await _txChannel.Writer.WriteAsync(message, cancellationToken);
-
-        return true;
+        TxChannel = Channel.CreateBounded<TTX>(new BoundedChannelOptions(WebsocketConstants.ClientTxChannelCapacity) { FullMode = BoundedChannelFullMode.Wait });
     }
 
     public async Task RunWebSocketAsync(CancellationToken cancellationToken)
@@ -65,7 +57,7 @@ public abstract class FlatbufferWebSocketBase<TRX, TTX>
             {
                 try
                 {
-                    _txChannel.Writer.TryComplete();
+                    TxChannel.Writer.TryComplete();
                     await _webSocket.CloseAsync(closeStatus, reason, cs);
                 }
                 catch
@@ -104,7 +96,7 @@ public abstract class FlatbufferWebSocketBase<TRX, TTX>
                     break;
                 }
 
-                var data = new ArraySegment<byte>(bytes, 0, msg.Count);
+                ArraySegment<byte> data = new ArraySegment<byte>(bytes, 0, msg.Count);
 
                 if (!await ValidateMessage(data, cancellationToken))
                 {
@@ -131,7 +123,7 @@ public abstract class FlatbufferWebSocketBase<TRX, TTX>
 
     private async Task TxTask(CancellationToken cancellationToken)
     {
-        while (IsConnnected && await _txChannel.Reader.WaitToReadAsync(cancellationToken))
+        while (IsConnnected && await TxChannel.Reader.WaitToReadAsync(cancellationToken))
         {
             // We start with 512 bytes, but the buffer will be resized if needed
             byte[] bytes = ArrayPool<byte>.Shared.Rent(512);
@@ -139,7 +131,7 @@ public abstract class FlatbufferWebSocketBase<TRX, TTX>
             try
             {
                 // Read all messages from the channel and send them
-                while (_txChannel.Reader.TryRead(out TTX? message) && message is not null)
+                while (TxChannel.Reader.TryRead(out TTX? message) && message is not null)
                 {
                     // Get a max estimate of the buffer size needed
                     int bufferSize = _txSerializer.GetMaxSize(message);
@@ -155,7 +147,7 @@ public abstract class FlatbufferWebSocketBase<TRX, TTX>
                     int messageSize = _txSerializer.Write(new Span<byte>(bytes), message);
 
                     // Send the message
-                    var segment = new ArraySegment<byte>(bytes, 0, messageSize);
+                    ArraySegment<byte> segment = new ArraySegment<byte>(bytes, 0, messageSize);
                     await _webSocket.SendAsync(segment, WebSocketMessageType.Binary, true, cancellationToken);
                 }
             }

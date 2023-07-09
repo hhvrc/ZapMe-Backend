@@ -1,0 +1,16 @@
+include "./ClientHeartbeat.fbs";
+
+attribute "fs_serializer";
+
+namespace fbs.client;
+
+
+union ClientDevicePayload {
+  heartbeat:common.ClientHeartbeat,
+}
+
+table ClientDeviceMessage (fs_serializer) {
+  payload:ClientDevicePayload;
+}
+
+root_type ClientDeviceMessage;

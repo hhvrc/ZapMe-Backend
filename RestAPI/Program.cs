@@ -13,6 +13,7 @@ using ZapMe.Options.OAuth;
 using ZapMe.Services;
 using ZapMe.Services.Interfaces;
 using ZapMe.Utils;
+using ZapMe.Websocket;
 
 // The services are ordered by dependency requirements.
 // The middlewares are ordered by execution order.
@@ -134,6 +135,8 @@ services.AddTransient<ILockOutStore, LockOutStore>();
 services.AddTransient<IEmailVerificationManager, EmailVerificationManager>();
 services.AddTransient<ISSOStateStore, SSOStateStore>();
 services.AddSingleton<IDiscordBotService, DiscordBotService>();
+
+services.AddTransient<IWebSocketHandler, WebSocketHandler>();
 
 services.AddRateLimiting();
 services.AddSwagger(isDevelopment);

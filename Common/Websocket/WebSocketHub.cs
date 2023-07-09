@@ -119,7 +119,7 @@ public static class WebSocketHub
         return Task.CompletedTask;
     }
 
-    public static Task RunActionOnUserAsync(Guid userId, Func<UserWebSocket, Task> action)
+    public static Task RunActionOnUserAsync(Guid userId, Func<UserWebSocket, ValueTask> action)
     {
         if (Users.TryGetValue(userId, out WebSocketUser? user) && user is not null)
         {
