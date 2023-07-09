@@ -131,9 +131,9 @@ public sealed class WebSocketHandler : IWebSocketHandler
         }
 
         // Validate AccessToken
-        var authenticationResult = await _dbContext.UserDevices
+        var authenticationResult = await _dbContext.Devices
             .Where(d => d.AccessToken == accessToken)
-            .Select(d => new { d.UserId, d.DeviceId })
+            .Select(d => new { d.Id, d.OwnerId })
             .FirstOrDefaultAsync(cancellationToken);
         if (authenticationResult is null)
         {
@@ -142,7 +142,7 @@ public sealed class WebSocketHandler : IWebSocketHandler
         }
 
         // Success, create websocket instance
-        using DeviceWebSocket instance = new DeviceWebSocket(authenticationResult.UserId, authenticationResult.DeviceId, webSocket);
+        using DeviceWebSocket instance = new DeviceWebSocket(authenticationResult.OwnerId, authenticationResult.Id, webSocket);
 
         await instance.RunWebSocketAsync(cancellationToken);
     }

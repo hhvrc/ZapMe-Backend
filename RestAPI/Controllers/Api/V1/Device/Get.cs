@@ -21,8 +21,11 @@ public partial class DeviceController
         DeviceEntity? device = await _dbContext
             .Devices
             .AsNoTracking()
-            .Include(d => d.Model)
-            .ThenInclude(m => m!.Manufacturer)
+            .Include(d => d.Icon)
+            .Include(d => d.Model).ThenInclude(m => m!.Icon)
+            .Include(d => d.Model).ThenInclude(m => m!.Manufacturer)
+            .Include(d => d.Model).ThenInclude(m => m!.Manufacturer).ThenInclude(m => m!.Icon)
+            .Include(d => d.Owner)
             .FirstOrDefaultAsync(d => d.Id == deviceId, cancellationToken);
         if (device is null)
         {

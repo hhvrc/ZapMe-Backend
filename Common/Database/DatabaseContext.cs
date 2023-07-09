@@ -13,7 +13,6 @@ public sealed class DatabaseContext : DbContext
     public required DbSet<UserEntity> Users { get; set; }
     public required DbSet<UserRoleEntity> UserRoles { get; set; }
     public required DbSet<UserRelationEntity> UserRelations { get; set; }
-    public required DbSet<UserDeviceEntity> UserDevices { get; set; }
     public required DbSet<UserPasswordResetRequestEntity> UserPasswordResetRequests { get; set; }
     public required DbSet<UserEmailVerificationRequestEntity> UserEmailVerificationRequests { get; set; }
     public required DbSet<DeletedUserEntity> DeletedUsers { get; set; }
@@ -47,7 +46,6 @@ public sealed class DatabaseContext : DbContext
         modelBuilder.ApplyConfiguration(new UserEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserRoleEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserRelationEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new UserDeviceEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserPasswordResetRequestEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserEmailVerificationRequestEntityConfiguration());
         modelBuilder.ApplyConfiguration(new DeletedUserEntityConfiguration());
