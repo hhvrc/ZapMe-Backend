@@ -61,6 +61,7 @@ public static class UserMapper
             BannerUrl = user.ProfileBanner?.PublicUrl,
             Status = user.Status,
             StatusText = user.StatusText,
+            OwnedDeviceIds = user.OwnedDevices.Select(d => d.Id),
             FriendUserIds = user.RelationsOutgoing.Where(r => r.FriendStatus == UserPartialRelationType.Accepted).Select(r => r.ToUserId),
             SSOConnections = user.SSOConnections.Select(oc => oc.ProviderName),
             CreatedAt = user.CreatedAt,

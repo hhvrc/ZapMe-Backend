@@ -40,5 +40,7 @@ public sealed class DeviceEntityConfiguration : IEntityTypeConfiguration<DeviceE
 
         builder.HasIndex(ud => ud.OwnerId);
         builder.HasIndex(ud => ud.AccessToken).IsUnique();
+
+        builder.HasOne(ud => ud.Owner).WithMany(u => u.OwnedDevices).OnDelete(DeleteBehavior.Cascade);
     }
 }

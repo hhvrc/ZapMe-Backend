@@ -29,6 +29,11 @@ public readonly struct AccountDto : IUserDto
     public required string StatusText { get; init; }
 
     /// <summary>
+    /// Ids of devices this account owns
+    /// </summary>
+    public required IEnumerable<Guid> OwnedDeviceIds { get; init; }
+
+    /// <summary>
     /// Ids of users this account has friended
     /// </summary>
     public required IEnumerable<Guid> FriendUserIds { get; init; }

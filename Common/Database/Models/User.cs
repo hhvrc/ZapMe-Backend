@@ -57,6 +57,7 @@ public sealed class UserEntity
     public List<UserRelationEntity> RelationsOutgoing { get; private set; } = new List<UserRelationEntity>();
     public List<UserRelationEntity> RelationsIncoming { get; private set; } = new List<UserRelationEntity>();
     public List<SSOConnectionEntity> SSOConnections { get; private set; } = new List<SSOConnectionEntity>();
+    public List<DeviceEntity> OwnedDevices { get; private set; } = new List<DeviceEntity>();
 }
 
 public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
