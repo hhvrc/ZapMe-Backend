@@ -835,6 +835,7 @@ components:
         - friendUserIds
         - id
         - lastOnline
+        - ownedDeviceIds
         - ssoConnections
         - status
         - statusText
@@ -870,6 +871,12 @@ components:
             - $ref: '#/components/schemas/UserStatus'
         statusText:
           type: string
+        ownedDeviceIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Ids of devices this account owns
         friendUserIds:
           type: array
           items:
