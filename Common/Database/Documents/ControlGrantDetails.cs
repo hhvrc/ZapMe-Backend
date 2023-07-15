@@ -2,10 +2,8 @@
 
 namespace ZapMe.Database.Documents;
 
-public sealed class ControlGrantDeviceDetails
+public struct ControlLimits
 {
-    public Guid DeviceId { get; init; }
-
     /// <summary>
     /// Max strength of a command in fractional units. 0 for unlimited.
     /// <para>Range: 0 - 65535 (0.0 - 1.0)</para>
@@ -25,15 +23,19 @@ public sealed class ControlGrantDeviceDetails
     public uint Cooldown { get; set; }
 }
 
+public sealed class ControlGrantDeviceDetails
+{
+    public Guid DeviceId { get; init; }
+
+    /// <summary>
+    /// Limits that apply to this specific device.
+    /// </summary>
+    public ControlLimits GrantLimits { get; set; }
+}
+
 public sealed class ControlGrantDeviceMap
 {
     public required string Name { get; init; }
-
-    /// <summary>
-    /// Max strength of a command in fractional units. 0 for unlimited.
-    /// <para>Range: 0 - 65535 (0.0 - 1.0)</para>
-    /// </summary>
-    public ushort MaxStrength { get; set; }
 
     public Guid ImageId { get; init; }
 
@@ -49,22 +51,14 @@ public sealed class ControlGrantDetails
     public Guid Id { get; init; }
 
     /// <summary>
-    /// [FOR ENTIRE GRANT] Max strength of a command in fractional units. 0 for unlimited.
-    /// <para>Range: 0 - 65535 (0.0 - 1.0)</para>
+    /// Limits that apply to the entire grant.
     /// </summary>
-    public ushort MaxStrength { get; set; }
+    public ControlLimits GrantLimits { get; set; }
 
     /// <summary>
-    /// [FOR ENTIRE GRANT] Max duration a command can be executed for in milliseconds. 0 for unlimited.
-    /// <para>Range: 0 - 65535 (0 milliseconds - 1 minute 5 seconds)</para>
+    /// Limits for the grantee's.
     /// </summary>
-    public ushort MaxDuration { get; set; }
-
-    /// <summary>
-    /// [FOR ENTIRE GRANT] Cooldown between command executions in milliseconds. 0 for no cooldown.
-    /// <para>Range: 0 - 4294967295 (0 milliseconds - 50 days)</para>
-    /// </summary>
-    public uint Cooldown { get; set; }
+    public List<ControlLimits> UserLimits { get; set; } = new();
 
     /// <summary>
     /// Individual devices that the grantee's have access to.
