@@ -7,76 +7,48 @@ namespace ZapMe.Utils;
 
 public static class StringUtils
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static char GetUrlSafeChar(int bits) => "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"[bits & 0x3F];
+    private const string _Chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
+    private static ReadOnlySpan<char> CharsSpan => _Chars.AsSpan();
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static int AssignUrlSafeCharChunk(Span<char> buffer, int bits)
-    {
-        buffer[0] = GetUrlSafeChar(bits >> 00);
-        buffer[1] = GetUrlSafeChar(bits >> 06);
-        buffer[2] = GetUrlSafeChar(bits >> 12);
-        buffer[3] = GetUrlSafeChar(bits >> 18);
-        buffer[4] = GetUrlSafeChar(bits >> 24);
-        return bits >> 30;
-    }
-
-    private static int GetElementsCount(int length)
-    {
-        int fullCycles = (length >> 4) * 3; // (length / 16) * 3
-        length &= 0xF; // length % 16
-
-        int wasteCycles = length / 5;
-        length -= wasteCycles * 5;
-
-        if (length > 0)
-        {
-            wasteCycles++;
-        }
-
-        return fullCycles + wasteCycles;
-    }
-
+    private static char GetUrlSafeChar(byte bits) => CharsSpan[bits & 0x3F];
 
     private static void FillUrlSafeRandomString(Span<char> buffer, int length)
     {
-        int elements = GetElementsCount(length);
+        byte[] rented = ArrayPool<byte>.Shared.Rent((length * 3 / 4) + 3);
+        Span<byte> data = new Span<byte>(rented);
 
-        int[] rented = ArrayPool<int>.Shared.Rent(elements);
-        Span<int> data = new Span<int>(rented);
+        RandomNumberGenerator.Fill(data);
 
-        RandomNumberGenerator.Fill(MemoryMarshal.AsBytes(data));
-
-        int i = 0, offset = 0;
-        for (; (offset + 16) <= length; i += 3, offset += 16)
+        int strPos = 0;
+        int dataPos = 0;
+        int batchLength = length & ~3;
+        for (; (strPos + 4) <= batchLength; dataPos += 3, strPos += 4)
         {
-            Span<char> chunk = buffer.Slice(offset, 16);
-
-            int spareBits
-                = (AssignUrlSafeCharChunk(chunk[..5], data[i + 0]) << 0)
-                | (AssignUrlSafeCharChunk(chunk[5..10], data[i + 1]) << 2)
-                | (AssignUrlSafeCharChunk(chunk[10..15], data[i + 2]) << 4);
-
-            chunk[15] = GetUrlSafeChar(spareBits);
+            buffer[strPos + 0] = GetUrlSafeChar(data[dataPos + 0]);
+            buffer[strPos + 1] = GetUrlSafeChar(data[dataPos + 1]);
+            buffer[strPos + 2] = GetUrlSafeChar(data[dataPos + 2]);
+            buffer[strPos + 3] = GetUrlSafeChar((byte)((data[dataPos + 0] >> 6) | (data[dataPos + 1] >> 4) | (data[dataPos + 2] >> 2)));
         }
 
-        for (; (offset + 5) <= length; i++, offset += 5)
+        switch (length - batchLength)
         {
-            _ = AssignUrlSafeCharChunk(buffer.Slice(offset, 5), data[i]);
+            case 1:
+                buffer[strPos + 0] = GetUrlSafeChar(data[dataPos + 0]);
+                break;
+            case 2:
+                buffer[strPos + 0] = GetUrlSafeChar(data[dataPos + 0]);
+                buffer[strPos + 1] = GetUrlSafeChar(data[dataPos + 1]);
+                break;
+            case 3:
+                buffer[strPos + 0] = GetUrlSafeChar(data[dataPos + 0]);
+                buffer[strPos + 1] = GetUrlSafeChar(data[dataPos + 1]);
+                buffer[strPos + 2] = GetUrlSafeChar(data[dataPos + 2]);
+                break;
+            default:
+                break;
         }
 
-        int remainder = length - offset;
-        if (remainder > 0)
-        {
-            int bits = data[i++];
-            do
-            {
-                buffer[offset++] = GetUrlSafeChar(bits >> (--remainder * 6));
-            }
-            while (remainder > 0);
-        }
-
-        ArrayPool<int>.Shared.Return(rented);
+        ArrayPool<byte>.Shared.Return(rented);
     }
 
     /// <summary>
