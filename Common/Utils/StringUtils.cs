@@ -6,53 +6,90 @@ namespace ZapMe.Utils;
 
 public static class StringUtils
 {
+    private static ReadOnlySpan<char> UrlSafeChars => "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
+
+    private static int GetElementsCount(int length)
+    {
+        int fullCycles = length / 16;
+        length -= fullCycles * 16;
+
+        int wasteCycles = length / 5;
+        length -= wasteCycles * 5;
+
+        if (length > 0)
+        {
+            wasteCycles++;
+        }
+
+        return (fullCycles * 3) + wasteCycles;
+    }
+
     private static void FillUrlSafeRandomString(Span<char> buffer, int length)
     {
-        const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
+        int elements = GetElementsCount(length);
 
-        int[] array = ArrayPool<int>.Shared.Rent((length / 5) + 1);
-        try
+        int[] rented = ArrayPool<int>.Shared.Rent(elements);
+        Span<int> data = new Span<int>(rented);
+
+        using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
         {
-            Span<int> data = new(array);
+            rng.GetBytes(MemoryMarshal.AsBytes(data));
+        }
 
-            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(MemoryMarshal.AsBytes(data));
-            }
+        int bits, i = 0, offset = 0;
+        for (; (offset + 16) <= length; i += 3, offset += 16)
+        {
+            int spareBits;
 
-            int i = 0;
-            int j = 0;
+            bits = data[i + 0];
+            buffer[offset + 00] = UrlSafeChars[(bits >> 00) & 0x3F];
+            buffer[offset + 01] = UrlSafeChars[(bits >> 06) & 0x3F];
+            buffer[offset + 02] = UrlSafeChars[(bits >> 12) & 0x3F];
+            buffer[offset + 03] = UrlSafeChars[(bits >> 18) & 0x3F];
+            buffer[offset + 04] = UrlSafeChars[(bits >> 24) & 0x3F];
+            spareBits = (bits >> 30) & 0x03;
+
+            bits = data[i + 1];
+            buffer[offset + 05] = UrlSafeChars[(bits >> 00) & 0x3F];
+            buffer[offset + 06] = UrlSafeChars[(bits >> 06) & 0x3F];
+            buffer[offset + 07] = UrlSafeChars[(bits >> 12) & 0x3F];
+            buffer[offset + 08] = UrlSafeChars[(bits >> 18) & 0x3F];
+            buffer[offset + 09] = UrlSafeChars[(bits >> 24) & 0x3F];
+            spareBits |= (bits >> 28) & 0x0C;
+
+            bits = data[i + 2];
+            buffer[offset + 10] = UrlSafeChars[(bits >> 00) & 0x3F];
+            buffer[offset + 11] = UrlSafeChars[(bits >> 06) & 0x3F];
+            buffer[offset + 12] = UrlSafeChars[(bits >> 12) & 0x3F];
+            buffer[offset + 13] = UrlSafeChars[(bits >> 18) & 0x3F];
+            buffer[offset + 14] = UrlSafeChars[(bits >> 24) & 0x3F];
+            spareBits |= (bits >> 26) & 0x30;
+
+            buffer[offset + 15] = UrlSafeChars[spareBits];
+        }
+
+        for (; (offset + 5) <= length; offset += 5)
+        {
+            bits = data[i++];
+            buffer[offset + 00] = UrlSafeChars[(bits >> 00) & 0x3F];
+            buffer[offset + 01] = UrlSafeChars[(bits >> 06) & 0x3F];
+            buffer[offset + 02] = UrlSafeChars[(bits >> 12) & 0x3F];
+            buffer[offset + 03] = UrlSafeChars[(bits >> 18) & 0x3F];
+            buffer[offset + 04] = UrlSafeChars[(bits >> 24) & 0x3F];
+        }
+
+        int remainder = length - offset;
+        if (remainder > 0)
+        {
+            bits = data[i++];
             do
             {
-                int bitBuffer = data[i++];
-
-                buffer[j + 0] = chars[bitBuffer & 0x3F];
-                buffer[j + 1] = chars[(bitBuffer >> 6) & 0x3F];
-                buffer[j + 2] = chars[(bitBuffer >> 12) & 0x3F];
-                buffer[j + 3] = chars[(bitBuffer >> 18) & 0x3F];
-                buffer[j + 4] = chars[(bitBuffer >> 24) & 0x3F];
-
-                j += 5;
-            }
-            while ((j + 5) < length);
-
-            int remainder = length - j;
-            if (remainder == 0)
-            {
-                return;
-            }
-
-            int lastBitBuffer = data[i];
-            do
-            {
-                buffer[j++] = chars[(lastBitBuffer >> (--remainder * 6)) & 0x3F];
+                buffer[offset++] = UrlSafeChars[(bits >> (--remainder * 6)) & 0x3F];
             }
             while (remainder > 0);
         }
-        finally
-        {
-            ArrayPool<int>.Shared.Return(array);
-        }
+
+        ArrayPool<int>.Shared.Return(rented);
     }
 
     /// <summary>
@@ -62,6 +99,16 @@ public static class StringUtils
     /// <returns></returns>
     public static string GenerateUrlSafeRandomString(int length)
     {
+        if (length < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(length), "Length must be greater than or equal to 0");
+        }
+
+        if (length == 0)
+        {
+            return String.Empty;
+        }
+
         return String.Create(length, length, FillUrlSafeRandomString);
     }
 }
