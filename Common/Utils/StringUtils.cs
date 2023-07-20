@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 
@@ -6,12 +7,24 @@ namespace ZapMe.Utils;
 
 public static class StringUtils
 {
-    private static ReadOnlySpan<char> UrlSafeChars => "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static char GetUrlSafeChar(int bits) => "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"[bits & 0x3F];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static int AssignUrlSafeCharChunk(Span<char> buffer, int bits)
+    {
+        buffer[0] = GetUrlSafeChar(bits >> 00);
+        buffer[1] = GetUrlSafeChar(bits >> 06);
+        buffer[2] = GetUrlSafeChar(bits >> 12);
+        buffer[3] = GetUrlSafeChar(bits >> 18);
+        buffer[4] = GetUrlSafeChar(bits >> 24);
+        return bits >> 30;
+    }
 
     private static int GetElementsCount(int length)
     {
-        int fullCycles = length / 16;
-        length -= fullCycles * 16;
+        int fullCycles = (length >> 4) * 3; // (length / 16) * 3
+        length &= 0xF; // length % 16
 
         int wasteCycles = length / 5;
         length -= wasteCycles * 5;
@@ -21,8 +34,9 @@ public static class StringUtils
             wasteCycles++;
         }
 
-        return (fullCycles * 3) + wasteCycles;
+        return fullCycles + wasteCycles;
     }
+
 
     private static void FillUrlSafeRandomString(Span<char> buffer, int length)
     {
@@ -31,60 +45,33 @@ public static class StringUtils
         int[] rented = ArrayPool<int>.Shared.Rent(elements);
         Span<int> data = new Span<int>(rented);
 
-        using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
-        {
-            rng.GetBytes(MemoryMarshal.AsBytes(data));
-        }
+        RandomNumberGenerator.Fill(MemoryMarshal.AsBytes(data));
 
-        int bits, i = 0, offset = 0;
+        int i = 0, offset = 0;
         for (; (offset + 16) <= length; i += 3, offset += 16)
         {
-            int spareBits;
+            Span<char> chunk = buffer.Slice(offset, 16);
 
-            bits = data[i + 0];
-            buffer[offset + 00] = UrlSafeChars[(bits >> 00) & 0x3F];
-            buffer[offset + 01] = UrlSafeChars[(bits >> 06) & 0x3F];
-            buffer[offset + 02] = UrlSafeChars[(bits >> 12) & 0x3F];
-            buffer[offset + 03] = UrlSafeChars[(bits >> 18) & 0x3F];
-            buffer[offset + 04] = UrlSafeChars[(bits >> 24) & 0x3F];
-            spareBits = (bits >> 30) & 0x03;
+            int spareBits
+                = (AssignUrlSafeCharChunk(chunk[..5], data[i + 0]) << 0)
+                | (AssignUrlSafeCharChunk(chunk[5..10], data[i + 1]) << 2)
+                | (AssignUrlSafeCharChunk(chunk[10..15], data[i + 2]) << 4);
 
-            bits = data[i + 1];
-            buffer[offset + 05] = UrlSafeChars[(bits >> 00) & 0x3F];
-            buffer[offset + 06] = UrlSafeChars[(bits >> 06) & 0x3F];
-            buffer[offset + 07] = UrlSafeChars[(bits >> 12) & 0x3F];
-            buffer[offset + 08] = UrlSafeChars[(bits >> 18) & 0x3F];
-            buffer[offset + 09] = UrlSafeChars[(bits >> 24) & 0x3F];
-            spareBits |= (bits >> 28) & 0x0C;
-
-            bits = data[i + 2];
-            buffer[offset + 10] = UrlSafeChars[(bits >> 00) & 0x3F];
-            buffer[offset + 11] = UrlSafeChars[(bits >> 06) & 0x3F];
-            buffer[offset + 12] = UrlSafeChars[(bits >> 12) & 0x3F];
-            buffer[offset + 13] = UrlSafeChars[(bits >> 18) & 0x3F];
-            buffer[offset + 14] = UrlSafeChars[(bits >> 24) & 0x3F];
-            spareBits |= (bits >> 26) & 0x30;
-
-            buffer[offset + 15] = UrlSafeChars[spareBits];
+            chunk[15] = GetUrlSafeChar(spareBits);
         }
 
-        for (; (offset + 5) <= length; offset += 5)
+        for (; (offset + 5) <= length; i++, offset += 5)
         {
-            bits = data[i++];
-            buffer[offset + 00] = UrlSafeChars[(bits >> 00) & 0x3F];
-            buffer[offset + 01] = UrlSafeChars[(bits >> 06) & 0x3F];
-            buffer[offset + 02] = UrlSafeChars[(bits >> 12) & 0x3F];
-            buffer[offset + 03] = UrlSafeChars[(bits >> 18) & 0x3F];
-            buffer[offset + 04] = UrlSafeChars[(bits >> 24) & 0x3F];
+            _ = AssignUrlSafeCharChunk(buffer.Slice(offset, 5), data[i]);
         }
 
         int remainder = length - offset;
         if (remainder > 0)
         {
-            bits = data[i++];
+            int bits = data[i++];
             do
             {
-                buffer[offset++] = UrlSafeChars[(bits >> (--remainder * 6)) & 0x3F];
+                buffer[offset++] = GetUrlSafeChar(bits >> (--remainder * 6));
             }
             while (remainder > 0);
         }
