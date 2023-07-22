@@ -35,8 +35,10 @@ public sealed class DiscordBotService : IDiscordBotService
         }
         else
         {
+#if !DEBUG
             await _client.ConnectAsync(activity, status, idleSince);
             IsConnected = true;
+#endif
         }
     }
 }

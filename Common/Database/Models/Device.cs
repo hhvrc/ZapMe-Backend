@@ -8,9 +8,9 @@ public sealed class DeviceEntity
 {
     public Guid Id { get; private set; }
 
-    public Guid ModelId { get; private set; }
+    public Guid ModelId { get; init; }
 
-    public Guid OwnerId { get; private set; }
+    public Guid OwnerId { get; init; }
 
     public required string Name { get; set; }
 

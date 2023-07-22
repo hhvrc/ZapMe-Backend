@@ -137,7 +137,7 @@ public sealed class WebSocketHandler : IWebSocketHandler
             .FirstOrDefaultAsync(cancellationToken);
         if (authenticationResult is null)
         {
-              _logger.LogError("Failed to authenticate websocket connection, provided AccessToken was invalid");
+            _logger.LogError("Failed to authenticate websocket connection, provided AccessToken was invalid");
             return;
         }
 

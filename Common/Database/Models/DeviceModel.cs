@@ -26,7 +26,7 @@ public sealed class DeviceModelEntity
 
     public Guid IconId { get; init; }
 
-    public Guid ManufacturerId { get; init; }
+    public Guid? ManufacturerId { get; init; }
 
     /// <summary>
     /// The FCC ID of this device model, if applicable.

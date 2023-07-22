@@ -19,7 +19,7 @@ public static class UIStringValidator
 
         str = str.Trim();
 
-        // String was only whitespace
+        // String had whitespace on one or both ends
         if (str.Length != len) return true;
 
         // Check if string contains any unwanted characters

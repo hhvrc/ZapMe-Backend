@@ -2,7 +2,7 @@
 
 namespace ZapMe.DTOs;
 
-public readonly struct DeviceDto
+public readonly struct DeviceModelDto
 {
     public Guid Id { get; init; }
 
@@ -20,7 +20,7 @@ public readonly struct DeviceDto
 
     public RfProtocol Protocol { get; init; }
 
-    public Guid? ManufacturerId { get; init; }
+    public Guid ManufacturerId { get; init; }
 
     public string ManufacturerName { get; init; }
 

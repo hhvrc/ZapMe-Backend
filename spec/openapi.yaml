@@ -448,6 +448,106 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/device:
+    post:
+      tags:
+        - Device
+      summary: Register a device.
+      operationId: RegisterDevice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/RegisterDeviceRequest'
+      responses:
+        '200':
+          description: Device
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceDto'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/device/manufacturer:
+    post:
+      tags:
+        - Device
+      summary: Register a device manufacturer.
+      operationId: RegisterDeviceManufacturer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/RegisterDeviceManufacturerRequest'
+      responses:
+        '200':
+          description: Device
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceManufacturerDto'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/device/model:
+    post:
+      tags:
+        - Device
+      summary: Register a device.
+      operationId: RegisterDeviceModel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/RegisterDeviceModelRequest'
+      responses:
+        '200':
+          description: Device
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceModelDto'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
+  /api/v1/device/specification:
+    post:
+      tags:
+        - Device
+      summary: Register a device specification.
+      operationId: RegisterDeviceSpecification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/RegisterDeviceSpecificationRequest'
+      responses:
+        '200':
+          description: Device
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceSpecificationDto'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetails'
   /api/v1/health:
     get:
       tags:
@@ -1006,6 +1106,53 @@ components:
       required:
         - iconUrl
         - id
+        - manufacturerName
+        - manufacturerWebsiteUrl
+        - modelId
+        - modelName
+        - modelNumber
+        - modelWebsiteUrl
+        - name
+        - protocol
+        - registeredAt
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        modelId:
+          type: string
+          format: uuid
+        modelName:
+          type: string
+        modelNumber:
+          type: string
+        modelWebsiteUrl:
+          type: string
+        iconUrl:
+          type: string
+          format: uri
+        protocol:
+          allOf:
+            - $ref: '#/components/schemas/RfProtocol'
+        manufacturerId:
+          type: string
+          format: uuid
+          nullable: true
+        manufacturerName:
+          type: string
+        manufacturerWebsiteUrl:
+          type: string
+        registeredAt:
+          type: string
+          format: date-time
+      additionalProperties: false
+    DeviceManufacturerDto:
+      required:
+        - iconUrl
+        - id
         - manufacturerId
         - manufacturerName
         - manufacturerWebsiteUrl
@@ -1049,6 +1196,91 @@ components:
           type: string
           format: date-time
       additionalProperties: false
+    DeviceModelDto:
+      required:
+        - iconUrl
+        - id
+        - manufacturerId
+        - manufacturerName
+        - manufacturerWebsiteUrl
+        - modelId
+        - modelName
+        - modelNumber
+        - modelWebsiteUrl
+        - name
+        - protocol
+        - registeredAt
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        modelId:
+          type: string
+          format: uuid
+        modelName:
+          type: string
+        modelNumber:
+          type: string
+        modelWebsiteUrl:
+          type: string
+        iconUrl:
+          type: string
+          format: uri
+        protocol:
+          allOf:
+            - $ref: '#/components/schemas/RfProtocol'
+        manufacturerId:
+          type: string
+          format: uuid
+        manufacturerName:
+          type: string
+        manufacturerWebsiteUrl:
+          type: string
+        registeredAt:
+          type: string
+          format: date-time
+      additionalProperties: false
+    DeviceSpecificationDto:
+      required:
+        - dataRate
+        - encoding
+        - frequency
+        - id
+        - invertedBits
+        - modulation
+        - packetSize
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        frequency:
+          type: integer
+          format: int64
+        modulation:
+          allOf:
+            - $ref: '#/components/schemas/ModulationType'
+        dataRate:
+          type: integer
+          format: int64
+        packetSize:
+          type: integer
+          format: int64
+        encoding:
+          allOf:
+            - $ref: '#/components/schemas/EncodingType'
+        invertedBits:
+          type: boolean
+      additionalProperties: false
+    EncodingType:
+      enum:
+        - none
+        - proprietary
+        - manchester
+      type: string
     ErrorDetails:
       required:
         - code
@@ -1107,6 +1339,16 @@ components:
           description: UserId's of users that this user has sent friend requests to
       additionalProperties: false
       description: List of incoming and outgoing friendrequests
+    ModulationType:
+      enum:
+        - ask
+        - ook
+        - gfsk
+        - fsk
+        - fsK2
+        - fsK4
+        - msk
+      type: string
     NotificationSeverityLevel:
       enum:
         - info
@@ -1169,6 +1411,103 @@ components:
           description: Response from cloudflare turnstile request
       additionalProperties: false
       description: Request sent to server to request a password reset token
+    RegisterDeviceManufacturerRequest:
+      required:
+        - iconId
+        - name
+        - websiteUrl
+      type: object
+      properties:
+        name:
+          pattern: '^[^\s].*[^\s]$'
+          type: string
+          example: String
+        websiteUrl:
+          type: string
+        iconId:
+          type: string
+          format: uuid
+      additionalProperties: false
+    RegisterDeviceModelRequest:
+      required:
+        - documentationUrl
+        - iconId
+        - modelNumber
+        - name
+        - protocol
+        - websiteUrl
+      type: object
+      properties:
+        name:
+          pattern: '^[^\s].*[^\s]$'
+          type: string
+          example: String
+        modelNumber:
+          type: string
+        websiteUrl:
+          type: string
+        iconId:
+          type: string
+          format: uuid
+        manufacturerId:
+          type: string
+          format: uuid
+          nullable: true
+        fccId:
+          type: string
+          nullable: true
+        documentationUrl:
+          type: string
+        protocol:
+          allOf:
+            - $ref: '#/components/schemas/RfProtocol'
+        specificationId:
+          type: string
+          format: uuid
+          nullable: true
+      additionalProperties: false
+    RegisterDeviceRequest:
+      required:
+        - deviceModelId
+        - name
+      type: object
+      properties:
+        deviceModelId:
+          type: string
+          format: uuid
+        name:
+          pattern: '^[^\s].*[^\s]$'
+          type: string
+          example: String
+      additionalProperties: false
+    RegisterDeviceSpecificationRequest:
+      required:
+        - dataRate
+        - encoding
+        - frequency
+        - invertedBits
+        - modulation
+        - packetSize
+      type: object
+      properties:
+        frequency:
+          type: integer
+          format: int64
+        modulation:
+          allOf:
+            - $ref: '#/components/schemas/ModulationType'
+        dataRate:
+          type: integer
+          format: int64
+        packetSize:
+          type: integer
+          format: int64
+        encoding:
+          allOf:
+            - $ref: '#/components/schemas/EncodingType'
+        invertedBits:
+          type: boolean
+      additionalProperties: false
     RfProtocol:
       enum:
         - proprietary
