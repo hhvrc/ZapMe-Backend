@@ -27,3 +27,7 @@ cd zapme/
 chmod +x build-linux.sh
 ./build-linux.sh
 ```
+
+# Contact
+
+[contact@zapme.app](mailto:contact@zapme.app)
