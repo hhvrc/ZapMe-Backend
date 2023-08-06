@@ -12,14 +12,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.S3" Version="3.7.201.7" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.201.8" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="DSharpPlus" Version="4.4.2" />
-    <PackageReference Include="FlatSharp.Compiler" Version="7.2.0">
+    <PackageReference Include="FlatSharp.Compiler" Version="7.2.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="FlatSharp.Runtime" Version="7.2.0" />
+    <PackageReference Include="FlatSharp.Runtime" Version="7.2.1" />
     <PackageReference Include="Marten" Version="6.0.5" />
     <PackageReference Include="Mediator.Abstractions" Version="2.1.5" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.9" />
